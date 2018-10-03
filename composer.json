@@ -1,0 +1,48 @@
+{
+  "name": "alnv/catalog-manager-bundle",
+  "type": "contao-bundle",
+  "license": "proprietary",
+  "description": "Create Catalogs without coding skills.",
+  "homepage": "https://catalog-manager.alexandernaumov.de",
+  "authors": [
+    {
+      "name": "Alexander Naumov",
+      "homepage": "https://www.alexandernaumov.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "me@alexandernaumov.de",
+    "issues": "https://github.com/alnv/catalog-manager-bundle/issues",
+    "wiki": "https://catalog-manager.alexandernaumov.de/dokumentation.html"
+  },
+  "autoload": {
+    "psr-4": {
+      "Alnv\\CatalogManagerBundle\\": "src/"
+    },
+    "classmap": [
+      "src/Resources/contao/"
+    ],
+    "exclude-from-classmap": [
+      "src/Resources/contao/dca/",
+      "src/Resources/contao/config/",
+      "src/Resources/contao/languages/",
+      "src/Resources/contao/templates/"
+    ]
+  },
+  "require": {
+    "php":">=7.1",
+    "contao/core-bundle":"~4.4"
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "extra": {
+    "contao": {
+      "sources": {
+        "": "system/modules/catalog-manager-bundle"
+      }
+    },
+    "contao-manager-plugin": "Alnv\\CatalogManagerBundle\\ContaoManager\\Plugin"
+  }
+}
