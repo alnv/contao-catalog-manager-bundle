@@ -1,0 +1,7 @@
+services:
+  catalogmanager.datacontainer.catalog:
+    class: Alnv\CatalogManagerBundle\DataContainer\Catalog
+    public: true
+  catalogmanager.hooks.initialize:
+    class: Alnv\CatalogManagerBundle\Hooks\Initialize
+    public: true
