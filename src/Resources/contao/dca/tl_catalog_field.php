@@ -82,7 +82,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
 
     'palettes' => [
 
-        'default' => 'fieldname'
+        '__selector__' => [ 'type' ],
+        'default' => '{general_settings},name,type',
+        'text' => '{general_settings},name,type;{field_settings},fieldname,role',
+        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role',
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role'
     ],
 
     'subpalettes' => [
@@ -116,6 +123,59 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'tstamp' => [
 
             'sql' => "int(10) unsigned NOT NULL default '0'"
+        ],
+
+        'type' => [
+
+            'label' =>  &$GLOBALS['TL_LANG']['tl_catalog_field']['type'],
+            'inputType' => 'select',
+            'default' => 'table',
+            'eval' => [
+
+                'chosen' => true,
+                'maxlength' => 32,
+                'tl_class' => 'w50',
+                'submitOnChange' => true,
+                'blankOptionLabel' => '-',
+                'includeBlankOption' => true
+            ],
+            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFieldTypes' ],
+            'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
+            'filter' => true,
+            'exclude' => true,
+            'sorting' => true,
+            'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
+        ],
+
+        'name' => [
+
+            'label' => &$GLOBALS['TL_LANG']['tl_catalog_field']['name'],
+            'inputType' => 'text',
+            'eval' => [
+
+                'maxlength' => 64,
+                'tl_class' => 'w50',
+                'mandatory' => true,
+            ],
+            'search' => true,
+            'exclude' => true,
+            'sql' => "varchar(64) NOT NULL default ''"
+        ],
+
+        'role' => [
+
+            'label' => &$GLOBALS['TL_LANG']['tl_catalog_field']['role'],
+            'inputType' => 'select',
+            'eval' => [
+
+                'maxlength' => 64,
+                'tl_class' => 'w50',
+                'mandatory' => true,
+            ],
+            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getRoles' ],
+            'search' => true,
+            'exclude' => true,
+            'sql' => "varchar(64) NOT NULL default ''"
         ],
 
         'fieldname' => [
