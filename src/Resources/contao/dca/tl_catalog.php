@@ -11,7 +11,11 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         ],
         'onsubmit_callback' => [
 
-            [ 'catalogmanager.datacontainer.catalog', 'watchOnTable' ]
+           [ 'catalogmanager.datacontainer.catalog', 'generateModulename' ]
+        ],
+        'ondelete_callback' => [
+
+            [ 'catalogmanager.datacontainer.catalog', 'deleteTable' ]
         ],
         'sql' => [
 
@@ -162,7 +166,9 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'chosen' => true,
                 'maxlength' => 32,
                 'tl_class' => 'w50',
-                'submitOnChange' => true
+                'submitOnChange' => true,
+                'blankOptionLabel' => '-',
+                'includeBlankOption' => true
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getCatalogTypes' ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['type'],
@@ -183,7 +189,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'w50',
                 'mandatory' => true,
                 'doNotCopy' => true,
-                'spaceToUnderscore' => true,
+                'spaceToUnderscore' => true
             ],
             'save_callback' => [
 
@@ -308,7 +314,9 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
                 'chosen' => true,
                 'maxlength' => 32,
-                'tl_class' => 'w50'
+                'tl_class' => 'w50',
+                'blankOptionLabel' => '-',
+                'includeBlankOption' => true
             ],
             'exclude' => true,
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getNavigation' ],
@@ -319,6 +327,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
             'label' => &$GLOBALS['TL_LANG']['tl_catalog']['position'],
             'inputType' => 'text',
+            'default' => '0',
             'eval' => [
 
                 'maxlength' => 4,
