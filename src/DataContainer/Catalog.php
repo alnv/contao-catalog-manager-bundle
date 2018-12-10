@@ -12,6 +12,18 @@ class Catalog {
     }
 
 
+    public function getFieldTypes() {
+
+        return [ 'text', 'textarea', 'select', 'radio', 'checkbox', 'upload' ];
+    }
+
+
+    public function getRoles() {
+
+        return [];
+    }
+
+
     public function getViews() {
 
         return [ '0', '1', '2', '5' ];
@@ -36,31 +48,79 @@ class Catalog {
     }
 
 
+    public function generateModulename( \DataContainer $objDataContainer ) {
+
+        if ( $objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table ) {
+
+            return null;
+        }
+
+        $objDatabase = \Database::getInstance();
+        $strModulename = 'module_' . strtolower( $objDataContainer->activeRecord->table );
+        $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id = ?')->set([ 'tstamp' => time(), 'module' => $strModulename ])->execute( $objDataContainer->id );
+    }
+
+
     public function getNavigation() {
 
-        return [];
+        $arrReturn = [];
+
+        if ( !is_array( $GLOBALS['BE_MOD'] ) || empty( $GLOBALS['BE_MOD'] ) ) {
+
+            return $arrReturn;
+        }
+
+        foreach ( $GLOBALS['BE_MOD'] as $strModulename => $arrModules ) {
+
+            $strModuleLabel = $GLOBALS['TL_LANG']['MOD'][ $strModulename ] ?: $strModulename;
+
+            $arrReturn[ $strModulename ] = $strModuleLabel;
+        }
+
+        return $arrReturn;
     }
 
 
     public function watchTable( $strTable, \DataContainer $objDataContainer ) {
+
+        $objDatabaseBuilder = new \Alnv\CatalogManagerBundle\Library\Database();
+        $objDatabase = \Database::getInstance();
 
         if ( !$strTable ) {
 
             return '';
         }
 
-        $objDatabase = new \Alnv\CatalogManagerBundle\Library\Database();
+        if ( $strTable == $objDataContainer->activeRecord->table && $objDatabase->tableExists( $strTable ) ) {
+
+            return $strTable;
+        }
+
+        if ( $strTable != $objDataContainer->activeRecord->table && $objDataContainer->activeRecord->table ) {
+
+            if ( !$objDatabaseBuilder->renameTable( $objDataContainer->activeRecord->table, $strTable ) ) {
+
+                throw new \Exception( sprintf( 'table "%s" already exists in catalog manager.', $strTable ) );
+            }
+        }
+
+        if ( !$objDatabaseBuilder->createTableIfNotExist( $strTable ) ) {
+
+            throw new \Exception( sprintf( 'table "%s" already exists in catalog manager.', $strTable ) );
+        }
+
+        return $strTable;
+    }
+
+
+    public function deleteTable( \DataContainer $objDataContainer ) {
 
         if ( !$objDataContainer->activeRecord->table ) {
 
-            $objDatabase->createTableIfNotExist( $strTable );
+            return null;
         }
 
-        if ( $strTable != $objDataContainer->activeRecord->table ) {
-
-            $objDatabase->renameTable( $objDataContainer->activeRecord->table, $strTable );
-        }
-
-        exit;
+        $objDatabaseBuilder = new \Alnv\CatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder->deleteTable( $objDataContainer->activeRecord->table );
     }
 }
