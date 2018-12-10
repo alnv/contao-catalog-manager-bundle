@@ -13,14 +13,16 @@ class VirtualDataContainerArray {
 
         foreach ( $arrCatalogs as $arrCatalog ) {
 
-            $intPosition = (int) $arrCatalog['position'];
-            $strNavigation = $arrCatalog['navigation'] ?: 'content';
+            if ( !$arrCatalog['navigation'] ) {
+
+                continue;
+            }
 
             $arrModule = [];
-            $arrModule[ $strNavigation ] = [];
-            $arrModule[ $strNavigation ][ 'test-bundle' ] = $this->generateBeModConfig( $arrCatalog );
+            $arrModule[ $arrCatalog['navigation'] ] = [];
+            $arrModule[ $arrCatalog['navigation'] ][ $arrCatalog['module'] ] = $this->generateBeModConfig( $arrCatalog );
 
-            array_insert( $GLOBALS['BE_MOD'], $intPosition, $arrModule );
+            array_insert( $GLOBALS['BE_MOD'], (int) $arrCatalog['position'], $arrModule );
         }
     }
 
