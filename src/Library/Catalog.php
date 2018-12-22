@@ -34,6 +34,19 @@ class Catalog extends CatalogWizard {
     }
 
 
+    public function getNaturalFields( $blnLabelOnly = true ) {
+
+        $arrReturn = [];
+
+        foreach ( $this->arrFields as $strFieldname => $arrField ) {
+
+            $arrReturn[ $strFieldname ] = $strFieldname;
+        }
+
+        return $arrReturn;
+    }
+
+
     protected function setCatalog() {
 
         $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
@@ -51,6 +64,8 @@ class Catalog extends CatalogWizard {
 
     protected function setFields( $intPid ) {
 
+        $this->getDefaultFields();
+
         $objFields = CatalogFieldModel::findByPid( $intPid );
 
         if ( $objFields === null ) {
@@ -62,5 +77,21 @@ class Catalog extends CatalogWizard {
 
             $this->arrFields[ $objFields->fieldname ] = $this->parseField( $objFields->row() );
         }
+    }
+
+
+    protected function getDefaultFields() {
+
+        array_insert( $this->arrFields, 0, [
+
+            'id' => [],
+            'pid' => [],
+            'sorting' => [],
+            'tstamp' => [],
+            'invisible' => [],
+            'start' => [],
+            'stop' => [],
+            'alias' => []
+        ]);
     }
 }

@@ -6,90 +6,79 @@ namespace Alnv\CatalogManagerBundle\Library;
 class VirtualDataContainerArray {
 
 
-    public function initializeBackendModules() {
+    protected $arrCatalog = [];
+    protected $arrFields = [];
 
-        $objCatalogCollection = new CatalogCollection();
-        $arrCatalogs = $objCatalogCollection->getCatalogs( 'catalog' );
 
-        foreach ( $arrCatalogs as $arrCatalog ) {
+    public function __construct( $strModule ) {
 
-            if ( !$arrCatalog['navigation'] ) {
-
-                continue;
-            }
-
-            $arrModule = [];
-            $arrModule[ $arrCatalog['navigation'] ] = [];
-            $arrModule[ $arrCatalog['navigation'] ][ $arrCatalog['module'] ] = $this->generateBeModConfig( $arrCatalog );
-
-            array_insert( $GLOBALS['BE_MOD'], (int) $arrCatalog['position'], $arrModule );
-        }
+        $objCatalog = new Catalog( $strModule );
+        $this->arrCatalog = $objCatalog->getCatalog();
+        $this->arrFields = $objCatalog->getFields();
+        $this->generateEmptyDataContainer();
     }
 
 
-    public function generateBeModConfig( $arrCatalog ) {
+    protected function setConfig() {
 
-        $arrTables = [ $arrCatalog['table'] ];
-
-        if ( is_array( $arrCatalog['children'] ) && !empty( $arrCatalog['children'] ) ) {
-
-            foreach ( $arrCatalog['children'] as $strTable ) {
-
-                $arrTables[] = $strTable;
-            }
-        }
-
-        return [
-
-            'name' => '',
-            'tables' => $arrTables
-        ];
+        //
     }
 
 
-    public function initializeDataContainerArrays() {
+    protected function setList() {
 
-        $strModule = \Input::get('do');
-
-        if ( !$strModule ) {
-
-            return null;
-        }
-
-        $this->initializeDataContainerArrayByTable( $strModule );
+        //
     }
 
 
 
-    protected function initializeDataContainerArrayByTable( $strTable ) {
+    protected function setFields() {
 
-        $objCatalog = new Catalog( $strTable );
-        $arrCatalog = $objCatalog->getCatalog();
+        //
+    }
 
-        if ( empty( $arrCatalog ) ) {
 
-            return null;
-        }
+    protected function setPalettes() {
 
-        $GLOBALS['TL_DCA'][ $arrCatalog['table'] ] = [
+        //
+    }
 
-            'config' => [
 
-                'dataContainer' => 'Table'
+    protected function setSubPalettes() {
+
+        //
+    }
+
+
+    protected function generateEmptyDataContainer() {
+
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
+            'config' => [ 'dataContainer' => 'Table' ],
+            'list' => [
+                'label' => [],
+                'sorting' => [],
+                'operations' => [],
+                'global_operations' => []
             ],
-
-            'fields' => [
-
-                //
-            ]
+            'palettes' => [ '__selector__' => [], 'default' => '' ],
+            'subpalettes' => [],
+            'fields' => []
         ];
+    }
 
-        if ( is_array( $arrCatalog['children'] ) && !empty( $arrCatalog['children'] ) ) {
 
-            foreach ( $arrCatalog['children'] as $strTable ) {
+    public function getRelatedTables() {
 
-                $this->initializeDataContainerArrayByTable( $strTable );
-            }
-        }
+        return $this->arrCatalog['children'];
+    }
+
+
+    public function generate() {
+
+        $this->setConfig();
+        $this->setList();
+        $this->setPalettes();
+        $this->setSubPalettes();
+        $this->setFields();
     }
 }

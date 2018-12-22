@@ -26,7 +26,7 @@ class Catalog {
 
     public function getViews() {
 
-        return [ '0', '1', '2', '5' ];
+        return [ 'mode0', 'mode1', 'mode2', 'mode5' ];
     }
 
 
@@ -36,15 +36,29 @@ class Catalog {
     }
 
 
-    public function getParentFields() {
+    public function getParentFields( \DataContainer $objDataContainer ) {
 
-        return [];
+        if ( !$objDataContainer->activeRecord->parent ) {
+
+            return [];
+        }
+
+        $objCatalog = new \Alnv\CatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->parent );
+
+        return $objCatalog->getNaturalFields();
     }
 
 
-    public function getFields() {
+    public function getFields( \DataContainer $objDataContainer ) {
 
-        return [];
+        if ( !$objDataContainer->activeRecord->table ) {
+
+            return [];
+        }
+
+        $objCatalog = new \Alnv\CatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->table );
+
+        return $objCatalog->getNaturalFields();
     }
 
 

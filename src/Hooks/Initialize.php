@@ -2,7 +2,7 @@
 
 namespace Alnv\CatalogManagerBundle\Hooks;
 
-use Alnv\CatalogManagerBundle\Library\VirtualDataContainerArray;
+use Alnv\CatalogManagerBundle\Library\Application;
 
 
 class Initialize {
@@ -31,7 +31,7 @@ class Initialize {
 
         if ( $this->strMode == 'contao_backend' ) {
 
-            $objVirtualDataContainerArray = new VirtualDataContainerArray();
+            $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeBackendModules();
         }
     }
@@ -46,7 +46,7 @@ class Initialize {
 
         if ( $this->strMode == 'contao_backend' ) {
 
-            $objVirtualDataContainerArray = new VirtualDataContainerArray();
+            $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeDataContainerArrays();
         }
     }
