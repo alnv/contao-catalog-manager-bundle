@@ -34,8 +34,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
         'sorting' => [
 
-            'mode' => 2,
-            'flag' => 1,
+            'mode' => 5,
             'fields' => [ 'name' ],
             'panelLayout' => 'filter;sort,search,limit'
         ],
@@ -99,22 +98,23 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
     'palettes' => [
 
-        '__selector__' => [ 'type', 'view', 'showColumns', 'enableGeocoding' ],
+        '__selector__' => [ 'type', 'mode', 'showColumns', 'enableGeocoding' ],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{view_settings},view,navigation,position,enableCopy,enableVisibility;{geocoding_module:hide},enableGeocoding',
-        'subitem' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,parent,enableContentElements;{view_settings},parentList,sortable,orderBy,flag,enableCopy,enableMove,enableVisibility;{geocoding_module:hide},enableGeocoding',
+        'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{mode_settings},mode,enableCopy,enableVisibility;{navigation_settings},navigation,position;{geocoding_module:hide},enableGeocoding',
         'core' => '{type_settings},type;{general_settings},name;{catalog_settings};'
     ],
 
     'subpalettes' => [
 
         'enableGeocoding' => 'geoCity,geoZip,geoStreet,geoStreetNumber,geoCountry',
+
         'showColumns' => 'columns',
 
-        'view_mode0' => 'showColumns',
-        'view_mode1' => 'showColumns,orderBy,flag',
-        'view_mode2' => 'showColumns,orderBy,flag',
-        'view_mode5' => '',
+        'mode_none' => 'showColumns',
+        'mode_fixed' => 'orderBy',
+        'mode_flex' => 'showColumns,flag',
+        'mode_custom' => 'showColumns',
+        'mode_tree'=> ''
     ],
 
     'fields' => [
@@ -122,6 +122,16 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'id' => [
 
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
+        ],
+
+        'pid' => [
+
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+        ],
+
+        'sorting' => [
+
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
         ],
 
         'tstamp' => [
@@ -133,6 +143,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
             'label' => &$GLOBALS['TL_LANG']['tl_catalog']['children'],
             'sql' => ['type' => 'blob', 'notnull' => false ]
+        ],
+
+        'parent' => [
+
+            'label' => &$GLOBALS['TL_LANG']['tl_catalog']['parent'],
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
 
         'module' => [
@@ -217,42 +233,22 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
 
-        'parent' => [
+        'mode' => [
 
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog']['parent'],
+            'label' => &$GLOBALS['TL_LANG']['tl_catalog']['mode'],
             'inputType' => 'select',
             'eval' => [
 
                 'chosen' => true,
-                'maxlength' => 128,
+                'maxlength' => 12,
                 'tl_class' => 'w50',
-                'mandatory' => true,
-                'submitOnChange' => true,
-                'blankOptionLabel' => '-',
-                'includeBlankOption' => true
-            ],
-            'search' => true,
-            'filter' => true,
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
-        ],
-
-        'view' => [
-
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog']['view'],
-            'inputType' => 'radio',
-            'default' => '0',
-            'eval' => [
-
-                'maxlength' => 6,
-                'tl_class' => 'clr',
                 'mandatory' => true,
                 'submitOnChange' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getViews' ],
-            'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['view'],
+            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getModes' ],
+            'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'],
             'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 6, 'default' => '0']
+            'sql' => ['type' => 'string', 'length' => 12, 'default' => '']
         ],
 
         'orderBy' => [
@@ -274,6 +270,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'inputType' => 'select',
             'eval' => [
 
+                'chosen' => true,
                 'maxlength' => 2,
                 'tl_class' => 'w50',
             ],
@@ -304,7 +301,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'eval' => [
 
                 'multiple' => false,
-                'mandatory' => true,
                 'submitOnChange' => true
             ],
             'exclude' => true,
@@ -356,6 +352,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sql' => ['type' => 'string', 'length' => 4, 'default' => '']
         ],
 
+        /*
         'enableMove' => [
 
             'label' => &$GLOBALS['TL_LANG']['tl_catalog']['enableMove'],
@@ -368,6 +365,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
+        */
 
         'enableCopy' => [
 
@@ -375,7 +373,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'inputType' => 'checkbox',
             'eval' => [
 
-                'tl_class' => 'clr',
+                'tl_class' => 'w50',
                 'multiple' => false
             ],
             'exclude' => true,
@@ -388,7 +386,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'inputType' => 'checkbox',
             'eval' => [
 
-                'tl_class' => 'clr',
+                'tl_class' => 'w50',
                 'multiple' => false
             ],
             'exclude' => true,
@@ -408,6 +406,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
 
+        /*
         'sortable' => [
 
             'label' => &$GLOBALS['TL_LANG']['tl_catalog']['sortable'],
@@ -420,6 +419,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
+        */
 
         'enableGeocoding' => [
 

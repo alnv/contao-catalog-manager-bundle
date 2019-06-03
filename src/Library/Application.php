@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 class Application {
 
+
     public function initializeBackendModules() {
 
         $objCatalogCollection = new CatalogCollection();
@@ -60,7 +61,7 @@ class Application {
 
 
 
-    protected function initializeDataContainerArrayByTable( $strTable ) {
+    public function initializeDataContainerArrayByTable( $strTable ) {
 
         $objVDataContainerArray = new VirtualDataContainerArray( $strTable );
         $objVDataContainerArray->generate();

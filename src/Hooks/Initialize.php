@@ -17,8 +17,14 @@ class Initialize {
 
         if ( $objRequest !== null ) {
 
-            $this->strMode = $objRequest->get( '_route' );
+            $this->setEnvironment( $objRequest->get( '_route' ) );
         }
+    }
+
+
+    protected function setEnvironment( $strMode ) {
+
+        $this->strMode = $strMode;
     }
 
 

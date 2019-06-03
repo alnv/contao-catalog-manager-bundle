@@ -8,7 +8,7 @@ class Catalog {
 
     public function getCatalogTypes() {
 
-        return [ 'catalog', 'subitem', 'core' ];
+        return [ 'catalog', 'core' ];
     }
 
 
@@ -24,9 +24,9 @@ class Catalog {
     }
 
 
-    public function getViews() {
+    public function getModes() {
 
-        return [ 'mode0', 'mode1', 'mode2', 'mode5' ];
+        return [ 'none', 'flex', 'fixed', 'custom', 'tree' ];
     }
 
 

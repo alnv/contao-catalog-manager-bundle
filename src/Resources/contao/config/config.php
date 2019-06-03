@@ -18,6 +18,14 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
     ]
 ]);
 
+array_insert( $GLOBALS['FE_MOD'], 2, [
+
+    'catalog-manager-bundle' => [
+
+        'catalog_list_module' => 'Alnv\ContaoCatalogManagerBundle\Modules\CatalogListModule'
+    ]
+]);
+
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
 

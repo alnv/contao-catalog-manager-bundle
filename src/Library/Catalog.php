@@ -2,9 +2,9 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-use Alnv\CatalogManagerBundle\Models\CatalogModel;
-use Alnv\CatalogManagerBundle\Helper\CatalogWizard;
-use Alnv\CatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 
 
 class Catalog extends CatalogWizard {
@@ -57,7 +57,6 @@ class Catalog extends CatalogWizard {
         }
 
         $this->setFields( $objCatalog->id );
-
         $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
     }
 
