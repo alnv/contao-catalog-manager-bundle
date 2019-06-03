@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\Models;
+namespace Alnv\ContaoCatalogManagerBundle\Models;
 
 
 class CatalogFieldModel extends \Model {

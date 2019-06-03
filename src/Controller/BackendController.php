@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\Controller;
+namespace Alnv\ContaoCatalogManagerBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;

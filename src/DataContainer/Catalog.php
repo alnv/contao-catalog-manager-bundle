@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\DataContainer;
+namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
 
 class Catalog {
@@ -43,7 +43,7 @@ class Catalog {
             return [];
         }
 
-        $objCatalog = new \Alnv\CatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->parent );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->parent );
 
         return $objCatalog->getNaturalFields();
     }
@@ -56,7 +56,7 @@ class Catalog {
             return [];
         }
 
-        $objCatalog = new \Alnv\CatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->table );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->table );
 
         return $objCatalog->getNaturalFields();
     }
@@ -97,7 +97,7 @@ class Catalog {
 
     public function watchTable( $strTable, \DataContainer $objDataContainer ) {
 
-        $objDatabaseBuilder = new \Alnv\CatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
         $objDatabase = \Database::getInstance();
 
         if ( !$strTable ) {
@@ -134,7 +134,17 @@ class Catalog {
             return null;
         }
 
-        $objDatabaseBuilder = new \Alnv\CatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
         $objDatabaseBuilder->deleteTable( $objDataContainer->activeRecord->table );
+    }
+
+
+    public function getOrderByStatements( $strValue ) {
+
+        return [
+
+            'asc',
+            'desc'
+        ];
     }
 }

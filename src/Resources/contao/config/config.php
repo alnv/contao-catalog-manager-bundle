@@ -21,5 +21,5 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
 
-$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\CatalogManagerBundle\Models\CatalogModel';
-$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\CatalogManagerBundle\Models\CatalogFieldModel';
+$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
+$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';

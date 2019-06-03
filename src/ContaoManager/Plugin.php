@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\ContaoManager;
+namespace Alnv\ContaoCatalogManagerBundle\ContaoManager;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
@@ -16,9 +16,9 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface {
     public function getBundles( ParserInterface $parser ) {
 
         return [
-            BundleConfig::create('Alnv\CatalogManagerBundle\AlnvCatalogManagerBundle')
+            BundleConfig::create('Alnv\ContaoCatalogManagerBundle\AlnvContaoCatalogManagerBundle')
                 ->setLoadAfter(['Contao\CoreBundle\ContaoCoreBundle'])
-                ->setReplace(['catalog-manager-bundle']),
+                ->setReplace(['contao-catalog-manager-bundle']),
         ];
     }
 

@@ -258,12 +258,13 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'orderBy' => [
 
             'label' => &$GLOBALS['TL_LANG']['tl_catalog']['orderBy'],
-            'inputType' => 'text',
+            'inputType' => 'vueConditionalSelectWidget',
             'eval' => [
 
-                'tl_class' => 'clr w50',
+                'tl_class' => 'clr',
+                'conditional_options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getOrderByStatements' ],
             ],
-            // @todo order by widget
+            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
             'sql' => ['type' => 'blob', 'notnull' => false ]
         ],
 

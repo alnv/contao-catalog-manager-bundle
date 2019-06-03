@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\Helper;
+namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 
 abstract class CatalogWizard {

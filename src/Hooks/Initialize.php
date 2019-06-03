@@ -1,8 +1,8 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-use Alnv\CatalogManagerBundle\Library\Application;
+use Alnv\ContaoCatalogManagerBundle\Library\Application;
 
 
 class Initialize {

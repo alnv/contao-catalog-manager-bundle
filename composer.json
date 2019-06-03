@@ -13,12 +13,12 @@
   ],
   "support": {
     "email": "support@catalog-manager.org",
-    "issues": "https://github.com/alnv/catalog-manager-bundle/issues",
+    "issues": "https://github.com/alnv/contao-catalog-manager-bundle/issues",
     "wiki": "https://catalog-manager.org"
   },
   "autoload": {
     "psr-4": {
-      "Alnv\\CatalogManagerBundle\\": "src/"
+      "Alnv\\ContaoCatalogManagerBundle\\": "src/"
     },
     "classmap": [
       "src/Resources/contao/"
@@ -40,9 +40,9 @@
   "extra": {
     "contao": {
       "sources": {
-        "": "system/modules/catalog-manager-bundle"
+        "": "system/modules/contao-catalog-manager-bundle"
       }
     },
-    "contao-manager-plugin": "Alnv\\CatalogManagerBundle\\ContaoManager\\Plugin"
+    "contao-manager-plugin": "Alnv\\ContaoCatalogManagerBundle\\ContaoManager\\Plugin"
   }
 }

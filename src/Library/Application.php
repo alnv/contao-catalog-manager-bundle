@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\CatalogManagerBundle\Library;
+namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 
 class Application {
