@@ -2,7 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
-use Alnv\ContaoCatalogManagerBundle\Model\DynModel;
+use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
 
 
 class ModelWizard {
@@ -13,9 +13,11 @@ class ModelWizard {
 
     public function __construct( $strTable ) {
 
-        if ( isset( $GLOBALS['TL_MODELS'][ $strTable ] ) ) {
+        $strModel = \Model::getClassFromTable( $strTable );
 
-            $this->objModel = new $GLOBALS['TL_MODELS'][ $strTable ]();
+        if ( $strModel ) {
+
+            $this->objModel = new $strModel();
 
             return null;
         }
