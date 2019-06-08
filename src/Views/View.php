@@ -43,9 +43,15 @@ abstract class View extends \Controller {
     protected function setOptions( $arrOptions ) {
 
         $this->arrOptions['id'] = (int) $arrOptions['id'];
+        $this->arrOptions['alias'] = $arrOptions['alias'];
         $this->arrOptions['limit'] = (int) $arrOptions['limit'] ?: 0;
         $this->arrOptions['offset'] = (int) $arrOptions['offset'] ?: 0;
         $this->arrOptions['order'] = $arrOptions['order'] ?: $this->dcaExtractor->getOrderBy();
+
+        if ( !$this->arrOptions['order'] ) {
+
+            unset( $this->arrOptions['order'] );
+        }
 
         if ( $arrOptions['template'] ) {
 
