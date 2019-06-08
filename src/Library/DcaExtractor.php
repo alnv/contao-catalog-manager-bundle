@@ -14,21 +14,19 @@ class DcaExtractor extends \DcaExtractor {
 
     public function getOrderBy() {
 
-        $arrOrderBy = [];
-
         if ( !isset( $GLOBALS['TL_DCA'][ $this->strTable ]['list'] ) ) {
 
-            return $arrOrderBy;
+            return '';
         }
 
         if ( !isset( $GLOBALS['TL_DCA'][ $this->strTable ]['list']['sorting'] ) ) {
 
-            return $arrOrderBy;
+            return '';
         }
 
         if ( !$GLOBALS['TL_DCA'][ $this->strTable ]['list']['sorting']['mode'] ) {
 
-            return $arrOrderBy;
+            return '';
         }
 
         switch ( $GLOBALS['TL_DCA'][ $this->strTable ]['list']['sorting']['mode'] ) {
@@ -65,32 +63,32 @@ class DcaExtractor extends \DcaExtractor {
 
             case 2:
 
-                //
+                return '';
 
                 break;
 
             case 3:
 
                 // do not support
-                return $arrOrderBy;
+                return '';
 
                 break;
 
             case 4:
 
-                //
+                return '';
 
                 break;
 
             case 5:
             case 6:
 
-                //
+                return '';
 
                 break;
         }
 
-        return $arrOrderBy;
+        return '';
     }
 
 
