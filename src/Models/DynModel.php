@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Model;
+namespace Alnv\ContaoCatalogManagerBundle\Models;
 
 
 class DynModel extends \Model {
