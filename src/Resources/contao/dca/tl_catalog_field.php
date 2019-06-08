@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
 
         'id' => [
 
-            'sql' => "int(10) unsigned NOT NULL auto_increment"
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
         ],
 
         'pid' => [
@@ -112,17 +112,17 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'type' => 'belongsTo',
                 'load' => 'lazy'
             ],
-            'sql' => "int(10) unsigned NOT NULL default '0'",
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
         ],
 
         'sorting' => [
 
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
         ],
 
         'tstamp' => [
 
-            'sql' => "int(10) unsigned NOT NULL default '0'"
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
 
         'type' => [
@@ -159,7 +159,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'search' => true,
             'exclude' => true,
-            'sql' => "varchar(64) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
 
         'role' => [
@@ -175,7 +175,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getRoles' ],
             'search' => true,
             'exclude' => true,
-            'sql' => "varchar(64) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
 
         'fieldname' => [
@@ -193,7 +193,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'search' => true,
             'exclude' => true,
-            'sql' => "varchar(64) NOT NULL default ''"
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ]
     ]
 ];

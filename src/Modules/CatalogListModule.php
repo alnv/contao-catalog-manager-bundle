@@ -32,7 +32,17 @@ class CatalogListModule extends \Module {
 
     protected function compile() {
 
-        $objListing = new Listing( 'tl_product' );
-        $objListing->parse();
+        $objListing = new Listing( 'tl_product', [
+            'template' => 'cm_listing_default',
+            // 'groupBy' => 'type',
+            // 'groupByHl' => 'h2',
+            'limit' => 0,
+            'offset' => 0,
+            'id' => $this->id,
+            // 'pagination' => true
+        ]);
+
+        $this->Template->entities = $objListing->parse();
+        $this->Template->pagination = $objListing->getPagination();
     }
 }

@@ -12,14 +12,14 @@ class Listing extends View {
 
         $objModel = new ModelWizard( $this->strTable );
         $objModel = $objModel->getModel();
-        $objEntities = $objModel->findAll();
+        $objEntities = $objModel->findAll($this->arrOptions);
         $arrReturn = [];
 
         if ( $objEntities !== null ) {
 
             while ( $objEntities->next() ) {
 
-                $arrReturn[] = $this->parseEntity( $objEntities->row() );
+                $this->parseEntity( $objEntities->row(), $arrReturn );
             }
         }
 

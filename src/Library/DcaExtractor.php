@@ -47,16 +47,18 @@ class DcaExtractor extends \DcaExtractor {
 
                     foreach ( $GLOBALS['TL_DCA'][ $this->strTable ]['list']['sorting']['fields'] as $strField ) {
 
+                        $strTable = $this->strTable;
+
+                        if ( $this->getDataContainer() == 'Multilingual' ) {
+
+                            $strTable = 't1';
+                        }
+
                         $arrOrder = explode( ' ', $strField );
-
-                        $arrOrderBy[] = [
-
-                            'field' => $arrOrder[0],
-                            'order' => $arrOrder[1] ?: $strFlag
-                        ];
+                        $arrOrderBy[] = $strTable . '.' . $arrOrder[0] . ' ' . strtoupper( $arrOrder[1] ?: $strFlag );
                     }
 
-                    return $arrOrderBy;
+                    return implode( ' ', $arrOrderBy );
                 }
 
                 break;
@@ -89,5 +91,11 @@ class DcaExtractor extends \DcaExtractor {
         }
 
         return $arrOrderBy;
+    }
+
+
+    public function getDataContainer() {
+
+        return $GLOBALS['TL_DCA'][ $this->strTable ]['config']['dataContainer'];
     }
 }

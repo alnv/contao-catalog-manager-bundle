@@ -1,4 +1,22 @@
 <?php $this->extend('block_searchable'); ?>
 <?php $this->block('content'); ?>
-<h1>Test</h1>
+<?php foreach ( $this->entities as $arrEntity ): ?>
+    <?php if ( isset( $arrEntity['entities'] ) && is_array( $arrEntity['entities'] ) ): ?>
+        <<?= $arrEntity['hl'] ?>><?= $arrEntity['headline'] ?></<?= $arrEntity['hl'] ?>>
+        <?php foreach ( $arrEntity['entities'] as $arrElement ): ?>
+            <?php if ( isset( $arrElement['template'] ) ): ?>
+                <?=  $arrElement['template'] ?>
+            <?php else: ?>
+                <!-- no template defined -->
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <?php if ( isset( $arrEntity['template'] ) ): ?>
+            <?= $arrEntity['template'] ?>
+        <?php else: ?>
+            <!-- no template defined -->
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endforeach; ?>
+<?= $this->pagination ?>
 <?php $this->endblock(); ?>
