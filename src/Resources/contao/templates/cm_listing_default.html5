@@ -1,8 +1,4 @@
 <div class="cm_listing default">
 <p><?= $this->name ?></p>
-<?php
-    use Alnv\ContaoShopManagerBundle\VueTemplates\CartForm;
-    $objProduct = new CartForm();
-    echo $objProduct->generate( $this->id, null );
-?>
+<cart-form id="<?= $this->id ?>" currency-position="after"></cart-form>
 </div>
