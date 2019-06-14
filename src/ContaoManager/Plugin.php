@@ -18,6 +18,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface {
         return [
             BundleConfig::create('Alnv\ContaoCatalogManagerBundle\AlnvContaoCatalogManagerBundle')
                 ->setLoadAfter(['Contao\CoreBundle\ContaoCoreBundle'])
+                ->setLoadAfter(['Alnv\ContaoAssetsManagerBundle\AlnvContaoAssetsManagerBundle'])
                 ->setReplace(['contao-catalog-manager-bundle']),
         ];
     }
