@@ -190,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
             'label' =>  &$GLOBALS['TL_LANG']['tl_catalog']['type'],
             'inputType' => 'select',
-            'default' => 'table',
+            'default' => 'catalog',
             'eval' => [
 
                 'chosen' => true,
