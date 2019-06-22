@@ -49,7 +49,12 @@ class Catalog {
     }
 
 
-    public function getFields( \DataContainer $objDataContainer ) {
+    public function getFields( \DataContainer $objDataContainer = null ) {
+
+        if ( $objDataContainer == null ) {
+
+            return [];
+        }
 
         if ( !$objDataContainer->activeRecord->table ) {
 
