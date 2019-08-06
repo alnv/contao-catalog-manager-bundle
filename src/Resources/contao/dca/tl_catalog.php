@@ -101,7 +101,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         '__selector__' => [ 'type', 'mode', 'showColumns', 'enableGeocoding' ],
         'default' => '{type_settings},type;',
         'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{mode_settings},mode,enableCopy,enableVisibility;{navigation_settings},navigation,position;{geocoding_module:hide},enableGeocoding',
-        'core' => '{type_settings},type;{general_settings},name;{catalog_settings},;'
+        'core' => '{type_settings},type;{general_settings},name;'
     ],
 
     'subpalettes' => [
