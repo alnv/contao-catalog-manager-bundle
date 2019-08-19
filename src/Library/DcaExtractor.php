@@ -96,4 +96,10 @@ class DcaExtractor extends \DcaExtractor {
 
         return $GLOBALS['TL_DCA'][ $this->strTable ]['config']['dataContainer'];
     }
+
+
+    public function getField( $strFieldname ) {
+
+        return $GLOBALS['TL_DCA'][ $this->strTable ]['fields'][ $strFieldname ];
+    }
 }

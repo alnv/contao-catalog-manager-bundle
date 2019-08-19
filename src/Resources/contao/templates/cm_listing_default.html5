@@ -1,10 +1,6 @@
 <div class="cm_listing default">
-<p><?= $this->name ?></p>
-<cart-form
-        id="<?= $this->id ?>"
-        currency-position="before"
-        language="<?= \System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale(); ?>"
-        disableTax="true"
-        add-to-cart-button-label="<?= \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( 'addToCartButton', $GLOBALS['TL_LANG']['MSC']['addToCartButton'] ) ?>"
-></cart-form>
+    <p><?= $this->name ?></p>
+    <?php if ( $this->masterUrl ): ?>
+        <a href="<?= $this->masterUrl ?>">Weiterlesen</a>
+    <?php endif; ?>
 </div>

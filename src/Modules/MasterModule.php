@@ -2,13 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
-use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+use Alnv\ContaoCatalogManagerBundle\Views\Master;
 
 
-class CatalogListModule extends \Module {
+class MasterModule extends \Module {
 
 
-    protected $strTemplate = 'mod_catalog_list';
+    protected $strTemplate = 'mod_master';
 
 
     public function generate() {
@@ -26,23 +26,22 @@ class CatalogListModule extends \Module {
             return $objTemplate->parse();
         }
 
+        if ( !$this->cmTable ) {
+
+            return null;
+        }
+
         return parent::generate();
     }
 
 
     protected function compile() {
 
-        $objListing = new Listing( 'tl_product', [
-            'template' => 'cm_listing_default',
-            // 'groupBy' => 'type',
-            // 'groupByHl' => 'h2',
-            'limit' => 0,
-            'offset' => 0,
-            'id' => $this->id,
-            // 'pagination' => true
+        $objMaster = new Master( $this->cmTable, [
+            'alias' => \Input::get('auto_item'),
+            'template' => $this->cmTemplate,
+            'id' => $this->id
         ]);
-
-        $this->Template->entities = $objListing->parse();
-        $this->Template->pagination = $objListing->getPagination();
+        $this->Template->entities = $objMaster->parse();
     }
 }

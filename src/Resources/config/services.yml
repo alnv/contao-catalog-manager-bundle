@@ -2,6 +2,9 @@ services:
   catalogmanager.datacontainer.catalog:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog
     public: true
+  catalogmanager.datacontainer.module:
+    class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
+    public: true
   catalogmanager.hooks.initialize:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\Initialize
     public: true

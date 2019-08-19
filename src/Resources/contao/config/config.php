@@ -22,7 +22,8 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
 
     'catalog-manager-bundle' => [
 
-        'catalog_list_module' => 'Alnv\ContaoCatalogManagerBundle\Modules\CatalogListModule'
+        'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
+        'master' => 'Alnv\ContaoCatalogManagerBundle\Modules\MasterModule'
     ]
 ]);
 

@@ -14,6 +14,9 @@ abstract class View extends \Controller {
     protected $arrOptions = [];
     protected $dcaExtractor = null;
 
+    protected $blnMaster = false;
+    protected $arrMasterPage = null;
+
 
     public function __construct( $strTable, $arrOptions = [] ) {
 
@@ -42,11 +45,23 @@ abstract class View extends \Controller {
 
     protected function setOptions( $arrOptions ) {
 
+        // @todo improve option setter
+
         $this->arrOptions['id'] = (int) $arrOptions['id'];
         $this->arrOptions['alias'] = $arrOptions['alias'];
         $this->arrOptions['limit'] = (int) $arrOptions['limit'] ?: 0;
         $this->arrOptions['offset'] = (int) $arrOptions['offset'] ?: 0;
         $this->arrOptions['order'] = $arrOptions['order'] ?: $this->dcaExtractor->getOrderBy();
+
+        if ( $arrOptions['column'] ) {
+
+            $this->arrOptions['column'] = $arrOptions['column'];
+        }
+
+        if ( $arrOptions['value'] ) {
+
+            $this->arrOptions['value'] = $arrOptions['value'];
+        }
 
         if ( !$this->arrOptions['order'] ) {
 
@@ -86,18 +101,26 @@ abstract class View extends \Controller {
             $this->arrOptions['offset'] = ( $numOffset - 1 ) * $this->arrOptions['limit'];
             $this->arrOptions['total'] = $numTotal;
         }
+
+        $this->arrMasterPage = $arrOptions['masterPage'];
     }
 
 
     protected function parseEntity( $arrEntity, &$arrReturn = [] ) {
 
+        // @todo improve parser -> &$arrReturn ?
+
         $arrRow = [];
         $arrRow['origin'] = [];
-        $arrRow['masterUrl'] = '';
+
+        if ( $this->arrMasterPage ) {
+
+            $arrRow['masterUrl'] = \Controller::generateFrontendUrl( $this->arrMasterPage, $arrEntity['alias'] ? '/' . $arrEntity['alias'] : '' ); // @todo make alias interchangeable
+        }
 
         foreach ( $arrEntity as $strField => $varValue ) {
 
-            $strParsedValue = $this->parseField( $varValue, $strField );
+            $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity );
 
             if ( $strParsedValue !== $varValue ) {
 
@@ -139,7 +162,69 @@ abstract class View extends \Controller {
     }
 
 
-    protected function parseField( $varValue, $strField ) {
+    protected function parseField( $varValue, $strField, $arrValues ) {
+
+        if ( $varValue === '' || $varValue === null ) {
+
+            return $varValue;
+        }
+
+        $arrField = $this->dcaExtractor->getField( $strField );
+
+        if ( !isset( $arrField['inputType'] ) ) {
+
+            return $varValue;
+        }
+
+        switch ( $arrField['inputType'] ) {
+
+            case 'text':
+
+                // @todo multiple
+                // @todo date
+
+                return $varValue;
+
+                break;
+
+            case 'checkbox':
+            case 'select':
+            case 'radio':
+
+                // @todo multiple
+                // @todo get clean option
+
+                return $varValue;
+
+                break;
+
+            case 'fileTree':
+
+                $strSizeId = null;
+
+                if ( isset( $arrField['eval']['sizeField'] ) ) {
+
+                    $strSizeId = $arrValues[ $arrField['eval']['sizeField'] ];
+                }
+
+                if ( isset( $arrField['eval']['isImage'] ) && $arrField['eval']['isImage'] == true ) {
+
+                    return \Alnv\ContaoCatalogManagerBundle\Helper\Image::getImage( $varValue, $strSizeId );
+                }
+
+                // @todo files
+                return [];
+
+                break;
+
+            case 'pageTree':
+
+                // @todo parse url
+
+                return '';
+
+                break;
+        }
 
         return $varValue;
     }
