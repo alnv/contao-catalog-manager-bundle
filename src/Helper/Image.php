@@ -26,6 +26,11 @@ class Image {
                 continue;
             }
 
+            if ( !file_exists( $objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path ) ) {
+
+                continue;
+            }
+
             $arrMeta = [];
 
             if ( $objFile->meta ) {
