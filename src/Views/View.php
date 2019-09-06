@@ -193,6 +193,10 @@ abstract class View extends \Controller {
 
                 // @todo multiple
                 // @todo get clean option
+                if ( isset( $arrField['eval']['multiple'] ) && $arrField['eval']['multiple'] == true ) {
+
+                    //
+                }
 
                 return $varValue;
 
@@ -202,9 +206,9 @@ abstract class View extends \Controller {
 
                 $strSizeId = null;
 
-                if ( isset( $arrField['eval']['sizeField'] ) ) {
+                if ( isset( $arrField['eval']['imageSize'] ) && $arrField['eval']['imageSize'] ) {
 
-                    $strSizeId = $arrValues[ $arrField['eval']['sizeField'] ];
+                    $strSizeId = $arrField['eval']['imageSize'];
                 }
 
                 if ( isset( $arrField['eval']['isImage'] ) && $arrField['eval']['isImage'] == true ) {
