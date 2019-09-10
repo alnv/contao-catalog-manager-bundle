@@ -12,24 +12,137 @@ abstract class View extends \Controller {
 
     protected $strTable = null;
     protected $arrOptions = [];
-    protected $dcaExtractor = null;
-
+    protected $arrEntities = [];
     protected $blnMaster = false;
+    protected $dcaExtractor = null;
     protected $arrMasterPage = null;
 
 
     public function __construct( $strTable, $arrOptions = [] ) {
 
-        $this->setDataContainer( $strTable );
-        $this->setOptions( $arrOptions );
+        $this->strTable = $strTable;
+        $this->initializeDataContainer();
+        $this->dcaExtractor = new DcaExtractor( $strTable );
+
+        foreach ( $arrOptions as $strName => $varValue ) {
+
+            switch ( $strName ) {
+
+                case 'id':
+
+                    $this->arrOptions['id'] = (int) $varValue;
+
+                    break;
+
+                case 'alias':
+
+                    $this->arrOptions['alias'] = $varValue;
+
+                    break;
+
+                case 'masterPage':
+
+                    $this->arrMasterPage = $varValue;
+
+                    break;
+
+                case 'limit':
+
+                    $this->arrOptions['limit'] = (int) $varValue;
+
+                    break;
+
+                case 'offset':
+
+                    $this->arrOptions['offset'] = (int) $varValue;
+
+                    break;
+
+                case 'order':
+
+                    $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
+
+                    if ( !$this->arrOptions['order'] ) {
+
+                        unset( $this->arrOptions['order'] );
+                    }
+
+                    break;
+
+                case 'column':
+
+                    if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
+
+                        $this->arrOptions['column'] = $varValue;
+                    }
+
+                    break;
+
+                case 'value':
+
+                    if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
+
+                        $this->arrOptions['value'] = $varValue;
+                    }
+
+                    break;
+
+                case 'groupBy':
+
+                    $this->arrOptions['groupBy'] = $varValue;
+
+                    break;
+
+                case 'groupByHl':
+
+                    $this->arrOptions['groupByHl'] = $varValue;
+
+                    break;
+
+                case 'template':
+
+                    $this->arrOptions['template'] = $varValue;
+
+                    break;
+            }
+        }
+
+        $this->paginate();
 
         parent::__construct();
     }
 
 
-    protected function setDataContainer( $strTable ) {
+    protected function paginate() {
 
-        $this->strTable = $strTable;
+        if ( !$this->arrOptions['pagination'] ) {
+
+            return null;
+        }
+
+        $objModel = new ModelWizard( $this->strTable );
+        $objModel = $objModel->getModel();
+        $numTotal = $objModel->countBy( [ 'id > ?' ], [ 0 ], $this->arrOptions );
+        $numOffset = $this->arrOptions['offset'];
+
+        if ( $this->arrOptions['offset'] ) {
+
+            $numTotal -= $numOffset;
+        }
+
+        $numOffset = $this->getPageNumber();
+
+        if ( $this->arrOptions['limit'] > 0 && $this->arrOptions['offset'] ) {
+
+            $numOffset += round( $this->arrOptions['offset'] / $this->arrOptions['limit'] );
+        }
+
+        $this->arrOptions['offset'] = ( $numOffset - 1 ) * $this->arrOptions['limit'];
+        $this->arrOptions['total'] = $numTotal;
+    }
+
+
+    protected function initializeDataContainer() {
 
         $objApplication = new Application();
         $objApplication->initializeDataContainerArrayByTable( $this->strTable );
@@ -38,77 +151,27 @@ abstract class View extends \Controller {
 
             \Controller::loadDataContainer( $this->strTable );
         }
-
-        $this->dcaExtractor = new DcaExtractor( $this->strTable );
     }
 
 
-    protected function setOptions( $arrOptions ) {
+    protected function getModelOptions() {
 
-        // @todo improve option setter
+        $arrReturn = [];
+        $arrOptions = [ 'limit', 'offset', 'order', 'column', 'value' ];
 
-        $this->arrOptions['id'] = (int) $arrOptions['id'];
-        $this->arrOptions['alias'] = $arrOptions['alias'];
-        $this->arrOptions['limit'] = (int) $arrOptions['limit'] ?: 0;
-        $this->arrOptions['offset'] = (int) $arrOptions['offset'] ?: 0;
-        $this->arrOptions['order'] = $arrOptions['order'] ?: $this->dcaExtractor->getOrderBy();
+        foreach ( $arrOptions as $strOption ) {
 
-        if ( $arrOptions['column'] ) {
+            if ( isset( $this->arrOptions[ $strOption ] ) ) {
 
-            $this->arrOptions['column'] = $arrOptions['column'];
-        }
-
-        if ( $arrOptions['value'] ) {
-
-            $this->arrOptions['value'] = $arrOptions['value'];
-        }
-
-        if ( !$this->arrOptions['order'] ) {
-
-            unset( $this->arrOptions['order'] );
-        }
-
-        if ( $arrOptions['template'] ) {
-
-            $this->arrOptions['template'] = $arrOptions['template'];
-        }
-
-        if ( $arrOptions['groupBy'] ) {
-
-            $this->arrOptions['groupBy'] = $arrOptions['groupBy'];
-            $this->arrOptions['groupByHl'] = $arrOptions['groupByHl'];
-        }
-
-        if ( $arrOptions['pagination'] ) {
-
-            $objModel = new ModelWizard( $this->strTable );
-            $objModel = $objModel->getModel();
-            $numTotal = $objModel->countBy( [ 'id > ?' ], [ 0 ], $this->arrOptions );
-            $numOffset = $this->arrOptions['offset'];
-
-            if ( $this->arrOptions['offset'] ) {
-
-                $numTotal -= $numOffset;
+                $arrReturn[ $strOption ] = $this->arrOptions[ $strOption ];
             }
-
-            $numOffset = $this->getPageNumber();
-
-            if ( $this->arrOptions['limit'] > 0 && $this->arrOptions['offset'] ) {
-
-                $numOffset += round( $this->arrOptions['offset'] / $this->arrOptions['limit'] );
-            }
-
-            $this->arrOptions['offset'] = ( $numOffset - 1 ) * $this->arrOptions['limit'];
-            $this->arrOptions['total'] = $numTotal;
         }
 
-        $this->arrMasterPage = $arrOptions['masterPage'];
+        return $arrReturn;
     }
 
 
-    protected function parseEntity( $arrEntity, &$arrReturn = [] ) {
-
-        // @todo improve parser -> &$arrReturn ?
+    protected function parseEntity( $arrEntity ) {
 
         $arrRow = [];
         $arrRow['origin'] = [];
@@ -141,21 +204,21 @@ abstract class View extends \Controller {
 
             $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
 
-            if ( !isset( $arrReturn[ $strGroup ] ) ) {
+            if ( !isset( $this->arrEntities[ $strGroup ] ) ) {
 
-                $arrReturn[ $strGroup ] = [
+                $this->arrEntities[ $strGroup ] = [
                     'headline' => $arrRow[ $this->arrOptions['groupBy'] ],
                     'hl' => $this->arrOptions['groupByHl'],
                     'entities' => []
                 ];
             }
 
-            $arrReturn[ $strGroup ]['entities'][] = $arrRow;
+            $this->arrEntities[ $strGroup ]['entities'][] = $arrRow;
         }
 
         else {
 
-            $arrReturn[] = $arrRow;
+            $this->arrEntities[] = $arrRow;
         }
 
         return $arrEntity;
@@ -169,21 +232,18 @@ abstract class View extends \Controller {
             return $varValue;
         }
 
-        $arrField = $this->dcaExtractor->getField( $strField );
+        $arrField = \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable );
 
-        if ( !isset( $arrField['inputType'] ) ) {
+        if ( !isset( $arrField['type'] ) ) {
 
             return $varValue;
         }
 
-        switch ( $arrField['inputType'] ) {
+        switch ( $arrField['type'] ) {
 
             case 'text':
 
-                // @todo multiple
-                // @todo date
-
-                return $varValue;
+                return $arrField['value'];
 
                 break;
 
@@ -191,14 +251,9 @@ abstract class View extends \Controller {
             case 'select':
             case 'radio':
 
-                // @todo multiple
-                // @todo get clean option
-                if ( isset( $arrField['eval']['multiple'] ) && $arrField['eval']['multiple'] == true ) {
+                $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
 
-                    //
-                }
-
-                return $varValue;
+                return $this->getSelectedOptions( $varValue, $arrField['options'] );
 
                 break;
 
@@ -206,31 +261,28 @@ abstract class View extends \Controller {
 
                 $strSizeId = null;
 
-                if ( isset( $arrField['eval']['imageSize'] ) && $arrField['eval']['imageSize'] ) {
+                if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
 
-                    $strSizeId = $arrField['eval']['imageSize'];
+                    $strSizeId = $arrField['imageSize'];
                 }
 
-                if ( isset( $arrField['eval']['isImage'] ) && $arrField['eval']['isImage'] == true ) {
+                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
 
                     return \Alnv\ContaoCatalogManagerBundle\Helper\Image::getImage( $varValue, $strSizeId );
                 }
 
-                // @todo files
-                return [];
+                return []; // @todo files
 
                 break;
 
             case 'pageTree':
 
-                // @todo parse url
-
-                return '';
+                return ''; // @todo parse url
 
                 break;
         }
 
-        return $varValue;
+        return $arrField['value'];
     }
 
 
@@ -251,4 +303,28 @@ abstract class View extends \Controller {
 
         return $objPagination->generate("\n  ");
     }
+
+
+    protected function getSelectedOptions( $arrValues, $arrOptions ) {
+
+        $arrReturn = [];
+
+        if ( empty( $arrValues ) || !is_array( $arrValues ) ) {
+
+            return [];
+        }
+
+        foreach ( $arrOptions as $arrValue ) {
+
+            if ( in_array( $arrValue['value'], $arrValues ) ) {
+
+                $arrReturn[] = $arrValue;
+            }
+        }
+
+        return $arrReturn;
+    }
+
+
+    abstract public function parse();
 }

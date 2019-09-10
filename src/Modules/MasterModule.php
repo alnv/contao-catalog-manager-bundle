@@ -38,10 +38,12 @@ class MasterModule extends \Module {
     protected function compile() {
 
         $objMaster = new Master( $this->cmTable, [
+
             'alias' => \Input::get('auto_item'),
             'template' => $this->cmTemplate,
             'id' => $this->id
         ]);
+
         $this->Template->entities = $objMaster->parse();
     }
 }

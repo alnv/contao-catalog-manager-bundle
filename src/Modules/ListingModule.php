@@ -8,6 +8,7 @@ use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 class ListingModule extends \Module {
 
 
+    protected $arrOptions = [];
     protected $strTemplate = 'mod_listing';
 
 
@@ -42,64 +43,68 @@ class ListingModule extends \Module {
 
     protected function compile() {
 
-        $arrSettings = [
+        $this->arrOptions = [
+
             'template' => $this->cmTemplate,
             'id' => $this->id
         ];
-        $this->setGroup( $arrSettings );
-        $this->setFilter( $arrSettings );
-        $this->setMasterPage( $arrSettings );
-        $this->setPagination( $arrSettings );
-        $objListing = new Listing( $this->cmTable, $arrSettings );
+
+        $this->setGroup();
+        $this->setFilter();
+        $this->setMasterPage();
+        $this->setPagination();
+
+        $objListing = new Listing( $this->cmTable, $this->arrOptions );
+
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();
     }
 
 
-    protected function setFilter( &$arrSettings ) {
+    protected function setFilter() {
 
         if ( $this->cmFilter ) {
 
-            $arrSettings['column'] = explode( ',', $this->cmColumn );
-            $arrSettings['value'] = explode( ',', $this->cmValue );
+            $this->arrOptions['column'] = explode( ',', $this->cmColumn );
+            $this->arrOptions['value'] = explode( ',', $this->cmValue );
         }
     }
 
 
-    protected function setPagination( &$arrSettings ) {
+    protected function setPagination() {
 
         if ( $this->cmPagination ) {
 
-            $arrSettings['pagination'] = $this->cmPagination ? true: false;
+            $this->arrOptions['pagination'] = $this->cmPagination ? true: false;
         }
 
         if ( $this->cmLimit ) {
 
-            $arrSettings['limit'] = $this->cmLimit;
+            $this->arrOptions['limit'] = $this->cmLimit;
         }
 
         if ( $this->cmOffset ) {
 
-            $arrSettings['offset'] = $this->cmOffset;
+            $this->arrOptions['offset'] = $this->cmOffset;
         }
     }
 
 
-    protected function setGroup( &$arrSettings ) {
+    protected function setGroup() {
 
         if ( $this->cmGroupBy ) {
 
-            $arrSettings['groupBy'] = $this->cmGroupBy;
+            $this->arrOptions['groupBy'] = $this->cmGroupBy;
         }
 
         if ( $this->cmGroupByHl ) {
 
-            $arrSettings['groupByHl'] = $this->cmGroupByHl;
+            $this->arrOptions['groupByHl'] = $this->cmGroupByHl;
         }
     }
 
 
-    protected function setMasterPage( &$arrSettings ) {
+    protected function setMasterPage() {
 
         if ( $this->cmMaster ) {
 
@@ -109,7 +114,7 @@ class ListingModule extends \Module {
 
                 if ( $objPage !== null ) {
 
-                    $arrSettings['masterPage'] = $objPage->row();
+                    $this->arrOptions['masterPage'] = $objPage->row();
                 }
             }
         }

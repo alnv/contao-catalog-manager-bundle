@@ -10,16 +10,15 @@ class Master extends View {
 
     public function parse() {
 
-        $arrReturn = [];
         $objModel = new ModelWizard( $this->strTable );
         $objModel = $objModel->getModel();
-        $objEntity = $objModel->findByIdOrAlias( $this->arrOptions['alias'], $this->arrOptions );
+        $objEntity = $objModel->findByIdOrAlias( $this->arrOptions['alias'], $this->getModelOptions() );
 
         if ( $objEntity !== null ) {
 
-            $this->parseEntity( $objEntity->row(), $arrReturn );
+            $this->parseEntity( $objEntity->row() );
         }
 
-        return $arrReturn;
+        return $this->arrEntities;
     }
 }
