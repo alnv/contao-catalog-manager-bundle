@@ -42,7 +42,13 @@ abstract class View extends \Controller {
 
                 case 'masterPage':
 
-                    $this->arrMasterPage = $varValue;
+                    $objPage = \PageModel::findByPk( $varValue );
+
+                    if ( $objPage !== null ) {
+
+                        $this->arrMasterPage = $objPage->row();
+                        $this->arrOptions['masterPage'] = true;
+                    }
 
                     break;
 
@@ -176,9 +182,9 @@ abstract class View extends \Controller {
         $arrRow = [];
         $arrRow['origin'] = [];
 
-        if ( $this->arrMasterPage ) {
+        if ( $this->arrOptions['masterPage'] ) {
 
-            $arrRow['masterUrl'] = \Controller::generateFrontendUrl( $this->arrMasterPage, $arrEntity['alias'] ? '/' . $arrEntity['alias'] : '' ); // @todo make alias interchangeable
+            $arrRow['masterUrl'] = \Controller::generateFrontendUrl( $this->arrMasterPage, $arrEntity['alias'] ? '/' . $arrEntity['alias'] : '' ); // @todo make alias changeable
         }
 
         foreach ( $arrEntity as $strField => $varValue ) {
@@ -309,7 +315,7 @@ abstract class View extends \Controller {
 
         $arrReturn = [];
 
-        if ( empty( $arrValues ) || !is_array( $arrValues ) ) {
+        if ( !is_array( $arrOptions ) || !is_array( $arrValues ) ) {
 
             return [];
         }

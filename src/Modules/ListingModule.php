@@ -110,12 +110,7 @@ class ListingModule extends \Module {
 
             if ( $this->cmMasterPage ) {
 
-                $objPage = \PageModel::findByPk( $this->cmMasterPage );
-
-                if ( $objPage !== null ) {
-
-                    $this->arrOptions['masterPage'] = $objPage->row();
-                }
+                $this->arrOptions['masterPage'] = $this->cmMasterPage;
             }
         }
     }
