@@ -20,7 +20,7 @@ class Database {
 
     public function createTableIfNotExist( $strTable ) {
 
-        if ( $this->objDatabase->tableExists( $strTable ) ) {
+        if ( $this->objDatabase->tableExists( $strTable, true ) ) {
 
             return false;
         }
@@ -44,7 +44,7 @@ class Database {
 
     public function renameTable( $strOldTable, $strNewTable ) {
 
-        if ( $this->objDatabase->tableExists( $strNewTable ) ) {
+        if ( $this->objDatabase->tableExists( $strNewTable, true ) ) {
 
             return false;
         }
@@ -65,6 +65,46 @@ class Database {
         $this->objDatabase->prepare( sprintf( 'DROP TABLE %s;', $strTable ) )->execute();
 
         return true;
+    }
 
+
+    public function createFieldIfNotExist( $strField, $strTable, $strSql ) {
+
+        if ( $this->objDatabase->fieldExists( $strField, $strTable, true ) ) {
+
+            return false;
+        }
+
+        $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s ADD `%s` %s', $strTable, $strField, $strSql ) )->execute();
+
+        return true;
+    }
+
+
+    public function renameFieldname( $strOldField, $strNewField, $strTable, $strSql ) {
+
+        if ( $this->objDatabase->fieldExists( $strNewField, $strTable, true ) ) {
+
+            return false;
+        }
+
+        $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s CHANGE `%s` `%s` %s', $strTable, $strOldField, $strNewField, $strSql ) )->execute();
+
+        return true;
+    }
+
+
+    public function changeFieldType( $strField, $strTable, $strSql ) {
+
+        if ( !$this->objDatabase->fieldExists( $strField, $strTable, true ) ) {
+
+            return null;
+        }
+
+        //todo try and catch block
+
+        $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s MODIFY COLUMN %s %s', $strTable, $strField, $strSql ) )->execute();
+
+        return true;
     }
 }
