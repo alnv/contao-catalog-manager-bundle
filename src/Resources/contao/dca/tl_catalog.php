@@ -100,7 +100,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
 
         '__selector__' => [ 'type', 'mode', 'showColumns', 'enableGeocoding' ],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{mode_settings},mode,enableCopy,enableVisibility;{navigation_settings},navigation,position;{geocoding_module:hide},enableGeocoding',
+        'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{mode_settings},mode,enableCopy,enableVisibility;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
         'core' => '{type_settings},type;{general_settings},name;'
     ],
 
@@ -403,21 +403,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
-
-        /*
-        'sortable' => [
-
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog']['sortable'],
-            'inputType' => 'checkbox',
-            'eval' => [
-
-                'tl_class' => 'clr',
-                'multiple' => false
-            ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
-        ],
-        */
 
         'enableGeocoding' => [
 
