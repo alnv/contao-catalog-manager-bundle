@@ -12,18 +12,6 @@ class Catalog {
     }
 
 
-    public function getFieldTypes() {
-
-        return [ 'text', 'textarea', 'select', 'radio', 'checkbox', 'upload' ];
-    }
-
-
-    public function getRoles() {
-
-        return [];
-    }
-
-
     public function getModes() {
 
         return [ 'none', 'flex', 'fixed', 'custom', 'tree' ];
@@ -110,7 +98,7 @@ class Catalog {
             return '';
         }
 
-        if ( $strTable == $objDataContainer->activeRecord->table && $objDatabase->tableExists( $strTable ) ) {
+        if ( $strTable == $objDataContainer->activeRecord->table && $objDatabase->tableExists( $strTable, true ) ) {
 
             return $strTable;
         }
