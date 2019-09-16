@@ -26,6 +26,7 @@ class Toolkit {
     public static function getSqlTypes() {
 
         // @todo numbers
+
         return [
 
             'vc255' => "varchar(255) NOT NULL default '%s'",
@@ -107,5 +108,28 @@ class Toolkit {
 
                 break;
         }
+    }
+
+
+    public static function parseDetailLink( $varPage, $strAlias ) {
+
+        $arrPage = null;
+
+        if ( is_numeric( $varPage ) && $varPage ) {
+
+            $objPage = \PageModel::findByPk( $varPage );
+
+            if ( $objPage !== null ) {
+
+                $arrPage = $objPage->row();
+            }
+        }
+
+        if ( is_array( $varPage ) && !empty( $varPage ) ) {
+
+            $arrPage = $varPage;
+        }
+
+        return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
     }
 }

@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Views;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 
@@ -184,7 +185,7 @@ abstract class View extends \Controller {
 
         if ( $this->arrOptions['masterPage'] ) {
 
-            $arrRow['masterUrl'] = \Controller::generateFrontendUrl( $this->arrMasterPage, $arrEntity['alias'] ? '/' . $arrEntity['alias'] : '' ); // @todo make alias changeable
+            $arrRow['masterUrl'] = Toolkit::parseDetailLink( $this->arrMasterPage, $arrEntity['alias'] ); // @todo make alias changeable
         }
 
         foreach ( $arrEntity as $strField => $varValue ) {
