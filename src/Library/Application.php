@@ -60,7 +60,6 @@ class Application {
     }
 
 
-
     public function initializeDataContainerArrayByTable( $strTable ) {
 
         $objVDataContainerArray = new VirtualDataContainerArray( $strTable );

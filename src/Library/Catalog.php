@@ -18,7 +18,33 @@ class Catalog extends CatalogWizard {
     public function __construct( $strIdentifier ) {
 
         $this->strIdentifier = $strIdentifier;
-        $this->setCatalog();
+        $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
+
+        if ( $objCatalog === null ) {
+
+            return null;
+        }
+
+        $this->getDefaultFields();
+        $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
+        $objFields = CatalogFieldModel::findByPid( $this->arrCatalog['id'] );
+
+        if ( $objFields === null ) {
+
+            return null;
+        }
+
+        while ( $objFields->next() ) {
+
+            $arrField = $this->parseField( $objFields->row() );
+
+            if ( $arrField === null ) {
+
+                continue;
+            }
+
+            $this->arrFields[ $objFields->fieldname ] = $arrField;
+        }
     }
 
 
@@ -44,38 +70,6 @@ class Catalog extends CatalogWizard {
         }
 
         return $arrReturn;
-    }
-
-
-    protected function setCatalog() {
-
-        $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
-
-        if ( $objCatalog === null ) {
-
-            return null;
-        }
-
-        $this->setFields( $objCatalog->id );
-        $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
-    }
-
-
-    protected function setFields( $intPid ) {
-
-        $this->getDefaultFields();
-
-        $objFields = CatalogFieldModel::findByPid( $intPid );
-
-        if ( $objFields === null ) {
-
-            return null;
-        }
-
-        while ( $objFields->next() ) {
-
-            $this->arrFields[ $objFields->fieldname ] = $this->parseField( $objFields->row() );
-        }
     }
 
 
