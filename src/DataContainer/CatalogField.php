@@ -28,7 +28,12 @@ class CatalogField {
             'street_number',
             'city',
             'postal',
-            'country'
+            'country',
+            'firstname',
+            'lastname',
+            'email',
+            'phone',
+            'mobile'
         ];
     }
 
@@ -62,7 +67,7 @@ class CatalogField {
 
         $objDatabase = \Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
-        $strSql = $this->getSql( $strType, $objDataContainer->activeRecord->row() );
+        $strSql = Toolkit::getSql( $strType, $objDataContainer->activeRecord->row() );
         $objCatalog = CatalogModel::findByPk( $objDataContainer->activeRecord->pid );
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
 
@@ -99,7 +104,7 @@ class CatalogField {
 
         if ( !$strType || !$objDataContainer->activeRecord->fieldname ) {
 
-            return '';
+            return $strType;
         }
 
         if ( $strType == $objDataContainer->activeRecord->type ) {

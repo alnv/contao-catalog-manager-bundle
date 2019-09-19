@@ -27,26 +27,93 @@ class VirtualDataContainerArray {
 
     protected function setList() {
 
-        //
-    }
+        $arrList = [
 
+            'label' => [],
+            'sorting' => []
+        ];
+
+        if ( $this->arrCatalog['showColumns'] ) {
+
+            $arrList['labels']['showColumns'] = true;
+            $arrList['labels']['fields'] = $this->arrCatalog['columns'];
+        }
+
+        switch ( $this->arrCatalog['mode'] ) {
+
+            case 'none':
+
+                $arrList['sorting']['mode'] = 0;
+
+                break;
+
+            case 'flex':
+
+                $arrList['sorting']['mode'] = 2;
+                $arrList['sorting']['flag'] = $this->arrCatalog['flag'];
+
+                break;
+
+            case 'fixed':
+
+                $arrList['sorting']['mode'] = 1;
+
+                break;
+
+            case 'custom':
+
+                break;
+
+            case 'tree':
+
+                break;
+        }
+
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['label'] = $arrList['labels'];
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['sorting'] = $arrList['sorting'];
+    }
 
 
     protected function setFields() {
 
-        //
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['fields'] = $this->arrFields;
     }
 
 
     protected function setPalettes() {
 
+        // @todo implement palettes builder with extra table for configs…
+        $arrPalette = [];
 
+        foreach ( $this->arrFields as $strFieldname => $arrField ) {
+
+            $arrPalette[] =  $strFieldname;
+        }
+
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['palettes']['default'] = implode(',', $arrPalette );
     }
 
 
     protected function setSubPalettes() {
 
         //
+    }
+
+
+    protected function setLabels() {
+
+        foreach ( $this->arrFields as $strFieldname => $arrField ) {
+
+            if ( isset( $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] ) ) {
+
+                continue;
+            }
+
+            $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] = [
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.' . $strFieldname, $arrField['name'] ),
+                '' // @todo description
+            ];
+        }
     }
 
 
@@ -57,8 +124,28 @@ class VirtualDataContainerArray {
             'list' => [
                 'label' => [],
                 'sorting' => [],
-                'operations' => [],
-                'global_operations' => []
+                'operations' => [
+                    'edit' => [
+                        'href' => 'act=edit',
+                        'icon' => 'header.gif'
+                    ],
+                    'delete' => [
+                        'href' => 'act=delete',
+                        'icon' => 'delete.gif',
+                        'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
+                    ],
+                    'show' => [
+                        'href' => 'act=show',
+                        'icon' => 'show.gif'
+                    ]
+                ],
+                'global_operations' => [
+                    'all' => [
+                        'href' => 'act=select',
+                        'class' => 'header_edit_all',
+                        'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+                    ]
+                ]
             ],
             'palettes' => [ '__selector__' => [], 'default' => '' ],
             'subpalettes' => [],
@@ -80,5 +167,6 @@ class VirtualDataContainerArray {
         $this->setPalettes();
         $this->setSubPalettes();
         $this->setFields();
+        $this->setLabels();
     }
 }

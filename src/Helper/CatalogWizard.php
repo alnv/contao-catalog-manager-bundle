@@ -8,6 +8,8 @@ abstract class CatalogWizard {
 
     protected function parseCatalog( $arrCatalog ) {
 
+        $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
+
         return $arrCatalog;
     }
 
@@ -26,10 +28,13 @@ abstract class CatalogWizard {
             'filter' => $blnMultiple,
             'search' => !$blnMultiple,
             'sorting' => !$blnMultiple,
+            'name' => $arrField['name'],
             'eval' => [
+                'tl_class' => 'w50',
                 'allowHtml' => true,
                 'decodeEntities' => true,
                 'multiple' => $blnMultiple,
+                'role' => $arrField['role'] ?: '',
                 'mandatory' => $arrField['mandatory'] ? true : false
             ],
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )
