@@ -65,8 +65,8 @@ class ListingModule extends \Module {
 
         if ( $this->cmFilter ) {
 
-            $this->arrOptions['column'] = explode( ',', \StringUtil::decodeEntities( $this->cmColumn ) );
-            $this->arrOptions['value'] = explode( ',', \StringUtil::decodeEntities( $this->cmValue ) );
+            $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
+            $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
         }
     }
 

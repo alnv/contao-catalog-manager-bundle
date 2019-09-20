@@ -27,8 +27,13 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
     ]
 ]);
 
+$objFormAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
+$objFormAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
+
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
 
 $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
+
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];

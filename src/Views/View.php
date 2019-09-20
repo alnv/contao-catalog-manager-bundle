@@ -6,6 +6,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
+use function Clue\StreamFilter\fun;
 
 
 abstract class View extends \Controller {
@@ -89,7 +90,11 @@ abstract class View extends \Controller {
 
                     if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
 
-                        $this->arrOptions['value'] = $varValue;
+                        $this->arrOptions['value'] = array_map( function ( $strValue ) {
+
+                            return \Controller::replaceInsertTags( $strValue );
+
+                        }, $varValue );
                     }
 
                     break;

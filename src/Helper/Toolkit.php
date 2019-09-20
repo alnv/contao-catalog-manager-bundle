@@ -132,4 +132,30 @@ class Toolkit {
 
         return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
     }
+
+
+    public static function parseParametersFromString( $strParameter ) {
+
+        $arrChunks = explode('?', urldecode( $strParameter ), 2 );
+        $strSource = \StringUtil::decodeEntities( $arrChunks[1] );
+        $strSource = str_replace( '[&]', '&', $strSource );
+
+        return explode( '&', $strSource );
+    }
+
+
+    public static function getValueFromUrl( $arrValue ) {
+
+        if ( $arrValue === '' || $arrValue === null ) {
+
+            return '';
+        }
+
+        if ( is_array( $arrValue ) ) {
+
+            return implode( ',', $arrValue );
+        }
+
+        return $arrValue;
+    }
 }
