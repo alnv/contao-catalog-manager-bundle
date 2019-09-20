@@ -15,7 +15,7 @@ class ModelWizard {
 
         $strModel = \Model::getClassFromTable( $strTable );
 
-        if ( $strModel ) {
+        if ( $strModel && class_exists( $strModel ) ) {
 
             $this->objModel = new $strModel();
 

@@ -53,14 +53,19 @@ abstract class CatalogWizard {
                 $arrReturn['inputType'] = 'textarea';
 
                 break;
+
+            case 'upload':
+
+                $arrReturn['inputType'] = 'fileTree';
+
+                // @todo image or doc
+                $arrReturn['eval']['fieldType'] = 'radio';
+                $arrReturn['eval']['filesOnly'] = true;
+                $arrReturn['eval']['isImage'] = '1';
+
+                break;
         }
 
         return $arrReturn;
-    }
-
-
-    protected function getMaxLengthBySql( $strSql ) {
-
-        return '';
     }
 }

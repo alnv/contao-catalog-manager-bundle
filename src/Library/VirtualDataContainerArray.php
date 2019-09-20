@@ -129,6 +129,10 @@ class VirtualDataContainerArray {
                         'href' => 'act=edit',
                         'icon' => 'header.gif'
                     ],
+                    'copy' => [
+                        'href' => 'act=copy',
+                        'icon' => 'copy.gif'
+                    ],
                     'delete' => [
                         'href' => 'act=delete',
                         'icon' => 'delete.gif',

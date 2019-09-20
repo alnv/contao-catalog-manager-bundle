@@ -33,7 +33,8 @@ class CatalogField {
             'lastname',
             'email',
             'phone',
-            'mobile'
+            'mobile',
+            'avatar'
         ];
     }
 
