@@ -10,20 +10,23 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
 /**
  *
- * @Route("/contao/catalog", defaults={"_scope" = "backend", "_token_check" = false})
+ * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
  */
-class BackendController {
+class FrontendController {
 
 
     /**
      *
-     * @Route("/fields/{table}", name="catalog-fields")
+     * @Route("/listing/{id}", name="listing")
      * @Method({"GET"})
      */
-    public function getFields( $table ) {
+    public function getListing( $id ) {
+
+        $strListing = \Controller::getFrontendModule( $id );
+        $strListing = \Controller::replaceInsertTags( $strListing );
 
         header('Content-Type: application/json');
-        echo json_encode( [ 'name' => $table ], 512 );
+        echo json_encode( [ 'template' => $strListing ], 512 );
         exit;
     }
 }
