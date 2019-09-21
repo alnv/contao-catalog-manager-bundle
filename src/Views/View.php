@@ -135,6 +135,12 @@ abstract class View extends \Controller {
 
                 return true;
             });
+
+            if ( empty( $this->arrOptions['value'] ) ) {
+
+                unset( $this->arrOptions['value'] );
+                unset( $this->arrOptions['column'] );
+            }
         }
 
         $this->paginate();
