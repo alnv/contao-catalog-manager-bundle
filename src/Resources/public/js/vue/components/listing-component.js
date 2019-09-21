@@ -7,7 +7,7 @@ const listingComponent = Vue.component( 'listing', {
     },
     methods: {
         fetch: function () {
-            this.$http.get( '/catalog-manager/listing/' + this.module, {
+            this.$http.get( '/catalog-manager/listing/' + this.module + '/' + this.page, {
                 params: this.parameters
             }).then(function ( objResponse ) {
                 if ( objResponse.body ) {
@@ -25,6 +25,11 @@ const listingComponent = Vue.component( 'listing', {
     },
     props: {
         module: {
+            type: String,
+            default: null,
+            required: true
+        },
+        page: {
             type: String,
             default: null,
             required: true

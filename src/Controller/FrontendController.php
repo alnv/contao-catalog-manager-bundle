@@ -17,12 +17,17 @@ class FrontendController {
 
     /**
      *
-     * @Route("/listing/{id}", name="listing")
+     * @Route("/listing/{module}/{page}", name="listing")
      * @Method({"GET"})
      */
-    public function getListing( $id ) {
+    public function getListing( $module, $page ) {
 
-        $strListing = \Controller::getFrontendModule( $id );
+        global $objPage;
+
+        $objPage = \PageModel::findByPK( $page )->loadDetails();
+        $objPage->ajaxContext = true;
+
+        $strListing = \Controller::getFrontendModule( $module );
         $strListing = \Controller::replaceInsertTags( $strListing );
 
         header('Content-Type: application/json');

@@ -146,7 +146,7 @@ class Toolkit {
 
     public static function getValueFromUrl( $arrValue ) {
 
-        if ( $arrValue === '' || $arrValue === null ) {
+        if ( $arrValue == '' || $arrValue == null ) {
 
             return '';
         }
