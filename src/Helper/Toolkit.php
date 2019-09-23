@@ -158,4 +158,24 @@ class Toolkit {
 
         return $arrValue;
     }
+
+
+    public static function getOrderByStatementFromArray( $arrOrder ) {
+
+        return implode(',', array_filter( array_map( function ( $arrOrder ) {
+
+            if ( !isset( $arrOrder['field'] ) || !$arrOrder['field'] ) {
+
+                return '';
+            }
+
+            if ( !$arrOrder['order'] ) {
+
+                $arrOrder['order'] = 'ASC';
+            }
+
+            return $arrOrder['field'] . ' ' . $arrOrder['order'];
+
+            }, $arrOrder ) ) );
+    }
 }
