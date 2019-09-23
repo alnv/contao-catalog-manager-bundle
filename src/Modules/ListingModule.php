@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
 
@@ -49,6 +50,7 @@ class ListingModule extends \Module {
             'id' => $this->id
         ];
 
+        $this->setOrder();
         $this->setGroup();
         $this->setFilter();
         $this->setMasterPage();
@@ -67,6 +69,18 @@ class ListingModule extends \Module {
 
             $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
             $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
+        }
+    }
+
+
+    protected function setOrder() {
+
+        // @todo module settings
+
+        // dyn by input
+        if ( is_array( \Input::get('order') ) && !empty( \Input::get('order') ) ) {
+
+            $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray( \Input::get('order') );
         }
     }
 
