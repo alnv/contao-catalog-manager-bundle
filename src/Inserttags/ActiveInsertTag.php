@@ -14,7 +14,7 @@ class ActiveInsertTag {
 
         if ( is_array( $arrFragments ) && $arrFragments[0] == 'ACTIVE' && isset( $arrFragments[1] ) ) {
 
-            $varValue = Toolkit::getValueFromUrl( \Input::get( $arrFragments[1] ) );
+            $varValue = Toolkit::getValueFromUrl( \Input::get( $arrFragments[1] ) ); // @todo post
 
             if ( isset( $arrFragments[2] ) && strpos( $arrFragments[2], '?' ) !== false ) {
 
