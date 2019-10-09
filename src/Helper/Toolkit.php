@@ -75,7 +75,7 @@ class Toolkit {
                     return $arrSql['blob'];
                 }
 
-                return $arrSql['vc255'];
+                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
 
                 break;
 
@@ -92,7 +92,7 @@ class Toolkit {
 
             case 'radio':
 
-                return $arrSql['vc255'];
+                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
 
                 break;
 

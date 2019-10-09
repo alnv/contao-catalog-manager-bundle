@@ -57,17 +57,18 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => [ 'type' ],
+        '__selector__' => [ 'type', 'optionsSource' ],
         'default' => '{general_settings},name,type',
         'text' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
         'textarea' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
         'upload' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published'
     ],
     'subpalettes' => [
-        //
+        'optionsSource_options' => '',
+        'optionsSource_dbOptions' => ''
     ],
     'fields' => [
         'id' => [
@@ -89,7 +90,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'type' => [
-            'label' =>  &$GLOBALS['TL_LANG']['tl_catalog_field']['type'],
             'inputType' => 'select',
             'default' => 'table',
             'eval' => [
@@ -111,7 +111,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
         'name' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog_field']['name'],
             'inputType' => 'text',
             'eval' => [
                 'maxlength' => 64,
@@ -123,7 +122,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'role' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog_field']['role'],
             'inputType' => 'select',
             'eval' => [
                 'chosen' => true,
@@ -138,7 +136,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'fieldname' => [
-            'label' => &$GLOBALS['TL_LANG']['tl_catalog_field']['fieldname'],
             'inputType' => 'text',
             'eval' => [
                 'rgxp' => 'extnd',
@@ -152,6 +149,19 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 [ 'catalogmanager.datacontainer.catalogfield', 'watchFieldname' ]
             ],
             'search' => true,
+            'exclude' => true,
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        ],
+        'optionsSource' => [
+            'inputType' => 'radio',
+            'eval' => [
+                'maxlength' => 64,
+                'tl_class' => 'clr',
+                'mandatory' => true,
+                'submitOnChange' => true
+            ],
+            'options' => [ 'options', 'dbOptions' ],
+            'reference' => $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],

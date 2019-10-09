@@ -35,8 +35,8 @@ const listingComponent = Vue.component( 'listing', {
                 var objSortField = arrSortingFields[i];
                 var strFieldname = objSortField.dataset.sort;
                 objSortField.dataset.order = this.parameters['order'][ strFieldname ] ? this.parameters['order'][ strFieldname ]['order'] : objSortField.dataset.order;
-                objSortField.classList.remove( 'desc' );
-                objSortField.classList.remove( 'asc' );
+                objSortField.classList.remove('desc');
+                objSortField.classList.remove('asc');
                 if ( objSortField.dataset.order ) {
                     objSortField.classList.add( objSortField.dataset.order );
                 }

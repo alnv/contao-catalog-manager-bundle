@@ -27,7 +27,11 @@ class Catalog extends CatalogWizard {
 
         $this->getDefaultFields();
         $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
-        $objFields = CatalogFieldModel::findByPid( $this->arrCatalog['id'] ); //@todo visible only and order
+        $objFields = CatalogFieldModel::findAll([
+            'column' => [ 'pid=?', 'published=?' ],
+            'value' => [ $this->arrCatalog['id'], '1' ],
+            'order' => 'sorting ASC'
+        ]);
 
         if ( $objFields === null ) {
 

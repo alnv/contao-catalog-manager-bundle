@@ -5,6 +5,9 @@ services:
   catalogmanager.datacontainer.catalogfield:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField
     public: true
+  catalogmanager.datacontainer.catalogoption:
+    class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogOption
+    public: true
   catalogmanager.datacontainer.module:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
     public: true

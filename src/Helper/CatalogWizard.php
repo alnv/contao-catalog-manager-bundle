@@ -2,6 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
+use Alnv\ContaoCatalogManagerBundle\Library\Options;
+
 
 abstract class CatalogWizard {
 
@@ -40,11 +42,29 @@ abstract class CatalogWizard {
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )
         ];
 
+        if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox' ] ) ) {
+
+            $arrReturn['options_callback'] = function ( $objDataContainer = null ) use ( $arrField ) {
+
+                $objOptions = Options::getInstance( $arrField['fieldname'] . '.' . $arrField['pid'] );
+                $objOptions::setParameter( $arrField, $objDataContainer );
+
+                return $objOptions::getOptions();
+            };
+        }
+
         switch ( $arrField['type'] ) {
 
             case 'text':
 
                 $arrReturn['inputType'] = 'text';
+
+                break;
+
+            case 'select':
+
+                $arrReturn['inputType'] = 'select';
+                $arrReturn['eval']['chosen'] = true;
 
                 break;
 
