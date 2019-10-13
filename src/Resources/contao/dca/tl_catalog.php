@@ -14,10 +14,10 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         ],
         'sql' => [
             'keys' => [
-                'id' => [
-                    'id' => 'primary',
-                    'table' => 'index'
-                ]
+                'id' => 'primary',
+                'pid' => 'index',
+                'table' => 'index',
+                'module' => 'index'
             ]
         ]
     ],
@@ -32,13 +32,13 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'fields' => [ 'name', 'tablename' ]
         ],
         'operations' => [
-            'fields' => [
-                'href' => 'table=tl_catalog_field',
-                'icon' => 'edit.gif'
-            ],
             'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'header.gif'
+            ],
+            'fields' => [
+                'href' => 'table=tl_catalog_field',
+                'icon' => 'edit.gif'
             ],
             'copy' => [
                 'href' => 'act=copy',
@@ -67,7 +67,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         '__selector__' => [ 'type', 'mode', 'showColumns', 'enableGeocoding' ],
         'default' => '{type_settings},type;',
         'catalog' => '{type_settings},type;{general_settings},name,description;{catalog_settings},table,enableContentElements;{mode_settings},mode,enableCopy,enableVisibility;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
-        'core' => '{type_settings},type;{general_settings},name;'
+        'modifier' => '{type_settings},type;{general_settings},name;'
     ],
     'subpalettes' => [
         'enableGeocoding' => 'geoCity,geoZip,geoStreet,geoStreetNumber,geoCountry',
@@ -90,12 +90,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
-        ],
-        'children' => [
-            'sql' => ['type' => 'blob', 'notnull' => false ]
-        ],
-        'parent' => [
-            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'module' => [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']

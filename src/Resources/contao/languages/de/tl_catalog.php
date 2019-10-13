@@ -26,3 +26,8 @@ $GLOBALS['TL_LANG']['tl_catalog']['geoZip'] = [ 'Postleitzahl-Eingabefeld', '' ]
 $GLOBALS['TL_LANG']['tl_catalog']['geoStreet'] = [ 'Straße-Eingabefeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['geoStreetNumber'] = [ 'Straßennummer-Eingabefeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['geoCountry'] = [ 'Land-Eingabefeld', '' ];
+
+$GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] = [
+    'catalog' => 'Katalog',
+    'modifier' => 'Modifizierer'
+];

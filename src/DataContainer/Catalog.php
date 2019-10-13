@@ -8,7 +8,7 @@ class Catalog {
 
     public function getCatalogTypes() {
 
-        return [ 'catalog', 'core' ];
+        return [ 'catalog', 'modifier' ];
     }
 
 

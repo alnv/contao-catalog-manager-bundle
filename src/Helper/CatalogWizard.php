@@ -3,20 +3,104 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
 
 abstract class CatalogWizard {
 
 
+    protected $arrCache = [];
+
+
     protected function parseCatalog( $arrCatalog ) {
 
+        $strIdentifier = 'catalog_' . $arrCatalog['table'];
+
+        if ( \Cache::has( $strIdentifier ) ) {
+
+            return \Cache::get( $strIdentifier );
+        }
+
+        $arrRelated = [];
+        $arrChildren = [];
+
+        $this->getRelatedTablesByCatalog( $arrCatalog, $arrRelated, $arrChildren );
         $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
+
+        $arrCatalog['ptable'] = '';
+        $arrCatalog['related'] = $arrRelated;
+        $arrCatalog['ctable'] = $arrChildren;
+
+        if ( $arrCatalog['pid'] ) {
+
+            $arrCatalog['ptable'] = $this->getParentCatalogByPid( $arrCatalog['pid'] );
+        }
+
+        if ( $arrCatalog['enableContentElements'] ) {
+
+            $arrCatalog['ctable'][] = 'tl_content';
+        }
+
+        \Cache::set( $strIdentifier, $arrCatalog );
 
         return $arrCatalog;
     }
 
 
+    protected function getRelatedTablesByCatalog( $arrCatalog, &$arrRelated, &$arrChildren, $intLevel = 0 ) {
+
+        $objChildCatalogs = CatalogModel::findChildrenCatalogsById( $arrCatalog['id'] );
+
+        if ( $objChildCatalogs === null ) {
+
+            return null;
+        }
+
+        while ( $objChildCatalogs->next() ) {
+
+            if ( $objChildCatalogs->table ) {
+
+                $arrRelated[] = $objChildCatalogs->table;
+            }
+
+            if ( $objChildCatalogs->enableContentElements && !in_array( 'tl_content', $arrRelated ) ) {
+
+                $arrRelated[] = 'tl_content';
+            }
+
+            if ( !$intLevel ) {
+
+                $arrChildren[] = $objChildCatalogs->table;
+            }
+
+            $intLevel++;
+
+            self::getRelatedTablesByCatalog( $objChildCatalogs->row(), $arrRelated, $arrChildren, $intLevel );
+        }
+    }
+
+
+    protected function getParentCatalogByPid( $strPid ) {
+
+        $objParent = CatalogModel::findByPk( $strPid );
+
+        if ( $objParent === null ) {
+
+            return '';
+        }
+
+        return $objParent->table;
+    }
+
+
     protected function parseField( $arrField ) {
+
+        $strIdentifier = 'catalog_field_' . $arrField['id'];
+
+        if ( \Cache::has( $strIdentifier ) ) {
+
+            return \Cache::get( $strIdentifier );
+        }
 
         if ( !$arrField['type'] ) {
 
@@ -85,6 +169,8 @@ abstract class CatalogWizard {
 
                 break;
         }
+
+        \Cache::set( $strIdentifier, $arrReturn );
 
         return $arrReturn;
     }

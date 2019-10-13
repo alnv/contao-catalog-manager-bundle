@@ -31,9 +31,9 @@ class Application {
 
         $arrTables = [ $arrCatalog['table'] ];
 
-        if ( is_array( $arrCatalog['children'] ) && !empty( $arrCatalog['children'] ) ) {
+        if ( is_array( $arrCatalog['related'] ) && !empty( $arrCatalog['related'] ) ) {
 
-            foreach ( $arrCatalog['children'] as $strTable ) {
+            foreach ( $arrCatalog['related'] as $strTable ) {
 
                 $arrTables[] = $strTable;
             }

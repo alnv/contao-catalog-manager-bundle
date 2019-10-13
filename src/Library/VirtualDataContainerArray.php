@@ -21,7 +21,12 @@ class VirtualDataContainerArray {
 
     protected function setConfig() {
 
-        //
+        if (  $this->arrCatalog['ptable'] ) {
+
+            $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ptable'] = $this->arrCatalog['ptable'];
+        }
+
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ctable'] = $this->arrCatalog['ctable'];
     }
 
 
@@ -51,6 +56,7 @@ class VirtualDataContainerArray {
 
                 $arrList['sorting']['mode'] = 2;
                 $arrList['sorting']['flag'] = $this->arrCatalog['flag'];
+                $arrList['sorting']['fields'] = [ 'id' ];
 
                 break;
 
@@ -160,7 +166,27 @@ class VirtualDataContainerArray {
 
     public function getRelatedTables() {
 
-        return $this->arrCatalog['children'];
+        return $this->arrCatalog['related'];
+    }
+
+
+    protected function setOperations() {
+
+        if ( empty( $this->arrCatalog['ctable'] ) || !is_array( $this->arrCatalog['ctable'] ) ) {
+
+            return null;
+        }
+
+        foreach ( $this->arrCatalog['ctable'] as $strTable ) {
+
+            $arrOperation = [];
+            $arrOperation[ 'child_' . $strTable ] = [
+                'href' => 'table=' . $strTable,
+                'icon' => 'edit.gif'
+            ];
+
+            array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, $arrOperation );
+        }
     }
 
 
@@ -168,6 +194,7 @@ class VirtualDataContainerArray {
 
         $this->setConfig();
         $this->setList();
+        $this->setOperations();
         $this->setPalettes();
         $this->setSubPalettes();
         $this->setFields();

@@ -16,4 +16,20 @@ class CatalogModel extends \Model {
 
         return static::findOneBy( $arrColumns, [ $strIdentifier, $strIdentifier ], $arrOptions );
     }
+
+
+    public static function findChildrenCatalogsById( $strId ) {
+
+        $strT = static::$strTable;
+        $objChildTables = \Database::getInstance()
+            ->prepare('SELECT * FROM ' . $strT . ' WHERE pid = ?' )
+            ->execute( $strId );
+
+        if ( $objChildTables->numRows < 1 ) {
+
+            return null;
+        }
+
+        return static::createCollectionFromDbResult( $objChildTables, 'tl_catalog' );
+    }
 }
