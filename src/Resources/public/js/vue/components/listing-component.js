@@ -34,7 +34,10 @@ const listingComponent = Vue.component( 'listing', {
             for ( var i = 0; i < arrSortingFields.length; i++ ) {
                 var objSortField = arrSortingFields[i];
                 var strFieldname = objSortField.dataset.sort;
-                objSortField.dataset.order = this.parameters['order'][ strFieldname ] ? this.parameters['order'][ strFieldname ]['order'] : objSortField.dataset.order;
+                // objSortField.dataset.order = this.parameters['order'][ strFieldname ] ? this.parameters['order'][ strFieldname ]['order'] : objSortField.dataset.order;
+                if ( typeof this.parameters['order'] !== 'undefined' && this.parameters['order'].hasOwnProperty( strFieldname ) ) {
+                    objSortField.dataset.order = this.parameters['order'][ strFieldname ]['order'];
+                }
                 objSortField.classList.remove('desc');
                 objSortField.classList.remove('asc');
                 if ( objSortField.dataset.order ) {
@@ -46,6 +49,9 @@ const listingComponent = Vue.component( 'listing', {
                         return null;
                     }
                     this.dataset.order = this.dataset.order === 'asc' || !this.dataset.order ? 'desc' : 'asc';
+                    if ( typeof self.parameters.order === 'undefined' ) {
+                        self.parameters.order = {};
+                    }
                     self.parameters.order[ this.dataset.sort ] = {
                         'field': this.dataset.sort,
                         'order': this.dataset.order
