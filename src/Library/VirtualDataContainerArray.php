@@ -35,7 +35,9 @@ class VirtualDataContainerArray {
         $arrList = [
 
             'label' => [],
-            'sorting' => []
+            'sorting' => [
+                'panelLayout' => 'filter;sort,search,limit'
+            ]
         ];
 
         if ( $this->arrCatalog['showColumns'] ) {

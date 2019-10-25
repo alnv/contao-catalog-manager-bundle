@@ -157,8 +157,9 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'eval' => [
                 'maxlength' => 64,
                 'tl_class' => 'clr',
-                'mandatory' => true,
-                'submitOnChange' => true
+                'submitOnChange' => true,
+                'blankOptionLabel' => '-',
+                'includeBlankOption' => true
             ],
             'options' => [ 'options', 'dbOptions' ],
             'reference' => $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],

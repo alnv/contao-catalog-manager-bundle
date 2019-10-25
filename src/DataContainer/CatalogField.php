@@ -34,7 +34,8 @@ class CatalogField {
             'email',
             'phone',
             'mobile',
-            'avatar'
+            'avatar',
+            'company'
         ];
     }
 
