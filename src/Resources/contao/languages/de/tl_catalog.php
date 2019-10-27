@@ -1,6 +1,7 @@
 <?php
 
 $GLOBALS['TL_LANG']['tl_catalog']['type_settings'] = 'Typ-Einstellungen';
+$GLOBALS['TL_LANG']['tl_catalog']['extended_settings'] = 'Erweiterte-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['catalog_settings'] = 'Katalog-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['mode_settings'] = 'Darstellung-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['navigation_settings'] = 'Navigation-Einstellungen';
@@ -16,8 +17,9 @@ $GLOBALS['TL_LANG']['tl_catalog']['mode'] = [ 'Darstellung', 'Bitte wählen Sie 
 $GLOBALS['TL_LANG']['tl_catalog']['showColumns'] = [ 'Als mehrspaltige Tabelle anzeigen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['columns'] = [ 'Spalten', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['flag'] = [ 'Sortierung', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['enableCopy'] = [ 'Duplizieren erlauben', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['enableVisibility'] = [ 'Sichtbarkeitssteuerung erlauben', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['enableCopy'] = [ 'Duplizieren aktivieren', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['enablePanel'] = [ 'Panel anzeigen', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['enableVisibility'] = [ 'Sichtbarkeitssteuerung aktivieren', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['navigation'] = [ 'Navigation', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['position'] = [ 'Position', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'Geo-Koordinaten aktivieren', '' ];

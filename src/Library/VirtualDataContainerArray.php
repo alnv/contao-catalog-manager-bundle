@@ -35,10 +35,13 @@ class VirtualDataContainerArray {
         $arrList = [
 
             'label' => [],
-            'sorting' => [
-                'panelLayout' => 'filter;sort,search,limit'
-            ]
+            'sorting' => []
         ];
+
+        if ( $this->arrCatalog['enablePanel'] ) {
+
+            $arrList['sorting']['panelLayout'] = 'filter,search,sort;limit';
+        }
 
         if ( $this->arrCatalog['showColumns'] ) {
 
@@ -51,6 +54,7 @@ class VirtualDataContainerArray {
             case 'none':
 
                 $arrList['sorting']['mode'] = 0;
+                $arrList['sorting']['fields'] = [ 'company' ];
 
                 break;
 

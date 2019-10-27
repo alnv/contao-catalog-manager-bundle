@@ -37,9 +37,9 @@ class Catalog {
     }
 
 
-    public function getFields( \DataContainer $objDataContainer = null ) {
+    public function getFields( $objDataContainer = null ) {
 
-        if ( $objDataContainer == null ) {
+        if ( $objDataContainer === null ) {
 
             return [];
         }
@@ -132,7 +132,7 @@ class Catalog {
     }
 
 
-    public function getOrderByStatements( $strValue ) {
+    public function getOrderByStatements() {
 
         return [
 
