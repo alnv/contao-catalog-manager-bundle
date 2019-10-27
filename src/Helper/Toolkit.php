@@ -178,4 +178,140 @@ class Toolkit {
 
             }, $arrOrder ) ) );
     }
+
+
+    public static function renderRow( $arrRow, $arrLabelFields, $arrCatalog, $arrFields ) {
+
+        $arrColumns = [];
+
+        foreach ( $arrLabelFields as $strField ) {
+
+            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow );
+        }
+
+        if ( count( $arrColumns ) < 2 ) {
+
+            return array_values( $arrColumns )[0];
+        }
+
+        $intIndex = 0;
+        $strTemplate = '<div class="tl_content_left">';
+
+        foreach ( $arrColumns as $strField => $strValue ) {
+
+            $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
+            $intIndex += 1;
+        }
+
+        $strTemplate .= '</div>';
+
+        return $strTemplate;
+    }
+
+
+    public static function renderTreeRow( $arrRow, $strLabel, $arrLabelFields, $arrCatalog, $arrFields ) {
+
+        $intIndex = 0;
+        $arrColumns = [];
+        $strTemplate = '';
+        $strImage = 'articles';
+
+        foreach ( $arrLabelFields as $strField ) {
+
+            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow );
+        }
+
+        if ( count( $arrColumns ) < 2 ) {
+
+            return array_values( $arrColumns )[0];
+        }
+
+        foreach ( $arrColumns as $strField => $strValue ) {
+
+            $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
+            $intIndex += 1;
+        }
+
+        return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
+    }
+
+
+    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [] ) {
+
+        if ( $varValue === '' || $varValue === null ) {
+
+            return $varValue;
+        }
+
+        if ( !isset( $arrField['type'] ) ) {
+
+            return $varValue;
+        }
+
+        switch ( $arrField['type'] ) {
+
+            case 'text':
+
+                return $arrField['value'];
+
+                break;
+
+            case 'checkbox':
+            case 'select':
+            case 'radio':
+
+                $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
+
+                return static::getSelectedOptions( $varValue, $arrField['options'] );
+
+                break;
+
+            case 'fileTree':
+
+                $strSizeId = null;
+
+                if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
+
+                    $strSizeId = $arrField['imageSize'];
+                }
+
+                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
+
+                    return \Alnv\ContaoCatalogManagerBundle\Helper\Image::getImage( $varValue, $strSizeId );
+                }
+
+                return []; // @todo files
+
+                break;
+
+            case 'pageTree':
+
+                return ''; // @todo parse url
+
+                break;
+        }
+
+        return $arrField['value'];
+    }
+
+
+    public static function getSelectedOptions( $arrValues, $arrOptions ) {
+
+        $arrReturn = [];
+
+        if ( !is_array( $arrOptions ) || !is_array( $arrValues ) ) {
+
+            return [];
+        }
+
+        foreach ( $arrOptions as $arrValue ) {
+
+            if ( in_array( $arrValue['value'], $arrValues ) ) {
+
+                $arrReturn[] = $arrValue;
+            }
+        }
+
+        return $arrReturn;
+    }
 }

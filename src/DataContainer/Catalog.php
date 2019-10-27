@@ -8,13 +8,37 @@ class Catalog {
 
     public function getCatalogTypes() {
 
-        return [ 'catalog', 'modifier' ];
+        return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] );
     }
 
 
-    public function getModes() {
+    public function getSortingTypes() {
 
-        return [ 'none', 'flex', 'fixed', 'custom', 'tree' ];
+        return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] );
+    }
+
+
+    public function getModes( \DataContainer $objDataContainer ) {
+
+        $arrModes = array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'] );
+
+        if ( !$objDataContainer->activeRecord->pid ) {
+
+            if ( ( $intPos = array_search( 'parent', $arrModes ) ) !== false ) {
+
+                unset( $arrModes[ $intPos ] );
+            }
+        }
+
+        else {
+
+            if ( ( $intPos = array_search( 'tree', $arrModes ) ) !== false ) {
+
+                unset( $arrModes[ $intPos ] );
+            }
+        }
+
+        return array_values( $arrModes );
     }
 
 
@@ -26,12 +50,12 @@ class Catalog {
 
     public function getParentFields( \DataContainer $objDataContainer ) {
 
-        if ( !$objDataContainer->activeRecord->parent ) {
+        if ( !$objDataContainer->activeRecord->pid ) {
 
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->parent );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->pid );
 
         return $objCatalog->getNaturalFields();
     }
@@ -136,8 +160,8 @@ class Catalog {
 
         return [
 
-            'asc',
-            'desc'
+            'ASC',
+            'DESC'
         ];
     }
 }

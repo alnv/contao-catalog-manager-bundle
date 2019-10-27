@@ -35,7 +35,10 @@ class CatalogField {
             'phone',
             'mobile',
             'avatar',
-            'company'
+            'company',
+            'date',
+            'datim',
+            'time'
         ];
     }
 

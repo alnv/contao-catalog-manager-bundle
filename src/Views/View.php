@@ -263,62 +263,7 @@ abstract class View extends \Controller {
 
     protected function parseField( $varValue, $strField, $arrValues ) {
 
-        if ( $varValue === '' || $varValue === null ) {
-
-            return $varValue;
-        }
-
-        $arrField = \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable );
-
-        if ( !isset( $arrField['type'] ) ) {
-
-            return $varValue;
-        }
-
-        switch ( $arrField['type'] ) {
-
-            case 'text':
-
-                return $arrField['value'];
-
-                break;
-
-            case 'checkbox':
-            case 'select':
-            case 'radio':
-
-                $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
-
-                return $this->getSelectedOptions( $varValue, $arrField['options'] );
-
-                break;
-
-            case 'fileTree':
-
-                $strSizeId = null;
-
-                if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
-
-                    $strSizeId = $arrField['imageSize'];
-                }
-
-                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
-
-                    return \Alnv\ContaoCatalogManagerBundle\Helper\Image::getImage( $varValue, $strSizeId );
-                }
-
-                return []; // @todo files
-
-                break;
-
-            case 'pageTree':
-
-                return ''; // @todo parse url
-
-                break;
-        }
-
-        return $arrField['value'];
+        return Toolkit::parseCatalogValue( $varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues );
     }
 
 
@@ -338,27 +283,6 @@ abstract class View extends \Controller {
         $objPagination = new \Pagination( $this->arrOptions['total'], $this->arrOptions['limit'], \Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id'] );
 
         return $objPagination->generate("\n  ");
-    }
-
-
-    protected function getSelectedOptions( $arrValues, $arrOptions ) {
-
-        $arrReturn = [];
-
-        if ( !is_array( $arrOptions ) || !is_array( $arrValues ) ) {
-
-            return [];
-        }
-
-        foreach ( $arrOptions as $arrValue ) {
-
-            if ( in_array( $arrValue['value'], $arrValues ) ) {
-
-                $arrReturn[] = $arrValue;
-            }
-        }
-
-        return $arrReturn;
     }
 
 

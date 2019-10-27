@@ -3,6 +3,8 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+
 class VirtualDataContainerArray {
 
 
@@ -33,9 +35,12 @@ class VirtualDataContainerArray {
     protected function setList() {
 
         $arrList = [
-
-            'label' => [],
-            'sorting' => []
+            'labels' => [
+                'fields' => []
+            ],
+            'sorting' => [
+                'mode' => 0
+            ]
         ];
 
         if ( $this->arrCatalog['enablePanel'] ) {
@@ -46,39 +51,76 @@ class VirtualDataContainerArray {
         if ( $this->arrCatalog['showColumns'] ) {
 
             $arrList['labels']['showColumns'] = true;
+        }
+
+        if ( !empty( $this->arrCatalog['columns'] ) ) {
+
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
         }
 
-        switch ( $this->arrCatalog['mode'] ) {
+        if ( $this->arrCatalog['sortingType'] ) {
 
-            case 'none':
-
-                $arrList['sorting']['mode'] = 0;
-                $arrList['sorting']['fields'] = [ 'company' ];
-
-                break;
-
-            case 'flex':
-
-                $arrList['sorting']['mode'] = 2;
-                $arrList['sorting']['flag'] = $this->arrCatalog['flag'];
-                $arrList['sorting']['fields'] = [ 'id' ];
-
-                break;
-
-            case 'fixed':
+            if ( $this->arrCatalog['sortingType'] == 'fixed' ) {
 
                 $arrList['sorting']['mode'] = 1;
+                $arrList['sorting']['flag'] = (int) $this->arrCatalog['flag'];
+                $arrList['sorting']['fields'] = [ $this->arrCatalog['flagField'] ];
 
-                break;
+                if ( empty( $arrList['labels']['fields'] ) ) {
 
-            case 'custom':
+                    $arrList['labels']['fields'] = [ $this->arrCatalog['flagField'] ];
+                }
+            }
 
-                break;
+            if ( $this->arrCatalog['sortingType'] == 'switchable' ) {
 
-            case 'tree':
+                $arrSortingFields = [];
+                $arrList['sorting']['mode'] = 2;
+                $arrList['sorting']['fields'] = [];
 
-                break;
+                foreach ( $this->arrCatalog['order'] as $arrOrder ) {
+
+                    if ( isset( $arrOrder['field'] ) && $arrOrder['field'] ) {
+
+                        $arrList['sorting']['fields'][] = $arrOrder['field'] . ( $arrOrder['order'] ? ' ' . $arrOrder['order'] : ' ASC' );
+                        $arrSortingFields[] = $arrOrder['field'];
+                    }
+                }
+
+                if ( empty( $arrList['labels']['fields'] ) ) {
+
+                    $arrList['labels']['fields'] = $arrSortingFields;
+                }
+            }
+        }
+
+        if ( $this->arrCatalog['mode'] == 'parent' ) {
+
+            $arrList['sorting']['mode'] = 4;
+            $arrList['sorting']['headerFields'] = [ 'name' ];
+            $arrList['sorting']['child_record_callback'] =  function ( $arrRow ) use ( $arrList ) {
+
+                return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
+            };
+
+            // do not supported
+            $arrList['labels']['showColumns'] = false;
+            $arrList['labels']['fields'] = [];
+        }
+
+        if ( $this->arrCatalog['mode'] == 'tree' ) {
+
+            $arrList['sorting']['mode'] = 5;
+            $arrList['sorting']['icon'] = 'articles.svg';
+            $arrList['labels']['fields'] = $this->arrCatalog['columns'];
+            $arrList['labels']['label_callback'] =  function ( $arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false  ) use ( $arrList ) {
+
+                return Toolkit::renderTreeRow( $arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
+            };
+
+            // do not supported
+            $arrList['sorting']['fields'] = [];
+            $arrList['labels']['showColumns'] = false;
         }
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['label'] = $arrList['labels'];

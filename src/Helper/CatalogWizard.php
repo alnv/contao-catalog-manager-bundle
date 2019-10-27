@@ -26,7 +26,10 @@ abstract class CatalogWizard {
 
         $this->getRelatedTablesByCatalog( $arrCatalog, $arrRelated, $arrChildren );
         $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
-
+        $arrCatalog['order'] = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $arrCatalog['order'], [
+            'option' => 'field',
+            'option2' => 'order'
+        ]);
         $arrCatalog['ptable'] = '';
         $arrCatalog['related'] = $arrRelated;
         $arrCatalog['ctable'] = $arrChildren;
