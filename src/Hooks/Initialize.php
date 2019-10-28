@@ -8,7 +8,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\Application;
 class Initialize {
 
 
-    protected  $strMode = null;
+    protected $strMode = null;
 
 
     public function __construct() {

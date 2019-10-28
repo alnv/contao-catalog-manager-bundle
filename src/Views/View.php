@@ -66,6 +66,24 @@ abstract class View extends \Controller {
 
                     break;
 
+                case 'pagination':
+
+                    $this->arrOptions['pagination'] = $varValue;
+
+                    break;
+
+                case 'distance':
+
+                    $this->arrOptions['distance'] = $varValue;
+
+                    break;
+
+                case 'having':
+
+                    $this->arrOptions['having'] = $varValue;
+
+                    break;
+
                 case 'order':
 
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
@@ -193,7 +211,7 @@ abstract class View extends \Controller {
     protected function getModelOptions() {
 
         $arrReturn = [];
-        $arrOptions = [ 'limit', 'offset', 'order', 'column', 'value' ];
+        $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having' ];
 
         foreach ( $arrOptions as $strOption ) {
 

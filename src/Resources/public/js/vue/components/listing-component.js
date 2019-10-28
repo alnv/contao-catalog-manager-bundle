@@ -8,8 +8,11 @@ const listingComponent = Vue.component( 'listing', {
         }
     },
     methods: {
-        fetch: function () {
-            this.$http.get( '/catalog-manager/listing/' + this.module + '/' + this.page, {
+        fetch: function (strUrl) {
+            if (!strUrl) {
+                strUrl = '/catalog-manager/listing/' + this.module + '/' + this.page;
+            }
+            this.$http.get( strUrl, {
                 params: this.parameters
             }).then(function ( objResponse ) {
                 if ( objResponse.body ) {
@@ -34,7 +37,6 @@ const listingComponent = Vue.component( 'listing', {
             for ( var i = 0; i < arrSortingFields.length; i++ ) {
                 var objSortField = arrSortingFields[i];
                 var strFieldname = objSortField.dataset.sort;
-                // objSortField.dataset.order = this.parameters['order'][ strFieldname ] ? this.parameters['order'][ strFieldname ]['order'] : objSortField.dataset.order;
                 if ( typeof this.parameters['order'] !== 'undefined' && this.parameters['order'].hasOwnProperty( strFieldname ) ) {
                     objSortField.dataset.order = this.parameters['order'][ strFieldname ]['order'];
                 }
@@ -62,11 +64,26 @@ const listingComponent = Vue.component( 'listing', {
                     self.fetch();
                 });
             }
+        },
+        pagination: function () {
+            var self = this;
+            var objPagination = this.$refs.view.querySelector('.pagination');
+            if ( !objPagination ) {
+                return null;
+            }
+            var arrLinks = objPagination.querySelectorAll('a');
+            for ( var i = 0; i < arrLinks.length; i++ ) {
+                arrLinks[i].addEventListener( 'click', function ( objEvent ) {
+                    objEvent.preventDefault();
+                    self.fetch(this.href);
+                });
+            }
         }
     },
     updated: function () {
         this.$nextTick(function () {
             this.sortable();
+            this.pagination()
         })
     },
     mounted: function () {

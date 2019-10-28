@@ -11,7 +11,7 @@ class RoleResolver {
     protected static $arrInstances = [];
 
 
-    public static function getInstance( $strTable, $arrEntity ) {
+    public static function getInstance( $strTable, $arrEntity = [] ) {
 
         self::$strTable = $strTable;
 
@@ -47,6 +47,7 @@ class RoleResolver {
             }
 
             $arrRoles[ $arrField['eval']['role'] ] = [
+
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],

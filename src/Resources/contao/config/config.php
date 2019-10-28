@@ -32,6 +32,7 @@ $objFormAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/c
 
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
+$GLOBALS['TL_HOOKS']['loadDataContainer'][] = [ 'catalogmanager.hooks.datacontainer', 'generateDataContainerArray' ];
 
 $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';

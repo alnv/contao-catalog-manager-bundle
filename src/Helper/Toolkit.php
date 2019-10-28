@@ -3,7 +3,6 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
-use Doctrine\ORM\Mapping\Entity;
 
 
 class Toolkit {

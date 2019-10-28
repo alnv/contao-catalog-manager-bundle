@@ -14,3 +14,6 @@ services:
   catalogmanager.hooks.initialize:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\Initialize
     public: true
+  catalogmanager.hooks.datacontainer:
+      class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
+      public: true

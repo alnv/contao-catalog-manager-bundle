@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
 
@@ -55,6 +56,7 @@ class ListingModule extends \Module {
         $this->setFilter();
         $this->setMasterPage();
         $this->setPagination();
+        $this->setDistance();
 
         $objListing = new Listing( $this->cmTable, $this->arrOptions );
 
@@ -63,20 +65,50 @@ class ListingModule extends \Module {
     }
 
 
+    protected function setDistance() {
+
+        if ( !$this->cmRadiusSearch ) {
+
+            return null;
+        }
+
+        $objRoleResolver = RoleResolver::getInstance( $this->cmTable );
+        $arrGeoCodingFields = $objRoleResolver->getGeoCodingValues();
+        $strAddress = '4057, Switzerland'; // @todo
+        $strRadius = '50'; // @todo
+        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+        $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
+
+        if ( $arrGeoCoding !== null ) {
+
+            $this->arrOptions['distance'] = [
+
+                'latCord' => $arrGeoCoding['latitude'],
+                'lngCord' => $arrGeoCoding['longitude'],
+                'latField' => $arrGeoCodingFields['latitude'],
+                'lngField' => $arrGeoCodingFields['longitude']
+            ];
+
+            $this->arrOptions['having'] = '_distance <= ' . floatval( $strRadius );
+        }
+    }
+
+
     protected function setFilter() {
 
-        if ( $this->cmFilter ) {
+        if ( !$this->cmFilter ) {
 
-            $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
-            $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
+            return null;
         }
+
+        $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
+        $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
     }
 
 
     protected function setOrder() {
 
         // @todo module settings
-
         // dyn by input
         if ( is_array( \Input::get('order') ) && !empty( \Input::get('order') ) ) {
 
