@@ -25,9 +25,10 @@ class CatalogField {
 
         return [
             'street',
-            'street_number',
+            'streetNumber',
             'city',
-            'postal',
+            'zip',
+            'state',
             'country',
             'firstname',
             'lastname',
@@ -38,7 +39,9 @@ class CatalogField {
             'company',
             'date',
             'datim',
-            'time'
+            'time',
+            'latitude',
+            'longitude'
         ];
     }
 

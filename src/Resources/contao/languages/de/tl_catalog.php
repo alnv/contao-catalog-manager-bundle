@@ -6,7 +6,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['catalog_settings'] = 'Katalog-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['mode_settings'] = 'Darstellung-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['navigation_settings'] = 'Navigation-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['general_settings'] = 'Allgemeine-Einstellungen';
-// $GLOBALS['TL_LANG']['tl_catalog']['geocoding_settings'] = 'Geo-Koordinaten-Einstellungen';
+$GLOBALS['TL_LANG']['tl_catalog']['geocoding_settings'] = 'GeoCoding-Einstellungen';
 
 $GLOBALS['TL_LANG']['tl_catalog']['type'] = [ 'Typ', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['name'] = [ 'Name', 'Bitte geben Sie den Katalognamen ein.' ];
@@ -22,19 +22,11 @@ $GLOBALS['TL_LANG']['tl_catalog']['enablePanel'] = [ 'Panel anzeigen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableVisibility'] = [ 'Sichtbarkeitssteuerung aktivieren', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['navigation'] = [ 'Navigation', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['position'] = [ 'Position', '' ];
-/*
-$GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'Geo-Koordinaten aktivieren', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoCity'] = [ 'Stadt-Eingabefeld', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoZip'] = [ 'Postleitzahl-Eingabefeld', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoStreet'] = [ 'Straße-Eingabefeld', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoStreetNumber'] = [ 'Straßennummer-Eingabefeld', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoCountry'] = [ 'Land-Eingabefeld', '' ];
-$GLOBALS['TL_LANG']['tl_catalog']['geoCountry'] = [ 'Land-Eingabefeld', '' ];
-*/
 $GLOBALS['TL_LANG']['tl_catalog']['headerFields'] = [ 'Header-Felder', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['flagField'] = [ 'Sortierfeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['sortingType'] = [ 'Sortierung', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['order'] = [ 'Sortierfelder', 'Eines oder mehrere Felder, anhand derer die Tabelle sortiert wird.' ];
+$GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'GeoCoding aktivieren', '' ];
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
     'fixed' => 'Feste Sortierung',

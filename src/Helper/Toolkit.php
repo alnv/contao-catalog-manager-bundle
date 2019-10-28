@@ -2,6 +2,9 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Doctrine\ORM\Mapping\Entity;
+
 
 class Toolkit {
 
@@ -313,5 +316,32 @@ class Toolkit {
         }
 
         return $arrReturn;
+    }
+
+
+    public static function saveGeoCoordinates( $strTable, $arrEntity ) {
+
+        if ( !$arrEntity['id'] ) {
+
+            return null;
+        }
+
+        $objRoleResolver = RoleResolver::getInstance( $strTable, $arrEntity );
+        $arrGeoFields = $objRoleResolver->getGeoCodingValues();
+        $strAddress = $objRoleResolver->getGeoCodingAddress();
+
+        $objDatabase = \Database::getInstance();
+        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+        $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
+
+        if ( $arrGeoCoding !== null && !empty( $arrGeoFields ) ) {
+
+            $arrSet = [];
+            $arrSet[ 'tstamp' ] = time();
+            $arrSet[ $arrGeoFields['longitude'] ] = $arrGeoCoding['longitude'];
+            $arrSet[ $arrGeoFields['latitude'] ] = $arrGeoCoding['latitude'];
+
+            $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrEntity['id'] );
+        }
     }
 }

@@ -68,7 +68,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'modifier' => '{type_settings},type;{general_settings},name;'
     ],
     'subpalettes' => [
-        // 'enableGeocoding' => 'geoCity,geoZip,geoStreet,geoStreetNumber,geoCountry',
         'sortingType_fixed' => 'flagField,flag',
         'sortingType_switchable' => 'order',
         'mode_list' => 'sortingType,columns,showColumns',
@@ -303,72 +302,14 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
-        /*
         'enableGeocoding' => [
             'inputType' => 'checkbox',
             'eval' => [
                 'tl_class' => 'clr',
-                'multiple' => false,
-                'submitOnChange' => true
+                'multiple' => false
             ],
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
-        ],
-        'geoCity' => [
-            'inputType' => 'select',
-            'eval' => [
-                'chosen' => true,
-                'maxlength' => 64,
-                'tl_class' => 'w50'
-            ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 64, 'fixed' => true, 'default' => '']
-        ],
-        'geoZip' => [
-            'inputType' => 'select',
-            'eval' => [
-                'chosen' => true,
-                'maxlength' => 64,
-                'tl_class' => 'w50'
-            ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 64, 'fixed' => true, 'default' => '']
-        ],
-        'geoStreet' => [
-            'inputType' => 'select',
-            'eval' => [
-                'chosen' => true,
-                'maxlength' => 64,
-                'tl_class' => 'w50'
-            ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 64, 'fixed' => true, 'default' => '']
-        ],
-        'geoStreetNumber' => [
-            'inputType' => 'select',
-            'eval' => [
-                'chosen' => true,
-                'maxlength' => 64,
-                'tl_class' => 'w50'
-            ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 64, 'fixed' => true, 'default' => '']
-        ],
-        'geoCountry' => [
-            'inputType' => 'select',
-            'eval' => [
-                'chosen' => true,
-                'maxlength' => 64,
-                'tl_class' => 'w50'
-            ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 64, 'fixed' => true, 'default' => '']
         ]
-        */
     ]
 ];

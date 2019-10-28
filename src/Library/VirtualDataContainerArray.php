@@ -2,8 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+
 
 class VirtualDataContainerArray {
 
@@ -174,7 +174,15 @@ class VirtualDataContainerArray {
     protected function generateEmptyDataContainer() {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
-            'config' => [ 'dataContainer' => 'Table' ],
+            'config' => [
+                'dataContainer' => 'Table',
+                'onsubmit_callback' => [
+                    function( \DataContainer $objDataContainer ) {
+                        // @todo parse values
+                        Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
+                    }
+                ]
+            ],
             'list' => [
                 'label' => [],
                 'sorting' => [],
