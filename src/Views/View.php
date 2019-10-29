@@ -6,7 +6,6 @@ use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
-use function Clue\StreamFilter\fun;
 
 
 abstract class View extends \Controller {
@@ -144,7 +143,7 @@ abstract class View extends \Controller {
 
                 $intIndex = $intIndex + 1;
 
-                if ( $strValue === '' ) {
+                if ( $strValue === '' || $strValue === null ) {
 
                     unset( $this->arrOptions['column'][ $intIndex ] );
 

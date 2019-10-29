@@ -17,7 +17,7 @@ class Initialize {
 
         if ( $objRequest !== null ) {
 
-            $this->setEnvironment( $objRequest->get( '_route' ) );
+            $this->setEnvironment( $objRequest->get( '_scope' ) );
         }
     }
 
@@ -35,7 +35,7 @@ class Initialize {
             return null;
         }
 
-        if ( $this->strMode == 'contao_backend' ) {
+        if ( $this->strMode == 'backend' ) {
 
             $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeBackendModules();
@@ -50,7 +50,7 @@ class Initialize {
             return null;
         }
 
-        if ( $this->strMode == 'contao_backend' ) {
+        if ( $this->strMode == 'backend' ) {
 
             $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeDataContainerArrays();

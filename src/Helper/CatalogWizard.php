@@ -155,6 +155,17 @@ abstract class CatalogWizard {
 
                 break;
 
+            case 'checkbox':
+
+                $arrReturn['inputType'] = 'checkbox';
+
+                if ( !$blnMultiple ) {
+
+                    unset( $arrReturn['options_callback'] );
+                }
+
+                break;
+
             case 'textarea':
 
                 $arrReturn['inputType'] = 'textarea';

@@ -326,12 +326,17 @@ class Toolkit {
         }
 
         $objRoleResolver = RoleResolver::getInstance( $strTable, $arrEntity );
-        $arrGeoFields = $objRoleResolver->getGeoCodingValues();
+        $arrGeoFields = $objRoleResolver->getGeoCodingFields();
         $strAddress = $objRoleResolver->getGeoCodingAddress();
 
         $objDatabase = \Database::getInstance();
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
+
+        if ( ( $arrEntity[ $arrGeoFields['longitude'] ] !== null && $arrEntity[ $arrGeoFields['longitude'] ]  !== '' ) && ( $arrEntity[ $arrGeoFields['latitude'] ] !== null && $arrEntity[ $arrGeoFields['latitude'] ] !== '' ) ) {
+
+            return null;
+        }
 
         if ( $arrGeoCoding !== null && !empty( $arrGeoFields ) ) {
 

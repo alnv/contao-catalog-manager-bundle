@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 class RoleResolver {
 
+
     protected static $strTable = null;
     protected static $arrRoles = null;
     protected static $arrEntity = null;
@@ -61,43 +62,21 @@ class RoleResolver {
 
     public function getGeoCodingAddress() {
 
-        $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder();
+        $arrAddress = [];
+        $arrAddressFields = [ 'street', 'streetNumber', 'postal', 'city', 'state', 'country' ];
 
-        if ( isset( self::$arrRoles[ 'street' ][ 'name' ] ) ) {
+        foreach ( $arrAddressFields as $strAddressField ) {
 
-            $objAddress->setStreet( self::$arrEntity[ self::$arrRoles[ 'street' ]['name'] ] );
+            $arrAddress[ $strAddressField ] = self::$arrEntity[ self::$arrRoles[$strAddressField]['name'] ];
         }
 
-        if ( isset( self::$arrRoles[ 'streetNumber' ][ 'name' ] ) ) {
-
-            $objAddress->setStreetNumber( self::$arrEntity[ self::$arrRoles[ 'streetNumber' ]['name'] ] );
-        }
-
-        if ( isset( self::$arrRoles[ 'postal' ][ 'name' ] ) ) {
-
-            $objAddress->setZip( self::$arrEntity[ self::$arrRoles[ 'postal' ]['name'] ] );
-        }
-
-        if ( isset( self::$arrRoles[ 'city' ][ 'name' ] ) ) {
-
-            $objAddress->setCity( self::$arrEntity[ self::$arrRoles[ 'city' ]['name'] ] );
-        }
-
-        if ( isset( self::$arrRoles[ 'state' ][ 'name' ] ) ) {
-
-            $objAddress->setState( self::$arrEntity[ self::$arrRoles[ 'state' ]['name'] ] );
-        }
-
-        if ( isset( self::$arrRoles[ 'country' ][ 'name' ] ) ) {
-
-            $objAddress->setCountry( self::$arrEntity[ self::$arrRoles[ 'country' ]['name'] ] );
-        }
+        $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder( $arrAddress );
 
         return $objAddress->getAddress();
     }
 
 
-    public function getGeoCodingValues() {
+    public function getGeoCodingFields() {
 
         $arrReturn = [];
         $arrGeoRoles = [ 'latitude', 'longitude' ];

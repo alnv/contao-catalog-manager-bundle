@@ -103,6 +103,8 @@ const listingComponent = Vue.component( 'listing', {
     },
     template:
     '<div class="listing-component" ref="view">' +
-        '<div class="listing-component-container" v-html="view"></div>' +
+        '<transition name="fade">' +
+            '<div class="listing-component-container" v-html="view" v-show="view"></div>' +
+        '</transition>' +
     '</div>'
 });

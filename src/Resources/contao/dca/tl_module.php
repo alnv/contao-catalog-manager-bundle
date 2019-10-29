@@ -6,7 +6,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilter'] = 'cmColumn,cmValue';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmMaster'] = 'cmMasterPage,cmMasterModule';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl;{radius_search_legend},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmTemplate;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
@@ -24,7 +24,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'exclude' => true,
     'sql' => "varchar(128) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmTemplate'],
     'inputType' => 'select',
@@ -38,7 +37,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'exclude' => true,
     'sql' => "varchar(255) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmPagination'],
     'inputType' => 'checkbox',
@@ -49,7 +47,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
     'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmLimit'],
     'inputType' => 'text',
@@ -59,7 +56,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     'exclude' => true,
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmOffset'],
     'inputType' => 'text',
@@ -69,7 +65,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     'exclude' => true,
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmGroupBy'],
     'inputType' => 'select',
@@ -83,7 +78,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
     'exclude' => true,
     'sql' => "varchar(64) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmGroupByHl'],
     'inputType' => 'select',
@@ -97,7 +91,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
     'exclude' => true,
     'sql' => "varchar(2) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmFilter'],
     'inputType' => 'checkbox',
@@ -109,7 +102,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmColumn'],
     'inputType' => 'textarea',
@@ -119,7 +111,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     'exclude' => true,
     'sql' => "mediumtext NULL"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmValue'],
     'inputType' => 'textarea',
@@ -129,7 +120,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     'exclude' => true,
     'sql' => "mediumtext NULL"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMaster'],
     'inputType' => 'checkbox',
@@ -141,7 +131,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
     'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMasterModule'],
     'inputType' => 'select',
@@ -158,7 +147,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     'exclude' => true,
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
-
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMasterPage'],
     'inputType' => 'pageTree',
@@ -173,4 +161,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     ],
     'exclude' => true,
     'sql' => "int(10) unsigned NOT NULL default '0'"
+];
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
+    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmRadiusSearch'],
+    'inputType' => 'checkbox',
+    'eval' => [
+        'multiple' => false,
+        'tl_class' => 'clr'
+    ],
+    'exclude' => true,
+    'sql' => "char(1) NOT NULL default ''"
 ];

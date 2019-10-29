@@ -61,9 +61,9 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'default' => '{general_settings},name,type',
         'text' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
         'textarea' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role,multiple;{options_legend},optionsSource;{published_legend},published',
         'radio' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,multiple;{options_legend},optionsSource;{published_legend},published',
         'upload' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published'
     ],
     'subpalettes' => [
@@ -166,12 +166,20 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
+        'multiple' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50 m12',
+                'multiple' => false
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
+        ],
         'published' => [
             'inputType' => 'checkbox',
             'eval' => [
                 'doNotCopy' => true
             ],
-            'flag' => 2,
             'exclude' => true,
             'filter' => true,
             'sql' => "char(1) NOT NULL default ''"

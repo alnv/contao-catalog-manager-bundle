@@ -74,7 +74,7 @@ class Database {
 
             return false;
         }
-        var_dump(sprintf( 'ALTER TABLE %s ADD `%s` %s', $strTable, $strField, $strSql ));
+
         $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s ADD `%s` %s', $strTable, $strField, $strSql ) )->execute();
 
         return true;

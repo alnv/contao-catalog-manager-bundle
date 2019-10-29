@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Modules;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 
 
 class ListingModule extends \Module {
@@ -73,9 +74,31 @@ class ListingModule extends \Module {
         }
 
         $objRoleResolver = RoleResolver::getInstance( $this->cmTable );
-        $arrGeoCodingFields = $objRoleResolver->getGeoCodingValues();
-        $strAddress = '4057, Switzerland'; // @todo
-        $strRadius = '50'; // @todo
+        $arrGeoCodingFields = $objRoleResolver->getGeoCodingFields();
+
+        if ( empty( $arrGeoCodingFields ) ) {
+
+            return null;
+        }
+
+        $arrAddress = [
+            'street' => Toolkit::getValueFromUrl( \Input::get('street') ),
+            'streetNumber' => Toolkit::getValueFromUrl( \Input::get('streetNumber') ),
+            'zip' => Toolkit::getValueFromUrl( \Input::get('zip') ),
+            'city' => Toolkit::getValueFromUrl( \Input::get('city') ),
+            'state' => Toolkit::getValueFromUrl( \Input::get('state') ),
+            'country' => Toolkit::getValueFromUrl( \Input::get('country') )
+        ];
+
+        $objAddressBuilder = new AddressBuilder( $arrAddress );
+        $strAddress = $objAddressBuilder->getAddress();
+        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 50;
+
+        if ( !$strAddress ) {
+
+            return null;
+        }
+
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
 
@@ -152,12 +175,11 @@ class ListingModule extends \Module {
 
     protected function setMasterPage() {
 
-        if ( $this->cmMaster ) {
+        if ( !$this->cmMaster || !$this->cmMasterPage ) {
 
-            if ( $this->cmMasterPage ) {
-
-                $this->arrOptions['masterPage'] = $this->cmMasterPage;
-            }
+            return null;
         }
+
+        $this->arrOptions['masterPage'] = $this->cmMasterPage;
     }
 }
