@@ -92,7 +92,7 @@ class ListingModule extends \Module {
 
         $objAddressBuilder = new AddressBuilder( $arrAddress );
         $strAddress = $objAddressBuilder->getAddress();
-        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 50;
+        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
 
         if ( !$strAddress ) {
 
