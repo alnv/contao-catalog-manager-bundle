@@ -113,6 +113,7 @@ class ListingModule extends \Module {
             ];
 
             $this->arrOptions['having'] = '_distance < ' . (int) $strRadius;
+            $this->arrOptions['order'] = '_distance ASC';
         }
     }
 
