@@ -1,3 +1,11 @@
+Vue.directive( 'share', {
+
+    inserted: function (el) {
+
+        console.log(el);
+    }
+});
+
 const listingComponent = Vue.component( 'listing', {
     data: function () {
         return {
@@ -78,12 +86,27 @@ const listingComponent = Vue.component( 'listing', {
                     self.fetch(this.href);
                 });
             }
+        },
+        collectShareData: function () {
+            var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
+            this.$parent.shared['listingShareData'] = [];
+            for ( var i = 0; i < arrShares.length; i++ ) {
+                var objShare = arrShares[i];
+                var strShare = objShare.dataset['share'];
+                if ( strShare === null || strShare === '' ) {
+                    continue;
+                }
+                if ( this.$parent.shared['listingShareData'].indexOf( strShare ) === -1 ) {
+                    this.$parent.shared['listingShareData'].push( strShare );
+                }
+            }
         }
     },
     updated: function () {
         this.$nextTick(function () {
             this.sortable();
-            this.pagination()
+            this.pagination();
+            this.collectShareData();
         })
     },
     mounted: function () {
