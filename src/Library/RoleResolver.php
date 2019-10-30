@@ -63,11 +63,14 @@ class RoleResolver {
     public function getGeoCodingAddress() {
 
         $arrAddress = [];
-        $arrAddressFields = [ 'street', 'streetNumber', 'postal', 'city', 'state', 'country' ];
+        $arrAddressFields = [ 'street', 'streetNumber', 'zip', 'city', 'state', 'country' ];
 
         foreach ( $arrAddressFields as $strAddressField ) {
 
-            $arrAddress[ $strAddressField ] = self::$arrEntity[ self::$arrRoles[$strAddressField]['name'] ];
+            if ( isset( self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ] ) ) {
+
+                $arrAddress[ $strAddressField ] = self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ];
+            }
         }
 
         $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder( $arrAddress );
