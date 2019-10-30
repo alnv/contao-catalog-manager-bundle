@@ -88,8 +88,8 @@ const listingComponent = Vue.component( 'listing', {
             }
         },
         collectShareData: function () {
-            var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
             this.$parent.shared['listingShareData'] = [];
+            var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
             for ( var i = 0; i < arrShares.length; i++ ) {
                 var objShare = arrShares[i];
                 var strShare = objShare.dataset['share'];

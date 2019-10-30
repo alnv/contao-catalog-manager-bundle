@@ -112,7 +112,7 @@ class ListingModule extends \Module {
                 'lngField' => $arrGeoCodingFields['longitude']
             ];
 
-            $this->arrOptions['having'] = '_distance <= ' . floatval( $strRadius );
+            $this->arrOptions['having'] = '_distance < ' . (int) $strRadius;
         }
     }
 
