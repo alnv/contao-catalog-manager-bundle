@@ -1,15 +1,9 @@
-Vue.directive( 'share', {
-
-    inserted: function (el) {
-
-        console.log(el);
-    }
-});
-
 const listingComponent = Vue.component( 'listing', {
     data: function () {
         return {
             view: '',
+            shareData: [],
+            share: false,
             parameters: {
                 order: {}
             }
@@ -88,7 +82,7 @@ const listingComponent = Vue.component( 'listing', {
             }
         },
         collectShareData: function () {
-            this.$parent.shared['listingShareData'] = [];
+            this.shareData = [];
             var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
             for ( var i = 0; i < arrShares.length; i++ ) {
                 var objShare = arrShares[i];
@@ -96,10 +90,22 @@ const listingComponent = Vue.component( 'listing', {
                 if ( strShare === null || strShare === '' ) {
                     continue;
                 }
-                if ( this.$parent.shared['listingShareData'].indexOf( strShare ) === -1 ) {
-                    this.$parent.shared['listingShareData'].push( strShare );
+                if ( this.shareData.indexOf( strShare ) === -1 ) {
+                    this.shareData.push( strShare );
                 }
             }
+        }
+    },
+    watch: {
+        shareData : {
+            handler: function () {
+                this.$parent.shared['listingShareData'] = this.shareData;
+                if (this.share) {
+                    this.$parent.onChange(this);
+                }
+                this.share = true;
+            },
+            deep: true
         }
     },
     updated: function () {
