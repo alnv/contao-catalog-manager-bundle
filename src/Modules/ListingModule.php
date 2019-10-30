@@ -86,18 +86,18 @@ class ListingModule extends \Module {
             'streetNumber' => Toolkit::getValueFromUrl( \Input::get('streetNumber') ),
             'zip' => Toolkit::getValueFromUrl( \Input::get('zip') ),
             'city' => Toolkit::getValueFromUrl( \Input::get('city') ),
-            'state' => Toolkit::getValueFromUrl( \Input::get('state') ),
-            'country' => Toolkit::getValueFromUrl( \Input::get('country') )
         ];
 
-        $objAddressBuilder = new AddressBuilder( $arrAddress );
-        $strAddress = $objAddressBuilder->getAddress();
-        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
-
-        if ( !$strAddress ) {
+        if ( empty( array_filter( $arrAddress ) ) ) {
 
             return null;
         }
+
+        $arrAddress['state'] = Toolkit::getValueFromUrl( \Input::get('state') );
+        $arrAddress['country'] = Toolkit::getValueFromUrl( \Input::get('country') );
+        $objAddressBuilder = new AddressBuilder( $arrAddress );
+        $strAddress = $objAddressBuilder->getAddress();
+        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
 
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
