@@ -3,7 +3,6 @@ const listingComponent = Vue.component( 'listing', {
         return {
             view: '',
             shareData: [],
-            share: false,
             parameters: {
                 order: {}
             }
@@ -100,10 +99,7 @@ const listingComponent = Vue.component( 'listing', {
         shareData : {
             handler: function () {
                 this.$parent.shared['listingShareData'] = this.shareData;
-                if (this.share) {
-                    this.$parent.onChange(this);
-                }
-                this.share = true;
+                this.$parent.onChange(this);
             },
             deep: true
         }
