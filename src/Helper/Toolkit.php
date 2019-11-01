@@ -8,13 +8,13 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 class Toolkit {
 
 
-    public static function parse( $varValue, $strDelimiter = ', ' ) {
+    public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {
 
         if ( is_array( $varValue ) ) {
 
-            $arrValues = array_map( function ( $arrValue ) {
+            $arrValues = array_map( function ( $arrValue ) use ( $strField ) {
 
-                return $arrValue['value'];
+                return $arrValue[ $strField ];
 
             }, $varValue );
 
@@ -32,9 +32,10 @@ class Toolkit {
         return [
 
             'vc255' => "varchar(255) NOT NULL default '%s'",
+            'vc8' => "varchar(8) NOT NULL default '%s'",
             'c1' => "char(1) NOT NULL default ''",
             'i10' => "int(10) unsigned NOT NULL default '0'",
-            'iNotNull10' => "int(10) unsigned NULL",
+            'i10NullAble' => "int(10) unsigned NULL",
             'text' => "text NULL",
             'longtext' => "longtext NULL",
             'blob' => "blob NULL"
@@ -56,6 +57,18 @@ class Toolkit {
                 }
 
                 return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
+
+                break;
+
+            case 'color':
+
+                return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions : '' ) );
+
+                break;
+
+            case 'date':
+
+                return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions : '' ) );
 
                 break;
 
@@ -188,7 +201,7 @@ class Toolkit {
 
         foreach ( $arrLabelFields as $strField ) {
 
-            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow );
+            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
         }
 
         if ( count( $arrColumns ) < 2 ) {
@@ -196,16 +209,20 @@ class Toolkit {
             return array_values( $arrColumns )[0];
         }
 
-        $intIndex = 0;
+        $intIndex = -1;
+        $arrLabels = [];
         $strTemplate = '<div class="tl_content_left">';
 
         foreach ( $arrColumns as $strField => $strValue ) {
-
-            $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
             $intIndex += 1;
+            if ( !$intIndex ) {
+                $strTemplate .= $strValue;
+                continue;
+            }
+            $arrLabels[] = strtoupper( $strField ) . ': ' . $strValue;
         }
 
-        $strTemplate .= '</div>';
+        $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ', ' ) .')</span>' . '</div>';
 
         return $strTemplate;
     }
@@ -220,7 +237,7 @@ class Toolkit {
 
         foreach ( $arrLabelFields as $strField ) {
 
-            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow );
+            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
         }
 
         if ( count( $arrColumns ) < 2 ) {
@@ -238,7 +255,7 @@ class Toolkit {
     }
 
 
-    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [] ) {
+    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false ) {
 
         if ( $varValue === '' || $varValue === null ) {
 
@@ -263,8 +280,14 @@ class Toolkit {
             case 'radio':
 
                 $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
+                $arrOptionValues =  static::getSelectedOptions( $varValue, $arrField['options'] );
 
-                return static::getSelectedOptions( $varValue, $arrField['options'] );
+                if ( $blnStringFormat ) {
+
+                    return static::parse( $arrOptionValues );
+                }
+
+                return $arrOptionValues;
 
                 break;
 
@@ -279,7 +302,7 @@ class Toolkit {
 
                 if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
 
-                    return \Alnv\ContaoCatalogManagerBundle\Helper\Image::getImage( $varValue, $strSizeId );
+                    return Image::getImage( $varValue, $strSizeId );
                 }
 
                 return []; // @todo files
@@ -318,11 +341,18 @@ class Toolkit {
     }
 
 
-    public static function saveGeoCoordinates( $strTable, $arrEntity ) {
+    public static function saveGeoCoordinates( $strTable, $arrActiveRecord ) {
 
-        if ( !$arrEntity['id'] ) {
+        $arrEntity = [];
+
+        if ( !$arrActiveRecord['id'] ) {
 
             return null;
+        }
+
+        foreach ( $arrActiveRecord as $strField => $strValue ) {
+
+            $arrEntity[ $strField ] = static::parseCatalogValue( $strValue, \Widget::getAttributesFromDca( $GLOBALS['TL_DCA'][ $strTable ]['fields'][ $strField ], $strField, $strValue, $strField, $strTable ), $arrActiveRecord, true );
         }
 
         $objRoleResolver = RoleResolver::getInstance( $strTable, $arrEntity );

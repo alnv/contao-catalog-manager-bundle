@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
 
@@ -129,6 +130,12 @@ abstract class CatalogWizard {
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )
         ];
 
+        if ( $arrField['includeBlankOption'] ) {
+
+            $arrReturn['eval']['includeBlankOption'] = true;
+            $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
+        }
+
         if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox' ] ) ) {
 
             $arrReturn['options_callback'] = function ( $objDataContainer = null ) use ( $arrField ) {
@@ -148,10 +155,44 @@ abstract class CatalogWizard {
 
                 break;
 
+            case 'date':
+
+                $arrReturn['default'] = time();
+                $arrReturn['inputType'] = 'text';
+
+                if ( $arrReturn['eval']['role'] ) {
+
+                    $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
+                    $strRgxp = $objRoleResolver->getRole($arrReturn['eval']['role'])['type'];
+
+                    if ( in_array( $strRgxp, [ 'date', 'time', 'datim' ] ) ) {
+
+                        $arrReturn['eval']['rgxp'] = $strRgxp;
+                    }
+                }
+
+                $arrReturn['eval']['datepicker'] = true;
+
+                break;
+
+
+            case 'color':
+
+                $arrReturn['inputType'] = 'text';
+                $arrReturn['eval']['colorpicker'] = true;
+
+                break;
+
             case 'select':
 
                 $arrReturn['inputType'] = 'select';
                 $arrReturn['eval']['chosen'] = true;
+
+                break;
+
+            case 'radio':
+
+                $arrReturn['inputType'] = 'radio';
 
                 break;
 
@@ -170,16 +211,43 @@ abstract class CatalogWizard {
 
                 $arrReturn['inputType'] = 'textarea';
 
+                if ( $arrField['rte'] ) {
+
+                    $arrReturn['eval']['rte'] = 'tinyMCE';
+                }
+
                 break;
 
             case 'upload':
 
                 $arrReturn['inputType'] = 'fileTree';
-
-                // @todo image or doc
-                $arrReturn['eval']['fieldType'] = 'radio';
                 $arrReturn['eval']['filesOnly'] = true;
-                $arrReturn['eval']['isImage'] = '1';
+                $arrReturn['eval']['fieldType'] = 'radio';
+
+                if ( $blnMultiple ) {
+
+                    $arrReturn['eval']['fieldType'] = 'checkbox';
+                }
+
+                if ( $arrReturn['eval']['role'] ) {
+
+                    $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
+
+                    switch ( $objRoleResolver->getRole($arrReturn['eval']['role'])['type'] ) {
+
+                        case 'image':
+
+                            $arrReturn['eval']['isImage'] = '1';
+
+                            break;
+
+                        case 'file':
+
+                            $arrReturn['eval']['isFile'] = '1';
+
+                            break;
+                    }
+                }
 
                 break;
         }

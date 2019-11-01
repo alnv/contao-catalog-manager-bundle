@@ -94,6 +94,14 @@ class VirtualDataContainerArray {
             }
         }
 
+        if ( count( $arrList['labels']['fields'] ) > 1 && !$arrList['labels']['showColumns'] ) {
+
+            $arrList['labels']['label_callback'] = function ( $arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false  ) use ( $arrList ) {
+
+                return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
+            };
+        }
+
         if ( $this->arrCatalog['mode'] == 'parent' ) {
 
             $arrList['sorting']['mode'] = 4;
@@ -103,7 +111,6 @@ class VirtualDataContainerArray {
                 return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
 
-            // do not supported
             $arrList['labels']['showColumns'] = false;
             $arrList['labels']['fields'] = [];
         }
@@ -118,7 +125,6 @@ class VirtualDataContainerArray {
                 return Toolkit::renderTreeRow( $arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
 
-            // do not supported
             $arrList['sorting']['fields'] = [];
             $arrList['labels']['showColumns'] = false;
         }
@@ -178,7 +184,7 @@ class VirtualDataContainerArray {
                 'dataContainer' => 'Table',
                 'onsubmit_callback' => [
                     function( \DataContainer $objDataContainer ) {
-                        // @todo parse values
+
                         Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
                     }
                 ]

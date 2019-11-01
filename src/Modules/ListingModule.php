@@ -132,8 +132,16 @@ class ListingModule extends \Module {
 
     protected function setOrder() {
 
-        // @todo module settings
-        // dyn by input
+        if ( $this->cmOrder ) {
+
+            $strOrder = Toolkit::getOrderByStatementFromArray( \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $this->cmOrder, [
+                'option' => 'field',
+                'option2' => 'order'
+            ]));
+
+            $this->arrOptions['order'] = $strOrder;
+        }
+
         if ( is_array( \Input::get('order') ) && !empty( \Input::get('order') ) ) {
 
             $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray( \Input::get('order') );

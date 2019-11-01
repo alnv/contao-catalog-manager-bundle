@@ -54,4 +54,13 @@ class Module {
 
         return \Controller::getTemplateGroup( 'cm_' . $dc->activeRecord->type . '_' );
     }
+
+
+    public function getOrderByStatements() {
+
+        return [
+            'ASC',
+            'DESC'
+        ];
+    }
 }

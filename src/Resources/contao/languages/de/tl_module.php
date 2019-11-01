@@ -2,6 +2,7 @@
 
 $GLOBALS['TL_LANG']['tl_module']['listing_settings'] = 'Listen-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['master_settings'] = 'Detail-Einstellungen';
+$GLOBALS['TL_LANG']['tl_module']['radius_search_settings'] = 'Umkreissuche-Einstellungen';
 
 $GLOBALS['TL_LANG']['tl_module']['cmTable'] = [ 'Tabelle', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmTemplate'] = [ 'Template', '' ];
@@ -16,3 +17,5 @@ $GLOBALS['TL_LANG']['tl_module']['cmValue'] = [ 'Werte', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmMaster'] = [ 'Detailseite verwenden', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmMasterPage'] = [ 'Detailseite auswählen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmMasterModule'] = [ 'Detailansicht auswählen', '' ];
+$GLOBALS['TL_LANG']['tl_module']['cmRadiusSearch'] = [ 'Umkreissuche aktivieren', '' ];
+$GLOBALS['TL_LANG']['tl_module']['cmOrder'] = [ 'Sortierung', '' ];

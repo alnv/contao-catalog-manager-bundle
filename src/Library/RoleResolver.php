@@ -52,11 +52,18 @@ class RoleResolver {
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
-                'type' => $arrField['inputType']
+                'type' => $arrField['inputType'],
+                'role' => $GLOBALS['CM_ROLES'][ $arrField['eval']['role'] ]
             ];
         }
 
         return $arrRoles;
+    }
+
+
+    public function getRole( $strRolename ) {
+
+        return $GLOBALS['CM_ROLES'][ $strRolename ];
     }
 
 

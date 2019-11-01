@@ -39,3 +39,90 @@ $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Mod
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
+
+$GLOBALS['CM_ROLES'] = [
+    'miscellaneous' => [
+        'group' => 'miscellaneous',
+        'type' => 'string'
+    ],
+    'street' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'streetNumber' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'city' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'zip' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'state' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'country' => [
+        'group' => 'address',
+        'type' => 'string'
+    ],
+    'firstname' => [
+        'group' => 'person',
+        'type' => 'string'
+    ],
+    'lastname' => [
+        'group' => 'person',
+        'type' => 'string'
+    ],
+    'email' => [
+        'group' => 'contact',
+        'type' => 'email'
+    ],
+    'phone' => [
+        'group' => 'contact',
+        'type' => 'string'
+    ],
+    'mobile' => [
+        'group' => 'contact',
+        'type' => 'string'
+    ],
+    'avatar' => [
+        'group' => 'person',
+        'type' => 'image'
+    ],
+    'company' => [
+        'group' => 'contact',
+        'type' => 'string'
+    ],
+    'date' => [
+        'group' => 'date',
+        'type' => 'date'
+    ],
+    'datim' => [
+        'group' => 'date',
+        'type' => 'datim'
+    ],
+    'time' => [
+        'group' => 'date',
+        'type' => 'time'
+    ],
+    'latitude' => [
+        'group' => 'geo',
+        'type' => 'float'
+    ],
+    'longitude'=> [
+        'group' => 'geo',
+        'type' => 'float'
+    ],
+    'teaser' => [
+        'group' => 'text',
+        'type' => 'string'
+    ],
+    'gender' => [
+        'group' => 'person',
+        'type' => 'string'
+    ]
+];

@@ -6,11 +6,10 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilter'] = 'cmColumn,cmValue';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmMaster'] = 'cmMasterPage,cmMasterModule';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl;{radius_search_legend},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmTemplate;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmTable'],
     'inputType' => 'select',
     'eval' => [
         'chosen' => true,
@@ -25,7 +24,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'sql' => "varchar(128) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmTemplate'],
     'inputType' => 'select',
     'eval' => [
         'chosen' => true,
@@ -38,7 +36,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'sql' => "varchar(255) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmPagination'],
     'inputType' => 'checkbox',
     'eval' => [
         'multiple' => false,
@@ -48,7 +45,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmLimit'],
     'inputType' => 'text',
     'eval' => [
         'tl_class' => 'w50 clr'
@@ -57,7 +53,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmOffset'],
     'inputType' => 'text',
     'eval' => [
         'tl_class' => 'w50'
@@ -66,7 +61,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmGroupBy'],
     'inputType' => 'select',
     'eval' => [
         'chosen' => true,
@@ -79,7 +73,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
     'sql' => "varchar(64) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmGroupByHl'],
     'inputType' => 'select',
     'eval' => [
         'chosen' => true,
@@ -91,8 +84,17 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
     'exclude' => true,
     'sql' => "varchar(2) NOT NULL default ''"
 ];
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
+    'inputType' => 'comboWizard',
+    'eval' => [
+        'tl_class' => 'w50',
+        'mandatory' => true,
+        'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOrderByStatements' ]
+    ],
+    'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
+    'sql' => ['type' => 'blob', 'notnull' => false ]
+];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmFilter'],
     'inputType' => 'checkbox',
     'eval' => [
         'multiple' => false,
@@ -103,7 +105,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmColumn'],
     'inputType' => 'textarea',
     'eval' => [
         'tl_class' => 'clr'
@@ -112,7 +113,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     'sql' => "mediumtext NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmValue'],
     'inputType' => 'textarea',
     'eval' => [
         'tl_class' => 'clr'
@@ -121,7 +121,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     'sql' => "mediumtext NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMaster'],
     'inputType' => 'checkbox',
     'eval' => [
         'multiple' => false,
@@ -132,7 +131,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMasterModule'],
     'inputType' => 'select',
     'eval' => [
         'chosen' => true,
@@ -148,7 +146,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmMasterPage'],
     'inputType' => 'pageTree',
     'eval' => [
         'tl_class' => 'w50 clr',
@@ -163,7 +160,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
-    'label' => &$GLOBALS['TL_LANG']['tl_module']['cmRadiusSearch'],
     'inputType' => 'checkbox',
     'eval' => [
         'multiple' => false,

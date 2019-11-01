@@ -57,16 +57,19 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => [ 'type', 'optionsSource' ],
+        '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption' ],
         'default' => '{general_settings},name,type',
-        'text' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role,multiple;{options_legend},optionsSource;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role;{options_legend},optionsSource;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,multiple;{options_legend},optionsSource;{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role;{published_legend},published'
+        'text' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
+        'date' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
+        'color' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
+        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,rte;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{published_legend},published'
     ],
     'subpalettes' => [
+        'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => '',
         'optionsSource_dbOptions' => ''
     ],
@@ -127,6 +130,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'chosen' => true,
                 'maxlength' => 64,
                 'tl_class' => 'w50',
+                'mandatory' => true,
                 'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
@@ -169,7 +173,25 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'multiple' => [
             'inputType' => 'checkbox',
             'eval' => [
-                'tl_class' => 'w50 m12',
+                'tl_class' => 'w50',
+                'multiple' => false
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'mandatory' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50',
+                'multiple' => false
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'rte' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50',
                 'multiple' => false
             ],
             'exclude' => true,
@@ -178,11 +200,32 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'published' => [
             'inputType' => 'checkbox',
             'eval' => [
+                'tl_class' => 'clr',
                 'doNotCopy' => true
             ],
             'exclude' => true,
             'filter' => true,
             'sql' => "char(1) NOT NULL default ''"
+        ],
+        'includeBlankOption' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+                'multiple' => false,
+                'submitOnChange' => true
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'blankOptionLabel' => [
+            'inputType' => 'text',
+            'default' => '-',
+            'eval' => [
+                'maxlength' => 128,
+                'tl_class' => 'w50',
+            ],
+            'exclude' => true,
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '-']
         ]
     ]
 ];

@@ -17,32 +17,39 @@ class CatalogField {
 
     public function getFieldTypes() {
 
-        return [ 'text', 'textarea', 'select', 'radio', 'checkbox', 'upload' ];
+        return [ 'text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'upload' ];
     }
 
 
-    public function getRoles() {
+    public function getRoles( \DataContainer $dc ) {
 
-        return [
-            'street',
-            'streetNumber',
-            'city',
-            'zip',
-            'state',
-            'country',
-            'firstname',
-            'lastname',
-            'email',
-            'phone',
-            'mobile',
-            'avatar',
-            'company',
-            'date',
-            'datim',
-            'time',
-            'latitude',
-            'longitude'
-        ];
+        $arrRoles = array_keys( $GLOBALS['CM_ROLES'] );
+
+        if ( !$dc->activeRecord->type ) {
+
+            return $arrRoles;
+        }
+
+        switch ( $dc->activeRecord->type ) {
+
+            case 'date':
+
+                $arrDateRoles = [];
+
+                foreach ( $GLOBALS['CM_ROLES'] as $strRole => $arrRole ) {
+
+                    if ( $arrRole['group'] == 'date' ) {
+
+                        $arrDateRoles[] = $strRole;
+                    }
+                }
+
+                return $arrDateRoles;
+
+                break;
+        }
+
+        return $arrRoles;
     }
 
     // @todo make it reuseabel
