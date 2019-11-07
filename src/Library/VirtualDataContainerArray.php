@@ -5,7 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
 
-class VirtualDataContainerArray {
+class VirtualDataContainerArray extends \System {
 
 
     protected $arrCatalog = [];
@@ -29,6 +29,7 @@ class VirtualDataContainerArray {
         }
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ctable'] = $this->arrCatalog['ctable'];
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
     }
 
 
@@ -181,10 +182,8 @@ class VirtualDataContainerArray {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
             'config' => [
-                'dataContainer' => 'Table',
                 'onsubmit_callback' => [
                     function( \DataContainer $objDataContainer ) {
-
                         Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
                     }
                 ]
@@ -261,5 +260,14 @@ class VirtualDataContainerArray {
         $this->setSubPalettes();
         $this->setFields();
         $this->setLabels();
+
+        if ( isset( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) && is_array( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) ) {
+
+            foreach ( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback ) {
+
+                $this->import( $arrCallback[0] );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}( $this->arrCatalog['table'], $this );
+            }
+        }
     }
 }

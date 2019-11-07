@@ -63,4 +63,10 @@ class Module {
             'DESC'
         ];
     }
+
+
+    public function getOperators() {
+
+        return array_keys( $GLOBALS['CM_OPERATORS'] );
+    }
 }

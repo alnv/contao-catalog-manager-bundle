@@ -7,7 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
 
-abstract class CatalogWizard {
+abstract class CatalogWizard extends \System {
 
 
     protected $arrCache = [];
@@ -175,7 +175,6 @@ abstract class CatalogWizard {
 
                 break;
 
-
             case 'color':
 
                 $arrReturn['inputType'] = 'text';
@@ -193,12 +192,14 @@ abstract class CatalogWizard {
             case 'radio':
 
                 $arrReturn['inputType'] = 'radio';
+                $arrReturn['eval']['tl_class'] = 'clr';
 
                 break;
 
             case 'checkbox':
 
                 $arrReturn['inputType'] = 'checkbox';
+                $arrReturn['eval']['tl_class'] = 'clr';
 
                 if ( !$blnMultiple ) {
 
@@ -210,6 +211,7 @@ abstract class CatalogWizard {
             case 'textarea':
 
                 $arrReturn['inputType'] = 'textarea';
+                $arrReturn['eval']['tl_class'] = 'clr';
 
                 if ( $arrField['rte'] ) {
 
@@ -221,6 +223,7 @@ abstract class CatalogWizard {
             case 'upload':
 
                 $arrReturn['inputType'] = 'fileTree';
+                $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['eval']['filesOnly'] = true;
                 $arrReturn['eval']['fieldType'] = 'radio';
 
@@ -250,6 +253,15 @@ abstract class CatalogWizard {
                 }
 
                 break;
+        }
+
+        if ( isset( $GLOBALS['TL_HOOKS']['parseCatalogField'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalogField'] ) ) {
+
+            foreach ( $GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback ) {
+
+                $this->import( $arrCallback[0] );
+                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrReturn, $arrField, $this );
+            }
         }
 
         \Cache::set( $strIdentifier, $arrReturn );

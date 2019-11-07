@@ -18,4 +18,11 @@ $GLOBALS['TL_LANG']['tl_module']['cmMaster'] = [ 'Detailseite verwenden', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmMasterPage'] = [ 'Detailseite auswählen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmMasterModule'] = [ 'Detailansicht auswählen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmRadiusSearch'] = [ 'Umkreissuche aktivieren', '' ];
+$GLOBALS['TL_LANG']['tl_module']['cmFilterType'] = [ 'Eingabetyp', '' ];
+$GLOBALS['TL_LANG']['tl_module']['cmWizardFilterSettings'] = [ 'Filtereinstellungen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmOrder'] = [ 'Sortierung', '' ];
+
+$GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'] = [
+    'expert' => 'Experte',
+    'wizard' => 'Wizard (Klassisch)'
+];

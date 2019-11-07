@@ -22,6 +22,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['enablePanel'] = [ 'Panel anzeigen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableVisibility'] = [ 'Sichtbarkeitssteuerung aktivieren', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['navigation'] = [ 'Navigation', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['position'] = [ 'Position', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['dataContainer'] = [ 'Data Container auswählen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['headerFields'] = [ 'Header-Felder', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['flagField'] = [ 'Sortierfeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['sortingType'] = [ 'Sortierung', '' ];

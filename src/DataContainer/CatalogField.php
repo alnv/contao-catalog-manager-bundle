@@ -95,6 +95,8 @@ class CatalogField {
 
         if ( $strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists( $strFieldname, $strTable, true ) ) {
 
+
+
             return $strFieldname;
         }
 
@@ -115,29 +117,24 @@ class CatalogField {
     }
 
 
-    public function changeFieldType( $strType, \DataContainer $objDataContainer ) {
+    public function changeFieldType( $strValue, \DataContainer $objDataContainer ) {
 
-        if ( !$strType || !$objDataContainer->activeRecord->fieldname ) {
+        if ( !$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname ) {
 
-            return $strType;
-        }
-
-        if ( $strType == $objDataContainer->activeRecord->type ) {
-
-            return $strType;
+            return $strValue;
         }
 
         $objCatalog = CatalogModel::findByPk( $objDataContainer->activeRecord->pid );
 
         if ( $objCatalog == null ) {
 
-            return $strType;
+            return $strValue;
         }
 
-        $strSql = Toolkit::getSql( $strType, $objDataContainer->activeRecord->row() );
+        $strSql = Toolkit::getSql( $objDataContainer->activeRecord->type, $objDataContainer->activeRecord->row() );
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
         $objDatabaseBuilder->changeFieldType( $objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql );
 
-        return $strType;
+        return $strValue;
     }
 }

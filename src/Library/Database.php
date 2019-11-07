@@ -42,6 +42,28 @@ class Database {
     }
 
 
+    public function createCustomFieldsIfNotExists( $strTable ) {
+
+        if ( !$this->objDatabase->tableExists( $strTable, true ) ) {
+
+            return null;
+        }
+
+        if ( is_array( $GLOBALS['CM_CUSTOM_FIELDS'] ) && !empty( $GLOBALS['CM_CUSTOM_FIELDS'] ) ) {
+
+            foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strField => $arrField ) {
+
+                if ( isset( $arrField['table'] ) && $arrField['table'] !== $strTable ) {
+
+                    continue;
+                }
+
+                $this->createFieldIfNotExist( $strField, $strTable, $arrField['sql'] );
+            }
+        }
+    }
+
+
     public function renameTable( $strOldTable, $strNewTable ) {
 
         if ( $this->objDatabase->tableExists( $strNewTable, true ) ) {

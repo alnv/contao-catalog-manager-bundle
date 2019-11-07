@@ -25,7 +25,8 @@ class Catalog extends CatalogWizard {
             return null;
         }
 
-        $this->getDefaultFields();
+        $this->setDefaultFields();
+        $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
         $objFields = CatalogFieldModel::findAll([
             'column' => [ 'pid=?', 'published=?' ],
@@ -77,7 +78,7 @@ class Catalog extends CatalogWizard {
     }
 
 
-    protected function getDefaultFields() {
+    protected function setDefaultFields() {
 
         array_insert( $this->arrFields, 0, [
 
@@ -90,5 +91,30 @@ class Catalog extends CatalogWizard {
             'stop' => [],
             'alias' => []
         ]);
+    }
+
+
+    protected function setCustomFields() {
+
+        if ( !is_array( $GLOBALS['CM_CUSTOM_FIELDS'] ) || empty( $GLOBALS['CM_CUSTOM_FIELDS'] ) ) {
+
+            return null;
+        }
+
+        $arrFields = [];
+
+        foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField ) {
+
+            if ( isset( $arrField['table'] ) && $this->arrCatalog['table'] != $arrField['table'] ) {
+
+                continue;
+            }
+
+            unset( $arrField['index'] );
+
+            $arrFields[ $strFieldname ] = $arrField;
+        }
+
+        array_insert( $this->arrFields, 0, $arrFields );
     }
 }

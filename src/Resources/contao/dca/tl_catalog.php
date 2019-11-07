@@ -7,7 +7,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'tl_catalog_field'
         ],
         'onsubmit_callback' => [
-           [ 'catalogmanager.datacontainer.catalog', 'generateModulename' ]
+            [ 'catalogmanager.datacontainer.catalog', 'generateModulename' ],
+            [ 'catalogmanager.datacontainer.catalog', 'createCustomFields' ]
         ],
         'ondelete_callback' => [
             [ 'catalogmanager.datacontainer.catalog', 'deleteTable' ]
@@ -64,7 +65,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     'palettes' => [
         '__selector__' => [ 'type', 'mode', 'sortingType' ],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{catalog_settings},table;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
+        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
         'modifier' => '{type_settings},type;{general_settings},name;'
     ],
     'subpalettes' => [
@@ -148,6 +149,19 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sorting' => true,
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
+        ],
+        'dataContainer' => [
+            'inputType' => 'select',
+            'default' => 'Table',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 32,
+                'tl_class' => 'w50',
+                'mandatory' => true
+            ],
+            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDataContainers' ],
+            'exclude' => true,
+            'sql' => ['type' => 'string', 'length' => 32, 'default' => 'Table']
         ],
         'mode' => [
             'inputType' => 'select',

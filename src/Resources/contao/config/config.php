@@ -40,9 +40,66 @@ $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Mo
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
 
+
+$GLOBALS['CM_CUSTOM_FIELDS'] = [];
+$GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
+$GLOBALS['CM_OPERATORS'] = [
+    'equal' => [
+
+    ],
+    'notEqual' => [
+
+    ],
+    'findInSet' => [
+
+    ],
+    'regexp' => [
+
+    ],
+    'greater' => [
+
+    ],
+    'greaterEqual' => [
+
+    ],
+    'lower' => [
+
+    ],
+    'lowerEqual' => [
+
+    ]
+];
 $GLOBALS['CM_ROLES'] = [
     'miscellaneous' => [
         'group' => 'miscellaneous',
+        'type' => 'string'
+    ],
+    'title' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'teaser' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'content' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'image' => [
+        'group' => 'article',
+        'type' => 'image'
+    ],
+    'duration' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'price' => [
+        'group' => 'shop',
+        'type' => 'string'
+    ],
+    'category' => [
+        'group' => 'article',
         'type' => 'string'
     ],
     'street' => [
@@ -116,10 +173,6 @@ $GLOBALS['CM_ROLES'] = [
     'longitude'=> [
         'group' => 'geo',
         'type' => 'float'
-    ],
-    'teaser' => [
-        'group' => 'text',
-        'type' => 'string'
     ],
     'gender' => [
         'group' => 'person',

@@ -18,6 +18,12 @@ class Catalog {
     }
 
 
+    public function getDataContainers() {
+
+        return $GLOBALS['CM_DATA_CONTAINERS'];
+    }
+
+
     public function getModes( \DataContainer $objDataContainer ) {
 
         $arrModes = array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'] );
@@ -141,6 +147,18 @@ class Catalog {
         }
 
         return $strTable;
+    }
+
+
+    public function createCustomFields( \DataContainer $objDataContainer ) {
+
+        if ( !$objDataContainer->activeRecord->table ) {
+
+            return null;
+        }
+
+        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder->createCustomFieldsIfNotExists( $objDataContainer->activeRecord->table );
     }
 
 
