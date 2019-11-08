@@ -95,8 +95,6 @@ class CatalogField {
 
         if ( $strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists( $strFieldname, $strTable, true ) ) {
 
-
-
             return $strFieldname;
         }
 
@@ -136,5 +134,25 @@ class CatalogField {
         $objDatabaseBuilder->changeFieldType( $objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql );
 
         return $strValue;
+    }
+
+
+    public function getImageSizes() {
+
+        $arrReturn = [];
+        $objDatabase = \Database::getInstance();
+        $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
+
+        if ( !$objImagesSize->numRows ) {
+
+            return $arrReturn;
+        }
+
+        while ( $objImagesSize->next() ) {
+
+            $arrReturn[ $objImagesSize->id ] = $objImagesSize->name;
+        }
+
+        return $arrReturn;
     }
 }

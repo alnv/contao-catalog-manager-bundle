@@ -1,5 +1,5 @@
 <div class="cm_listing default">
-    <p><?= $this->name ?></p>
+    <p><?= $this->title ?></p>
     <?php if ( $this->masterUrl ): ?>
         <a href="<?= $this->masterUrl ?>">Weiterlesen</a>
     <?php endif; ?>

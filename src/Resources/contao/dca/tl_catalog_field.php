@@ -66,7 +66,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'select' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'radio' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{published_legend},published'
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple,imageSize;{published_legend},published'
     ],
     'subpalettes' => [
         'includeBlankOption' => 'blankOptionLabel',
@@ -178,6 +178,18 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'exclude' => true,
             'sql' => "char(1) NOT NULL default ''"
+        ],
+        'imageSize' => [
+            'inputType' => 'radio',
+            'eval' => [
+                'maxlength' => 64,
+                'tl_class' => 'clr',
+                'blankOptionLabel' => '-',
+                'includeBlankOption' => true
+            ],
+            'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getImageSizes' ],
+            'exclude' => true,
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'mandatory' => [
             'inputType' => 'checkbox',

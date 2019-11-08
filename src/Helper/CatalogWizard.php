@@ -43,6 +43,16 @@ abstract class CatalogWizard extends \System {
         if ( $arrCatalog['enableContentElements'] ) {
 
             $arrCatalog['ctable'][] = 'tl_content';
+            $arrCatalog['related'][] = 'tl_content';
+        }
+
+        if ( isset( $GLOBALS['TL_HOOKS']['parseCatalog'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalog'] ) ) {
+
+            foreach ( $GLOBALS['TL_HOOKS']['parseCatalog'] as $arrCallback ) {
+
+                $this->import( $arrCallback[0] );
+                $arrCatalog = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrCatalog, $this );
+            }
         }
 
         \Cache::set( $strIdentifier, $arrCatalog );
@@ -241,6 +251,11 @@ abstract class CatalogWizard extends \System {
                         case 'image':
 
                             $arrReturn['eval']['isImage'] = '1';
+
+                            if ( $arrField['imageSize'] ) {
+
+                                $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
+                            }
 
                             break;
 

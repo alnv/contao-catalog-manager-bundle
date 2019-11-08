@@ -14,6 +14,7 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['rte'] = [ 'TinyMCE verwenden', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['fieldname'] = [ 'Feldname', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['published'] = [ 'Veröffentlichen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['optionsSource'] = [ 'Optionen-Quelle', '' ];
+$GLOBALS['TL_LANG']['tl_catalog_field']['imageSize'] = [ 'Bildgröße', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['includeBlankOption'] = [ 'Leere Option hinzufügen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['blankOptionLabel'] = [ 'Bezeichnung der leeren Option', '' ];
 

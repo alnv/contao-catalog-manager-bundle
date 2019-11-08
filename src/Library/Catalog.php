@@ -81,15 +81,42 @@ class Catalog extends CatalogWizard {
     protected function setDefaultFields() {
 
         array_insert( $this->arrFields, 0, [
-
-            'id' => [],
-            'pid' => [],
-            'sorting' => [],
-            'tstamp' => [],
-            'invisible' => [],
-            'start' => [],
-            'stop' => [],
-            'alias' => []
+            'id' => [
+                'sql' => "int(10) unsigned NOT NULL auto_increment"
+            ],
+            'pid' => [
+                'sql' => "int(10) unsigned NOT NULL default '0'"
+            ],
+            'sorting' => [
+                'sql' => "int(10) unsigned NOT NULL default '0'"
+            ],
+            'tstamp' => [
+                'sql' => "int(10) unsigned NOT NULL default '0'"
+            ],
+            'invisible' => [
+                'sql' => "char(1) NOT NULL default ''"
+            ],
+            'start' => [
+                'sql' => "varchar(10) NOT NULL default ''"
+            ],
+            'stop' => [
+                'sql' => "varchar(10) NOT NULL default ''"
+            ],
+            'alias' => [
+                'inputType' => 'text',
+                'label' => [
+                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( 'alias', 'Alias' ),
+                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( 'alias.description', '' )
+                ],
+                'eval' => [
+                    'tl_class' => 'w50',
+                    'maxlength' => 128,
+                    'rgxp' => 'alias'
+                ],
+                'exclude' => true,
+                'search' => true,
+                'sql' => "varchar(128) NOT NULL default ''"
+            ]
         ]);
     }
 

@@ -186,6 +186,11 @@ class VirtualDataContainerArray extends \System {
                     function( \DataContainer $objDataContainer ) {
                         Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
                     }
+                ],
+                'sql' => [
+                    'keys' => [
+                        'id' => 'primary'
+                    ]
                 ]
             ],
             'list' => [

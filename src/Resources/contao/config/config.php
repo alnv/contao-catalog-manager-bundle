@@ -40,35 +40,23 @@ $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Mo
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
 
+$GLOBALS['CM_MODELS'] = [];
 
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
+
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
+
 $GLOBALS['CM_OPERATORS'] = [
-    'equal' => [
-
-    ],
-    'notEqual' => [
-
-    ],
-    'findInSet' => [
-
-    ],
-    'regexp' => [
-
-    ],
-    'greater' => [
-
-    ],
-    'greaterEqual' => [
-
-    ],
-    'lower' => [
-
-    ],
-    'lowerEqual' => [
-
-    ]
+    'equal' => [],
+    'notEqual' => [],
+    'findInSet' => [],
+    'regexp' => [],
+    'greater' => [],
+    'greaterEqual' => [],
+    'lower' => [],
+    'lowerEqual' => []
 ];
+
 $GLOBALS['CM_ROLES'] = [
     'miscellaneous' => [
         'group' => 'miscellaneous',
@@ -99,6 +87,10 @@ $GLOBALS['CM_ROLES'] = [
         'type' => 'string'
     ],
     'category' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'author' => [
         'group' => 'article',
         'type' => 'string'
     ],
