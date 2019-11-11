@@ -220,6 +220,15 @@ abstract class View extends \Controller {
             }
         }
 
+        if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
+
+            foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
+
+                $this->import( $arrCallback[0] );
+                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrReturn, $this->strTable, $this->arrOptions );
+            }
+        }
+
         return $arrReturn;
     }
 
