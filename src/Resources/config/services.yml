@@ -17,3 +17,6 @@ services:
   catalogmanager.hooks.datacontainer:
       class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
       public: true
+  catalogmanager.hooks.element:
+      class: Alnv\ContaoCatalogManagerBundle\Hooks\Element
+      public: true
