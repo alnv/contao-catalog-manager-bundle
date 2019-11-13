@@ -432,7 +432,7 @@ class Toolkit {
             $strAlias = substr( $strAlias, 0, 100 );
         }
 
-        if ( $objDatabase->prepare('SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
+        if ( $objDatabase->prepare( 'SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
 
             $strAlias = $strAlias . '-' . $arrActiveRecord['id'];
         }
