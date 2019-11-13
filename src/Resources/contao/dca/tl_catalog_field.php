@@ -59,13 +59,13 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'palettes' => [
         '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption' ],
         'default' => '{general_settings},name,type',
-        'text' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
-        'date' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
-        'color' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{published_legend},published',
+        'text' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{published_legend},published',
+        'date' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{published_legend},published',
+        'color' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{published_legend},published',
         'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,rte;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
         'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple,imageSize;{published_legend},published'
     ],
     'subpalettes' => [
@@ -123,6 +123,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'search' => true,
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        ],
+        'useAsAlias' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50 m12',
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
         ],
         'role' => [
             'inputType' => 'select',

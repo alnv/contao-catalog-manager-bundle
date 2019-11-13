@@ -17,6 +17,7 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['optionsSource'] = [ 'Optionen-Quelle', 
 $GLOBALS['TL_LANG']['tl_catalog_field']['imageSize'] = [ 'Bildgröße', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['includeBlankOption'] = [ 'Leere Option hinzufügen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['blankOptionLabel'] = [ 'Bezeichnung der leeren Option', '' ];
+$GLOBALS['TL_LANG']['tl_catalog_field']['useAsAlias'] = [ 'Im Alias verwenden', 'Dieser Wert wird dem Alias hinzugefügt.' ];
 
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
     'text' => 'Textfeld',

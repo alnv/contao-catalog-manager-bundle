@@ -4,6 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 
 
@@ -82,38 +83,62 @@ class Catalog extends CatalogWizard {
 
         array_insert( $this->arrFields, 0, [
             'id' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'id', '' ),
+                    Translation::getInstance()->translate( 'id.description', '' )
+                ],
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'pid', '' ),
+                    Translation::getInstance()->translate( 'pid.description', '' )
+                ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'sorting' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'sorting', '' ),
+                    Translation::getInstance()->translate( 'sorting.description', '' )
+                ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'tstamp', '' ),
+                    Translation::getInstance()->translate( 'tstamp.description', '' )
+                ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'invisible' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'invisible', '' ),
+                    Translation::getInstance()->translate( 'invisible.description', '' )
+                ],
                 'sql' => "char(1) NOT NULL default ''"
             ],
             'start' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'start', '' ),
+                    Translation::getInstance()->translate( 'start.description', '' )
+                ],
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'stop' => [
+                'label' => [
+                    Translation::getInstance()->translate( 'stop', '' ),
+                    Translation::getInstance()->translate( 'stop.description', '' )
+                ],
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'alias' => [
-                'inputType' => 'text',
                 'label' => [
-                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( 'alias', 'Alias' ),
-                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( 'alias.description', '' )
+                    Translation::getInstance()->translate( 'alias', 'Alias' ),
+                    Translation::getInstance()->translate( 'alias.description', '' )
                 ],
                 'eval' => [
-                    'tl_class' => 'w50',
-                    'maxlength' => 128,
-                    'rgxp' => 'alias'
+                    'doNotCopy' => true
                 ],
-                'exclude' => true,
                 'search' => true,
                 'sql' => "varchar(128) NOT NULL default ''"
             ]

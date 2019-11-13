@@ -185,6 +185,9 @@ class VirtualDataContainerArray extends \System {
                 'onsubmit_callback' => [
                     function( \DataContainer $objDataContainer ) {
                         Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
+                    },
+                    function( \DataContainer $objDataContainer ) {
+                        Toolkit::saveAlias( $objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog );
                     }
                 ],
                 'sql' => [

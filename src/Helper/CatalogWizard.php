@@ -135,6 +135,7 @@ abstract class CatalogWizard extends \System {
                 'decodeEntities' => true,
                 'multiple' => $blnMultiple,
                 'role' => $arrField['role'] ?: '',
+                'useAsAlias' => $arrField['useAsAlias'] ?: '',
                 'mandatory' => $arrField['mandatory'] ? true : false
             ],
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )

@@ -378,4 +378,68 @@ class Toolkit {
             $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrEntity['id'] );
         }
     }
+
+
+    public function saveAlias( $arrActiveRecord, $arrFields, $arrCatalog ) {
+
+        if ( !$arrActiveRecord['id'] ) {
+
+            return null;
+        }
+
+        $arrValues = [];
+        $strAlias = $arrActiveRecord['alias'];
+        $objDatabase = \Database::getInstance();
+
+        /* @todo only if alias field exist in palette
+        if ( $strAlias !== '' && $strAlias !== null && \Validator::isAlias( $strAlias ) && !$objDatabase->prepare('SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
+
+            return null;
+        }
+        */
+
+        foreach ( $arrFields as $strFieldname => $arrField ) {
+
+            if ( !isset( $arrField['eval'] ) ) {
+
+                continue;
+            }
+
+            if ( !$arrField['eval']['useAsAlias'] ) {
+
+                continue;
+            }
+
+            if ( isset( $arrActiveRecord[ $strFieldname ] ) && $arrActiveRecord[ $strFieldname ] !== '' && $arrActiveRecord[ $strFieldname ] !== null ) {
+
+                $arrValues[] = $arrActiveRecord[ $strFieldname ];
+            }
+        }
+
+        if ( empty( $arrValues ) ) {
+
+            $strAlias = md5( time() . '/' . ( $arrActiveRecord['id'] ?: '' ) );
+
+        } else {
+
+            $strAlias = implode( '-', $arrValues );
+        }
+
+        $strAlias = \System::getContainer()->get('contao.slug.generator')->generate( \StringUtil::prepareSlug( $strAlias ), []);
+
+        if ( strlen( $strAlias ) > 100 ) {
+
+            $strAlias = substr( $strAlias, 0, 100 );
+        }
+
+        if ( $objDatabase->prepare('SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
+
+            $strAlias = $strAlias . '-' . $arrActiveRecord['id'];
+        }
+
+        $arrSet = [];
+        $arrSet[ 'tstamp' ] = time();
+        $arrSet[ 'alias' ] = $strAlias;
+        $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrActiveRecord['id'] );
+    }
 }
