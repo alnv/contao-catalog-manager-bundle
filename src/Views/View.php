@@ -133,6 +133,12 @@ abstract class View extends \Controller {
                     $this->arrOptions['template'] = $varValue;
 
                     break;
+
+                case 'language':
+
+                    $this->arrOptions['language'] = $varValue;
+
+                    break;
             }
         }
 
@@ -210,7 +216,7 @@ abstract class View extends \Controller {
     protected function getModelOptions() {
 
         $arrReturn = [];
-        $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having' ];
+        $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language' ];
 
         foreach ( $arrOptions as $strOption ) {
 
