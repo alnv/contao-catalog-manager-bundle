@@ -30,7 +30,6 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
 $objFormAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
 $objFormAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
 
-
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = [ 'catalogmanager.hooks.element', 'isVisibleElement' ];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = [ 'catalogmanager.hooks.search', 'getSearchablePages' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
