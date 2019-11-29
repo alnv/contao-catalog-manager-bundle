@@ -6,24 +6,25 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 class RoleResolver {
 
 
-    protected static $strTable = null;
-    protected static $arrRoles = null;
-    protected static $arrEntity = null;
+    public static $strTable = null;
+    public static $arrRoles = null;
+    public static $arrEntity = null;
     protected static $arrInstances = [];
 
 
     public static function getInstance( $strTable, $arrEntity = [] ) {
 
-        self::$strTable = $strTable;
+        $strInstanceKey = $strTable . ( $arrEntity['id'] ? '_' . $arrEntity['id'] : '' );
 
-        if ( !array_key_exists( self::$strTable, self::$arrInstances ) ) {
+        if ( !array_key_exists( $strInstanceKey, self::$arrInstances ) ) {
 
+            self::$strTable = $strTable;
             self::$arrEntity = $arrEntity;
             self::$arrRoles = static::setRoles();
-            self::$arrInstances[ self::$strTable ] = new self;
+            self::$arrInstances[ $strInstanceKey ] = new self;
         }
 
-        return self::$arrInstances[ self::$strTable ];
+        return self::$arrInstances[ $strInstanceKey ];
     }
 
 
@@ -53,7 +54,8 @@ class RoleResolver {
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
-                'role' => $GLOBALS['CM_ROLES'][ $arrField['eval']['role'] ]
+                'role' => $GLOBALS['CM_ROLES'][ $arrField['eval']['role'] ],
+                'value' => isset( self::$arrEntity[ $strFieldname ] ) ? self::$arrEntity[ $strFieldname ] : ''
             ];
         }
 
@@ -64,6 +66,18 @@ class RoleResolver {
     public function getRole( $strRolename ) {
 
         return $GLOBALS['CM_ROLES'][ $strRolename ];
+    }
+
+
+    public function getValueByRole( $strRolename ) {
+
+        if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
+
+            return '';
+        }
+
+
+        return self::$arrRoles[ $strRolename ]['value'];
     }
 
 

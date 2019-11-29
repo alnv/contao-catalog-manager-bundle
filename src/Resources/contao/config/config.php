@@ -175,5 +175,9 @@ $GLOBALS['CM_ROLES'] = [
     'gender' => [
         'group' => 'person',
         'type' => 'string'
+    ],
+    'sku' => [
+        'group' => 'product',
+        'type' => 'string'
     ]
 ];

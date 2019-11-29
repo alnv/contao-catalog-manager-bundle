@@ -2,10 +2,11 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Views;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 
 abstract class View extends \Controller {
@@ -267,6 +268,12 @@ abstract class View extends \Controller {
             $objTemplate->setData( $arrRow );
             $arrRow['template'] =  $objTemplate->parse();
         }
+
+        $arrRow['roleResolver'] = function () use ( $arrRow ) {
+
+            return RoleResolver::getInstance( $this->strTable, $arrRow );
+            // var_dump($arrRow['sku']);
+        };
 
         if ( $this->arrOptions['groupBy'] ) {
 
