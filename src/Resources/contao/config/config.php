@@ -49,14 +49,30 @@ $GLOBALS['CM_CUSTOM_FIELDS'] = [];
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
 
 $GLOBALS['CM_OPERATORS'] = [
-    'equal' => [],
-    'notEqual' => [],
-    'findInSet' => [],
-    'regexp' => [],
-    'greater' => [],
-    'greaterEqual' => [],
-    'lower' => [],
-    'lowerEqual' => []
+    'equal' => [
+        'token' => '##field##=##value##'
+    ],
+    'notEqual' => [
+        'token' => '##field##!=##value##'
+    ],
+    'findInSet' => [
+        'token' => 'FIND_IN_SET(##field##,##value##)'
+    ],
+    'regexp' => [
+        'token' => '##field## REGEXP ##value##'
+    ],
+    'greater' => [
+        'token' => '##field##>##value##'
+    ],
+    'greaterEqual' => [
+        'token' => '##field##>=##value##'
+    ],
+    'lower' => [
+        'token' => '##field##<##value##'
+    ],
+    'lowerEqual' => [
+        'token' => '##field##<=##value##'
+    ]
 ];
 
 $GLOBALS['CM_ROLES'] = [

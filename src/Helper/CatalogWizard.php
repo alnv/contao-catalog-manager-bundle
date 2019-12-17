@@ -34,6 +34,7 @@ abstract class CatalogWizard extends \System {
         $arrCatalog['ptable'] = '';
         $arrCatalog['related'] = $arrRelated;
         $arrCatalog['ctable'] = $arrChildren;
+        $arrCatalog['_table'] = $arrCatalog['table'];
 
         if ( $arrCatalog['pid'] ) {
 

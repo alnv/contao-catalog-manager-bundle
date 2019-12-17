@@ -2,10 +2,11 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 
 class ListingModule extends \Module {
@@ -125,8 +126,25 @@ class ListingModule extends \Module {
             return null;
         }
 
-        $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
-        $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
+        switch ( $this->cmFilterType ) {
+
+            case 'wizard':
+
+                $arrCatalog = new Catalog( $this->cmTable );
+                $arrCatalog->getCatalog();
+                $arrQueries = Toolkit::convertComboWizardToModelValues( $this->cmWizardFilterSettings, $arrCatalog->getCatalog()['_table'] );
+                $this->arrOptions['column'] = $arrQueries['column'];
+                $this->arrOptions['value'] = $arrQueries['value'];
+
+                break;
+
+            case 'expert':
+
+                $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
+                $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
+
+                break;
+        }
     }
 
 

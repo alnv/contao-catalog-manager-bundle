@@ -143,6 +143,7 @@ abstract class View extends \Controller {
             }
         }
 
+        /*
         if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
 
             $intIndex = -1;
@@ -166,6 +167,7 @@ abstract class View extends \Controller {
                 unset( $this->arrOptions['column'] );
             }
         }
+        */
 
         $this->paginate();
 

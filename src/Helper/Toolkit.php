@@ -161,14 +161,14 @@ class Toolkit {
 
     public static function getValueFromUrl( $arrValue ) {
 
-        if ( $arrValue == '' || $arrValue == null ) {
+        if ( $arrValue === '' || $arrValue === null ) {
 
             return '';
         }
 
         if ( is_array( $arrValue ) ) {
 
-            return implode( ',', $arrValue );
+            return serialize( $arrValue );
         }
 
         return $arrValue;
@@ -441,5 +441,107 @@ class Toolkit {
         $arrSet[ 'tstamp' ] = time();
         $arrSet[ 'alias' ] = $strAlias;
         $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrActiveRecord['id'] );
+    }
+
+
+    public static function convertComboWizardToModelValues( $strValue, $strTable = '' ) {
+
+        $arrReturn = [];
+        $arrValues = [];
+        $arrQueries = [];
+        $strName = 'group0';
+        $blnInitialGroup = true;
+        $arrJson = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $strValue, [
+            'option' => 'field',
+            'option2' => 'operator',
+            'option3' => 'value',
+            'option4' => 'group'
+        ]);
+
+        if ( !is_array( $arrJson ) || empty( $arrJson ) ) {
+
+            return $arrReturn;
+        }
+
+        foreach ( $arrJson as $intIndex => $arrQuery ) {
+
+            if ( isset( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ] ) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'] ) {
+
+                if ( $arrQuery['group'] || $blnInitialGroup ) {
+
+                    $strName = 'group' . $intIndex;
+                }
+
+                if ( !isset( $arrQueries[ $strName ] ) ) {
+
+                    $arrQueries[ $strName ] = [];
+                }
+
+
+                $varValue = $arrQuery['value'];
+
+                if ( $varValue !== '' || $varValue !== null ) {
+
+                    $objIt = new \InsertTags();
+                    $varValue = $objIt->replace( $varValue, true );
+                }
+
+                $arrColumns = [];
+                $varValue = \StringUtil::deserialize( $varValue, true );
+
+                foreach ( $varValue as $strValue ) {
+
+                    $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
+                        'field' => $strTable . '.' . $arrQuery['field'],
+                        'value' => '?'
+                    ]);
+
+                    $arrValues[] = $strValue;
+                }
+
+                if ( !empty( $arrColumns ) ) {
+
+                    if ( count( $arrColumns ) > 1 ) {
+
+                        $strColumn = '(' . implode( ' OR ', $arrColumns ) . ')';
+                    }
+
+                    else {
+
+                        $strColumn = $arrColumns[0];
+                    }
+
+                    $arrQueries[ $strName ][] = $strColumn;
+                }
+
+                if ( $arrQuery['group'] ) {
+
+                    $blnInitialGroup = false;
+                }
+            }
+        }
+
+        $arrReturn['column'] = [];
+        $arrReturn['value'] = $arrValues;
+
+        foreach ( $arrQueries as $arrQuery ) {
+
+            if ( empty( $arrQuery ) ) {
+
+                continue;
+            }
+
+            if ( count( $arrQuery ) > 1 ) {
+
+                $arrReturn['column'][] = '(' . implode( ' OR ', $arrQuery ) . ')';
+            }
+
+            else {
+
+                $arrReturn['column'][] = $arrQuery[0];
+            }
+        }
+
+        return $arrReturn;
     }
 }
