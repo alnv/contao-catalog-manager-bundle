@@ -3,8 +3,9 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
-use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 
 
 abstract class CatalogWizard extends \System {
@@ -130,6 +131,10 @@ abstract class CatalogWizard extends \System {
             'search' => !$blnMultiple,
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
+            'label' => [
+                Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $arrField['fieldname'], $arrField['name'] ),
+                Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $arrField['fieldname'], $arrField['description'] ),
+            ],
             'eval' => [
                 'tl_class' => 'w50',
                 'allowHtml' => true,

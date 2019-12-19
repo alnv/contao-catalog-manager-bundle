@@ -19,10 +19,8 @@ class Application {
             }
 
             $arrModule = [];
-            $arrModule[ $arrCatalog['navigation'] ] = [];
-            $arrModule[ $arrCatalog['navigation'] ][ $arrCatalog['module'] ] = $this->generateBeModConfig( $arrCatalog );
-
-            array_insert( $GLOBALS['BE_MOD'], (int) $arrCatalog['position'], $arrModule );
+            $arrModule[ $arrCatalog['module'] ] = $this->generateBeModConfig( $arrCatalog );
+            array_insert( $GLOBALS['BE_MOD'][ $arrCatalog['navigation'] ], (int) $arrCatalog['position'], $arrModule );
         }
     }
 

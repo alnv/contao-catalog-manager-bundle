@@ -26,7 +26,6 @@ class Catalog extends CatalogWizard {
             return null;
         }
 
-        $this->setDefaultFields();
         $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
         $objFields = CatalogFieldModel::findAll([
@@ -51,6 +50,8 @@ class Catalog extends CatalogWizard {
 
             $this->arrFields[ $objFields->fieldname ] = $arrField;
         }
+
+        $this->setDefaultFields();
     }
 
 
@@ -72,7 +73,7 @@ class Catalog extends CatalogWizard {
 
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
 
-            $arrReturn[ $strFieldname ] = $strFieldname;
+            $arrReturn[ $strFieldname ] = $blnLabelOnly ? $arrField['label'][0] : $strFieldname;
         }
 
         return $arrReturn;
@@ -81,60 +82,87 @@ class Catalog extends CatalogWizard {
 
     protected function setDefaultFields() {
 
-        array_insert( $this->arrFields, 0, [
+        \System::loadLanguageFile('default');
+
+        array_insert( $this->arrFields, count( $this->arrFields ), [
             'id' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'id', '' ),
-                    Translation::getInstance()->translate( 'id.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.id', $GLOBALS['TL_LANG']['MSC']['id'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.id', $GLOBALS['TL_LANG']['MSC']['id'][1] )
                 ],
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'pid', '' ),
-                    Translation::getInstance()->translate( 'pid.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.pid', $GLOBALS['TL_LANG']['MSC']['pid'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.pid', $GLOBALS['TL_LANG']['MSC']['pid'][1] )
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'sorting' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'sorting', '' ),
-                    Translation::getInstance()->translate( 'sorting.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.sorting', $GLOBALS['TL_LANG']['MSC']['sorting'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.sorting', $GLOBALS['TL_LANG']['MSC']['sorting'][1] )
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'tstamp', '' ),
-                    Translation::getInstance()->translate( 'tstamp.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.tstamp', $GLOBALS['TL_LANG']['MSC']['tstamp'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.tstamp', $GLOBALS['TL_LANG']['MSC']['tstamp'][1] )
                 ],
+                'flag' => 6,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
-            'invisible' => [
+            'published' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'invisible', '' ),
-                    Translation::getInstance()->translate( 'invisible.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.published', $GLOBALS['TL_LANG']['MSC']['published'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.published', $GLOBALS['TL_LANG']['MSC']['published'][1] )
                 ],
+                'inputType' => 'checkbox',
+                'eval' => [
+                    'multiple' => false,
+                    'doNotCopy' => true,
+                    'tl_class' => 'clr'
+                ],
+                'filter' => true,
+                'exclude' => true,
                 'sql' => "char(1) NOT NULL default ''"
             ],
             'start' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'start', '' ),
-                    Translation::getInstance()->translate( 'start.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.start', $GLOBALS['TL_LANG']['MSC']['start'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.start', $GLOBALS['TL_LANG']['MSC']['start'][1] )
                 ],
+                'inputType' => 'text',
+                'eval' => [
+                    'rgxp'=>'datim',
+                    'datepicker' => true,
+                    'tl_class' => 'w50 wizard'
+                ],
+                'flag' => 6,
+                'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'stop' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'stop', '' ),
-                    Translation::getInstance()->translate( 'stop.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.stop', $GLOBALS['TL_LANG']['MSC']['stop'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.stop', $GLOBALS['TL_LANG']['MSC']['stop'][1] )
                 ],
+                'inputType' => 'text',
+                'eval' => [
+                    'rgxp'=>'datim',
+                    'datepicker' => true,
+                    'tl_class' => 'w50 wizard'
+                ],
+                'flag' => 6,
+                'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'alias' => [
                 'label' => [
-                    Translation::getInstance()->translate( 'alias', 'Alias' ),
-                    Translation::getInstance()->translate( 'alias.description', '' )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.alias', $GLOBALS['TL_LANG']['MSC']['alias'][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.alias', $GLOBALS['TL_LANG']['MSC']['alias'][1] )
                 ],
                 'eval' => [
                     'doNotCopy' => true
@@ -163,6 +191,14 @@ class Catalog extends CatalogWizard {
             }
 
             unset( $arrField['index'] );
+
+            if ( !isset( $arrField['label'] ) ) {
+
+                $arrField['label'] = [
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )
+                ];
+            }
 
             $arrFields[ $strFieldname ] = $arrField;
         }

@@ -363,7 +363,7 @@ class Toolkit {
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
 
-        if ( ( $arrEntity[ $arrGeoFields['longitude'] ] !== null && $arrEntity[ $arrGeoFields['longitude'] ]  !== '' ) && ( $arrEntity[ $arrGeoFields['latitude'] ] !== null && $arrEntity[ $arrGeoFields['latitude'] ] !== '' ) ) {
+        if ( ( $arrEntity[ $arrGeoFields['longitude'] ] !== null || $arrEntity[ $arrGeoFields['longitude'] ]  !== '' ) && ( $arrEntity[ $arrGeoFields['latitude'] ] !== null || $arrEntity[ $arrGeoFields['latitude'] ] !== '' ) ) {
 
             return null;
         }
@@ -543,5 +543,22 @@ class Toolkit {
         }
 
         return $arrReturn;
+    }
+
+
+    public static function getTableByDo() {
+
+        if ( !\Input::get('do') ) {
+
+            return null;
+        }
+
+        if ( \Input::get('do') && \Input::get('table') ) {
+
+            return \Input::get('table');
+        }
+
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( \Input::get('do') );
+        return $objCatalog->getCatalog()['table'];
     }
 }

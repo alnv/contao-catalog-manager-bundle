@@ -2,6 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+
 
 class Catalog {
 
@@ -181,5 +183,108 @@ class Catalog {
             'ASC',
             'DESC'
         ];
+    }
+
+
+    public function toggleIcon( $arrRow, $strHref, $strLabel, $strTitle, $strIcon, $strAttributes ) {
+
+        if ( \Input::get('tid') ) {
+
+            $this->toggleVisibility( \Input::get('tid'), ( \Input::get('state') == 1 ), ( @func_get_arg(12) ?: null ) );
+
+            \Controller::redirect( \Controller::getReferer() );
+        }
+
+        $strHref .= '&amp;tid='.$arrRow['id'].'&amp;state='.( $arrRow['published'] ? '' : 1);
+
+        if ( !$arrRow['published'] ) {
+
+            $strIcon = 'invisible.svg';
+        }
+
+        return '<a href="'. \Backend::addToUrl( $strHref ) . '" title="'. \StringUtil::specialchars( $strTitle ) .'"'. $strAttributes. '>'.\Image::getHtml( $strIcon, $strLabel, 'data-state="' . ( $arrRow['published'] ? 1 : 0 ) . '"' ).'</a> ';
+    }
+
+
+    protected function toggleVisibility( $intId, $blnVisible, \DataContainer $objDataContainer=null ) {
+
+        \Input::setGet('id', $intId);
+        \Input::setGet('act', 'toggle');
+
+        $strTable = Toolkit::getTableByDo();
+
+        if ( !$strTable ) {
+
+            return null;
+        }
+
+        if ( $objDataContainer ) {
+
+            $objDataContainer->id = $intId;
+        }
+
+        if (is_array($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'])) {
+            foreach ($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'] as $callback) {
+                if (is_array($callback)) {
+                    $this->import($callback[0]);
+                    $this->{$callback[0]}->{$callback[1]}($objDataContainer);
+                }
+                elseif (is_callable($callback)) {
+                    $callback($objDataContainer);
+                }
+            }
+        }
+
+        if ( $objDataContainer ) {
+
+            $objRow = \Database::getInstance()->prepare('SELECT * FROM '. $strTable .' WHERE id=?')->limit( 1 )->execute( $intId );
+
+            if ($objRow->numRows) {
+
+                $objDataContainer->activeRecord = $objRow;
+            }
+        }
+
+        $objVersions = new \Versions( $strTable, $intId );
+        $objVersions->initialize();
+
+        if (is_array($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'] as $callback) {
+                if (is_array($callback)) {
+                    $this->import($callback[0]);
+                    $this->{$callback[0]}->{$callback[1]}($blnVisible, $objDataContainer);
+                }
+                elseif (is_callable($callback)) {
+                    $callback($blnVisible, $objDataContainer);
+                }
+            }
+        }
+
+        $intTime = time();
+
+        \Database::getInstance()->prepare('UPDATE '. $strTable .' %s WHERE id=?')->set([
+            'tstamp' => time(),
+            'published' => ( $blnVisible ? '1' : '' )
+        ])->execute($intId);
+
+        if ( $objDataContainer ) {
+
+            $objDataContainer->activeRecord->tstamp = $intTime;
+            $objDataContainer->activeRecord->published = ( $blnVisible ? '1' : '' );
+        }
+
+        if (is_array($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'] as $callback) {
+                if (is_array($callback)) {
+                    $this->import($callback[0]);
+                    $this->{$callback[0]}->{$callback[1]}($objDataContainer);
+                }
+                elseif (is_callable($callback)) {
+                    $callback($objDataContainer);
+                }
+            }
+        }
+
+        $objVersions->create();
     }
 }

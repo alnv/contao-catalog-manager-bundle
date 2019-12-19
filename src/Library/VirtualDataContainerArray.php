@@ -30,6 +30,13 @@ class VirtualDataContainerArray extends \System {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ctable'] = $this->arrCatalog['ctable'];
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
+
+        if ( $this->arrCatalog['enableGeocoding'] ) {
+
+            $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['onsubmit_callback'][] = function( \DataContainer $objDataContainer ) {
+                Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
+            };
+        }
     }
 
 
@@ -83,7 +90,7 @@ class VirtualDataContainerArray extends \System {
 
                     if ( isset( $arrOrder['field'] ) && $arrOrder['field'] ) {
 
-                        $arrList['sorting']['fields'][] = $arrOrder['field'] . ( $arrOrder['order'] ? ' ' . $arrOrder['order'] : ' ASC' );
+                        $arrList['sorting']['fields'][] = $arrOrder['field'] . ( $arrOrder['order'] ? ' ' . $arrOrder['order'] : '' );
                         $arrSortingFields[] = $arrOrder['field'];
                     }
                 }
@@ -119,7 +126,8 @@ class VirtualDataContainerArray extends \System {
         if ( $this->arrCatalog['mode'] == 'tree' ) {
 
             $arrList['sorting']['mode'] = 5;
-            $arrList['sorting']['icon'] = 'articles.svg';
+            $arrList['sorting']['fields'] = ['sorting'];
+            $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
             $arrList['labels']['label_callback'] =  function ( $arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false  ) use ( $arrList ) {
 
@@ -128,10 +136,40 @@ class VirtualDataContainerArray extends \System {
 
             $arrList['sorting']['fields'] = [];
             $arrList['labels']['showColumns'] = false;
+
+            array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, [
+                'cut' => [
+                    'icon' => 'cut.svg',
+                    'href' => 'act=paste&amp;mode=cut',
+                    'attributes' => 'onclick="Backend.getScrollOffset()"'
+                ]
+            ]);
         }
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['label'] = $arrList['labels'];
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['sorting'] = $arrList['sorting'];
+
+        if ( $this->arrCatalog['enableCopy'] ) {
+
+            array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, [
+                'copy' => [
+                    'href' => 'act=copy',
+                    'icon' => 'copy.gif'
+                ]
+            ]);
+        }
+
+        if ( $this->arrCatalog['enableVisibility'] ) {
+
+            array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], count( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'] ) - 1, [
+                'toggle' => [
+                    'icon' => 'visible.gif',
+                    'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s,\''.$this->arrCatalog['table'].'\')"',
+                    'button_callback' => [ 'catalogmanager.datacontainer.catalog', 'toggleIcon' ],
+                    'showInHeader' => true
+                ]
+            ]);
+        }
     }
 
 
@@ -147,6 +185,11 @@ class VirtualDataContainerArray extends \System {
         $arrPalette = [];
 
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
+
+            if ( !$this->arrCatalog['enableVisibility'] && in_array( $strFieldname, [ 'published', 'start', 'stop' ] ) ) {
+
+                continue;
+            }
 
             $arrPalette[] =  $strFieldname;
         }
@@ -171,8 +214,9 @@ class VirtualDataContainerArray extends \System {
             }
 
             $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.' . $strFieldname, $arrField['name'] ),
-                '' // @todo description
+
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $arrField['name'] ),
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description' . $strFieldname, $arrField['name'] )
             ];
         }
     }
@@ -183,9 +227,6 @@ class VirtualDataContainerArray extends \System {
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
             'config' => [
                 'onsubmit_callback' => [
-                    function( \DataContainer $objDataContainer ) {
-                        Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
-                    },
                     function( \DataContainer $objDataContainer ) {
                         Toolkit::saveAlias( $objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog );
                     }
@@ -203,10 +244,6 @@ class VirtualDataContainerArray extends \System {
                     'edit' => [
                         'href' => 'act=edit',
                         'icon' => 'header.gif'
-                    ],
-                    'copy' => [
-                        'href' => 'act=copy',
-                        'icon' => 'copy.gif'
                     ],
                     'delete' => [
                         'href' => 'act=delete',

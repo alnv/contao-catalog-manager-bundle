@@ -29,16 +29,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'icon' => 'copy.gif'
             ],
             'delete' => [
-
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
                 'icon' => 'visible.gif',
-                'href' => sprintf( 'catalogTable=%s', 'tl_catalog_fields' ),
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'toggleIcon' ],
+                'button_callback' => [ 'catalogmanager.datacontainer.catalog', 'toggleIcon' ],
                 'showInHeader' => true
             ],
             'show' => [
@@ -47,7 +45,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ]
         ],
         'global_operations' => [
-
             'all' => [
                 'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',

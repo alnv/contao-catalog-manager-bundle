@@ -52,31 +52,6 @@ class CatalogField {
         return $arrRoles;
     }
 
-    // @todo make it reuseabel
-    public function toggleIcon( $arrRow, $strHref, $strLabel, $strTitle, $strIcon, $strAttributes ) {
-
-        if ( \Input::get('tid') ) {
-
-            $this->toggleVisibility( \Input::get('tid'), ( \Input::get('state') == 1 ), ( @func_get_arg(12) ?: null ) );
-            \Controller::redirect( \Controller::getReferer() );
-        }
-
-        $strHref .= '&amp;tid='.$arrRow['id'].'&amp;state='.( $arrRow['published'] ? '' : 1);
-
-        if ( !$arrRow['published'] ) {
-
-            $strIcon = 'invisible.svg';
-        }
-
-        return '<a href="'. \Backend::addToUrl( $strHref ) . '" title="'. \StringUtil::specialchars( $strTitle ) .'"'. $strAttributes. '>'.\Image::getHtml( $strIcon, $strLabel, 'data-state="' . ( $arrRow['published'] ? 1 : 0 ) . '"' ).'</a> ';
-    }
-
-
-    protected function toggleVisibility() {
-
-        // @todo
-    }
-
 
     public function watchFieldname( $strFieldname, \DataContainer $objDataContainer ) {
 

@@ -145,24 +145,16 @@ abstract class View extends \Controller {
 
         /*
         if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
-
             $intIndex = -1;
             $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
-
                 $intIndex = $intIndex + 1;
-
                 if ( $strValue === '' || $strValue === null ) {
-
                     unset( $this->arrOptions['column'][ $intIndex ] );
-
                     return false;
                 }
-
                 return true;
             });
-
             if ( empty( $this->arrOptions['value'] ) ) {
-
                 unset( $this->arrOptions['value'] );
                 unset( $this->arrOptions['column'] );
             }

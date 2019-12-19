@@ -12,7 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
  *
  * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
  */
-class FrontendController {
+class FrontendController extends Controller {
 
 
     /**

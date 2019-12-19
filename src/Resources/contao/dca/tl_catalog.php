@@ -213,7 +213,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'headerFields' => [
-            'inputType' => 'checkbox',
+            'inputType' => 'checkboxWizard',
             'eval' => [
                 'tl_class' => 'clr',
                 'multiple' => true
@@ -296,7 +296,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'multiple' => false
             ],
             'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '1']
+            'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enableVisibility' => [
             'inputType' => 'checkbox',

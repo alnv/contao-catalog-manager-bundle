@@ -28,7 +28,7 @@ class Database {
         $strFields =
             "`stop` varchar(16) NOT NULL default ''," .
             "`start` varchar(16) NOT NULL default ''," .
-            "`invisible` char(1) NOT NULL default ''," .
+            "`published` char(1) NOT NULL default ''," .
             "`alias` varchar(255) NOT NULL default ''," .
             "`pid` int(10) unsigned NOT NULL default '0',".
             "`id` int(10) unsigned NOT NULL auto_increment," .
