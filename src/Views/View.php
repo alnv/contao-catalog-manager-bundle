@@ -96,7 +96,7 @@ abstract class View extends \Controller {
 
                 case 'column':
 
-                    if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
+                    if ( is_array( $varValue ) && !empty( $varValue ) ) {
 
                         $this->arrOptions['column'] = $varValue;
                     }
@@ -105,7 +105,7 @@ abstract class View extends \Controller {
 
                 case 'value':
 
-                    if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
+                    if ( is_array( $varValue ) && !empty( $varValue ) ) {
 
                         $this->arrOptions['value'] = $varValue;
                     }
