@@ -37,6 +37,8 @@ class VirtualDataContainerArray extends \System {
                 Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
             };
         }
+
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
     }
 
 

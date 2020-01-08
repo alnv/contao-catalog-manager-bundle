@@ -15,7 +15,6 @@ abstract class View extends \Controller {
     protected $strTable = null;
     protected $arrOptions = [];
     protected $arrEntities = [];
-    protected $blnMaster = false;
     protected $dcaExtractor = null;
     protected $arrMasterPage = null;
 
@@ -108,11 +107,7 @@ abstract class View extends \Controller {
 
                     if ( is_array( $varValue ) && !empty( is_array( $varValue ) ) ) {
 
-                        $this->arrOptions['value'] = array_map( function ( $strValue ) {
-
-                            return \Controller::replaceInsertTags( $strValue );
-
-                        }, $varValue );
+                        $this->arrOptions['value'] = $varValue;
                     }
 
                     break;
@@ -142,24 +137,6 @@ abstract class View extends \Controller {
                     break;
             }
         }
-
-        /*
-        if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
-            $intIndex = -1;
-            $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
-                $intIndex = $intIndex + 1;
-                if ( $strValue === '' || $strValue === null ) {
-                    unset( $this->arrOptions['column'][ $intIndex ] );
-                    return false;
-                }
-                return true;
-            });
-            if ( empty( $this->arrOptions['value'] ) ) {
-                unset( $this->arrOptions['value'] );
-                unset( $this->arrOptions['column'] );
-            }
-        }
-        */
 
         $this->paginate();
 
@@ -266,7 +243,6 @@ abstract class View extends \Controller {
         $arrRow['roleResolver'] = function () use ( $arrRow ) {
 
             return RoleResolver::getInstance( $this->strTable, $arrRow );
-            // var_dump($arrRow['sku']);
         };
 
         if ( $this->arrOptions['groupBy'] ) {

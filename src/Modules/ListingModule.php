@@ -60,6 +60,10 @@ class ListingModule extends \Module {
         $this->setPagination();
         $this->setDistance();
 
+        // @todo check visibility by data container >hasVisibilityFields<
+        // @todo impl optional visibility parameter
+        // @todo add visibility query in View Class
+
         $objListing = new Listing( $this->cmTable, $this->arrOptions );
 
         $this->Template->entities = $objListing->parse();
@@ -140,8 +144,25 @@ class ListingModule extends \Module {
 
             case 'expert':
 
+                $this->cmValue =  \Controller::replaceInsertTags( $this->cmValue );
                 $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
                 $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
+
+                if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
+                    $intIndex = -1;
+                    $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
+                        $intIndex = $intIndex + 1;
+                        if ( $strValue === '' || $strValue === null ) {
+                            unset( $this->arrOptions['column'][ $intIndex ] );
+                            return false;
+                        }
+                        return true;
+                    });
+                    if ( empty( $this->arrOptions['value'] ) ) {
+                        unset( $this->arrOptions['value'] );
+                        unset( $this->arrOptions['column'] );
+                    }
+                }
 
                 break;
         }
