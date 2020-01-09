@@ -23,6 +23,8 @@ class VirtualDataContainerArray extends \System {
 
     protected function setConfig() {
 
+        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['_table'] = $this->arrCatalog['table'];
+
         if (  $this->arrCatalog['ptable'] ) {
 
             $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ptable'] = $this->arrCatalog['ptable'];
