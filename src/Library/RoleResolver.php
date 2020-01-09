@@ -76,7 +76,6 @@ class RoleResolver {
             return '';
         }
 
-
         return self::$arrRoles[ $strRolename ]['value'];
     }
 

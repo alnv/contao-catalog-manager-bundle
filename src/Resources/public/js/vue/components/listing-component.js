@@ -131,5 +131,6 @@ const listingComponent = Vue.component( 'listing', {
         '<transition name="fade">' +
             '<div class="listing-component-container" v-html="view" v-show="view"></div>' +
         '</transition>' +
+        '<loading v-if="!view"></loading>' +
     '</div>'
 });

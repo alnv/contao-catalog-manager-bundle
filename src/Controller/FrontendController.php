@@ -34,4 +34,39 @@ class FrontendController extends Controller {
         echo json_encode( [ 'template' => $strListing ], 512 );
         exit;
     }
+
+
+    /**
+     *
+     * @Route("/async-image", name="async-image")
+     * @Method({"POST"})
+     */
+    public function getAsyncImage() {
+
+        $this->container->get( 'contao.framework' )->initialize();
+
+        $arrReturn = [
+            'src' => null,
+            'alt' => ''
+        ];
+
+        $objEntity = new \Alnv\ContaoCatalogManagerBundle\Views\Master( \Input::post('table'), [
+            'alias' => \Input::post('id'),
+            'id' => '1'
+        ]);
+
+        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance( \Input::post('table'), $objEntity->parse()[0] );
+        $arrImage = $objRoleResolver->getValueByRole(\Input::post('role'));
+
+        if ( is_array( $arrImage ) && !empty( $arrImage ) ) {
+
+            $arrReturn['src'] = $arrImage[0]['img']['srcset'];
+            $arrReturn['alt'] = $arrImage[0]['alt'];
+            $arrReturn['test'] = $objEntity->parse()[0];
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode( $arrReturn, 512 );
+        exit;
+    }
 }

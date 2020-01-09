@@ -27,8 +27,9 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
     ]
 ]);
 
-$objFormAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
-$objFormAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
+$objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
+$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
+$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
 
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = [ 'catalogmanager.hooks.element', 'isVisibleElement' ];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = [ 'catalogmanager.hooks.search', 'getSearchablePages' ];
