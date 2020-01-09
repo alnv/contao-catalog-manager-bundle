@@ -134,9 +134,8 @@ class ListingModule extends \Module {
 
             case 'wizard':
 
-                $arrCatalog = new Catalog( $this->cmTable );
-                $arrCatalog->getCatalog();
-                $arrQueries = Toolkit::convertComboWizardToModelValues( $this->cmWizardFilterSettings, $arrCatalog->getCatalog()['_table'] );
+                \Controller::loadDataContainer($this->cmTable);
+                $arrQueries = Toolkit::convertComboWizardToModelValues( $this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] );
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
 
