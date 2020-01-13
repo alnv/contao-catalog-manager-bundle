@@ -22,6 +22,6 @@ class Listing extends View {
             }
         }
 
-        return $this->arrEntities;
+        return $this->getEntities();
     }
 }

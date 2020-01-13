@@ -295,5 +295,20 @@ abstract class View extends \Controller {
     }
 
 
+    public function getEntities() {
+
+        if ( isset( $GLOBALS['TL_HOOKS']['parseViewEntities'] ) && is_array( $GLOBALS['TL_HOOKS']['parseViewEntities'] ) ) {
+
+            foreach ( $GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback ) {
+
+                $this->import( $arrCallback[0] );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}( $this->arrEntities, $this );
+            }
+        }
+
+        return $this->arrEntities;
+    }
+
+
     abstract public function parse();
 }

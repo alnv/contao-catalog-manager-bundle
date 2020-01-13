@@ -19,6 +19,6 @@ class Master extends View {
             $this->parseEntity( $objEntity->row() );
         }
 
-        return $this->arrEntities;
+        return $this->getEntities();
     }
 }
