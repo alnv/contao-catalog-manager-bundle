@@ -42,11 +42,8 @@ $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Mod
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
 
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
-
 $GLOBALS['CM_MODELS'] = [];
-
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
-
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
 
 $GLOBALS['CM_OPERATORS'] = [

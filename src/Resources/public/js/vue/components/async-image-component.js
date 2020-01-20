@@ -23,11 +23,14 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         },
         onChange: function () {
             if ( this.$parent.shared.item ) {
-                this.id = parseInt( this.$parent.shared.item );
+                var imageId = parseInt( this.$parent.shared.item );
+                if ( imageId !== this.id ) {
+                    this.id = imageId;
+                    this.src = '';
+                    this.alt = '';
+                    this.fetch();
+                }
             }
-            this.src = '';
-            this.alt = '';
-            this.fetch();
         }
     },
     mounted: function () {
