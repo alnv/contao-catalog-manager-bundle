@@ -16,13 +16,20 @@ const listingComponent = Vue.component( 'listing', {
             this.$http.get( strUrl, {
                 params: this.parameters
             }).then(function ( objResponse ) {
-                if ( objResponse.body ) {
+                if ( objResponse.body && objResponse.ok ) {
                     this.view = objResponse.body.template;
+                    this.$parent.clearAlert();
+                }
+                if ( !objResponse.ok ) {
+                    this.$parent.setErrorAlert( '', this );
                 }
             });
         },
         onChange: function ( shared ) {
             this.parameters = shared;
+            if ( this.view ) {
+                this.$parent.setLoadingAlert( '', this );
+            }
             this.fetch();
         },
         sortable: function () {
@@ -112,9 +119,16 @@ const listingComponent = Vue.component( 'listing', {
         })
     },
     mounted: function () {
-        this.fetch();
+        if (!this.awaitOnChange) {
+            this.fetch();
+        }
     },
     props: {
+        awaitOnChange: {
+            type: Boolean,
+            default: false,
+            required: true
+        },
         module: {
             type: String,
             default: null,
