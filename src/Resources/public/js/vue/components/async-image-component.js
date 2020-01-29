@@ -48,16 +48,24 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         table: {
             type: String,
             required: true
+        },
+        isSticky: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
+        stickyOffset: {
+            type: String,
+            default: '0px',
+            required: false
         }
     },
     template:
         '<div class="async-image-component">' +
             '<slot>' +
                 '<div class="ce_image block">' +
-                    '<figure v-if="src">' +
-                        '<img :src="src" :alt="alt">' +
-                    '</figure>' +
-                    '<loading v-if="!src"></loading>' +
+                    '<figure v-if="src"><img :src="src" :alt="alt" v-sticky-image="{offset: this.stickyOffset, isSticky: this.isSticky}"></figure>' +
+                    '<loading v-if="!src" v-sticky-image="{offset: this.stickyOffset, isSticky: this.isSticky}"></loading>' +
                 '</div>' +
             '</slot>' +
         '</div>'

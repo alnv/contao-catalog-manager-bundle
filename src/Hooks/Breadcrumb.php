@@ -13,12 +13,15 @@ class Breadcrumb {
             return null;
         }
 
+        $intLastItemId = count( $arrItems ) -1;
+        $arrItems[ $intLastItemId]['isActive'] = false;
+
         $arrItem = [];
         $arrItem['isActive'] = true;
         $arrItem['href'] = $GLOBALS['CM_MASTER']['masterUrl'];
-        $arrItem['data'] = [];
         $arrItem['link'] = $GLOBALS['CM_MASTER']['title']; // @todo role resolver
         $arrItem['title'] = $GLOBALS['CM_MASTER']['title']; // @todo role resolver
+        $arrItem['data'] = $arrItems[ $intLastItemId ]['data'];
 
         $arrItems[] = $arrItem;
 
