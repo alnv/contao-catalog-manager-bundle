@@ -14,6 +14,12 @@ services:
   catalogmanager.hooks.initialize:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\Initialize
     public: true
+  catalogmanager.hooks.breadcrumb:
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\Breadcrumb
+    public: true
+  catalogmanager.hooks.pageLayout:
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout
+    public: true
   catalogmanager.hooks.datacontainer:
       class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
       public: true

@@ -31,17 +31,20 @@ $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
 
+$GLOBALS['TL_HOOKS']['getPageLayout'][] = [ 'catalogmanager.hooks.pageLayout', 'generateMaster' ];
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = [ 'catalogmanager.hooks.element', 'isVisibleElement' ];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = [ 'catalogmanager.hooks.search', 'getSearchablePages' ];
+$GLOBALS['TL_HOOKS']['generateBreadcrumb'][] = [ 'catalogmanager.hooks.breadcrumb', 'generateDetailPage' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'initializeBackendModules' ];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
 $GLOBALS['TL_HOOKS']['loadDataContainer'][] = [ 'catalogmanager.hooks.datacontainer', 'generateDataContainerArray' ];
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
 
 $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
 
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
+$GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
@@ -82,6 +85,14 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'type' => 'string'
     ],
+    'subtitle' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'tags' => [
+        'group' => 'article',
+        'type' => 'array'
+    ],
     'alias' => [
         'group' => 'article',
         'type' => 'string'
@@ -112,6 +123,10 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'author' => [
         'group' => 'article',
+        'type' => 'string'
+    ],
+    'location' => [
+        'group' => 'address',
         'type' => 'string'
     ],
     'street' => [
@@ -149,6 +164,10 @@ $GLOBALS['CM_ROLES'] = [
     'email' => [
         'group' => 'contact',
         'type' => 'email'
+    ],
+    'url' => [
+        'group' => 'contact',
+        'type' => 'url'
     ],
     'phone' => [
         'group' => 'contact',
