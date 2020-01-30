@@ -6,7 +6,6 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
-use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 
 abstract class View extends \Controller {
@@ -215,6 +214,7 @@ abstract class View extends \Controller {
 
         $arrRow = [];
         $arrRow['origin'] = [];
+        $arrRow['_table'] = $this->strTable;
 
         if ( $this->arrOptions['masterPage'] ) {
 
@@ -233,17 +233,27 @@ abstract class View extends \Controller {
             $arrRow[ $strField ] = $strParsedValue;
         }
 
+        $arrRow['roleResolver'] = function () use ( $arrRow ) {
+
+            return \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance( $this->strTable, $arrRow );
+        };
+
+        $arrRow['shareButtons'] = function () use ( $arrRow ) {
+
+            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ShareButtons( $arrRow ) )->getShareButtons();
+        };
+
+        $arrRow['iCalendarUrl'] = function () use ( $arrRow ) {
+
+            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
+        };
+
         if ( $this->arrOptions['template'] ) {
 
             $objTemplate = new \FrontendTemplate( $this->arrOptions['template'] );
             $objTemplate->setData( $arrRow );
             $arrRow['template'] =  $objTemplate->parse();
         }
-
-        $arrRow['roleResolver'] = function () use ( $arrRow ) {
-
-            return RoleResolver::getInstance( $this->strTable, $arrRow );
-        };
 
         if ( $this->arrOptions['groupBy'] ) {
 

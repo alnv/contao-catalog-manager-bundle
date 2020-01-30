@@ -187,6 +187,22 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'contact',
         'type' => 'string'
     ],
+    'startDate' => [
+        'group' => 'date',
+        'type' => 'date'
+    ],
+    'startTime' => [
+        'group' => 'date',
+        'type' => 'time'
+    ],
+    'endDate' => [
+        'group' => 'date',
+        'type' => 'date'
+    ],
+    'endTime' => [
+        'group' => 'date',
+        'type' => 'time'
+    ],
     'date' => [
         'group' => 'date',
         'type' => 'date'

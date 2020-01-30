@@ -165,7 +165,8 @@ class Catalog extends CatalogWizard {
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.alias', $GLOBALS['TL_LANG']['MSC']['alias'][1] )
                 ],
                 'eval' => [
-                    'doNotCopy' => true
+                    'doNotCopy' => true,
+                    'role' => 'alias'
                 ],
                 'search' => true,
                 'sql' => "varchar(128) NOT NULL default ''"

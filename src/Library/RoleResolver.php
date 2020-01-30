@@ -80,6 +80,17 @@ class RoleResolver {
     }
 
 
+    public function getFieldByRole( $strRolename ) {
+
+        if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
+
+            return '';
+        }
+
+        return self::$arrRoles[ $strRolename ]['name'];
+    }
+
+
     public function getGeoCodingAddress() {
 
         $arrAddress = [];
