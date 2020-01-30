@@ -64,9 +64,9 @@ class FrontendController extends Controller {
     public function getICalendar() {
         $this->container->get( 'contao.framework' )->initialize();
         global $objPage;
-        $objPage = \PageModel::findByPK( \Input::get('id') )->loadDetails();
-        $objEntity = new \Alnv\ContaoCatalogManagerBundle\Views\Master( \Input::get('table'), [
-            'alias' => \Input::get('id'),
+        $objPage = \PageModel::findByPK( \Input::get('p') )->loadDetails();
+        $objEntity = new \Alnv\ContaoCatalogManagerBundle\Views\Master( \Input::get('t'), [
+            'alias' => \Input::get('i'),
             'id' => '1'
         ]);
         $arrMaster = $objEntity->parse()[0] ?: [];

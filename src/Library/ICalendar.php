@@ -17,7 +17,7 @@ class ICalendar {
 
         global $objPage;
 
-        return 'catalog-manager/icalendar/?table='. ( $this->arrEntity['_table'] ) .'&id='. ( $this->arrEntity['id'] ) .'&page=' . $objPage->id;
+        return 'catalog-manager/icalendar/?t='. ( $this->arrEntity['_table'] ) .'&i='. ( $this->arrEntity['id'] ) .'&p=' . $objPage->id;
     }
 
 
