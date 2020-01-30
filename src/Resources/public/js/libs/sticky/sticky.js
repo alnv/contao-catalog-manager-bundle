@@ -50,7 +50,7 @@ class Sticky {
                 clearInterval(pageLoaded);
                 this.renderElement(this.selector)
             }
-        }, 10);
+        }, 250);
     }
 
 
