@@ -14,6 +14,8 @@ class ActiveInsertTag {
 
         if ( is_array( $arrFragments ) && $arrFragments[0] == 'ACTIVE' && isset( $arrFragments[1] ) ) {
 
+            global $objPage;
+
             $strDefault = null;
             $blnUseDefault = false;
             $varValue = Toolkit::getValueFromUrl( \Input::get( $arrFragments[1] ) ); // @todo post
@@ -41,6 +43,16 @@ class ActiveInsertTag {
             if ( $blnUseDefault && ( $varValue === '' || $varValue === null ) ) {
 
                 $varValue = $strDefault;
+            }
+
+            if ( \Validator::isDate( $varValue ) ) {
+
+                $varValue = (new \Date( $varValue, $objPage->dateFormat ))->dayBegin;
+            }
+
+            if ( \Validator::isDatim( $varValue ) ) {
+
+                $varValue = (new \Date( $varValue, $objPage->dateFormat ))->dayBegin;
             }
 
             return $varValue;
