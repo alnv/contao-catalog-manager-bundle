@@ -65,7 +65,6 @@ class ListingModule extends \Module {
         // @todo add visibility query in View Class
 
         $objListing = new Listing( $this->cmTable, $this->arrOptions );
-
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();
     }

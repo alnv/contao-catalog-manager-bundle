@@ -1,0 +1,45 @@
+<?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
+    <?php $strUniqueId = 'map_' . uniqid(); ?>
+    <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:400px"></div>
+    <script defer async>
+        var initMap = function () {
+            var objInfoBox, objPosition, objMarker, arrLocations = <?= $this->varLocations ?>;
+            var objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {
+                center: new google.maps.LatLng(-25.363, 131.044),
+                zoom: 4
+            });
+            var objBounds = new google.maps.LatLngBounds();
+            if ( typeof arrLocations === 'undefined' || !arrLocations.length ) {
+                return null;
+            }
+            for (var i=0;i<arrLocations.length;i++) {
+                if ( !arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude'] ) {
+                    continue;
+                }
+                objInfoBox = new google.maps.InfoWindow({
+                    content: 'Hallo Welt'
+                });
+                objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'],arrLocations[i]['map']['longitude']);
+                objMarker = new google.maps.Marker({
+                    title: arrLocations[i]['map']['title'],
+                    position: objPosition,
+                    map: objMap
+                });
+                objMarker.addListener('click', function() {
+                    objInfoBox.open(objMap,objMarker);
+                });
+                objBounds.extend(objPosition);
+            }
+            objMap.fitBounds(objBounds);
+        };
+        var loadGMap = function () {
+            var objScript = document.createElement('script');
+            objScript.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyByWU1hQHfJEQjOkUjIBNU1JmyQ9_SG1nY&callback=initMap';
+            objScript.id = "script_<?= $strUniqueId ?>";
+            objScript.defer = true;
+            objScript.async = true;
+            document.body.appendChild(objScript);
+        };
+        loadGMap();
+    </script>
+<?php endif; ?>
