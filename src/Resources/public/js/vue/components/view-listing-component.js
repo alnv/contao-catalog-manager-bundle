@@ -1,4 +1,4 @@
-const listingComponent = Vue.component( 'listing', {
+const viewListingComponent = Vue.component( 'view-listing', {
     data: function () {
         return {
             view: '',
@@ -11,7 +11,7 @@ const listingComponent = Vue.component( 'listing', {
     methods: {
         fetch: function (strUrl) {
             if (!strUrl) {
-                strUrl = '/catalog-manager/listing/' + this.module + '/' + this.page;
+                strUrl = '/catalog-manager/view-listing/' + this.module + '/' + this.page;
             }
             this.$http.get( strUrl, {
                 params: this.parameters
@@ -83,6 +83,7 @@ const listingComponent = Vue.component( 'listing', {
             for ( var i = 0; i < arrLinks.length; i++ ) {
                 arrLinks[i].addEventListener( 'click', function ( objEvent ) {
                     objEvent.preventDefault();
+                    self.$parent.setLoadingAlert( '', self );
                     self.fetch(this.href);
                 });
             }
@@ -141,9 +142,9 @@ const listingComponent = Vue.component( 'listing', {
         }
     },
     template:
-    '<div class="listing-component" ref="view">' +
+    '<div class="view-component" ref="view">' +
         '<transition name="fade">' +
-            '<div class="listing-component-container" v-html="view" v-show="view"></div>' +
+            '<div class="view-component-container" v-html="view" v-show="view"></div>' +
         '</transition>' +
         '<loading v-if="!view"></loading>' +
     '</div>'

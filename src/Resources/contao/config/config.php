@@ -22,6 +22,7 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
 
 array_insert( $GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
+        'listing-map' => 'Alnv\ContaoCatalogManagerBundle\Modules\MapModule',
         'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
         'master' => 'Alnv\ContaoCatalogManagerBundle\Modules\MasterModule'
     ]
@@ -29,9 +30,9 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
 
 $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/libs/sticky/sticky.js' );
+$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/sticky-image-directive.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/listing-component.js' );
 
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = [ 'catalogmanager.hooks.pageLayout', 'generateMaster' ];
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = [ 'catalogmanager.hooks.element', 'isVisibleElement' ];

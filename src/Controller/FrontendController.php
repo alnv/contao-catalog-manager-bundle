@@ -18,10 +18,10 @@ class FrontendController extends Controller {
 
     /**
      *
-     * @Route("/listing/{module}/{page}", name="listing")
+     * @Route("/view-listing/{module}/{page}", name="view-listing")
      * @Method({"GET"})
      */
-    public function getListing( $module, $page ) {
+    public function getViewListing( $module, $page ) {
         global $objPage;
         $objPage = \PageModel::findByPK( $page )->loadDetails();
         $objPage->ajaxContext = true;

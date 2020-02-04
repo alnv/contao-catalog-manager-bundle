@@ -28,7 +28,7 @@ abstract class MapView {
             $arrLocation['map']['latitude'] = $arrLocation['roleResolver']()->getValueByRole('latitude');
             $arrLocation['map']['longitude'] = $arrLocation['roleResolver']()->getValueByRole('longitude');
             return $arrLocation;
-        }, (new\Alnv\ContaoCatalogManagerBundle\Views\Listing( $this->strTable, $this->arrOptions ))->parse());
+        }, (new \Alnv\ContaoCatalogManagerBundle\Views\Listing( $this->strTable, $this->arrOptions ))->parse());
     }
 
     abstract public function render();
