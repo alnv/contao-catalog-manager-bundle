@@ -15,7 +15,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
  */
 class FrontendController extends Controller {
 
-
     /**
      *
      * @Route("/view-listing/{module}/{page}", name="view-listing")
@@ -28,6 +27,19 @@ class FrontendController extends Controller {
         $strListing = \Controller::getFrontendModule( $module );
         $strListing = \Controller::replaceInsertTags( $strListing );
         return new JsonResponse([ 'template' => $strListing ]);
+    }
+
+    /**
+     *
+     * @Route("/view-map/{module}/{page}", name="view-map")
+     * @Method({"GET"})
+     */
+    public function getViewMap( $module, $page ) {
+        global $objPage;
+        $objPage = \PageModel::findByPK( $page )->loadDetails();
+        $objPage->ajaxContext = true;
+        $strListing = \Controller::getFrontendModule( $module );
+        return new JsonResponse([ 'locations' => $strListing ]);
     }
 
 

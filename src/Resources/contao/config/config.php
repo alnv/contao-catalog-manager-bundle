@@ -33,6 +33,7 @@ $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/li
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/sticky-image-directive.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
+$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js' );
 
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = [ 'catalogmanager.hooks.pageLayout', 'generateMaster' ];
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = [ 'catalogmanager.hooks.element', 'isVisibleElement' ];
