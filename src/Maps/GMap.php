@@ -2,8 +2,6 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Maps;
 
-use function Clue\StreamFilter\fun;
-
 class GMap extends MapView {
 
     public function render() {
