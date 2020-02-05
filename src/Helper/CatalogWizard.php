@@ -142,7 +142,8 @@ abstract class CatalogWizard extends \System {
                 'multiple' => $blnMultiple,
                 'role' => $arrField['role'] ?: '',
                 'useAsAlias' => $arrField['useAsAlias'] ?: '',
-                'mandatory' => $arrField['mandatory'] ? true : false
+                'mandatory' => $arrField['mandatory'] ? true : false,
+                'size' => $arrField['size'] ? intval( $arrField['size'] )  : 1
             ],
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )
         ];
@@ -169,6 +170,11 @@ abstract class CatalogWizard extends \System {
             case 'text':
 
                 $arrReturn['inputType'] = 'text';
+
+                if ( $arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1 ) {
+
+                    $arrReturn['eval']['tl_class'] = 'long clr';
+                }
 
                 break;
 
