@@ -477,7 +477,6 @@ class Toolkit {
                     $arrQueries[ $strName ] = [];
                 }
 
-
                 $varValue = $arrQuery['value'];
 
                 if ( $varValue !== '' || $varValue !== null ) {
@@ -489,12 +488,26 @@ class Toolkit {
                 $arrColumns = [];
                 $varValue = \StringUtil::deserialize( $varValue, true );
 
-                foreach ( $varValue as $strValue ) {
+                foreach ( $varValue as $strIndex => $strValue ) {
 
-                    $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
-                        'field' => $strTable . '.' . $arrQuery['field'],
-                        'value' => '?'
-                    ]);
+                    if ( isset( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] ) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] > 1 ) {
+
+                        if ( $strIndex % $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] ) {
+
+                            $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
+                                'field' => $strTable . '.' . $arrQuery['field'],
+                                'value' => '?'
+                            ]);
+                        }
+                    }
+
+                    else {
+
+                        $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
+                            'field' => $strTable . '.' . $arrQuery['field'],
+                            'value' => '?'
+                        ]);
+                    }
 
                     $arrValues[] = $strValue;
                 }
