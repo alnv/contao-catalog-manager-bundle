@@ -88,6 +88,13 @@ const viewListingComponent = Vue.component( 'view-listing', {
                 });
             }
         },
+        setMasonryLayout: function() {
+            if ( typeof Masonry === 'undefined' || !this.masonry ) {
+                return null;
+            }
+            var objOptions = this.masonry.options || {};
+            new Masonry(this.$el.querySelector(this.masonry.item), objOptions);
+        },
         collectShareData: function () {
             this.shareData = [];
             var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
@@ -116,6 +123,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
         this.$nextTick(function () {
             this.sortable();
             this.pagination();
+            this.setMasonryLayout();
             this.collectShareData();
         })
     },
@@ -139,13 +147,16 @@ const viewListingComponent = Vue.component( 'view-listing', {
             type: String,
             default: null,
             required: true
+        },
+        masonry: {
+            type: Object,
+            default: null,
+            required: false
         }
     },
     template:
     '<div class="view-component" ref="view">' +
-        '<transition name="fade">' +
-            '<div class="view-component-container" v-html="view" v-show="view"></div>' +
-        '</transition>' +
+        '<div class="view-component-container" v-html="view" v-if="view"></div>' +
         '<loading v-if="!view"></loading>' +
     '</div>'
 });
