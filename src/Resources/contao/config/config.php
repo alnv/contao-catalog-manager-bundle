@@ -29,9 +29,7 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
 ]);
 
 $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/libs/sticky/sticky.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js' );
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/sticky-image-directive.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js' );
 
@@ -114,6 +112,10 @@ $GLOBALS['CM_ROLES'] = [
         'type' => 'string'
     ],
     'image' => [
+        'group' => 'article',
+        'type' => 'image'
+    ],
+    'hero' => [
         'group' => 'article',
         'type' => 'image'
     ],

@@ -7,6 +7,8 @@ const AsyncImageComponent = Vue.component( 'async-image', {
     },
     methods: {
         fetch: function () {
+            this.src = '';
+            this.alt = '';
             this.$http.post( '/catalog-manager/async-image', {
                 id: this.id,
                 role: this.role,
@@ -22,16 +24,31 @@ const AsyncImageComponent = Vue.component( 'async-image', {
             });
         },
         onChange: function () {
-            if ( this.$parent.shared.item ) {
-                var imageId = parseInt( this.$parent.shared.item );
-                if ( imageId !== this.id ) {
-                    this.id = imageId;
-                    this.src = '';
-                    this.alt = '';
-                    this.fetch();
-                }
+            //
+        },
+        setSticky: function () {
+            if ( typeof Sticky === 'undefined' || !this.sticky ) {
+                return null;
             }
+            this.$el.classList.add('is-sticky');
+            if ( this.sticky.hasOwnProperty('marginTop') ) {
+                this.$el.setAttribute('data-margin-top', this.sticky['marginTop']);
+            }
+            new Sticky(this.$el);
         }
+    },
+    watch: {
+        role: function () {
+            this.fetch();
+        },
+        id: function () {
+            this.fetch();
+        }
+    },
+    updated: function () {
+        this.$nextTick(function () {
+            this.setSticky();
+        })
     },
     mounted: function () {
         this.fetch();
@@ -49,14 +66,9 @@ const AsyncImageComponent = Vue.component( 'async-image', {
             type: String,
             required: true
         },
-        isSticky: {
-            type: Boolean,
-            default: false,
-            required: false
-        },
-        stickyOffset: {
-            type: String,
-            default: '0px',
+        sticky: {
+            type: Object,
+            default: null,
             required: false
         }
     },
@@ -64,8 +76,8 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         '<div class="async-image-component">' +
             '<slot>' +
                 '<div class="ce_image block">' +
-                    '<figure v-if="src"><img :src="src" :alt="alt" v-sticky-image="{offset: this.stickyOffset, isSticky: this.isSticky}"></figure>' +
-                    '<loading v-if="!src" v-sticky-image="{offset: this.stickyOffset, isSticky: this.isSticky}"></loading>' +
+                    '<figure v-if="src"><img :src="src" :alt="alt"></figure>' +
+                    '<loading v-if="!src"></loading>' +
                 '</div>' +
             '</slot>' +
         '</div>'
