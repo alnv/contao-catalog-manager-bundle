@@ -9,6 +9,22 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 class CatalogField {
 
 
+    public function checkExtensions( $varValue, \DataContainer $dc ) {
+
+        $varValue = strtolower($varValue);
+        $arrExtensions = \StringUtil::trimsplit(',', $varValue);
+        $arrUploadTypes = \StringUtil::trimsplit(',', strtolower(\Config::get('uploadTypes')));
+        $arrNotAllowed = array_diff($arrExtensions, $arrUploadTypes);
+
+        if ( 0 !== count( $arrNotAllowed ) ) {
+
+            throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['forbiddenExtensions'], implode(', ', $arrNotAllowed)));
+        }
+
+        return $varValue;
+    }
+
+
     public function listFields( $arrRow ) {
 
         return $arrRow['name'];

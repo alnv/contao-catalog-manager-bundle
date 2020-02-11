@@ -63,7 +63,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'select' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'radio' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple,imageSize;{published_legend},published'
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple,imageSize;{frontend_legend},extensions,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
     ],
     'subpalettes' => [
         'includeBlankOption' => 'blankOptionLabel',
@@ -252,6 +252,44 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '-']
+        ],
+        'extensions' => [
+            'exclude' => true,
+            'inputType' => 'text',
+            'eval' => [
+                'rgxp' => 'extnd',
+                'maxlength' => 255,
+                'mandatory' => true,
+                'tl_class' => 'w50'
+            ],
+            'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'checkExtensions']],
+            'sql' => "varchar(255) NOT NULL default 'jpg,jpeg,gif,png,pdf,doc,docx,xls,xlsx,ppt,pptx'"
+        ],
+        'uploadFolder' => [
+            'inputType' => 'fileTree',
+            'eval' => [
+                'mandatory' => true,
+                'fieldType' => 'radio',
+                'tl_class' => 'clr'
+            ],
+            'exclude' => true,
+            'sql' => "binary(16) NULL"
+        ],
+        'useHomeDir' => [
+            'exclude' => true,
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50 m12'
+            ],
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'doNotOverwrite' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'w50 m12'
+            ],
+            'exclude' => true,
+            'sql' => "char(1) NOT NULL default ''"
         ]
     ]
 ];

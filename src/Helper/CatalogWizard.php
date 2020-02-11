@@ -256,8 +256,10 @@ abstract class CatalogWizard extends \System {
                 }
 
                 $arrReturn['eval']['storeFile'] = '1';
-                // $arrReturn['eval']['uploadFolder'] = '110ddbb8-6de1-11e9-860c-00163e0501fe'; // test
-                $arrReturn['eval']['extensions'] = \Config::get('uploadTypes');
+                $arrReturn['eval']['extensions'] = $arrField['extensions'];
+                $arrReturn['eval']['useHomeDir'] = $arrField['useHomeDir'];
+                $arrReturn['eval']['uploadFolder'] = $arrField['uploadFolder'];
+                $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
 
                 if ( $arrReturn['eval']['role'] ) {
 
