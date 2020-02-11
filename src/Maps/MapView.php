@@ -27,6 +27,7 @@ abstract class MapView {
             $arrLocation['map']['text'] = $arrLocation['roleResolver']()->getValueByRole('teaser');
             $arrLocation['map']['latitude'] = $arrLocation['roleResolver']()->getValueByRole('latitude');
             $arrLocation['map']['longitude'] = $arrLocation['roleResolver']()->getValueByRole('longitude');
+            $arrLocation['map']['infoContent'] = \Controller::replaceInsertTags( \StringUtil::parseSimpleTokens($this->arrOptions['infoContent'], $arrLocation));
             return $arrLocation;
         }, (new \Alnv\ContaoCatalogManagerBundle\Views\Listing( $this->strTable, $this->arrOptions ))->parse());
     }

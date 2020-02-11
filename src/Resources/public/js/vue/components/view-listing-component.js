@@ -95,6 +95,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
             var objOptions = this.masonry.options || {};
             new Masonry(this.$el.querySelector(this.masonry.item), objOptions);
         },
+        /*
         collectShareData: function () {
             this.shareData = [];
             var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
@@ -109,6 +110,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
                 }
             }
         }
+        */
     },
     watch: {
         shareData : {
@@ -124,7 +126,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
             this.sortable();
             this.pagination();
             this.setMasonryLayout();
-            this.collectShareData();
+            // this.collectShareData();
         })
     },
     mounted: function () {

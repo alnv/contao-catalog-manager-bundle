@@ -50,9 +50,9 @@ class Listing extends \Module {
         $this->setOrder();
         $this->setGroup();
         $this->setFilter();
+        $this->setDistance();
         $this->setMasterPage();
         $this->setPagination();
-        $this->setDistance();
 
         // @todo check visibility by data container >hasVisibilityFields<
         // @todo impl optional visibility parameter
@@ -67,7 +67,7 @@ class Listing extends \Module {
 
         if ( !$this->cmRadiusSearch ) {
 
-            return null;
+            return false;
         }
 
         $objRoleResolver = RoleResolver::getInstance( $this->cmTable );
@@ -75,7 +75,7 @@ class Listing extends \Module {
 
         if ( empty( $arrGeoCodingFields ) ) {
 
-            return null;
+            return false;
         }
 
         $arrAddress = [
@@ -88,7 +88,7 @@ class Listing extends \Module {
 
         if ( empty( array_filter( $arrAddress ) ) ) {
 
-            return null;
+            return false;
         }
 
         $arrAddress['state'] = Toolkit::getValueFromUrl( \Input::get('state') );
@@ -111,7 +111,11 @@ class Listing extends \Module {
 
             $this->arrOptions['having'] = '_distance < ' . (int) $strRadius;
             $this->arrOptions['order'] = '_distance ASC';
+
+            return true;
         }
+
+        return false;
     }
 
     protected function setFilter() {

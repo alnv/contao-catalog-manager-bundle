@@ -150,9 +150,25 @@ abstract class View extends \Controller {
             return null;
         }
 
+        $arrOptions = $this->getModelOptions();
+        $numTotal = 0;
+        $arrOptions['limit'] = 0;
+        $arrOptions['offset'] = 0;
+
         $objModel = new ModelWizard( $this->strTable );
         $objModel = $objModel->getModel();
-        $numTotal = $objModel->countBy( [ 'id > ?' ], [ 0 ], $this->arrOptions );
+        $objTotal = $objModel->findAll($arrOptions);
+
+        if ( $objTotal !== null ) {
+
+            $numTotal = $objTotal->count();
+        }
+
+        if ( !$numTotal ) {
+
+            return null;
+        }
+
         $numOffset = $this->arrOptions['offset'];
 
         if ( $this->arrOptions['offset'] ) {

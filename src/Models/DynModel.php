@@ -37,7 +37,6 @@ class DynModel extends \Model {
         if ( isset( $arrOptions['distance'] ) ) {
 
             $strDistanceSelection = sprintf(
-
                 ",3956 * 1.6 * 2 * ASIN(SQRT(POWER(SIN((%s-abs(%s.`%s`)) * pi()/180 / 2),2) + COS(%s * pi()/180) * COS(abs(%s.`%s`) *  pi()/180) * POWER( SIN( (%s-%s.`%s`) *  pi()/180 / 2 ), 2 ))) AS _distance ",
                 $arrOptions['distance']['latCord'],
                 $arrOptions['table'],
@@ -105,7 +104,7 @@ class DynModel extends \Model {
         return $strQuery;
     }
 
-
+    /*
     protected static function buildCountQuery( array $arrOptions ) {
 
         $strDistanceSelection = '';
@@ -113,7 +112,6 @@ class DynModel extends \Model {
         if ( isset( $arrOptions['distance'] ) ) {
 
             $strDistanceSelection = sprintf(
-
                 ",3956 * 1.6 * 2 * ASIN(SQRT(POWER(SIN((%s-abs(%s.`%s`)) * pi()/180 / 2),2) + COS(%s * pi()/180) * COS(abs(%s.`%s`) *  pi()/180) * POWER( SIN( (%s-%s.`%s`) *  pi()/180 / 2 ), 2 ))) AS _distance ",
                 $arrOptions['distance']['latCord'],
                 $arrOptions['table'],
@@ -131,7 +129,7 @@ class DynModel extends \Model {
 
         if ( $arrOptions['column'] !== null ) {
 
-            $strQuery .= " WHERE " . ( is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column'] ) . "=?" );
+            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column'] ) . "=?");
         }
 
         if ( $strDistanceSelection ) {
@@ -146,4 +144,5 @@ class DynModel extends \Model {
 
         return $strQuery;
     }
+    */
 }

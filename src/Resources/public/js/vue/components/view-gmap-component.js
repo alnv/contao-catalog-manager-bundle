@@ -34,14 +34,16 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
         setMarkers: function() {
             this.bounds = new google.maps.LatLngBounds();
             for (var i=0;i<this.locations.length;i++) {
-                var strTemplate = '';
+                var strTemplate = this.locations[i]['map']['infoContent'];
                 var objPosition = new google.maps.LatLng(this.locations[i]['map']['latitude'],this.locations[i]['map']['longitude']);
                 var objMarker = new google.maps.Marker({
                     title: this.locations[i]['map']['title'],
                     position: objPosition,
                     map: this.map
                 });
-                google.maps.event.addListener(objMarker, 'click', this.getInfoContent(strTemplate));
+                if (strTemplate) {
+                    google.maps.event.addListener(objMarker, 'click', this.getInfoContent(strTemplate));
+                }
                 this.bounds.extend(objPosition);
                 this.markers.push(objMarker);
             }
@@ -71,7 +73,7 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
     mounted: function () {
         if ( typeof google === 'undefined' ) {
             var objScript = document.createElement('script');
-            objScript.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyByWU1hQHfJEQjOkUjIBNU1JmyQ9_SG1nY&callback=';
+            objScript.src = 'https://maps.googleapis.com/maps/api/js?key='+ this.mapApiKey +'&callback=';
             objScript.defer = true;
             objScript.async = true;
             objScript.onload = function() {
@@ -100,6 +102,11 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
         page: {
             type: String,
             default: null,
+            required: true
+        },
+        mapApiKey: {
+            default: '',
+            type: String,
             required: true
         }
     },
