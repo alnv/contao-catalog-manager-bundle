@@ -255,6 +255,12 @@ abstract class CatalogWizard extends \System {
                     $arrReturn['eval']['fieldType'] = 'checkbox';
                 }
 
+                $arrReturn['eval']['storeFile'] = '1';
+                $arrReturn['eval']['extensions'] = $arrField['extensions'];
+                $arrReturn['eval']['useHomeDir'] = $arrField['useHomeDir'];
+                $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
+                $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid( $arrField['uploadFolder'] );
+
                 if ( $arrReturn['eval']['role'] ) {
 
                     $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
