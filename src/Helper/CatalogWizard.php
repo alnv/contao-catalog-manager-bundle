@@ -255,6 +255,10 @@ abstract class CatalogWizard extends \System {
                     $arrReturn['eval']['fieldType'] = 'checkbox';
                 }
 
+                $arrReturn['eval']['storeFile'] = '1';
+                // $arrReturn['eval']['uploadFolder'] = '110ddbb8-6de1-11e9-860c-00163e0501fe'; // test
+                $arrReturn['eval']['extensions'] = \Config::get('uploadTypes');
+
                 if ( $arrReturn['eval']['role'] ) {
 
                     $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
