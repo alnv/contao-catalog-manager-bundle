@@ -190,6 +190,11 @@ class VirtualDataContainerArray extends \System {
 
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
 
+            if ( in_array( $this->arrFields['type'], ['empty'] ) ) {
+
+                continue;
+            }
+
             if ( !$this->arrCatalog['enableVisibility'] && in_array( $strFieldname, [ 'published', 'start', 'stop' ] ) ) {
 
                 continue;

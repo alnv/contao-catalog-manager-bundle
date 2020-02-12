@@ -180,6 +180,7 @@ abstract class CatalogWizard extends \System {
 
             case 'date':
 
+                $arrReturn['flag'] = 6;
                 $arrReturn['default'] = time();
                 $arrReturn['inputType'] = 'text';
 

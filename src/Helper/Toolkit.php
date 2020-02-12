@@ -47,18 +47,12 @@ class Toolkit {
 
         $arrSql = static::getSqlTypes();
 
+        if ( $arrOptions['multiple'] ) {
+
+            return $arrSql['blob'];
+        }
+
         switch ( $strType ) {
-
-            case 'text':
-
-                if ( $arrOptions['multiple'] ) {
-
-                    return $arrSql['blob'];
-                }
-
-                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
-
-                break;
 
             case 'color':
 
@@ -83,12 +77,9 @@ class Toolkit {
 
                 break;
 
+            case 'text':
+            case 'radio':
             case 'select':
-
-                if ( $arrOptions['multiple'] ) {
-
-                    return $arrSql['blob'];
-                }
 
                 return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
 
@@ -100,18 +91,6 @@ class Toolkit {
 
                     return $arrSql['c1'];
                 }
-
-                return $arrSql['blob'];
-
-                break;
-
-            case 'radio':
-
-                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
-
-                break;
-
-            case 'upload':
 
                 return $arrSql['blob'];
 

@@ -26,14 +26,15 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['useHomeDir'] = [ 'Home-Verzeichnis verw
 $GLOBALS['TL_LANG']['tl_catalog_field']['doNotOverwrite'] = [ 'Bestehende Dateien erhalten', 'Der neuen Datei ein numerisches Suffix hinzufügen, wenn der Dateiname bereits existiert.' ];
 
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
-    'text' => 'Textfeld',
     'date' => 'Datum',
     'color' => 'Farbe',
+    'text' => 'Textfeld',
+    'upload' => 'Upload',
+    'textarea' => 'Textarea',
+    'empty' => 'Leeres Feld',
     'select' => 'Select-Menü',
     'checkbox' => 'Checkbox-Menü',
-    'radio' => 'Radio-Button-Menü',
-    'upload' => 'Upload',
-    'textarea' => 'Textarea'
+    'radio' => 'Radio-Button-Menü'
 ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'options' => 'Options',
