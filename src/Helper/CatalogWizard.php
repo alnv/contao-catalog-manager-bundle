@@ -193,6 +193,8 @@ abstract class CatalogWizard extends \System {
 
                         $arrReturn['eval']['rgxp'] = $strRgxp;
                     }
+
+                    $arrReturn['eval']['dateFormat'] = \Date::getFormatFromRgxp( $strRgxp );
                 }
 
                 $arrReturn['eval']['datepicker'] = true;
