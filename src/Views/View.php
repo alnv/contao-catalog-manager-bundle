@@ -145,7 +145,7 @@ abstract class View extends \Controller {
 
     protected function paginate() {
 
-        if ( !$this->arrOptions['pagination'] ) {
+        if ( !$this->arrOptions['pagination'] && !\Input::get('reload') ) {
 
             return null;
         }
@@ -165,6 +165,22 @@ abstract class View extends \Controller {
         }
 
         if ( !$numTotal ) {
+
+            return null;
+        }
+
+        if ( \Input::get('reload') ) { // vue reload
+
+            $intOffset = (int) \Input::get('reload') + 1;
+            $intLimit = $this->arrOptions['limit'] * $intOffset;
+
+            if ( $intLimit > $numTotal ) {
+
+                $intLimit = $numTotal;
+            }
+
+            $this->arrOptions['offset'] = 0;
+            $this->arrOptions['limit'] = $intLimit;
 
             return null;
         }
@@ -310,7 +326,7 @@ abstract class View extends \Controller {
 
     public function getPagination() {
 
-        if ( !$this->arrOptions['total'] ) {
+        if ( !$this->arrOptions['pagination'] ) {
 
             return '';
         }

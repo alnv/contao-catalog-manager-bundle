@@ -1,9 +1,10 @@
 const viewListingComponent = Vue.component( 'view-listing', {
     data: function () {
         return {
-            view: '',
-            shareData: [],
+            view: null,
+            // shareData: [],
             parameters: {
+                reload: 0,
                 order: {}
             }
         }
@@ -95,6 +96,11 @@ const viewListingComponent = Vue.component( 'view-listing', {
             var objOptions = this.masonry.options || {};
             new Masonry(this.$el.querySelector(this.masonry.item), objOptions);
         },
+        listReload: function () {
+            this.parameters.reload += 1;
+            this.$parent.setLoadingAlert( '', this );
+            this.fetch();
+        },
         /*
         collectShareData: function () {
             this.shareData = [];
@@ -113,6 +119,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
         */
     },
     watch: {
+        /*
         shareData : {
             handler: function () {
                 this.$parent.shared['listingShareData'] = this.shareData;
@@ -120,6 +127,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
             },
             deep: true
         }
+        */
     },
     updated: function () {
         this.$nextTick(function () {
@@ -154,11 +162,22 @@ const viewListingComponent = Vue.component( 'view-listing', {
             type: Object,
             default: null,
             required: false
+        },
+        reload: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
+        reloadButton: {
+            type: String,
+            required: false,
+            default: 'Mehr laden'
         }
     },
     template:
     '<div class="view-component" ref="view">' +
-        '<div class="view-component-container" v-html="view" v-if="view"></div>' +
+        '<div class="view-component-container" v-if="view" v-html="view"></div>' +
+        '<div v-if="reload && view" class="reload block"><button v-on:click.prevent="listReload">{{ reloadButton }}</button></div>' +
         '<loading v-if="!view"></loading>' +
     '</div>'
 });
