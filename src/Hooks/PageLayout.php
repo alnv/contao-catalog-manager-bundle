@@ -21,7 +21,6 @@ class PageLayout {
         }
 
         $GLOBALS['CM_MASTER'] = (new \Alnv\ContaoCatalogManagerBundle\Views\Master( $objModule->cmTable, [
-
             'alias' => \Input::get('auto_item'),
             'masterPage' => $objModule->cmMasterPage,
             'id' => $objModule->id
