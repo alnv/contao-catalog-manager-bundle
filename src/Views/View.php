@@ -58,6 +58,12 @@ abstract class View extends \Controller {
 
                     break;
 
+                case 'fastMode':
+
+                    $this->arrOptions['fastMode'] = $varValue ? true : false;
+
+                    break;
+
                 case 'offset':
 
                     $this->arrOptions['offset'] = (int) $varValue;
@@ -255,11 +261,18 @@ abstract class View extends \Controller {
 
         foreach ( $arrEntity as $strField => $varValue ) {
 
-            $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity );
+            if ( !$this->arrOptions['fastMode'] ) {
 
-            if ( $strParsedValue !== $varValue ) {
+                $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity );
 
-                $arrRow['origin'][ $strField ] = $varValue;
+                if ( $strParsedValue !== $varValue ) {
+
+                    $arrRow['origin'][ $strField ] = $varValue;
+                }
+
+            } else {
+
+                $strParsedValue = $varValue;
             }
 
             $arrRow[ $strField ] = $strParsedValue;
