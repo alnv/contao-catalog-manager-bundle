@@ -10,7 +10,7 @@ class Breadcrumb {
 
         if ( !is_array( $GLOBALS['CM_MASTER'] ) ||  empty( $GLOBALS['CM_MASTER'] ) ) {
 
-            return null;
+            return $arrItems;
         }
 
         $intLastItemId = count( $arrItems ) -1;

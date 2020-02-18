@@ -19,7 +19,7 @@ class Element {
 
         if ( $objRequest->get( '_scope' ) == 'frontend' ) {
 
-            if ( $objElement->cmHideOnDetailPage && \Input::get('auto_item') ) {
+            if ( $objElement->cmHideOnDetailPage && $_GET['auto_item'] ) {
 
                 return false;
             }

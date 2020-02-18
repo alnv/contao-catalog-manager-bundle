@@ -26,12 +26,19 @@ const viewListingComponent = Vue.component( 'view-listing', {
                 }
             });
         },
-        onChange: function ( shared ) {
-            this.parameters = shared;
+        onChange: function (shared) {
+            this.addSharedParameters(shared);
             if ( this.view ) {
                 this.$parent.setLoadingAlert( '', this );
             }
             this.fetch();
+        },
+        addSharedParameters: function(shared) {
+            for (var name in shared) {
+                if (shared.hasOwnProperty(name)) {
+                    this.parameters[name] = shared[name];
+                }
+            }
         },
         sortable: function () {
             var objSortable = this.$refs.view.querySelector('.sortable');
@@ -139,6 +146,9 @@ const viewListingComponent = Vue.component( 'view-listing', {
     },
     mounted: function () {
         if (!this.awaitOnChange) {
+            if (typeof this.$parent.shared !== 'undefined') {
+                this.addSharedParameters(this.$parent.shared);
+            }
             this.fetch();
         }
     },
