@@ -33,7 +33,7 @@ class CatalogField {
 
     public function getFieldTypes() {
 
-        return [ 'text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'upload', 'empty' ];
+        return $GLOBALS['CM_FIELDS'];
     }
 
 

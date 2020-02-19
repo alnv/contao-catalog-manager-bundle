@@ -179,8 +179,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'multiple' => [
             'inputType' => 'checkbox',
             'eval' => [
-                'tl_class' => 'w50 m12',
-                'submitOnChange' => true
+                'tl_class' => 'w50 m12'
             ],
             'exclude' => true,
             'sql' => "char(1) NOT NULL default ''"
