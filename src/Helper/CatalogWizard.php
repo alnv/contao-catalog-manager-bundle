@@ -246,6 +246,18 @@ abstract class CatalogWizard extends \System {
 
                 break;
 
+            case 'empty':
+
+                $arrEmpty = [
+                    'label' => $arrReturn['label'],
+                    'sql' => $arrReturn['sql'],
+                    'eval' => []
+                ];
+
+                $arrReturn = $arrEmpty;
+
+                break;
+
             case 'upload':
 
                 $arrReturn['inputType'] = 'fileTree';

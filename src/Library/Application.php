@@ -70,7 +70,6 @@ class Application {
 
         $objVDataContainerArray = new VirtualDataContainerArray( $strTable );
         $objVDataContainerArray->generate();
-
         $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
 
         if ( is_array( $arrRelatedTables ) && !empty( $arrRelatedTables ) ) {

@@ -18,7 +18,7 @@ class DataContainer {
             return null;
         }
 
-        if ( $objRequest->get( '_scope' ) == 'frontend' ) {
+        if ( $strTable && $objRequest->get( '_scope' ) == 'frontend' ) {
 
             $objCatalog = CatalogModel::findByTableOrModule( $strTable );
 
