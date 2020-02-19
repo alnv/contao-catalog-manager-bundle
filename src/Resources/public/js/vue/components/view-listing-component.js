@@ -156,7 +156,7 @@ const viewListingComponent = Vue.component( 'view-listing', {
         awaitOnChange: {
             type: Boolean,
             default: false,
-            required: true
+            required: false
         },
         module: {
             type: String,
