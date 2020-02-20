@@ -109,7 +109,7 @@ abstract class CatalogWizard extends \System {
     }
 
 
-    protected function parseField( $arrField ) {
+    public function parseField( $arrField ) {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 

@@ -14,6 +14,11 @@ class RoleResolver {
 
     public static function getInstance( $strTable, $arrEntity = [] ) {
 
+        if ( $strTable === null ) {
+
+            return new self;
+        }
+
         $strInstanceKey = $strTable . ( $arrEntity['id'] ? '_' . $arrEntity['id'] : '' );
 
         if ( !array_key_exists( $strInstanceKey, self::$arrInstances ) ) {

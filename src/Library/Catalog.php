@@ -18,6 +18,11 @@ class Catalog extends CatalogWizard {
 
     public function __construct( $strIdentifier ) {
 
+        if ( $strIdentifier === null ) {
+
+            return null;
+        }
+
         $this->strIdentifier = $strIdentifier;
         $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
 
