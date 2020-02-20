@@ -57,14 +57,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption' ],
         'default' => '{general_settings},name,type',
         'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',
-        'text' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple,size;{published_legend},published',
-        'date' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{published_legend},published',
-        'color' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{published_legend},published',
-        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,rte;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,useAsAlias,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory,multiple,imageSize;{frontend_legend},extensions,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
+        'text' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory,multiple,size;{published_legend},published',
+        'date' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory;{published_legend},published',
+        'color' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory;{published_legend},published',
+        'textarea' => '{general_settings},name,type;{field_settings},fieldname,description,role,mandatory,rte;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory,multiple,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,description,role,useAsAlias,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,description,role,mandatory,multiple,imageSize;{frontend_legend},extensions,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
     ],
     'subpalettes' => [
         'includeBlankOption' => 'blankOptionLabel',
@@ -121,6 +121,16 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'search' => true,
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        ],
+        'description' => [
+            'inputType' => 'textarea',
+            'eval' => [
+                'tl_class' => 'clr',
+                'rte' => 'tinyMCE',
+                'allowHtml' => true
+            ],
+            'exclude' => true,
+            'sql' => "text NULL"
         ],
         'useAsAlias' => [
             'inputType' => 'checkbox',
