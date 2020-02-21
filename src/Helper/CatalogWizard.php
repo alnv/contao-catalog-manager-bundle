@@ -274,6 +274,8 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['extensions'] = $arrField['extensions'];
                 $arrReturn['eval']['useHomeDir'] = $arrField['useHomeDir'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
+                $arrReturn['eval']['imageWidth'] = $arrField['imageWidth'];
+                $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid( $arrField['uploadFolder'] );
 
                 if ( $arrReturn['eval']['role'] ) {
