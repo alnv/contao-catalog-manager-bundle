@@ -1,6 +1,5 @@
 <?php
 
-$GLOBALS['TL_LANG']['tl_module']['form_setting'] = 'Formular-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['master_settings'] = 'Detail-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['listing_settings'] = 'Listen-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['radius_search_settings'] = 'Umkreissuche-Einstellungen';
@@ -23,18 +22,7 @@ $GLOBALS['TL_LANG']['tl_module']['cmFilterType'] = [ 'Eingabetyp', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmWizardFilterSettings'] = [ 'Filtereinstellungen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmInfoContent'] = [ 'Info-Fenster Inhalt', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmOrder'] = [ 'Sortierung', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmSource'] = [ 'Quelle', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmIdentifier'] = [ 'Formular', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmFormHint'] = [ 'Hinweistext', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmSuccessRedirect'] = [ 'Weiterleitung', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmForm'] = [ 'Formular verwenden', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmFormPage'] = [ 'Formularseite auswählen', '' ];
-$GLOBALS['TL_LANG']['tl_module']['cmFormModule'] = [ 'Formular Manager auswählen', '' ];
 
-$GLOBALS['TL_LANG']['tl_module']['reference']['cmSource'] = [
-    'dc' => 'DataContainerArray',
-    'form' => 'Formular'
-];
 $GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'] = [
     'expert' => 'Experte',
     'wizard' => 'Wizard (Klassisch)'

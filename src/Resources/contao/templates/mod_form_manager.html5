@@ -1,7 +1,0 @@
-<div class="v-component">
-    <single-form id="<?= $this->id ?>" :model="<?= $this->model ?>" identifier="<?= $this->identifier ?>" source="<?= $this->source ?>" success-redirect="<?= $this->successRedirect ?>">
-        <?php if ($this->formHint): ?>
-            <?= $this->formHint ?>
-        <?php endif; ?>
-    </single-form>
-</div>
