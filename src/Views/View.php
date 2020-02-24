@@ -7,16 +7,14 @@ use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 
-
 abstract class View extends \Controller {
-
 
     protected $strTable = null;
     protected $arrOptions = [];
     protected $arrEntities = [];
+    protected $arrFormPage = [];
+    protected $arrMasterPage = [];
     protected $dcaExtractor = null;
-    protected $arrMasterPage = null;
-
 
     public function __construct( $strTable, $arrOptions = [] ) {
 
@@ -25,129 +23,95 @@ abstract class View extends \Controller {
         $this->dcaExtractor = new DcaExtractor( $strTable );
 
         foreach ( $arrOptions as $strName => $varValue ) {
-
             switch ( $strName ) {
-
                 case 'id':
-
                     $this->arrOptions['id'] = (int) $varValue;
-
                     break;
 
                 case 'alias':
-
                     $this->arrOptions['alias'] = $varValue;
-
                     break;
 
                 case 'masterPage':
-
                     $objPage = \PageModel::findByPk( $varValue );
-
                     if ( $objPage !== null ) {
-
                         $this->arrMasterPage = $objPage->row();
                         $this->arrOptions['masterPage'] = true;
                     }
+                    break;
 
+                case 'formPage':
+                    $objPage = \PageModel::findByPk( $varValue );
+                    if ( $objPage !== null ) {
+                        $this->arrFormPage = $objPage->row();
+                        $this->arrOptions['formPage'] = true;
+                    }
                     break;
 
                 case 'limit':
-
                     $this->arrOptions['limit'] = (int) $varValue;
-
                     break;
 
                 case 'fastMode':
-
                     $this->arrOptions['fastMode'] = $varValue ? true : false;
-
                     break;
 
                 case 'offset':
-
                     $this->arrOptions['offset'] = (int) $varValue;
-
                     break;
 
                 case 'pagination':
-
                     $this->arrOptions['pagination'] = $varValue;
-
                     break;
 
                 case 'distance':
-
                     $this->arrOptions['distance'] = $varValue;
-
                     break;
 
                 case 'having':
-
                     $this->arrOptions['having'] = $varValue;
-
                     break;
 
                 case 'order':
-
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
-
                     if ( !$this->arrOptions['order'] ) {
-
                         unset( $this->arrOptions['order'] );
                     }
-
                     break;
 
                 case 'column':
-
                     if ( is_array( $varValue ) && !empty( $varValue ) ) {
-
                         $this->arrOptions['column'] = $varValue;
                     }
-
                     break;
 
                 case 'value':
-
                     if ( is_array( $varValue ) && !empty( $varValue ) ) {
-
                         $this->arrOptions['value'] = $varValue;
                     }
-
                     break;
 
                 case 'groupBy':
-
                     $this->arrOptions['groupBy'] = $varValue;
-
                     break;
 
                 case 'groupByHl':
-
                     $this->arrOptions['groupByHl'] = $varValue;
-
                     break;
 
                 case 'template':
-
                     $this->arrOptions['template'] = $varValue;
-
                     break;
 
                 case 'language':
-
                     $this->arrOptions['language'] = $varValue;
-
                     break;
             }
         }
 
         $this->paginate();
-
         parent::__construct();
     }
-
 
     protected function paginate() {
 
@@ -209,7 +173,6 @@ abstract class View extends \Controller {
         $this->arrOptions['total'] = $numTotal;
     }
 
-
     protected function initializeDataContainer() {
 
         $objApplication = new Application();
@@ -220,7 +183,6 @@ abstract class View extends \Controller {
             \Controller::loadDataContainer( $this->strTable );
         }
     }
-
 
     protected function getModelOptions() {
 
@@ -246,7 +208,6 @@ abstract class View extends \Controller {
 
         return $arrReturn;
     }
-
 
     protected function parseEntity( $arrEntity ) {
 
@@ -279,18 +240,29 @@ abstract class View extends \Controller {
         }
 
         $arrRow['roleResolver'] = function () use ( $arrRow ) {
-
             return \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance( $this->strTable, $arrRow );
         };
 
         $arrRow['shareButtons'] = function () use ( $arrRow ) {
-
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ShareButtons( $arrRow ) )->getShareButtons();
         };
 
         $arrRow['iCalendarUrl'] = function () use ( $arrRow ) {
-
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
+        };
+
+        $arrRow['editUrl'] = function () use ( $arrRow ) {
+            if (!$this->arrOptions['formPage']) {
+                return '';
+            }
+            $strMemberField = $arrRow['roleResolver']()->getFieldByRole('member');
+            if ( $strMemberField ) {
+                $objMember = \FrontendUser::getInstance();
+                if (!$objMember->id || ($arrRow[$strMemberField]) != $objMember->id) {
+                    return '';
+                }
+            }
+            return Toolkit::parseDetailLink( $this->arrFormPage, $arrRow['alias'] ); // @todo make alias changeable
         };
 
         if ( $this->arrOptions['template'] ) {
@@ -324,18 +296,15 @@ abstract class View extends \Controller {
         return $arrEntity;
     }
 
-
     protected function parseField( $varValue, $strField, $arrValues ) {
 
         return Toolkit::parseCatalogValue( $varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues );
     }
 
-
     protected function getPageNumber() {
 
         return (int) \Input::get( 'page_e' . $this->arrOptions['id'] );
     }
-
 
     public function getPagination() {
 
@@ -348,7 +317,6 @@ abstract class View extends \Controller {
 
         return $objPagination->generate("\n  ");
     }
-
 
     public function getEntities() {
 
@@ -363,7 +331,6 @@ abstract class View extends \Controller {
 
         return $this->arrEntities;
     }
-
 
     abstract public function parse();
 }

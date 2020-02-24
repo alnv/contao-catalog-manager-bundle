@@ -32,7 +32,7 @@ class Listing extends \Module {
             return null;
         }
 
-        if ( \Input::get('auto_item') && $this->cmMasterModule ) {
+        if ( \Input::get('auto_item') && $this->cmMasterModule ) { // @todo impl formModule
 
             return \Controller::getFrontendModule( $this->cmMasterModule );
         }
@@ -50,6 +50,7 @@ class Listing extends \Module {
         $this->setOrder();
         $this->setGroup();
         $this->setFilter();
+        $this->setFormPage();
         $this->setDistance();
         $this->setMasterPage();
         $this->setPagination();
@@ -219,5 +220,15 @@ class Listing extends \Module {
         }
 
         $this->arrOptions['masterPage'] = $this->cmMasterPage;
+    }
+
+    protected function setFormPage() {
+
+        if ( !$this->cmForm || !$this->cmFormPage ) {
+
+            return null;
+        }
+
+        $this->arrOptions['formPage'] = $this->cmFormPage;
     }
 }

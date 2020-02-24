@@ -251,7 +251,9 @@ abstract class CatalogWizard extends \System {
                 $arrEmpty = [
                     'label' => $arrReturn['label'],
                     'sql' => $arrReturn['sql'],
-                    'eval' => []
+                    'eval' => [
+                        'role' => $arrReturn['eval']['role']
+                    ]
                 ];
 
                 $arrReturn = $arrEmpty;

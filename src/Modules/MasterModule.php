@@ -7,9 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Views\Master;
 
 class MasterModule extends \Module {
 
-
     protected $strTemplate = 'mod_master';
-
 
     public function generate() {
 
@@ -34,11 +32,9 @@ class MasterModule extends \Module {
         return parent::generate();
     }
 
-
     protected function compile() {
 
         $objMaster = new Master( $this->cmTable, [
-
             'alias' => \Input::get('auto_item'),
             'template' => $this->cmTemplate,
             'id' => $this->id

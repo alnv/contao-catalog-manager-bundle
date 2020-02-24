@@ -5,14 +5,12 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
 class Module {
 
-
     public function getTables() {
 
         $objDatabase = \Database::getInstance();
 
         return $objDatabase->listTables();
     }
-
 
     public function getFields( $dc = null ) {
 
@@ -39,7 +37,6 @@ class Module {
         return $arrReturn;
     }
 
-
     public function getListTemplates( \DataContainer $dc ) {
 
         if ( $dc == null ) {
@@ -55,7 +52,6 @@ class Module {
         return \Controller::getTemplateGroup( 'cm_' . $dc->activeRecord->type . '_' );
     }
 
-
     public function getOrderByStatements() {
 
         return [
@@ -64,9 +60,30 @@ class Module {
         ];
     }
 
-
     public function getOperators() {
 
         return array_keys( $GLOBALS['CM_OPERATORS'] );
+    }
+
+    public function getFormIdentifier(\DataContainer $dc) {
+
+        $arrReturn = [];
+        if (!$dc->activeRecord->cmSource) {
+            return $arrReturn;
+        }
+
+        switch ($dc->activeRecord->cmSource) {
+            case 'dc':
+                return $this->getTables();
+            case 'form':
+                $objForms = \FormModel::findAll();
+                if ($objForms === null) {
+                    while ($objForms->next()) {
+                        $arrReturn[$objForms->id] = $objForms->title;
+                    }
+                }
+                return $arrReturn;
+        }
+        return $arrReturn;
     }
 }

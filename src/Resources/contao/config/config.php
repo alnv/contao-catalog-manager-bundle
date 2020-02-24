@@ -22,6 +22,7 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
 
 array_insert( $GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
+        'form-manager' => 'Alnv\ContaoCatalogManagerBundle\Modules\FormManagerModule',
         'listing-map' => 'Alnv\ContaoCatalogManagerBundle\Modules\MapModule',
         'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
         'master' => 'Alnv\ContaoCatalogManagerBundle\Modules\MasterModule'
@@ -91,6 +92,10 @@ $GLOBALS['CM_ROLES'] = [
     'title' => [
         'group' => 'article',
         'type' => 'string'
+    ],
+    'member' => [
+        'group' => 'member',
+        'type' => 'id'
     ],
     'subtitle' => [
         'group' => 'article',

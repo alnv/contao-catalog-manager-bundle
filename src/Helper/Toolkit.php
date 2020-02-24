@@ -27,8 +27,6 @@ class Toolkit {
 
     public static function getSqlTypes() {
 
-        // @todo numbers
-
         return [
 
             'vc255' => "varchar(255) NOT NULL default '%s'",
@@ -46,6 +44,20 @@ class Toolkit {
     public static function getSql( $strType, $arrOptions = [] ) {
 
         $arrSql = static::getSqlTypes();
+        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
+        $arrRole = $objRoleResolver->getRole($arrOptions['role']);
+
+        if ( is_array($arrRole) && !empty($arrRole) ) {
+
+            if ($arrRole['sql']) {
+                return $arrRole['sql'];
+            }
+
+            switch ( $arrRole['type'] ) {
+                case 'id':
+                    return $arrSql['i10'];
+            }
+        }
 
         if ( $arrOptions['multiple'] ) {
 
@@ -55,52 +67,30 @@ class Toolkit {
         switch ( $strType ) {
 
             case 'color':
-
-                return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions : '' ) );
-
-                break;
+                return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
 
             case 'date':
-
-                return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions : '' ) );
-
-                break;
+                return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
 
             case 'textarea':
-
                 if ( $arrOptions['tinyMce'] ) {
-
                     return $arrSql['longtext'];
                 }
-
                 return $arrSql['text'];
-
-                break;
 
             case 'text':
             case 'radio':
             case 'select':
-
-                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions : '' ) );
-
-                break;
+                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
 
             case 'checkbox':
-
                 if ( !$arrOptions['multiple'] ) {
-
                     return $arrSql['c1'];
                 }
-
                 return $arrSql['blob'];
-
-                break;
 
             default:
-
                 return $arrSql['blob'];
-
-                break;
         }
     }
 

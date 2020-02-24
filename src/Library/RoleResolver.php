@@ -2,15 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-
 class RoleResolver {
-
 
     public static $strTable = null;
     public static $arrRoles = null;
     public static $arrEntity = null;
     protected static $arrInstances = [];
-
 
     public static function getInstance( $strTable, $arrEntity = [] ) {
 
@@ -32,7 +29,6 @@ class RoleResolver {
         return self::$arrInstances[ $strInstanceKey ];
     }
 
-
     protected function setRoles() {
 
         \Controller::loadDataContainer( self::$strTable );
@@ -40,6 +36,11 @@ class RoleResolver {
 
         $arrRoles = [];
         $arrFields = $GLOBALS['TL_DCA'][ self::$strTable ]['fields'] ?: [];
+
+        if ( empty( $arrFields ) ) {
+
+            return $arrRoles;
+        }
 
         foreach ( $arrFields as $strFieldname => $arrField ) {
 
@@ -67,12 +68,10 @@ class RoleResolver {
         return $arrRoles;
     }
 
-
     public function getRole( $strRolename ) {
 
         return $GLOBALS['CM_ROLES'][ $strRolename ];
     }
-
 
     public function getValueByRole( $strRolename ) {
 
@@ -84,7 +83,6 @@ class RoleResolver {
         return self::$arrRoles[ $strRolename ]['value'];
     }
 
-
     public function getFieldByRole( $strRolename ) {
 
         if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
@@ -94,7 +92,6 @@ class RoleResolver {
 
         return self::$arrRoles[ $strRolename ]['name'];
     }
-
 
     public function getGeoCodingAddress() {
 
@@ -114,7 +111,6 @@ class RoleResolver {
         return $objAddress->getAddress();
     }
 
-
     public function getGeoCodingFields() {
 
         $arrReturn = [];
@@ -127,7 +123,6 @@ class RoleResolver {
 
         return $arrReturn;
     }
-
 
     protected function getKeyValueByRoles( $arrRoles ) {
 
