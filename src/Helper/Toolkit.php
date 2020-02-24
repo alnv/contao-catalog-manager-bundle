@@ -7,7 +7,6 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 class Toolkit {
 
-
     public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {
 
         if ( is_array( $varValue ) ) {
@@ -24,7 +23,6 @@ class Toolkit {
         return $varValue;
     }
 
-
     public static function getSqlTypes() {
 
         return [
@@ -39,7 +37,6 @@ class Toolkit {
             'blob' => "blob NULL"
         ];
     }
-
 
     public static function getSql( $strType, $arrOptions = [] ) {
 
@@ -94,7 +91,6 @@ class Toolkit {
         }
     }
 
-
     public static function parseDetailLink( $varPage, $strAlias ) {
 
         $arrPage = null;
@@ -117,7 +113,6 @@ class Toolkit {
         return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
     }
 
-
     public static function parseParametersFromString( $strParameter ) {
 
         $arrChunks = explode('?', urldecode( $strParameter ), 2 );
@@ -126,7 +121,6 @@ class Toolkit {
 
         return explode( '&', $strSource );
     }
-
 
     public static function getValueFromUrl( $arrValue ) {
 
@@ -142,7 +136,6 @@ class Toolkit {
 
         return $arrValue;
     }
-
 
     public static function getOrderByStatementFromArray( $arrOrder ) {
 
@@ -162,7 +155,6 @@ class Toolkit {
 
             }, $arrOrder ) ) );
     }
-
 
     public static function renderRow( $arrRow, $arrLabelFields, $arrCatalog, $arrFields ) {
 
@@ -196,7 +188,6 @@ class Toolkit {
         return $strTemplate;
     }
 
-
     public static function renderTreeRow( $arrRow, $strLabel, $arrLabelFields, $arrCatalog, $arrFields ) {
 
         $intIndex = 0;
@@ -222,7 +213,6 @@ class Toolkit {
 
         return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
-
 
     public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false ) {
 
@@ -265,12 +255,10 @@ class Toolkit {
                 $strSizeId = null;
 
                 if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
-
                     $strSizeId = $arrField['imageSize'];
                 }
 
                 if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
-
                     return Image::getImage( $varValue, $strSizeId );
                 }
 
@@ -287,7 +275,6 @@ class Toolkit {
 
         return $arrField['value'];
     }
-
 
     public static function getSelectedOptions( $arrValues, $arrOptions ) {
 
@@ -308,7 +295,6 @@ class Toolkit {
 
         return $arrReturn;
     }
-
 
     public static function saveGeoCoordinates( $strTable, $arrActiveRecord ) {
 
@@ -348,7 +334,6 @@ class Toolkit {
         }
     }
 
-
     public function saveAlias( $arrActiveRecord, $arrFields, $arrCatalog ) {
 
         if ( !$arrActiveRecord['id'] ) {
@@ -357,12 +342,11 @@ class Toolkit {
         }
 
         $arrValues = [];
-        $strAlias = $arrActiveRecord['alias'];
+        // $strAlias = $arrActiveRecord['alias'];
         $objDatabase = \Database::getInstance();
 
         /* @todo only if alias field exist in palette
         if ( $strAlias !== '' && $strAlias !== null && \Validator::isAlias( $strAlias ) && !$objDatabase->prepare('SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
-
             return null;
         }
         */
@@ -370,12 +354,10 @@ class Toolkit {
         foreach ( $arrFields as $strFieldname => $arrField ) {
 
             if ( !isset( $arrField['eval'] ) ) {
-
                 continue;
             }
 
             if ( !$arrField['eval']['useAsAlias'] ) {
-
                 continue;
             }
 
@@ -386,23 +368,18 @@ class Toolkit {
         }
 
         if ( empty( $arrValues ) ) {
-
             $strAlias = md5( time() . '/' . ( $arrActiveRecord['id'] ?: '' ) );
-
         } else {
-
             $strAlias = implode( '-', $arrValues );
         }
 
         $strAlias = \System::getContainer()->get('contao.slug.generator')->generate( \StringUtil::prepareSlug( $strAlias ), []);
 
         if ( strlen( $strAlias ) > 100 ) {
-
             $strAlias = substr( $strAlias, 0, 100 );
         }
 
         if ( $objDatabase->prepare( 'SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
-
             $strAlias = $strAlias . '-' . $arrActiveRecord['id'];
         }
 
@@ -411,7 +388,6 @@ class Toolkit {
         $arrSet[ 'alias' ] = $strAlias;
         $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrActiveRecord['id'] );
     }
-
 
     public static function convertComboWizardToModelValues( $strValue, $strTable = '' ) {
 
@@ -526,7 +502,6 @@ class Toolkit {
 
         return $arrReturn;
     }
-
 
     public static function getTableByDo() {
 

@@ -31,8 +31,8 @@ class RoleResolver {
 
     protected function setRoles() {
 
-        \Controller::loadDataContainer( self::$strTable );
-        \System::loadLanguageFile( self::$strTable );
+        \Controller::loadDataContainer(self::$strTable);
+        \System::loadLanguageFile(self::$strTable);
 
         $arrRoles = [];
         $arrFields = $GLOBALS['TL_DCA'][ self::$strTable ]['fields'] ?: [];

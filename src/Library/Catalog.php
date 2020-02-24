@@ -7,14 +7,11 @@ use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 
-
 class Catalog extends CatalogWizard {
-
 
     protected $arrFields = [];
     protected $arrCatalog = [];
     protected $strIdentifier = null;
-
 
     public function __construct( $strIdentifier ) {
 
@@ -49,7 +46,6 @@ class Catalog extends CatalogWizard {
             $arrField = $this->parseField( $objFields->row() );
 
             if ( $arrField === null ) {
-
                 continue;
             }
 
@@ -59,18 +55,15 @@ class Catalog extends CatalogWizard {
         $this->setDefaultFields();
     }
 
-
     public function getCatalog() {
 
         return $this->arrCatalog;
     }
 
-
     public function getFields() {
 
         return $this->arrFields;
     }
-
 
     public function getNaturalFields( $blnLabelOnly = true ) {
 
@@ -83,7 +76,6 @@ class Catalog extends CatalogWizard {
 
         return $arrReturn;
     }
-
 
     protected function setDefaultFields() {
 
@@ -178,7 +170,6 @@ class Catalog extends CatalogWizard {
             ]
         ]);
     }
-
 
     protected function setCustomFields() {
 

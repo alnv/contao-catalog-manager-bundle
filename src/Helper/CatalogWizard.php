@@ -132,8 +132,8 @@ abstract class CatalogWizard extends \System {
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
-                Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $arrField['fieldname'], $arrField['name'] ),
-                Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $arrField['fieldname'], $arrField['description'] ),
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $arrField['fieldname'], $arrField['name']),
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.' . $arrField['fieldname'], $arrField['description']),
             ],
             'eval' => [
                 'tl_class' => 'w50',
@@ -143,7 +143,7 @@ abstract class CatalogWizard extends \System {
                 'role' => $arrField['role'] ?: '',
                 'useAsAlias' => $arrField['useAsAlias'] ?: '',
                 'mandatory' => $arrField['mandatory'] ? true : false,
-                'size' => $arrField['size'] ? intval( $arrField['size'] )  : 1
+                'size' => $arrField['size'] ? intval( $arrField['size'] ) : 1
             ],
             'sql' => Toolkit::getSql( $arrField['type'], $arrField )
         ];
@@ -186,7 +186,7 @@ abstract class CatalogWizard extends \System {
 
                 if ( $arrReturn['eval']['role'] ) {
 
-                    $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
+                    $objRoleResolver = RoleResolver::getInstance(null);
                     $strRgxp = $objRoleResolver->getRole($arrReturn['eval']['role'])['type'];
 
                     if ( in_array( $strRgxp, [ 'date', 'time', 'datim' ] ) ) {
@@ -240,7 +240,6 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['tl_class'] = 'clr';
 
                 if ( $arrField['rte'] ) {
-
                     $arrReturn['eval']['rte'] = 'tinyMCE';
                 }
 
@@ -250,10 +249,10 @@ abstract class CatalogWizard extends \System {
 
                 $arrEmpty = [
                     'label' => $arrReturn['label'],
-                    'sql' => $arrReturn['sql'],
                     'eval' => [
                         'role' => $arrReturn['eval']['role']
-                    ]
+                    ],
+                    'sql' => $arrReturn['sql']
                 ];
 
                 $arrReturn = $arrEmpty;
@@ -282,7 +281,7 @@ abstract class CatalogWizard extends \System {
 
                 if ( $arrReturn['eval']['role'] ) {
 
-                    $objRoleResolver = RoleResolver::getInstance( $this->arrCatalog['table'] );
+                    $objRoleResolver = RoleResolver::getInstance(null);
 
                     switch ( $objRoleResolver->getRole($arrReturn['eval']['role'])['type'] ) {
 

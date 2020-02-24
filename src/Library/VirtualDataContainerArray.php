@@ -4,13 +4,10 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
-
 class VirtualDataContainerArray extends \System {
-
 
     protected $arrCatalog = [];
     protected $arrFields = [];
-
 
     public function __construct( $strModule ) {
 
@@ -19,7 +16,6 @@ class VirtualDataContainerArray extends \System {
         $this->arrFields = $objCatalog->getFields();
         $this->generateEmptyDataContainer();
     }
-
 
     protected function setConfig() {
 
@@ -36,13 +32,14 @@ class VirtualDataContainerArray extends \System {
         if ( $this->arrCatalog['enableGeocoding'] ) {
 
             $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['onsubmit_callback'][] = function( \DataContainer $objDataContainer ) {
-                Toolkit::saveGeoCoordinates( $this->arrCatalog['table'], $objDataContainer->activeRecord->row() );
+                if ($objDataContainer->activeRecord) {
+                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
+                }
             };
         }
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
     }
-
 
     protected function setList() {
 
@@ -119,7 +116,6 @@ class VirtualDataContainerArray extends \System {
             $arrList['sorting']['mode'] = 4;
             $arrList['sorting']['headerFields'] = [ 'name' ];
             $arrList['sorting']['child_record_callback'] =  function ( $arrRow ) use ( $arrList ) {
-
                 return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
 
@@ -134,7 +130,6 @@ class VirtualDataContainerArray extends \System {
             $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
             $arrList['labels']['label_callback'] =  function ( $arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false  ) use ( $arrList ) {
-
                 return Toolkit::renderTreeRow( $arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
 
@@ -176,12 +171,10 @@ class VirtualDataContainerArray extends \System {
         }
     }
 
-
     protected function setFields() {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['fields'] = $this->arrFields;
     }
-
 
     protected function setPalettes() {
 
@@ -191,12 +184,10 @@ class VirtualDataContainerArray extends \System {
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
 
             if ( in_array( $this->arrFields['type'], ['empty'] ) ) {
-
                 continue;
             }
 
             if ( !$this->arrCatalog['enableVisibility'] && in_array( $strFieldname, [ 'published', 'start', 'stop' ] ) ) {
-
                 continue;
             }
 
@@ -206,12 +197,10 @@ class VirtualDataContainerArray extends \System {
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['palettes']['default'] = implode(',', $arrPalette );
     }
 
-
     protected function setSubPalettes() {
 
         //
     }
-
 
     protected function setLabels() {
 
@@ -230,14 +219,15 @@ class VirtualDataContainerArray extends \System {
         }
     }
 
-
     protected function generateEmptyDataContainer() {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
             'config' => [
                 'onsubmit_callback' => [
                     function( \DataContainer $objDataContainer ) {
-                        Toolkit::saveAlias( $objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog );
+                        if ($objDataContainer->activeRecord) {
+                            Toolkit::saveAlias($objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog);
+                        }
                     }
                 ],
                 'sql' => [
@@ -278,12 +268,10 @@ class VirtualDataContainerArray extends \System {
         ];
     }
 
-
     public function getRelatedTables() {
 
         return $this->arrCatalog['related'];
     }
-
 
     protected function setOperations() {
 
@@ -303,7 +291,6 @@ class VirtualDataContainerArray extends \System {
             array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, $arrOperation );
         }
     }
-
 
     public function generate() {
 
