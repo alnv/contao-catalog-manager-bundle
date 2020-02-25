@@ -217,7 +217,7 @@ abstract class View extends \Controller {
 
         if ( $this->arrOptions['masterPage'] ) {
 
-            $arrRow['masterUrl'] = Toolkit::parseDetailLink( $this->arrMasterPage, $arrEntity['alias'] ); // @todo make alias changeable
+            $arrRow['masterUrl'] = Toolkit::parseDetailLink( $this->arrMasterPage, $arrEntity['alias'] );
         }
 
         foreach ( $arrEntity as $strField => $varValue ) {
@@ -316,6 +316,11 @@ abstract class View extends \Controller {
         $objPagination = new \Pagination( $this->arrOptions['total'], $this->arrOptions['limit'], \Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id'] );
 
         return $objPagination->generate("\n  ");
+    }
+
+    public function getAddUrl() {
+
+        return Toolkit::parseDetailLink( $this->arrFormPage, '' );
     }
 
     public function getEntities() {
