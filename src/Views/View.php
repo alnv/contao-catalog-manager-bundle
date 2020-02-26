@@ -9,11 +9,11 @@ use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 
 abstract class View extends \Controller {
 
+    public $arrFormPage = [];
+    public $arrMasterPage = [];
     protected $strTable = null;
     protected $arrOptions = [];
     protected $arrEntities = [];
-    protected $arrFormPage = [];
-    protected $arrMasterPage = [];
     protected $dcaExtractor = null;
 
     public function __construct( $strTable, $arrOptions = [] ) {
@@ -251,19 +251,17 @@ abstract class View extends \Controller {
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
         };
 
-        $arrRow['editUrl'] = function () use ( $arrRow ) {
-            if (!$this->arrOptions['formPage']) {
-                return '';
-            }
-            $strMemberField = $arrRow['roleResolver']()->getFieldByRole('member');
-            if ( $strMemberField ) {
-                $objMember = \FrontendUser::getInstance();
-                if (!$objMember->id || ($arrRow[$strMemberField]) != $objMember->id) {
-                    return '';
+        if ( isset( $GLOBALS['TL_HOOKS']['parseEntity'] ) && is_array($GLOBALS['TL_HOOKS']['parseEntity'] ) ) {
+            foreach ( $GLOBALS['TL_HOOKS']['parseEntity'] as $arrCallback ) {
+                if (is_array($arrCallback)) {
+                    $this->import($arrCallback[0]);
+                    $this->{$arrCallback[0]}->{$arrCallback[1]}($arrRow, $this->strTable, $this->arrOptions, $this);
+                }
+                elseif (\is_callable($arrCallback)) {
+                    $arrCallback($arrRow, $this->strTable, $this->arrOptions, $this);
                 }
             }
-            return Toolkit::parseDetailLink( $this->arrFormPage, $arrRow['alias'] ); // @todo make alias changeable
-        };
+        }
 
         if ( $this->arrOptions['template'] ) {
 

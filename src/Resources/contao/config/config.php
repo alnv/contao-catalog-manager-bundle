@@ -96,6 +96,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'member',
         'type' => 'id'
     ],
+    'group' => [
+        'group' => 'member',
+        'type' => 'array'
+    ],
     'subtitle' => [
         'group' => 'article',
         'type' => 'string'
