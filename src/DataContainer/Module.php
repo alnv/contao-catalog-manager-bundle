@@ -16,22 +16,22 @@ class Module {
 
         $arrReturn = [];
 
-        if ( $dc == null ) {
+        if ( $dc === null ) {
 
             return $arrReturn;
         }
 
-        if ( $dc->activeRecord == null ) {
+        if ( $dc->activeRecord === null || !$dc->activeRecord->cmTable ) {
 
             return $arrReturn;
         }
 
-        $objDatabase = \Database::getInstance();
-        $arrFields = $objDatabase->listFields( $dc->activeRecord->cmTable );
+        \System::loadLanguageFile($dc->activeRecord->cmTable);
+        \Controller::loadDataContainer($dc->activeRecord->cmTable);
 
-        foreach ( $arrFields as $arrField ) {
+        foreach ( $GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField ) {
 
-            $arrReturn[] = $arrField['name'];
+            $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
         }
 
         return $arrReturn;
@@ -63,27 +63,5 @@ class Module {
     public function getOperators() {
 
         return array_keys( $GLOBALS['CM_OPERATORS'] );
-    }
-
-    public function getFormIdentifier(\DataContainer $dc) {
-
-        $arrReturn = [];
-        if (!$dc->activeRecord->cmSource) {
-            return $arrReturn;
-        }
-
-        switch ($dc->activeRecord->cmSource) {
-            case 'dc':
-                return $this->getTables();
-            case 'form':
-                $objForms = \FormModel::findAll();
-                if ($objForms === null) {
-                    while ($objForms->next()) {
-                        $arrReturn[$objForms->id] = $objForms->title;
-                    }
-                }
-                return $arrReturn;
-        }
-        return $arrReturn;
     }
 }

@@ -1,7 +1,16 @@
 <?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
-    <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:600px;width:100%"></div>
+    <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:100%">
+        <button>DSGVO Text</button> <!-- impl dsgvo text -->
+    </div>
     <script defer async>
+        var getInfoCallback = function (map, content) {
+            var objInfoBox = new google.maps.InfoWindow({content: content});
+            return function() {
+                objInfoBox.setContent(content);
+                objInfoBox.open(map, this);
+            };
+        };
         var initMap = function () {
             var arrLocations = <?= $this->varLocations ?>;
             var objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
@@ -25,25 +34,29 @@
             }
             objMap.fitBounds(objBounds);
         };
-        var getInfoCallback = function (map, content) {
-            var objInfoBox = new google.maps.InfoWindow({content: content});
-            return function() {
-                objInfoBox.setContent(content);
-                objInfoBox.open(map, this);
+        (function () {
+            var objMapDocument = document.getElementById("<?= $strUniqueId ?>");
+            var loadGMap = function () {
+                if (typeof google !== 'undefined') {
+                    initMap();
+                    return null;
+                }
+                var objScript = document.createElement('script');
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=&callback=initMap'; //@impl maps api
+                objScript.id = "script_<?= $strUniqueId ?>";
+                objScript.defer = true;
+                objScript.async = true;
+                document.body.appendChild(objScript);
             };
-        };
-        var loadGMap = function () {
-            if (typeof google !== 'undefined') {
-                initMap();
-                return null;
+            var objDataProtectionButton = objMapDocument.querySelector('button');
+            if (objDataProtectionButton && !localStorage.getItem('data-protection-gmap-accepted')) {
+                objDataProtectionButton.addEventListener('click', function () {
+                    loadGMap();
+                    localStorage.setItem('data-protection-gmap-accepted', '1')
+                },false);
+            } else {
+                loadGMap();
             }
-            var objScript = document.createElement('script');
-            objScript.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyByWU1hQHfJEQjOkUjIBNU1JmyQ9_SG1nY&callback=initMap';
-            objScript.id = "script_<?= $strUniqueId ?>";
-            objScript.defer = true;
-            objScript.async = true;
-            document.body.appendChild(objScript);
-        };
-        loadGMap();
+        })();
     </script>
 <?php endif; ?>

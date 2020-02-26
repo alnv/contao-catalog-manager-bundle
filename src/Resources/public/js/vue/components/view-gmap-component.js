@@ -68,24 +68,35 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
                 objInfoBox.setContent(content);
                 objInfoBox.open(this.map, this);
             };
+        },
+        loadGMap: function () {
+            if ( typeof google === 'undefined' ) {
+                var objScript = document.createElement('script');
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key='+ this.mapApiKey +'&callback=';
+                objScript.defer = true;
+                objScript.async = true;
+                objScript.onload = function() {
+                    if (!this.awaitOnChange) {
+                        this.fetch();
+                    }
+                }.bind(this);
+                document.body.appendChild(objScript);
+                localStorage.setItem('data-protection-gmap-accepted','1');
+                return null;
+            }
+            if (!this.awaitOnChange) {
+                this.fetch();
+            }
+        }
+    },
+    created: function() {
+        if (localStorage.getItem('data-protection-gmap-accepted')) {
+            this.useDataPrivacyMode = false;
         }
     },
     mounted: function () {
-        if ( typeof google === 'undefined' ) {
-            var objScript = document.createElement('script');
-            objScript.src = 'https://maps.googleapis.com/maps/api/js?key='+ this.mapApiKey +'&callback=';
-            objScript.defer = true;
-            objScript.async = true;
-            objScript.onload = function() {
-                if (!this.awaitOnChange) {
-                    this.fetch();
-                }
-            }.bind(this);
-            document.body.appendChild(objScript);
-            return null;
-        }
-        if (!this.awaitOnChange) {
-            this.fetch();
+        if (!this.useDataPrivacyMode) {
+            this.loadGMap();
         }
     },
     props: {
@@ -108,15 +119,34 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
             default: '',
             type: String,
             required: true
+        },
+        dataPrivacyText: {
+            type: String,
+            default: null,
+            required: false
+        },
+        useDataPrivacyMode: {
+            type: Boolean,
+            default: false,
+            required: false
+        },
+        style: {
+            type: Object,
+            default: {
+                height: '600px',
+                width: '100%'
+            },
+            required: false
         }
     },
     template:
         '<div class="view-gmap-component">' +
             '<transition name="fade">' +
                 '<div class="view-gmap-component-container" v-show="locations.length">' +
-                    '<div class="gmap" style="height:600px;width:100%"></div>' +
+                    '<div class="gmap" v-bind:style="style"></div>' +
                 '</div>' +
             '</transition>' +
-            '<loading v-if="!locations.length"></loading>' +
+            '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
+            '<loading v-if="!locations.length && !useDataPrivacyMode"></loading>' +
         '</div>'
 });
