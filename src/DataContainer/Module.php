@@ -7,9 +7,7 @@ class Module {
 
     public function getTables() {
 
-        $objDatabase = \Database::getInstance();
-
-        return $objDatabase->listTables();
+        return (new \Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog())->getTables();
     }
 
     public function getFields( $dc = null ) {
@@ -17,12 +15,10 @@ class Module {
         $arrReturn = [];
 
         if ( $dc === null ) {
-
             return $arrReturn;
         }
 
         if ( $dc->activeRecord === null || !$dc->activeRecord->cmTable ) {
-
             return $arrReturn;
         }
 

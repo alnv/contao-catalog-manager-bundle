@@ -4,27 +4,22 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
-
 class Catalog {
-
 
     public function getCatalogTypes() {
 
         return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] );
     }
 
-
     public function getSortingTypes() {
 
         return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] );
     }
 
-
     public function getDataContainers() {
 
         return $GLOBALS['CM_DATA_CONTAINERS'];
     }
-
 
     public function getModes( \DataContainer $objDataContainer ) {
 
@@ -49,12 +44,10 @@ class Catalog {
         return array_values( $arrModes );
     }
 
-
     public function getFlags() {
 
         return [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12' ];
     }
-
 
     public function getParentFields( \DataContainer $objDataContainer ) {
 
@@ -67,7 +60,6 @@ class Catalog {
 
         return $objCatalog->getNaturalFields();
     }
-
 
     public function getFields( $objDataContainer = null ) {
 
@@ -86,7 +78,6 @@ class Catalog {
         return $objCatalog->getNaturalFields();
     }
 
-
     public function generateModulename( \DataContainer $objDataContainer ) {
 
         if ( $objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table ) {
@@ -98,7 +89,6 @@ class Catalog {
         $strModulename = 'module_' . strtolower( $objDataContainer->activeRecord->table );
         $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id = ?')->set([ 'tstamp' => time(), 'module' => $strModulename ])->execute( $objDataContainer->id );
     }
-
 
     public function getNavigation() {
 
@@ -118,7 +108,6 @@ class Catalog {
 
         return $arrReturn;
     }
-
 
     public function watchTable( $strTable, \DataContainer $objDataContainer ) {
 
@@ -151,7 +140,6 @@ class Catalog {
         return $strTable;
     }
 
-
     public function createCustomFields( \DataContainer $objDataContainer ) {
 
         if ( !$objDataContainer->activeRecord->table ) {
@@ -162,7 +150,6 @@ class Catalog {
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
         $objDatabaseBuilder->createCustomFieldsIfNotExists( $objDataContainer->activeRecord->table );
     }
-
 
     public function deleteTable( \DataContainer $objDataContainer ) {
 
@@ -175,16 +162,13 @@ class Catalog {
         $objDatabaseBuilder->deleteTable( $objDataContainer->activeRecord->table );
     }
 
-
     public function getOrderByStatements() {
 
         return [
-
             'ASC',
             'DESC'
         ];
     }
-
 
     public function toggleIcon( $arrRow, $strHref, $strLabel, $strTitle, $strIcon, $strAttributes ) {
 
@@ -204,7 +188,6 @@ class Catalog {
 
         return '<a href="'. \Backend::addToUrl( $strHref ) . '" title="'. \StringUtil::specialchars( $strTitle ) .'"'. $strAttributes. '>'.\Image::getHtml( $strIcon, $strLabel, 'data-state="' . ( $arrRow['published'] ? 1 : 0 ) . '"' ).'</a> ';
     }
-
 
     protected function toggleVisibility( $intId, $blnVisible, \DataContainer $objDataContainer=null ) {
 
@@ -286,5 +269,33 @@ class Catalog {
         }
 
         $objVersions->create();
+    }
+
+    public function getTables() {
+
+        return \Database::getInstance()->listTables();
+    }
+
+    public function getDbFields(\DataContainer $dc) {
+
+        $arrReturn = [];
+
+        if ( $dc === null ) {
+            return $arrReturn;
+        }
+
+        if ( $dc->activeRecord === null || !$dc->activeRecord->dbTable ) {
+            return $arrReturn;
+        }
+
+        \System::loadLanguageFile($dc->activeRecord->dbTable);
+        \Controller::loadDataContainer($dc->activeRecord->dbTable);
+
+        foreach ( $GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['fields'] as $strField => $arrField ) {
+
+            $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
+        }
+
+        return $arrReturn;
     }
 }

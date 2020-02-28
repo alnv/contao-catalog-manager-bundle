@@ -4,7 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
-
 class Toolkit {
 
     public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {

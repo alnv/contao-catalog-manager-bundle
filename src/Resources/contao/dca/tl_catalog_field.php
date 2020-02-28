@@ -69,7 +69,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'subpalettes' => [
         'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => '',
-        'optionsSource_dbOptions' => ''
+        'optionsSource_dbOptions' => \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getPalette()
     ],
     'fields' => [
         'id' => [
@@ -78,7 +78,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'pid' => [
             'foreignKey' => 'tl_catalog.id',
             'relation' => [
-
                 'type' => 'belongsTo',
                 'load' => 'lazy'
             ],
@@ -178,7 +177,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'maxlength' => 64,
                 'tl_class' => 'clr',
                 'submitOnChange' => true,
-                'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
             'options' => [ 'options', 'dbOptions' ],
@@ -323,3 +321,5 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ]
 ];
+
+array_insert( $GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getFields() );

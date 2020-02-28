@@ -4,12 +4,9 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
 
-
 class ModelWizard {
 
-
     protected $objModel = null;
-
 
     public function __construct( $strTable ) {
 
@@ -35,7 +32,6 @@ class ModelWizard {
         $objDynModel->createDynTable( $strTable );
         $this->objModel = $objDynModel;
     }
-
 
     public function getModel() {
 
