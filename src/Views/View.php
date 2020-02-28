@@ -228,6 +228,10 @@ abstract class View extends \Controller {
 
                 if ( $strParsedValue !== $varValue ) {
 
+                    if (\Validator::isBinaryUuid($varValue)) {
+                        $varValue = \StringUtil::binToUuid($varValue);
+                    }
+
                     $arrRow['origin'][ $strField ] = $varValue;
                 }
 
