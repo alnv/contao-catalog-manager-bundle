@@ -2,7 +2,6 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-
 class Module {
 
     public function getTables() {

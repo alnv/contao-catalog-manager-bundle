@@ -4,7 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
 
-
 class MasterModule extends \Module {
 
     protected $strTemplate = 'mod_master';

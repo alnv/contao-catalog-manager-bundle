@@ -9,13 +9,9 @@ class Toolkit {
     public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {
 
         if ( is_array( $varValue ) ) {
-
             $arrValues = array_map( function ( $arrValue ) use ( $strField ) {
-
                 return $arrValue[ $strField ];
-
             }, $varValue );
-
             return implode( $strDelimiter, $arrValues );
         }
 
@@ -25,7 +21,6 @@ class Toolkit {
     public static function getSqlTypes() {
 
         return [
-
             'vc255' => "varchar(255) NOT NULL default '%s'",
             'vc8' => "varchar(8) NOT NULL default '%s'",
             'c1' => "char(1) NOT NULL default ''",
@@ -93,23 +88,34 @@ class Toolkit {
     public static function parseDetailLink( $varPage, $strAlias ) {
 
         $arrPage = null;
-
         if ( is_numeric( $varPage ) && $varPage ) {
-
             $objPage = \PageModel::findByPk( $varPage );
-
             if ( $objPage !== null ) {
-
                 $arrPage = $objPage->row();
             }
         }
 
         if ( is_array( $varPage ) && !empty( $varPage ) ) {
-
             $arrPage = $varPage;
         }
 
         return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
+    }
+
+    public static function parseImage($varImage) {
+        if (!is_array($varImage) && ( \Validator::isBinaryUuid($varImage) || \Validator::isUuid($varImage) )) {
+            $objFile = \FilesModel::findByUuid($varImage);
+            if ($objFile !== null) {
+                return $objFile->path;
+            }
+        }
+        if (!is_array($varImage) && empty($varImage)) {
+            return '';
+        }
+        if ( isset($varImage['img']) ) {
+            return $varImage['img']['src'];
+        }
+        return $varImage[0]['img']['src'];
     }
 
     public static function parseParametersFromString( $strParameter ) {
@@ -124,12 +130,10 @@ class Toolkit {
     public static function getValueFromUrl( $arrValue ) {
 
         if ( $arrValue === '' || $arrValue === null ) {
-
             return '';
         }
 
         if ( is_array( $arrValue ) ) {
-
             return serialize( $arrValue );
         }
 
@@ -139,19 +143,15 @@ class Toolkit {
     public static function getOrderByStatementFromArray( $arrOrder ) {
 
         return implode(',', array_filter( array_map( function ( $arrOrder ) {
-
             if ( !isset( $arrOrder['field'] ) || !$arrOrder['field'] ) {
-
                 return '';
             }
 
             if ( !$arrOrder['order'] ) {
-
                 $arrOrder['order'] = 'ASC';
             }
 
             return $arrOrder['field'] . ' ' . $arrOrder['order'];
-
             }, $arrOrder ) ) );
     }
 
@@ -160,12 +160,10 @@ class Toolkit {
         $arrColumns = [];
 
         foreach ( $arrLabelFields as $strField ) {
-
             $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
         }
 
         if ( count( $arrColumns ) < 2 ) {
-
             return array_values( $arrColumns )[0];
         }
 
@@ -195,17 +193,14 @@ class Toolkit {
         $strImage = 'articles';
 
         foreach ( $arrLabelFields as $strField ) {
-
             $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
         }
 
         if ( count( $arrColumns ) < 2 ) {
-
             return array_values( $arrColumns )[0];
         }
 
         foreach ( $arrColumns as $strField => $strValue ) {
-
             $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
             $intIndex += 1;
         }
@@ -216,59 +211,39 @@ class Toolkit {
     public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false ) {
 
         if ( $varValue === '' || $varValue === null ) {
-
             return $varValue;
         }
 
         if ( !isset( $arrField['type'] ) ) {
-
             return $varValue;
         }
 
         switch ( $arrField['type'] ) {
-
             case 'text':
-
                 return $arrField['value'];
-
                 break;
-
             case 'checkbox':
             case 'select':
             case 'radio':
-
                 $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
                 $arrOptionValues =  static::getSelectedOptions( $varValue, $arrField['options'] );
-
                 if ( $blnStringFormat ) {
-
                     return static::parse( $arrOptionValues );
                 }
-
                 return $arrOptionValues;
-
                 break;
-
             case 'fileTree':
-
                 $strSizeId = null;
-
                 if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
                     $strSizeId = $arrField['imageSize'];
                 }
-
                 if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
                     return Image::getImage( $varValue, $strSizeId );
                 }
-
                 return []; // @todo files
-
                 break;
-
             case 'pageTree':
-
                 return ''; // @todo parse url
-
                 break;
         }
 
@@ -280,14 +255,11 @@ class Toolkit {
         $arrReturn = [];
 
         if ( !is_array( $arrOptions ) || !is_array( $arrValues ) ) {
-
             return [];
         }
 
         foreach ( $arrOptions as $arrValue ) {
-
             if ( in_array( $arrValue['value'], $arrValues ) ) {
-
                 $arrReturn[] = $arrValue;
             }
         }
@@ -305,7 +277,6 @@ class Toolkit {
         }
 
         foreach ( $arrActiveRecord as $strField => $strValue ) {
-
             $arrEntity[ $strField ] = static::parseCatalogValue( $strValue, \Widget::getAttributesFromDca( $GLOBALS['TL_DCA'][ $strTable ]['fields'][ $strField ], $strField, $strValue, $strField, $strTable ), $arrActiveRecord, true );
         }
 
@@ -385,7 +356,7 @@ class Toolkit {
         $arrSet = [];
         $arrSet[ 'tstamp' ] = time();
         $arrSet[ 'alias' ] = $strAlias;
-        $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrActiveRecord['id'] );
+        $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
     public static function convertComboWizardToModelValues( $strValue, $strTable = '' ) {
@@ -403,7 +374,6 @@ class Toolkit {
         ]);
 
         if ( !is_array( $arrJson ) || empty( $arrJson ) ) {
-
             return $arrReturn;
         }
 
@@ -412,41 +382,31 @@ class Toolkit {
             if ( isset( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ] ) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'] ) {
 
                 if ( $arrQuery['group'] || $blnInitialGroup ) {
-
                     $strName = 'group' . $intIndex;
                 }
 
                 if ( !isset( $arrQueries[ $strName ] ) ) {
-
                     $arrQueries[ $strName ] = [];
                 }
 
                 $varValue = $arrQuery['value'];
 
                 if ( $varValue !== '' || $varValue !== null ) {
-
                     $objIt = new \InsertTags();
                     $varValue = $objIt->replace( $varValue, true );
                 }
 
                 $arrColumns = [];
                 $varValue = \StringUtil::deserialize( $varValue, true );
-
                 foreach ( $varValue as $strIndex => $strValue ) {
-
                     if ( isset( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] ) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] > 1 ) {
-
                         if ( $strIndex % $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['valueNumber'] ) {
-
                             $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
                                 'field' => $strTable . '.' . $arrQuery['field'],
                                 'value' => '?'
                             ]);
                         }
-                    }
-
-                    else {
-
+                    } else {
                         $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
                             'field' => $strTable . '.' . $arrQuery['field'],
                             'value' => '?'
@@ -457,22 +417,15 @@ class Toolkit {
                 }
 
                 if ( !empty( $arrColumns ) ) {
-
                     if ( count( $arrColumns ) > 1 ) {
-
                         $strColumn = '(' . implode( ' OR ', $arrColumns ) . ')';
-                    }
-
-                    else {
-
+                    } else {
                         $strColumn = $arrColumns[0];
                     }
-
                     $arrQueries[ $strName ][] = $strColumn;
                 }
 
                 if ( $arrQuery['group'] ) {
-
                     $blnInitialGroup = false;
                 }
             }
@@ -484,17 +437,11 @@ class Toolkit {
         foreach ( $arrQueries as $arrQuery ) {
 
             if ( empty( $arrQuery ) ) {
-
                 continue;
             }
-
             if ( count( $arrQuery ) > 1 ) {
-
                 $arrReturn['column'][] = '(' . implode( ' OR ', $arrQuery ) . ')';
-            }
-
-            else {
-
+            } else {
                 $arrReturn['column'][] = $arrQuery[0];
             }
         }
@@ -505,12 +452,10 @@ class Toolkit {
     public static function getTableByDo() {
 
         if ( !\Input::get('do') ) {
-
             return null;
         }
 
         if ( \Input::get('do') && \Input::get('table') ) {
-
             return \Input::get('table');
         }
 

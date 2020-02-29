@@ -190,17 +190,13 @@ abstract class View extends \Controller {
         $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language' ];
 
         foreach ( $arrOptions as $strOption ) {
-
             if ( isset( $this->arrOptions[ $strOption ] ) ) {
-
                 $arrReturn[ $strOption ] = $this->arrOptions[ $strOption ];
             }
         }
 
         if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
-
             foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
-
                 $this->import( $arrCallback[0] );
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrReturn, $this->strTable, $this->arrOptions );
             }
@@ -216,27 +212,19 @@ abstract class View extends \Controller {
         $arrRow['_table'] = $this->strTable;
 
         if ( $this->arrOptions['masterPage'] ) {
-
             $arrRow['masterUrl'] = Toolkit::parseDetailLink( $this->arrMasterPage, $arrEntity['alias'] );
         }
 
         foreach ( $arrEntity as $strField => $varValue ) {
-
             if ( !$this->arrOptions['fastMode'] ) {
-
                 $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity );
-
                 if ( $strParsedValue !== $varValue ) {
-
                     if (\Validator::isBinaryUuid($varValue)) {
                         $varValue = \StringUtil::binToUuid($varValue);
                     }
-
                     $arrRow['origin'][ $strField ] = $varValue;
                 }
-
             } else {
-
                 $strParsedValue = $varValue;
             }
 
@@ -268,30 +256,22 @@ abstract class View extends \Controller {
         }
 
         if ( $this->arrOptions['template'] ) {
-
             $objTemplate = new \FrontendTemplate( $this->arrOptions['template'] );
             $objTemplate->setData( $arrRow );
             $arrRow['template'] =  $objTemplate->parse();
         }
 
         if ( $this->arrOptions['groupBy'] ) {
-
             $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
-
             if ( !isset( $this->arrEntities[ $strGroup ] ) ) {
-
                 $this->arrEntities[ $strGroup ] = [
                     'headline' => $arrRow[ $this->arrOptions['groupBy'] ],
                     'hl' => $this->arrOptions['groupByHl'],
                     'entities' => []
                 ];
             }
-
             $this->arrEntities[ $strGroup ]['entities'][] = $arrRow;
-        }
-
-        else {
-
+        } else {
             $this->arrEntities[] = $arrRow;
         }
 
