@@ -36,6 +36,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'icon' => 'header.gif'
             ],
             'fields' => [
+                'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_field',
                 'icon' => 'edit.gif'
             ],
