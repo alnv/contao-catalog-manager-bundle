@@ -2,23 +2,18 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
-
 class DynModel extends \Model {
 
-
     public static $strTable = '';
-
 
     public function __construct( $objResult = null ) {
 
         if ( !static::$strTable ) {
-
             return null;
         }
 
         parent::__construct( $objResult );
     }
-
 
     public function createDynTable( $strTable, $objResult = null ) {
 
@@ -26,7 +21,6 @@ class DynModel extends \Model {
         static::$arrClassNames[ $strTable ] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
         parent::__construct( $objResult );
     }
-
 
     protected static function buildFindQuery( array $arrOptions ) {
 
@@ -82,67 +76,21 @@ class DynModel extends \Model {
         }
 
         if ( isset( $arrOptions['column'] ) ) {
-
             $strQuery .= " WHERE " . ( is_array($arrOptions['column'] ) ? implode(" AND ", $arrOptions['column'] ) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column'] ) . "=?");
         }
 
         if ( isset( $arrOptions['group'] ) ) {
-
             $strQuery .= " GROUP BY " . $arrOptions['group'];
         }
 
         if ( isset( $arrOptions['having'] ) ) {
-
             $strQuery .= " HAVING " . $arrOptions['having'];
         }
 
         if ( isset( $arrOptions['order'] ) ) {
-
             $strQuery .= " ORDER BY " . $arrOptions['order'];
         }
 
         return $strQuery;
     }
-
-    /*
-    protected static function buildCountQuery( array $arrOptions ) {
-
-        $strDistanceSelection = '';
-
-        if ( isset( $arrOptions['distance'] ) ) {
-
-            $strDistanceSelection = sprintf(
-                ",3956 * 1.6 * 2 * ASIN(SQRT(POWER(SIN((%s-abs(%s.`%s`)) * pi()/180 / 2),2) + COS(%s * pi()/180) * COS(abs(%s.`%s`) *  pi()/180) * POWER( SIN( (%s-%s.`%s`) *  pi()/180 / 2 ), 2 ))) AS _distance ",
-                $arrOptions['distance']['latCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['latField'],
-                $arrOptions['distance']['latCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['latField'],
-                $arrOptions['distance']['lngCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['lngField']
-            );
-        }
-
-        $strQuery = "SELECT COUNT(*) AS count ". $strDistanceSelection ." FROM " . $arrOptions['table'];
-
-        if ( $arrOptions['column'] !== null ) {
-
-            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column'] ) . "=?");
-        }
-
-        if ( $strDistanceSelection ) {
-
-            $strQuery .= " GROUP BY _distance";
-        }
-
-        if ( isset( $arrOptions['having'] ) ) {
-
-            $strQuery .= " HAVING " . $arrOptions['having'];
-        }
-
-        return $strQuery;
-    }
-    */
 }
