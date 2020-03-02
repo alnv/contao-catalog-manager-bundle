@@ -103,7 +103,6 @@ class Listing extends \Module {
         if ( $arrGeoCoding !== null ) {
 
             $this->arrOptions['distance'] = [
-
                 'latCord' => $arrGeoCoding['latitude'],
                 'lngCord' => $arrGeoCoding['longitude'],
                 'latField' => $arrGeoCodingFields['latitude'],
