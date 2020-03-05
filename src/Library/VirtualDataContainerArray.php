@@ -20,9 +20,7 @@ class VirtualDataContainerArray extends \System {
     protected function setConfig() {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['_table'] = $this->arrCatalog['table'];
-
         if (  $this->arrCatalog['ptable'] ) {
-
             $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ptable'] = $this->arrCatalog['ptable'];
         }
 
@@ -30,8 +28,7 @@ class VirtualDataContainerArray extends \System {
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
 
         if ( $this->arrCatalog['enableGeocoding'] ) {
-
-            $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['onsubmit_callback'][] = function( \DataContainer $objDataContainer ) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function( \DataContainer $objDataContainer ) {
                 if ($objDataContainer->activeRecord) {
                     Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
                 }
@@ -53,22 +50,18 @@ class VirtualDataContainerArray extends \System {
         ];
 
         if ( $this->arrCatalog['enablePanel'] ) {
-
             $arrList['sorting']['panelLayout'] = 'filter,search,sort;limit';
         }
 
         if ( $this->arrCatalog['showColumns'] ) {
-
             $arrList['labels']['showColumns'] = true;
         }
 
         if ( !empty( $this->arrCatalog['columns'] ) ) {
-
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
         }
 
         if ( $this->arrCatalog['sortingType'] ) {
-
             if ( $this->arrCatalog['sortingType'] == 'fixed' ) {
 
                 $arrList['sorting']['mode'] = 1;

@@ -270,9 +270,7 @@ class Toolkit {
     public static function saveGeoCoordinates( $strTable, $arrActiveRecord ) {
 
         $arrEntity = [];
-
         if ( !$arrActiveRecord['id'] ) {
-
             return null;
         }
 
@@ -283,13 +281,11 @@ class Toolkit {
         $objRoleResolver = RoleResolver::getInstance( $strTable, $arrEntity );
         $arrGeoFields = $objRoleResolver->getGeoCodingFields();
         $strAddress = $objRoleResolver->getGeoCodingAddress();
-
         $objDatabase = \Database::getInstance();
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
 
-        if ( ( $arrEntity[ $arrGeoFields['longitude'] ] !== null || $arrEntity[ $arrGeoFields['longitude'] ]  !== '' ) && ( $arrEntity[ $arrGeoFields['latitude'] ] !== null || $arrEntity[ $arrGeoFields['latitude'] ] !== '' ) ) {
-
+        if (static::isEmpty($arrEntity[$arrGeoFields['longitude']]) && $arrEntity[$arrGeoFields['latitude']]) {
             return null;
         }
 
@@ -299,9 +295,18 @@ class Toolkit {
             $arrSet[ 'tstamp' ] = time();
             $arrSet[ $arrGeoFields['longitude'] ] = $arrGeoCoding['longitude'];
             $arrSet[ $arrGeoFields['latitude'] ] = $arrGeoCoding['latitude'];
-
-            $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set( $arrSet )->execute( $arrEntity['id'] );
+            $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set( $arrSet )->execute($arrEntity['id']);
         }
+    }
+
+    public static function isEmpty($varValue) {
+        if ($varValue === null) {
+            return true;
+        }
+        if ($varValue === '') {
+            return true;
+        }
+        return false;
     }
 
     public function saveAlias( $arrActiveRecord, $arrFields, $arrCatalog ) {
