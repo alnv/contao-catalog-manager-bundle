@@ -12,14 +12,12 @@ class RoleResolver {
     public static function getInstance( $strTable, $arrEntity = [] ) {
 
         if ( $strTable === null ) {
-
             return new self;
         }
 
         $strInstanceKey = $strTable . ( $arrEntity['id'] ? '_' . $arrEntity['id'] : '' );
 
         if ( !array_key_exists( $strInstanceKey, self::$arrInstances ) ) {
-
             self::$strTable = $strTable;
             self::$arrEntity = $arrEntity;
             self::$arrRoles = static::setRoles();
@@ -38,24 +36,20 @@ class RoleResolver {
         $arrFields = $GLOBALS['TL_DCA'][ self::$strTable ]['fields'] ?: [];
 
         if ( empty( $arrFields ) ) {
-
             return $arrRoles;
         }
 
         foreach ( $arrFields as $strFieldname => $arrField ) {
 
             if ( !isset( $arrField['eval'] ) ) {
-
                 continue;
             }
 
             if ( !$arrField['eval']['role'] ) {
-
                 continue;
             }
 
             $arrRoles[ $arrField['eval']['role'] ] = [
-
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
@@ -76,7 +70,6 @@ class RoleResolver {
     public function getValueByRole( $strRolename ) {
 
         if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
-
             return '';
         }
 
@@ -86,7 +79,6 @@ class RoleResolver {
     public function getFieldByRole( $strRolename ) {
 
         if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
-
             return '';
         }
 
@@ -101,13 +93,11 @@ class RoleResolver {
         foreach ( $arrAddressFields as $strAddressField ) {
 
             if ( isset( self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ] ) ) {
-
                 $arrAddress[ $strAddressField ] = self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ];
             }
         }
 
         $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder( $arrAddress );
-
         return $objAddress->getAddress();
     }
 
@@ -117,7 +107,6 @@ class RoleResolver {
         $arrGeoRoles = [ 'latitude', 'longitude' ];
 
         foreach ( $arrGeoRoles as $strRole ) {
-
             $arrReturn[ $strRole ] = self::$arrRoles[ $strRole ]['name'];
         }
 
@@ -131,7 +120,6 @@ class RoleResolver {
         foreach ( $arrRoles as $strRole ) {
 
             if ( !isset( self::$arrRoles[ $strRole ][ 'name' ] ) ) {
-
                 continue;
             }
 

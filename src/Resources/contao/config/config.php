@@ -136,6 +136,14 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'shop',
         'type' => 'string'
     ],
+    'vpe' => [
+        'group' => 'shop',
+        'type' => 'string'
+    ],
+    'ean' => [
+        'group' => 'shop',
+        'type' => 'string'
+    ],
     'category' => [
         'group' => 'article',
         'type' => 'string'
