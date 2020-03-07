@@ -107,13 +107,12 @@ class VirtualDataContainerArray extends \System {
         if ( $this->arrCatalog['mode'] == 'parent' ) {
 
             $arrList['sorting']['mode'] = 4;
-            $arrList['sorting']['headerFields'] = [ 'name' ];
+            $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] =  function ( $arrRow ) use ( $arrList ) {
                 return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
 
             $arrList['labels']['showColumns'] = false;
-            $arrList['labels']['fields'] = [];
         }
 
         if ( $this->arrCatalog['mode'] == 'tree' ) {
@@ -269,18 +268,26 @@ class VirtualDataContainerArray extends \System {
     protected function setOperations() {
 
         if ( empty( $this->arrCatalog['ctable'] ) || !is_array( $this->arrCatalog['ctable'] ) ) {
-
             return null;
         }
 
         foreach ( $this->arrCatalog['ctable'] as $strTable ) {
-
+            $strTitle = '';
+            $strDescription = '';
+            $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
+            if ( $objCatalog !== null ) {
+                $strTitle = $objCatalog->name;
+                $strDescription = $objCatalog->description;
+            }
             $arrOperation = [];
             $arrOperation[ 'child_' . $strTable ] = [
+                'label' => [
+                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
+                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?:$strTitle)),
+                ],
                 'href' => 'table=' . $strTable,
                 'icon' => 'edit.gif'
             ];
-
             array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, $arrOperation );
         }
     }
@@ -288,7 +295,6 @@ class VirtualDataContainerArray extends \System {
     public function generate() {
 
         if ( empty( $this->arrCatalog ) ) {
-
             return null;
         }
 
@@ -301,9 +307,7 @@ class VirtualDataContainerArray extends \System {
         $this->setLabels();
 
         if ( isset( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) && is_array( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) ) {
-
             foreach ( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback ) {
-
                 $this->import( $arrCallback[0] );
                 $this->{$arrCallback[0]}->{$arrCallback[1]}( $this->arrCatalog['table'], $this );
             }

@@ -15,17 +15,16 @@ class DynModel extends \Model {
         parent::__construct( $objResult );
     }
 
-    public function createDynTable( $strTable, $objResult = null ) {
+    public function createDynTable($strTable, $objResult=null) {
 
         static::$strTable = $strTable;
-        static::$arrClassNames[ $strTable ] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
-        parent::__construct( $objResult );
+        static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
+        parent::__construct($objResult);
     }
 
     protected static function buildFindQuery( array $arrOptions ) {
 
         $objBase = \DcaExtractor::getInstance( $arrOptions['table'] );
-
         $strDistanceSelection = '';
 
         if ( isset( $arrOptions['distance'] ) ) {

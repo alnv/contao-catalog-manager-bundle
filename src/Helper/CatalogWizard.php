@@ -7,12 +7,9 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 
-
 abstract class CatalogWizard extends \System {
 
-
     protected $arrCache = [];
-
 
     protected function parseCatalog( $arrCatalog ) {
 
@@ -28,6 +25,7 @@ abstract class CatalogWizard extends \System {
 
         $this->getRelatedTablesByCatalog( $arrCatalog, $arrRelated, $arrChildren );
         $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
+        $arrCatalog['headerFields'] = \StringUtil::deserialize( $arrCatalog['headerFields'], true );
         $arrCatalog['order'] = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $arrCatalog['order'], [
             'option' => 'field',
             'option2' => 'order'
@@ -62,7 +60,6 @@ abstract class CatalogWizard extends \System {
         return $arrCatalog;
     }
 
-
     protected function getRelatedTablesByCatalog( $arrCatalog, &$arrRelated, &$arrChildren, $intLevel = 0 ) {
 
         $objChildCatalogs = CatalogModel::findChildrenCatalogsById( $arrCatalog['id'] );
@@ -95,31 +92,26 @@ abstract class CatalogWizard extends \System {
         }
     }
 
-
     protected function getParentCatalogByPid( $strPid ) {
 
         $objParent = CatalogModel::findByPk( $strPid );
 
         if ( $objParent === null ) {
-
             return '';
         }
 
         return $objParent->table;
     }
 
-
     public function parseField( $arrField ) {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 
         if ( \Cache::has( $strIdentifier ) ) {
-
             return \Cache::get( $strIdentifier );
         }
 
         if ( !$arrField['type'] ) {
-
             return null;
         }
 

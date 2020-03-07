@@ -18,7 +18,7 @@ class MasterModule extends \Module {
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
             $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . utf8_strtoupper( 'TODO' ) . ' ###';
+            $objTemplate->wildcard = '### ' . strtoupper( $GLOBALS['TL_LANG']['FMD']['master'] ) . ' ###';
 
             return $objTemplate->parse();
         }

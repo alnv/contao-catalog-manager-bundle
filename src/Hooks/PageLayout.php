@@ -2,9 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-
 class PageLayout {
-
 
     public function generateMaster( \PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular ) {
 
@@ -13,7 +11,7 @@ class PageLayout {
             return null;
         }
 
-        $objModule = \Database::getInstance()->prepare( 'SELECT * FROM tl_module WHERE `type`=? AND cmMasterPage=?' )->execute('listing',$objPage->id);
+        $objModule = \Database::getInstance()->prepare( 'SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?' )->execute('listing','1',$objPage->id);
 
         if ( !$objModule->numRows ) {
 
