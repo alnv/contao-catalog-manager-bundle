@@ -16,7 +16,6 @@ class Catalog extends CatalogWizard {
     public function __construct( $strIdentifier ) {
 
         if ( $strIdentifier === null ) {
-
             return null;
         }
 
@@ -24,12 +23,11 @@ class Catalog extends CatalogWizard {
         $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
 
         if ( $objCatalog === null ) {
-
             return null;
         }
 
         $this->setCustomFields();
-        $this->arrCatalog = $this->parseCatalog( $objCatalog->row() );
+        $this->arrCatalog = $this->parseCatalog($objCatalog->row());
         $objFields = CatalogFieldModel::findAll([
             'column' => [ 'pid=?', 'published=?' ],
             'value' => [ $this->arrCatalog['id'], '1' ],
@@ -37,19 +35,18 @@ class Catalog extends CatalogWizard {
         ]);
 
         if ( $objFields === null ) {
-
             return null;
         }
 
         while ( $objFields->next() ) {
 
-            $arrField = $this->parseField( $objFields->row() );
+            $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
 
             if ( $arrField === null ) {
                 continue;
             }
 
-            $this->arrFields[ $objFields->fieldname ] = $arrField;
+            $this->arrFields[$objFields->fieldname] = $arrField;
         }
 
         $this->setDefaultFields();
@@ -70,7 +67,6 @@ class Catalog extends CatalogWizard {
         $arrReturn = [];
 
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
-
             $arrReturn[ $strFieldname ] = $blnLabelOnly ? $arrField['label'][0] : $strFieldname;
         }
 
@@ -174,7 +170,6 @@ class Catalog extends CatalogWizard {
     protected function setCustomFields() {
 
         if ( !is_array( $GLOBALS['CM_CUSTOM_FIELDS'] ) || empty( $GLOBALS['CM_CUSTOM_FIELDS'] ) ) {
-
             return null;
         }
 
@@ -183,14 +178,12 @@ class Catalog extends CatalogWizard {
         foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField ) {
 
             if ( isset( $arrField['table'] ) && $this->arrCatalog['table'] != $arrField['table'] ) {
-
                 continue;
             }
 
             unset( $arrField['index'] );
 
             if ( !isset( $arrField['label'] ) ) {
-
                 $arrField['label'] = [
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )

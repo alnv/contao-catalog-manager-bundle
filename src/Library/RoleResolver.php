@@ -33,7 +33,7 @@ class RoleResolver {
         \System::loadLanguageFile(self::$strTable);
 
         $arrRoles = [];
-        $arrFields = $GLOBALS['TL_DCA'][ self::$strTable ]['fields'] ?: [];
+        $arrFields = $GLOBALS['TL_DCA'][self::$strTable]['fields'] ?: [];
 
         if ( empty( $arrFields ) ) {
             return $arrRoles;

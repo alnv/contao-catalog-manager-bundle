@@ -14,15 +14,12 @@ abstract class CatalogWizard extends \System {
     protected function parseCatalog( $arrCatalog ) {
 
         $strIdentifier = 'catalog_' . $arrCatalog['table'];
-
         if ( \Cache::has( $strIdentifier ) ) {
-
             return \Cache::get( $strIdentifier );
         }
 
         $arrRelated = [];
         $arrChildren = [];
-
         $this->getRelatedTablesByCatalog( $arrCatalog, $arrRelated, $arrChildren );
         $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
         $arrCatalog['headerFields'] = \StringUtil::deserialize( $arrCatalog['headerFields'], true );
@@ -36,20 +33,16 @@ abstract class CatalogWizard extends \System {
         $arrCatalog['_table'] = $arrCatalog['table'];
 
         if ( $arrCatalog['pid'] ) {
-
             $arrCatalog['ptable'] = $this->getParentCatalogByPid( $arrCatalog['pid'] );
         }
 
         if ( $arrCatalog['enableContentElements'] ) {
-
             $arrCatalog['ctable'][] = 'tl_content';
             $arrCatalog['related'][] = 'tl_content';
         }
 
         if ( isset( $GLOBALS['TL_HOOKS']['parseCatalog'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalog'] ) ) {
-
             foreach ( $GLOBALS['TL_HOOKS']['parseCatalog'] as $arrCallback ) {
-
                 $this->import( $arrCallback[0] );
                 $arrCatalog = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrCatalog, $this );
             }
@@ -103,7 +96,7 @@ abstract class CatalogWizard extends \System {
         return $objParent->table;
     }
 
-    public function parseField( $arrField ) {
+    public function parseField( $arrField, $arrCatalog = [] ) {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 
@@ -160,85 +153,59 @@ abstract class CatalogWizard extends \System {
         switch ( $arrField['type'] ) {
 
             case 'text':
-
                 $arrReturn['inputType'] = 'text';
-
                 if ( $arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1 ) {
-
                     $arrReturn['eval']['tl_class'] = 'long clr';
                 }
-
                 break;
 
             case 'date':
-
                 $arrReturn['flag'] = 6;
                 $arrReturn['default'] = time();
                 $arrReturn['inputType'] = 'text';
-
                 if ( $arrReturn['eval']['role'] ) {
-
                     $objRoleResolver = RoleResolver::getInstance(null);
                     $strRgxp = $objRoleResolver->getRole($arrReturn['eval']['role'])['type'];
-
                     if ( in_array( $strRgxp, [ 'date', 'time', 'datim' ] ) ) {
-
                         $arrReturn['eval']['rgxp'] = $strRgxp;
                     }
-
                     $arrReturn['eval']['dateFormat'] = \Date::getFormatFromRgxp( $strRgxp );
                 }
-
                 $arrReturn['eval']['datepicker'] = true;
-
                 break;
 
             case 'color':
-
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['colorpicker'] = true;
-
                 break;
 
             case 'select':
-
                 $arrReturn['inputType'] = 'select';
                 $arrReturn['eval']['chosen'] = true;
-
                 break;
 
             case 'radio':
-
                 $arrReturn['inputType'] = 'radio';
                 $arrReturn['eval']['tl_class'] = 'clr';
-
                 break;
 
             case 'checkbox':
-
                 $arrReturn['inputType'] = 'checkbox';
                 $arrReturn['eval']['tl_class'] = 'clr';
-
                 if ( !$blnMultiple ) {
-
                     unset( $arrReturn['options_callback'] );
                 }
-
                 break;
 
             case 'textarea':
-
                 $arrReturn['inputType'] = 'textarea';
                 $arrReturn['eval']['tl_class'] = 'clr';
-
                 if ( $arrField['rte'] ) {
                     $arrReturn['eval']['rte'] = 'tinyMCE';
                 }
-
                 break;
 
             case 'empty':
-
                 $arrEmpty = [
                     'label' => $arrReturn['label'],
                     'eval' => [
@@ -246,65 +213,55 @@ abstract class CatalogWizard extends \System {
                     ],
                     'sql' => $arrReturn['sql']
                 ];
-
                 $arrReturn = $arrEmpty;
-
                 break;
 
             case 'upload':
-
                 $arrReturn['inputType'] = 'fileTree';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['eval']['filesOnly'] = true;
                 $arrReturn['eval']['fieldType'] = 'radio';
-
                 if ( $blnMultiple ) {
-
                     $arrReturn['eval']['fieldType'] = 'checkbox';
                 }
-
                 $arrReturn['eval']['storeFile'] = '1';
                 $arrReturn['eval']['extensions'] = $arrField['extensions'];
                 $arrReturn['eval']['useHomeDir'] = $arrField['useHomeDir'];
-                $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
                 $arrReturn['eval']['imageWidth'] = $arrField['imageWidth'];
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
+                $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
                 $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid( $arrField['uploadFolder'] );
-
                 if ( $arrReturn['eval']['role'] ) {
-
                     $objRoleResolver = RoleResolver::getInstance(null);
-
-                    switch ( $objRoleResolver->getRole($arrReturn['eval']['role'])['type'] ) {
-
+                    switch ($objRoleResolver->getRole($arrReturn['eval']['role'])['type']) {
                         case 'image':
-
-                            $arrReturn['eval']['isImage'] = '1';
-
+                            $arrReturn['eval']['isImage'] = true;
                             if ( $arrField['imageSize'] ) {
-
                                 $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
                             }
-
                             break;
-
+                        case 'gallery':
+                            $arrReturn['eval']['isGallery'] = true;
+                            $arrReturn['eval']['tl_class'] = 'clr';
+                            if ( $arrField['imageSize'] ) {
+                                $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
+                            }
+                            if (!empty($arrCatalog)) {
+                                $arrReturn['eval']['orderField'] = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND role=?')->limit(1)->execute($arrCatalog['id'],'orderSRC')->fieldname;
+                            }
+                            break;
                         case 'file':
-
                             $arrReturn['eval']['isFile'] = '1';
-
                             break;
                     }
                 }
-
                 break;
         }
 
-        if ( isset( $GLOBALS['TL_HOOKS']['parseCatalogField'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalogField'] ) ) {
-
+        if (isset($GLOBALS['TL_HOOKS']['parseCatalogField'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalogField'])) {
             foreach ( $GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback ) {
-
-                $this->import( $arrCallback[0] );
-                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrReturn, $arrField, $this );
+                $this->import($arrCallback[0]);
+                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $arrField, $this);
             }
         }
 

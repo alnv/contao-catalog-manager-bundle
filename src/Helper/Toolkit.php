@@ -39,47 +39,40 @@ class Toolkit {
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if ( is_array($arrRole) && !empty($arrRole) ) {
-
             if ($arrRole['sql']) {
                 return $arrRole['sql'];
             }
-
             switch ( $arrRole['type'] ) {
                 case 'id':
                     return $arrSql['i10'];
+                case 'gallery':
+                    return $arrSql['blob'];
             }
         }
 
         if ( $arrOptions['multiple'] ) {
-
             return $arrSql['blob'];
         }
 
         switch ( $strType ) {
-
             case 'color':
                 return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-
             case 'date':
                 return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-
             case 'textarea':
                 if ( $arrOptions['tinyMce'] ) {
                     return $arrSql['longtext'];
                 }
                 return $arrSql['text'];
-
             case 'text':
             case 'radio':
             case 'select':
                 return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-
             case 'checkbox':
                 if ( !$arrOptions['multiple'] ) {
                     return $arrSql['c1'];
                 }
                 return $arrSql['blob'];
-
             default:
                 return $arrSql['blob'];
         }
@@ -237,7 +230,10 @@ class Toolkit {
                 if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
                     $strSizeId = $arrField['imageSize'];
                 }
-                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] == true ) {
+                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] === true ) {
+                    return Image::getImage( $varValue, $strSizeId );
+                }
+                if ( isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true ) {
                     return Image::getImage( $varValue, $strSizeId );
                 }
                 return []; // @todo files

@@ -2,9 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
-
 class Image {
-
 
     public static function getImage( $strUuid, $intSize = null ) {
 
@@ -15,26 +13,22 @@ class Image {
         foreach ( $arrUuids as $strUuid ) {
 
             if ( !\Validator::isUuid( $strUuid ) ) {
-
                 continue;
             }
 
             $objFile = \FilesModel::findByUuid( $strUuid );
 
             if ( $objFile == null ) {
-
                 continue;
             }
 
             if ( !file_exists( $objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path ) ) {
-
                 continue;
             }
 
             $arrMeta = [];
 
             if ( $objFile->meta ) {
-
                 $arrMeta = \Frontend::getMetaData( $objFile->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale() );
             }
 
@@ -46,18 +40,13 @@ class Image {
             ];
 
             if ( !empty( $arrMeta ) ) {
-
                 foreach ( $arrMeta as $strField => $strLabel ) {
-
                     if ( $strField === 'link' ) {
-
                         $strLabel = \Controller::replaceInsertTags( $strLabel );
                     }
-
                     $arrPicture[ $strField ] = $strLabel;
                 }
             }
-
             $arrImages[] = $arrPicture;
         }
 

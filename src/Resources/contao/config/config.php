@@ -125,6 +125,14 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'type' => 'image'
     ],
+    'gallery' => [
+        'group' => 'article',
+        'type' => 'gallery'
+    ],
+    'orderSRC' => [
+        'group' => 'article',
+        'type' => 'array'
+    ],
     'hero' => [
         'group' => 'article',
         'type' => 'image'
