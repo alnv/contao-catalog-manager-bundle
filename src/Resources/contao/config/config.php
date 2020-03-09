@@ -41,6 +41,7 @@ $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize'
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = [ 'catalogmanager.hooks.initialize', 'generateDataContainerArray' ];
 $GLOBALS['TL_HOOKS']['loadDataContainer'][] = [ 'catalogmanager.hooks.datacontainer', 'generateDataContainerArray' ];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace' ];
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = [ 'Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag', 'replace' ];
 
 $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';

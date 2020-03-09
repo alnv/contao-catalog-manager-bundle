@@ -11,7 +11,6 @@ class GMap extends MapView {
         $arrLocations = $this->getLocations();
 
         if ( $objPage->ajaxContext ) {
-
             return json_encode( $arrLocations, 512 );
         }
 

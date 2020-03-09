@@ -4,9 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
-
 class ActiveInsertTag {
-
 
     public function replace( $strFragment ) {
 
@@ -27,37 +25,30 @@ class ActiveInsertTag {
                 foreach ( $arrParams as $strParam ) {
 
                     list( $strKey, $strOption ) = explode( '=', $strParam );
-
                     switch ( $strKey ) {
 
                         case 'default':
-
                             $blnUseDefault = true;
                             $strDefault = $strOption;
-
                             break;
                     }
                 }
             }
 
             if ( $blnUseDefault && ( $varValue === '' || $varValue === null ) ) {
-
                 $varValue = $strDefault;
             }
 
             if ( \Validator::isDate( $varValue ) ) {
-
                 $varValue = (new \Date( $varValue, $objPage->dateFormat ))->dayBegin;
             }
 
             if ( \Validator::isDatim( $varValue ) ) {
-
                 $varValue = (new \Date( $varValue, $objPage->dateFormat ))->dayBegin;
             }
 
             return $varValue;
         }
-
 
         return false;
     }

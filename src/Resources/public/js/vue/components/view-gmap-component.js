@@ -31,6 +31,13 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
             }
             this.fetch();
         },
+        addSharedParameters: function(shared) {
+            for (var name in shared) {
+                if (shared.hasOwnProperty(name)) {
+                    this.parameters[name] = shared[name];
+                }
+            }
+        },
         setMarkers: function() {
             this.bounds = new google.maps.LatLngBounds();
             for (var i=0;i<this.locations.length;i++) {
@@ -56,7 +63,7 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
         initMap: function () {
             if (!this.map) {
                 this.map = new google.maps.Map(this.$el.querySelector('.gmap'), {
-                    maxZoom: 18
+                    maxZoom: 15
                 });
             }
             this.setMarkers();
@@ -96,6 +103,9 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
     },
     mounted: function () {
         if (!this.useDataPrivacyMode) {
+            if (typeof this.$parent.shared !== 'undefined') {
+                this.addSharedParameters(this.$parent.shared);
+            }
             this.loadGMap();
         }
     },

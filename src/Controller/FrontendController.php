@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
-
 /**
  *
  * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
@@ -23,6 +22,7 @@ class FrontendController extends Controller {
     public function getViewListing( $module, $page ) {
         global $objPage;
         $objPage = \PageModel::findByPK( $page )->loadDetails();
+        (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
         $strListing = \Controller::getFrontendModule( $module );
         $strListing = \Controller::replaceInsertTags( $strListing );
@@ -37,11 +37,11 @@ class FrontendController extends Controller {
     public function getViewMap( $module, $page ) {
         global $objPage;
         $objPage = \PageModel::findByPK( $page )->loadDetails();
+        (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
         $strListing = \Controller::getFrontendModule( $module );
         return new JsonResponse([ 'locations' => $strListing ]);
     }
-
 
     /**
      *
@@ -66,7 +66,6 @@ class FrontendController extends Controller {
         }
         return new JsonResponse($arrReturn);
     }
-
 
     /**
      *

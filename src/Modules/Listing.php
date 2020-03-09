@@ -121,27 +121,21 @@ class Listing extends \Module {
     protected function setFilter() {
 
         if ( !$this->cmFilter ) {
-
             return null;
         }
 
         switch ( $this->cmFilterType ) {
-
             case 'wizard':
-
                 \Controller::loadDataContainer($this->cmTable);
                 $arrQueries = Toolkit::convertComboWizardToModelValues( $this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] );
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
-
                 break;
 
             case 'expert':
-
                 $this->cmValue =  \Controller::replaceInsertTags( $this->cmValue );
                 $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
                 $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
-
                 if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
                     $intIndex = -1;
                     $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
@@ -157,7 +151,6 @@ class Listing extends \Module {
                         unset( $this->arrOptions['column'] );
                     }
                 }
-
                 break;
         }
     }
