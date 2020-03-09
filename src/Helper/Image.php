@@ -17,7 +17,6 @@ class Image {
             }
 
             $objFile = \FilesModel::findByUuid( $strUuid );
-
             if ( $objFile == null ) {
                 continue;
             }
@@ -27,14 +26,14 @@ class Image {
             }
 
             $arrMeta = [];
-
             if ( $objFile->meta ) {
                 $arrMeta = \Frontend::getMetaData( $objFile->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale() );
             }
 
             $strStaticUrl = $objContainer->get('contao.assets.files_context')->getStaticUrl();
-            $objPicture = $objContainer->get('contao.image.picture_factory')->create( $objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ( $intSize ? (int) $intSize : null ) );
+            $objPicture = $objContainer->get('contao.image.picture_factory')->create($objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ( $intSize ? (int) $intSize : null ));
             $arrPicture = [
+                'path' => $objFile->path,
                 'img' => $objPicture->getImg( $objContainer->getParameter('kernel.project_dir'), $strStaticUrl ),
                 'sources' => $objPicture->getSources( $objContainer->getParameter('kernel.project_dir'), $strStaticUrl ),
             ];
@@ -49,7 +48,6 @@ class Image {
             }
             $arrImages[] = $arrPicture;
         }
-
         return $arrImages;
     }
 }
