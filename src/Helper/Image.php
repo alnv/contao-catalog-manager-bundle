@@ -50,4 +50,17 @@ class Image {
         }
         return $arrImages;
     }
+
+    public static function getUuids($strUuid) {
+
+        $arrReturn = [];
+        $arrUuids = \StringUtil::deserialize( $strUuid, true );
+        foreach ( $arrUuids as $strUuid ) {
+            if (\Validator::isBinaryUuid($strUuid)) {
+                $strUuid = \StringUtil::binToUuid($strUuid);
+            }
+            $arrReturn[] = $strUuid;
+        }
+        return $arrReturn;
+    }
 }

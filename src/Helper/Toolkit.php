@@ -201,7 +201,7 @@ class Toolkit {
         return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
 
-    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false ) {
+    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false, $blnFastMode = false ) {
 
         if ( $varValue === '' || $varValue === null ) {
             return $varValue;
@@ -226,6 +226,9 @@ class Toolkit {
                 return $arrOptionValues;
                 break;
             case 'fileTree':
+                if ($blnFastMode) {
+                    return Image::getUuids($varValue);
+                }
                 $strSizeId = null;
                 if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
                     $strSizeId = $arrField['imageSize'];

@@ -216,18 +216,14 @@ abstract class View extends \Controller {
         }
 
         foreach ( $arrEntity as $strField => $varValue ) {
-            if ( !$this->arrOptions['fastMode'] ) {
-                $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity );
-                if ( $strParsedValue !== $varValue ) {
-                    if (\Validator::isBinaryUuid($varValue)) {
-                        $varValue = \StringUtil::binToUuid($varValue);
-                    }
-                    $arrRow['origin'][ $strField ] = $varValue;
-                }
-            } else {
-                $strParsedValue = $varValue;
-            }
 
+            $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity, $this->arrOptions['fastMode'] );
+            if ( $strParsedValue !== $varValue ) {
+                if (\Validator::isBinaryUuid($varValue)) {
+                    $varValue = \StringUtil::binToUuid($varValue);
+                }
+                $arrRow['origin'][ $strField ] = $varValue;
+            }
             $arrRow[ $strField ] = $strParsedValue;
         }
 
@@ -278,9 +274,9 @@ abstract class View extends \Controller {
         return $arrEntity;
     }
 
-    protected function parseField( $varValue, $strField, $arrValues ) {
+    protected function parseField( $varValue, $strField, $arrValues, $blnFastMode ) {
 
-        return Toolkit::parseCatalogValue( $varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues );
+        return Toolkit::parseCatalogValue( $varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues, false, $blnFastMode );
     }
 
     protected function getPageNumber() {
