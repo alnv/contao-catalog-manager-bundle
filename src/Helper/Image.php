@@ -4,9 +4,8 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 class Image {
 
-    public static function getImage( $strUuid, $intSize = null ) {
+    public static function getImage( $strUuid, $intSize = null, &$arrImages=[] ) {
 
-        $arrImages = [];
         $objContainer = \System::getContainer();
         $arrUuids = \StringUtil::deserialize( $strUuid, true );
 
@@ -18,6 +17,16 @@ class Image {
 
             $objFile = \FilesModel::findByUuid( $strUuid );
             if ( $objFile == null ) {
+                continue;
+            }
+
+            if ($objFile->type == 'folder') {
+                $objFiles = \FilesModel::findByPid($objFile->uuid);
+                if ($objFiles !== null) {
+                    while ($objFiles->next()) {
+                        self::getImage(\StringUtil::binToUuid($objFiles->uuid),$intSize,$arrImages);
+                    }
+                }
                 continue;
             }
 
@@ -48,6 +57,7 @@ class Image {
             }
             $arrImages[] = $arrPicture;
         }
+
         return $arrImages;
     }
 

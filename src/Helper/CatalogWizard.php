@@ -241,6 +241,8 @@ abstract class CatalogWizard extends \System {
                             }
                             break;
                         case 'gallery':
+                            $arrReturn['eval']['files'] = true;
+                            $arrReturn['eval']['filesOnly'] = false;
                             $arrReturn['eval']['isGallery'] = true;
                             $arrReturn['eval']['tl_class'] = 'clr';
                             if ( $arrField['imageSize'] ) {

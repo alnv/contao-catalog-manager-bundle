@@ -22,7 +22,7 @@ class Listing extends \Module {
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
             $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . utf8_strtoupper( $GLOBALS['TL_LANG']['FMD'][$this->type] ) . ' ###';
+            $objTemplate->wildcard = '### ' . strtoupper( $GLOBALS['TL_LANG']['FMD'][$this->type][0] ) . ' ###';
 
             return $objTemplate->parse();
         }
