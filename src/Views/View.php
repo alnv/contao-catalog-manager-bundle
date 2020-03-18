@@ -239,6 +239,18 @@ abstract class View extends \Controller {
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
         };
 
+        $arrRow['getContentElements'] = function () use ( $arrRow ) {
+            $strReturn = '';
+            $objContent = \ContentModel::findPublishedByPidAndTable($arrRow['id'], $this->strTable);
+            if ( $objContent === null ) {
+                return $strReturn;
+            }
+            while ($objContent->next()) {
+                $strReturn .= $this->getContentElement( $objContent->current() );
+            }
+            return $strReturn;
+        };
+
         if ( isset( $GLOBALS['TL_HOOKS']['parseEntity'] ) && is_array($GLOBALS['TL_HOOKS']['parseEntity'] ) ) {
             foreach ( $GLOBALS['TL_HOOKS']['parseEntity'] as $arrCallback ) {
                 if (is_array($arrCallback)) {
