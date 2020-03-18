@@ -5,9 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
-
 class CatalogField {
-
 
     public function checkExtensions( $varValue, \DataContainer $dc ) {
 
@@ -24,18 +22,15 @@ class CatalogField {
         return $varValue;
     }
 
-
     public function listFields( $arrRow ) {
 
-        return $arrRow['name'];
+        return $arrRow['name'] . '<span style="color:#999;padding-left:3px">['. $arrRow['fieldname'] .']</span>';
     }
-
 
     public function getFieldTypes() {
 
         return $GLOBALS['CM_FIELDS'];
     }
-
 
     public function getRoles( \DataContainer $dc ) {
 
@@ -67,7 +62,6 @@ class CatalogField {
 
         return $arrRoles;
     }
-
 
     public function watchFieldname( $strFieldname, \DataContainer $objDataContainer ) {
 
@@ -105,7 +99,6 @@ class CatalogField {
         return $strFieldname;
     }
 
-
     public function changeFieldType( $strValue, \DataContainer $objDataContainer ) {
 
         if ( !$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname ) {
@@ -126,7 +119,6 @@ class CatalogField {
 
         return $strValue;
     }
-
 
     public function getImageSizes() {
 
