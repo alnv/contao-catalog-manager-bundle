@@ -2,9 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-
 class Breadcrumb {
-
 
     public function generateDetailPage( $arrItems ) {
 

@@ -2,7 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class RoleResolver {
+class RoleResolver extends \System {
 
     public static $strTable = null;
     public static $arrRoles = null;
@@ -57,6 +57,12 @@ class RoleResolver {
                 'role' => $GLOBALS['CM_ROLES'][ $arrField['eval']['role'] ],
                 'value' => isset( self::$arrEntity[ $strFieldname ] ) ? self::$arrEntity[ $strFieldname ] : ''
             ];
+        }
+
+        if ( isset( $GLOBALS['TL_HOOKS']['roleResolverSetRoles'] ) && is_array($GLOBALS['TL_HOOKS']['roleResolverSetRoles'] ) ) {
+            foreach ( $GLOBALS['TL_HOOKS']['roleResolverSetRoles'] as $arrCallback ) {
+                $arrRoles = static::importStatic($arrCallback[0])->{$arrCallback[1]}($arrRoles, self::$arrEntity, self::$strTable);
+            }
         }
 
         return $arrRoles;
