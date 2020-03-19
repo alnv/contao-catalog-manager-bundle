@@ -13,7 +13,6 @@ class Master extends View {
         $objEntity = $objModel->findByIdOrAlias($this->arrOptions['alias'], $this->getModelOptions());
 
         if ( $objEntity !== null ) {
-
             $this->parseEntity( $objEntity->row() );
         }
 

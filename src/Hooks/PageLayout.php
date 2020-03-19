@@ -22,10 +22,10 @@ class PageLayout {
         if ( !$objModule->numRows ) {
             return null;
         }
+
         $GLOBALS['CM_MASTER'] = (new \Alnv\ContaoCatalogManagerBundle\Views\Master( $objModule->cmTable, [
             'alias' => $strAlias,
-            'masterPage' => $objModule->cmMasterPage,
-            'id' => $objModule->id
+            'masterPage' => $objModule->cmMasterPage
         ]))->parse()[0];
     }
 }
