@@ -193,8 +193,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'eval' => [
                 'showOperations' => true,
-                'fields' => ['label','value'],
                 'orderField' => 'sorting ASC',
+                'fields' => ['id','label','value'],
                 'operations' => ['edit','delete']
             ]
         ],

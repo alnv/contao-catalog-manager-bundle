@@ -3,27 +3,28 @@
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
         'dataContainer' => 'Table',
+        'closed' => true,
         'onsubmit_callback' => [
             function( \DataContainer $objDataContainer ) {
-                if ($objDataContainer->activeRecord) {
-                    $arrSet = [];
-                    $arrSet['tstamp'] = time();
-                    $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objDataContainer->activeRecord->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objDataContainer->activeRecord->pid);
-                    \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                if (!$objDataContainer->activeRecord) {
+                    return null;
                 }
+                $arrSet = [];
+                $arrSet['tstamp'] = time();
+                $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objDataContainer->activeRecord->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id);
+                \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
             },
             function( \DataContainer $objDataContainer ) {
-                if (\Input::get('dcaWizard')) {
-                    $arrSet = [];
-                    $arrSet['tstamp'] = time();
-                    $arrSet['pid'] = \Input::get('dcaWizard');
-                    \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                if (!$objDataContainer->activeRecord || !\Input::get('dcaWizard')) {
+                    return null;
                 }
+                $arrSet = [];
+                $arrSet['tstamp'] = time();
+                $arrSet['pid'] = \Input::get('dcaWizard');
+                \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
             }
         ],
-        'onload_callback' => [
-            [ 'catalogmanager.datacontainer.catalogoption', 'generatePidEntities' ]
-        ],
+        'onload_callback' => [],
         'sql' => [
             'keys' => [
                 'id' => [
@@ -36,22 +37,18 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     ],
     'list' => [
         'sorting' => [
-            'mode' => 5,
-            'fields' => [ 'label' ],
+            'mode' => 1,
+            'flag' => 4,
+            'fields' => [ 'pid' ],
             'panelLayout' => 'filter;sort,search,limit'
         ],
         'label' => [
-            'showColumns' => true,
-            'fields' => [ 'label', 'value' ]
+            'fields' => [ 'label' ]
         ],
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'header.gif'
-            ],
-            'copy' => [
-                'href' => 'act=copy',
-                'icon' => 'copy.gif'
             ],
             'delete' => [
                 'href' => 'act=delete',
@@ -63,14 +60,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 'icon' => 'show.gif'
             ]
         ],
-        'global_operations' => [
-            'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            ]
-        ]
+        'global_operations' => []
     ],
     'palettes' => [
         '__selector__' => [],
@@ -119,6 +109,6 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
 ];
 
 if (\Input::get('dcaWizard')) {
-    $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['mode'] = 2;
+    $GLOBALS['TL_DCA']['tl_catalog_option']['config']['closed'] = false;
     $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['filter'] = [['pid=?',\Input::get('id')]];
 }

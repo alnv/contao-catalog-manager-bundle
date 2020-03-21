@@ -22,6 +22,7 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['imageHeight'] = [ 'Maximale Bildhöhe',
 $GLOBALS['TL_LANG']['tl_catalog_field']['includeBlankOption'] = [ 'Leere Option hinzufügen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['blankOptionLabel'] = [ 'Bezeichnung der leeren Option', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['size'] = [ 'Size', '' ];
+$GLOBALS['TL_LANG']['tl_catalog_field']['optionsDcaWizard'] = [ 'Optionen', '' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['useAsAlias'] = [ 'Im Alias verwenden', 'Dieser Wert wird dem Alias hinzugefügt.' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['extensions'] = [ 'Erlaubte Dateitypen', 'Eine kommagetrennte Liste gültiger Dateiendungen.' ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['uploadFolder'] = [ 'Zielverzeichnis', 'Bitte wählen Sie das Zielverzeichnis aus der Dateiübersicht.' ];
