@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     ],
     'subpalettes' => [
         'includeBlankOption' => 'blankOptionLabel',
-        'optionsSource_options' => '',
+        'optionsSource_options' => 'optionsDcaWizard',
         'optionsSource_dbOptions' => \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getPalette()
     ],
     'fields' => [
@@ -183,6 +183,20 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'reference' => $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        ],
+        'optionsDcaWizard' => [
+            'inputType' => 'dcaWizard',
+            'foreignTable' => 'tl_catalog_option',
+            'foreignField' => 'pid',
+            'params' => [
+                'dcaWizard'=> \Input::get('id')
+            ],
+            'eval' => [
+                'showOperations' => true,
+                'fields' => ['label','value'],
+                'orderField' => 'sorting ASC',
+                'operations' => ['edit','delete']
+            ]
         ],
         'multiple' => [
             'inputType' => 'checkbox',

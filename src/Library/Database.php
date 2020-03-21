@@ -110,6 +110,11 @@ class Database {
             return false;
         }
 
+        if ( !$this->objDatabase->fieldExists( $strOldField, $strTable, true ) ) {
+
+            return $this->createFieldIfNotExist($strNewField, $strTable, $strSql);
+        }
+
         $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s CHANGE `%s` `%s` %s', $strTable, $strOldField, $strNewField, $strSql ) )->execute();
 
         return true;
@@ -124,7 +129,6 @@ class Database {
         }
 
         //todo try and catch block
-
         $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s MODIFY COLUMN %s %s', $strTable, $strField, $strSql ) )->execute();
 
         return true;

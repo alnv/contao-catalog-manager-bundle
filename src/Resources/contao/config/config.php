@@ -8,7 +8,8 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
             'name' => 'catalog-manager-bundle',
             'tables' => [
                 'tl_catalog',
-                'tl_catalog_field'
+                'tl_catalog_field',
+                'tl_catalog_option'
             ]
         ],
         'catalog-option' => [
@@ -110,6 +111,10 @@ $GLOBALS['CM_ROLES'] = [
         'type' => 'array'
     ],
     'alias' => [
+        'group' => 'article',
+        'type' => 'string'
+    ],
+    'type' => [
         'group' => 'article',
         'type' => 'string'
     ],

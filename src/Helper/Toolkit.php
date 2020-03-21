@@ -311,22 +311,13 @@ class Toolkit {
     public function saveAlias( $arrActiveRecord, $arrFields, $arrCatalog ) {
 
         if ( !$arrActiveRecord['id'] ) {
-
             return null;
         }
 
         $arrValues = [];
-        // $strAlias = $arrActiveRecord['alias'];
         $objDatabase = \Database::getInstance();
 
-        /* @todo only if alias field exist in palette
-        if ( $strAlias !== '' && $strAlias !== null && \Validator::isAlias( $strAlias ) && !$objDatabase->prepare('SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
-            return null;
-        }
-        */
-
         foreach ( $arrFields as $strFieldname => $arrField ) {
-
             if ( !isset( $arrField['eval'] ) ) {
                 continue;
             }
@@ -336,7 +327,6 @@ class Toolkit {
             }
 
             if ( isset( $arrActiveRecord[ $strFieldname ] ) && $arrActiveRecord[ $strFieldname ] !== '' && $arrActiveRecord[ $strFieldname ] !== null ) {
-
                 $arrValues[] = $arrActiveRecord[ $strFieldname ];
             }
         }
@@ -347,20 +337,47 @@ class Toolkit {
             $strAlias = implode( '-', $arrValues );
         }
 
-        $strAlias = \System::getContainer()->get('contao.slug.generator')->generate( \StringUtil::prepareSlug( $strAlias ), []);
-
-        if ( strlen( $strAlias ) > 100 ) {
-            $strAlias = substr( $strAlias, 0, 100 );
-        }
-
-        if ( $objDatabase->prepare( 'SELECT * FROM ' . $arrCatalog['table'] . ' WHERE `alias`=? AND `pid`=? AND `id`!=?' )->limit(1)->execute( $strAlias, $arrActiveRecord['pid'], $arrActiveRecord['id'] )->numRows ) {
-            $strAlias = $strAlias . '-' . $arrActiveRecord['id'];
-        }
-
         $arrSet = [];
         $arrSet[ 'tstamp' ] = time();
-        $arrSet[ 'alias' ] = $strAlias;
+        $arrSet[ 'alias' ] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], $arrActiveRecord['pid']);
         $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set($arrSet)->execute($arrActiveRecord['id']);
+    }
+
+    public static function generateAlias($strValue,$strAliasField='alias',$strTable=null,$strId=null,$strPid=null) {
+
+        $blnAliasFieldExist = $strTable ? \Database::getInstance()->fieldExists($strAliasField, $strTable) : false;
+
+        if ($strId && $blnAliasFieldExist) {
+            $objEntity = \Database::getInstance()->prepare( 'SELECT * FROM ' . $strTable . ' WHERE `id`=?' )->limit(1)->execute($strId);
+            if ($objEntity->numRows) {
+                $strValue = $objEntity->{$strAliasField} ?: $strValue;
+            }
+        }
+        if (!$strValue) {
+            return md5(time());
+        }
+
+        $objSlugGenerator = new \Ausi\SlugGenerator\SlugGenerator((new \Ausi\SlugGenerator\SlugOptions)
+            ->setValidChars('a-zA-Z0-9')
+            ->setLocale('de')
+            ->setDelimiter('_'));
+        $strValue = $objSlugGenerator->generate($strValue);
+
+        if ( strlen( $strValue ) > 100 ) {
+            $strValue = substr( $strValue, 0, 100 );
+        }
+
+        if ($blnAliasFieldExist && $strId) {
+            $arrValues = [$strValue, $strId];
+            if ($strPid !== null) {
+                $arrValues[] = $strPid;
+            }
+            if ( \Database::getInstance()->prepare( 'SELECT * FROM ' . $strTable . ' WHERE `'.$strAliasField.'`=? AND `id`!=?' . ( $strPid ? ' AND `pid`=?' : '' ) )->limit(1)->execute( $arrValues )->numRows ) {
+                $strValue = $strValue . '-' . $strId;
+            }
+        }
+
+        return $strValue;
     }
 
     public static function convertComboWizardToModelValues( $strValue, $strTable = '' ) {

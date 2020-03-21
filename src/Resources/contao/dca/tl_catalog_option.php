@@ -3,6 +3,24 @@
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
         'dataContainer' => 'Table',
+        'onsubmit_callback' => [
+            function( \DataContainer $objDataContainer ) {
+                if ($objDataContainer->activeRecord) {
+                    $arrSet = [];
+                    $arrSet['tstamp'] = time();
+                    $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objDataContainer->activeRecord->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objDataContainer->activeRecord->pid);
+                    \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                }
+            },
+            function( \DataContainer $objDataContainer ) {
+                if (\Input::get('dcaWizard')) {
+                    $arrSet = [];
+                    $arrSet['tstamp'] = time();
+                    $arrSet['pid'] = \Input::get('dcaWizard');
+                    \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                }
+            }
+        ],
         'onload_callback' => [
             [ 'catalogmanager.datacontainer.catalogoption', 'generatePidEntities' ]
         ],
@@ -61,8 +79,6 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'subpalettes' => [],
     'fields' => [
         'id' => [
-            // @todo watch for id in catalog field
-            // 'save_callback' => [ [ 'catalogmanager.datacontainer.catalogoption', 'preventDuplicateId' ] ],
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
         ],
         'sorting' => [
@@ -78,7 +94,8 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             'inputType' => 'text',
             'eval' => [
                 'maxlength' => 255,
-                'tl_class' => 'w50'
+                'tl_class' => 'w50',
+                'allowHtml' => true
             ],
             'search' => true,
             'sorting' => true,
@@ -88,13 +105,20 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
         'value' => [
             'inputType' => 'text',
             'eval' => [
-                'maxlength' => 255,
-                'tl_class' => 'w50'
+                'maxlength' => 128,
+                'tl_class' => 'w50',
+                'doNotCopy' => true,
+                'decodeEntities' => true
             ],
             'search' => true,
             'sorting' => true,
             'exclude' => true,
-            'sql' => ['type' => 'string', 'length' => 255, 'default' => '']
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ]
     ]
 ];
+
+if (\Input::get('dcaWizard')) {
+    $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['mode'] = 2;
+    $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['filter'] = [['pid=?',\Input::get('id')]];
+}
