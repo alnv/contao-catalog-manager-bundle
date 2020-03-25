@@ -137,7 +137,7 @@ abstract class CatalogWizard extends \System {
             $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
         }
 
-        if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox', 'customOptionWizard' ] ) ) {
+        if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox' ] ) ) {
             $arrReturn['options_callback'] = function ( $objDataContainer = null ) use ( $arrField ) {
                 $objOptions = Options::getInstance( $arrField['fieldname'] . '.' . $arrField['pid'] );
                 $objOptions::setParameter( $arrField, $objDataContainer );
@@ -252,10 +252,6 @@ abstract class CatalogWizard extends \System {
                             break;
                     }
                 }
-                break;
-
-            case 'customOptionWizard':
-                $arrReturn['inputType'] = 'customOptionWizard';
                 break;
         }
 
