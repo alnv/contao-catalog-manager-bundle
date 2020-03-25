@@ -199,12 +199,10 @@ class VirtualDataContainerArray extends \System {
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
 
             if ( isset( $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] ) ) {
-
                 continue;
             }
 
             $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] = [
-
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $arrField['name'] ),
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description' . $strFieldname, $arrField['name'] )
             ];

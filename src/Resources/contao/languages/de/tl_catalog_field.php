@@ -38,7 +38,8 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
     'empty' => 'Leeres Feld',
     'select' => 'Select-Menü',
     'checkbox' => 'Checkbox-Menü',
-    'radio' => 'Radio-Button-Menü'
+    'radio' => 'Radio-Button-Menü',
+    'customOptionWizard' => 'Options Wizard'
 ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'options' => 'Options',

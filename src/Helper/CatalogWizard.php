@@ -109,7 +109,6 @@ abstract class CatalogWizard extends \System {
         }
 
         $blnMultiple = $arrField['multiple'] ? true : false;
-
         $arrReturn = [
             'exclude' => true,
             'filter' => $blnMultiple,
@@ -134,23 +133,19 @@ abstract class CatalogWizard extends \System {
         ];
 
         if ( $arrField['includeBlankOption'] ) {
-
             $arrReturn['eval']['includeBlankOption'] = true;
             $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
         }
 
-        if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox' ] ) ) {
-
+        if ( in_array( $arrField['type'], [ 'select', 'radio', 'checkbox', 'customOptionWizard' ] ) ) {
             $arrReturn['options_callback'] = function ( $objDataContainer = null ) use ( $arrField ) {
-
                 $objOptions = Options::getInstance( $arrField['fieldname'] . '.' . $arrField['pid'] );
                 $objOptions::setParameter( $arrField, $objDataContainer );
-
                 return $objOptions::getOptions();
             };
         }
 
-        switch ( $arrField['type'] ) {
+        switch ($arrField['type']) {
 
             case 'text':
                 $arrReturn['inputType'] = 'text';
@@ -257,6 +252,10 @@ abstract class CatalogWizard extends \System {
                             break;
                     }
                 }
+                break;
+
+            case 'customOptionWizard':
+                $arrReturn['inputType'] = 'customOptionWizard';
                 break;
         }
 
