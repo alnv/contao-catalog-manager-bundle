@@ -36,7 +36,7 @@ class Options {
                     return $arrReturn;
                 }
                 while ( $objOptions->next() ) {
-                    $arrReturn[$objOptions->value] = \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate(static::$arrField['dbTable'].'.option.'.$objOptions->value,$objOptions->label);
+                    $arrReturn[$objOptions->value] = self::getLabel($objOptions->value, $objOptions->label);;
                 }
                 break;
 
@@ -50,7 +50,7 @@ class Options {
                 while ( $objEntities->next() ) {
                     $strKey = $objEntities->{static::$arrField['dbKey']};
                     $strLabel = $objEntities->{static::$arrField['dbLabel']};
-                    $arrReturn[$strKey] = \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( static::$arrField['dbTable'] . '.option.' . $strKey , $strLabel);
+                    $arrReturn[$strKey] = self::getLabel($strKey, $strLabel);
                 }
                 return $arrReturn;
                 break;
@@ -67,5 +67,10 @@ class Options {
 
         static::$arrField = $arrField;
         static::$arrDataContainer = $objDataContainer;
+    }
+
+    protected static function getLabel($strValue, $strFallbackLabel='') {
+
+        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( static::$arrField['dbTable'] . '.option.' . $strValue , $strFallbackLabel));
     }
 }

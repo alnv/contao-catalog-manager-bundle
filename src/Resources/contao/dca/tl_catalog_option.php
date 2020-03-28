@@ -60,7 +60,14 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 'icon' => 'show.gif'
             ]
         ],
-        'global_operations' => []
+        'global_operations' => [
+            'all' => [
+                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ]
+        ]
     ],
     'palettes' => [
         '__selector__' => [],
@@ -78,6 +85,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
+            'options_callback' => ['catalogmanager.datacontainer.catalogoption', 'getFieldLabels'],
             'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
         ],
         'label' => [

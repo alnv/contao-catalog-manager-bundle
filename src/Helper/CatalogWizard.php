@@ -146,7 +146,6 @@ abstract class CatalogWizard extends \System {
         }
 
         switch ($arrField['type']) {
-
             case 'text':
                 $arrReturn['inputType'] = 'text';
                 if ( $arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1 ) {
@@ -156,7 +155,6 @@ abstract class CatalogWizard extends \System {
 
             case 'date':
                 $arrReturn['flag'] = 6;
-                $arrReturn['default'] = time();
                 $arrReturn['inputType'] = 'text';
                 if ( $arrReturn['eval']['role'] ) {
                     $objRoleResolver = RoleResolver::getInstance(null);
