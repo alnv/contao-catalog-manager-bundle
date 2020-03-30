@@ -92,7 +92,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
     'inputType' => 'comboWizard',
     'eval' => [
         'tl_class' => 'w50',
-        'mandatory' => true,
+        'mandatory' => false,
         'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOrderByStatements' ]
     ],
     'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],

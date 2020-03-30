@@ -158,6 +158,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'shop',
         'type' => 'string'
     ],
+    'package' => [
+        'group' => 'shop',
+        'type' => 'string'
+    ],
     'category' => [
         'group' => 'article',
         'type' => 'string'

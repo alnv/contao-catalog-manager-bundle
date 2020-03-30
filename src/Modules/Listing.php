@@ -16,7 +16,6 @@ class Listing extends \Module {
     public function generate() {
 
         if ( System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend' ) {
-
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
@@ -75,12 +74,10 @@ class Listing extends \Module {
         $arrGeoCodingFields = $objRoleResolver->getGeoCodingFields();
 
         if ( empty( $arrGeoCodingFields ) ) {
-
             return false;
         }
 
         $arrAddress = [
-
             'street' => Toolkit::getValueFromUrl( \Input::get('street') ),
             'streetNumber' => Toolkit::getValueFromUrl( \Input::get('streetNumber') ),
             'zip' => Toolkit::getValueFromUrl( \Input::get('zip') ),
@@ -88,7 +85,6 @@ class Listing extends \Module {
         ];
 
         if ( empty( array_filter( $arrAddress ) ) ) {
-
             return false;
         }
 
@@ -131,7 +127,6 @@ class Listing extends \Module {
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
-
             case 'expert':
                 $this->cmValue =  \Controller::replaceInsertTags( $this->cmValue );
                 $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
@@ -158,17 +153,16 @@ class Listing extends \Module {
     protected function setOrder() {
 
         if ( $this->cmOrder ) {
-
             $strOrder = Toolkit::getOrderByStatementFromArray( \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'
             ]));
-
-            $this->arrOptions['order'] = $strOrder;
+            if ($strOrder) {
+                $this->arrOptions['order'] = $strOrder;
+            }
         }
 
         if ( is_array( \Input::get('order') ) && !empty( \Input::get('order') ) ) {
-
             $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray( \Input::get('order') );
         }
     }
@@ -176,17 +170,14 @@ class Listing extends \Module {
     protected function setPagination() {
 
         if ( $this->cmPagination ) {
-
             $this->arrOptions['pagination'] = $this->cmPagination ? true: false;
         }
 
         if ( $this->cmLimit ) {
-
             $this->arrOptions['limit'] = $this->cmLimit;
         }
 
         if ( $this->cmOffset ) {
-
             $this->arrOptions['offset'] = $this->cmOffset;
         }
     }
@@ -194,12 +185,10 @@ class Listing extends \Module {
     protected function setGroup() {
 
         if ( $this->cmGroupBy ) {
-
             $this->arrOptions['groupBy'] = $this->cmGroupBy;
         }
 
         if ( $this->cmGroupByHl ) {
-
             $this->arrOptions['groupByHl'] = $this->cmGroupByHl;
         }
     }
@@ -207,7 +196,6 @@ class Listing extends \Module {
     protected function setMasterPage() {
 
         if ( !$this->cmMaster || !$this->cmMasterPage ) {
-
             return null;
         }
 
@@ -217,7 +205,6 @@ class Listing extends \Module {
     protected function setFormPage() {
 
         if ( !$this->cmForm || !$this->cmFormPage ) {
-
             return null;
         }
 
