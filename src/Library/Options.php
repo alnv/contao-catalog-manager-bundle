@@ -25,7 +25,6 @@ class Options {
 
         $arrReturn = [];
         switch ( static::$arrField['optionsSource'] ) {
-
             case 'options':
                 $objOptions = CatalogOptionModel::findAll([
                     'column' => [ 'pid=?' ],
@@ -39,11 +38,12 @@ class Options {
                     $arrReturn[$objOptions->value] = self::getLabel($objOptions->value, $objOptions->label);;
                 }
                 break;
-
             case 'dbOptions':
                 $objModel = new ModelWizard( static::$arrField['dbTable'] );
                 $objModel = $objModel->getModel();
-                $objEntities = $objModel->findAll([]);
+                $arrModelOptions = [];
+                array_insert($arrModelOptions, 0, self::setFilter());
+                $objEntities = $objModel->findAll($arrModelOptions);
                 if ( $objEntities === null ) {
                     return $arrReturn;
                 }
@@ -61,6 +61,47 @@ class Options {
         }
 
         return $arrReturn;
+    }
+
+    protected static function setFilter() {
+
+        $arrOptions = [];
+        switch (static::$arrField['dbFilterType']) {
+            case 'wizard':
+                \Controller::loadDataContainer(static::$arrField['dbTable']);
+                $strTable = $GLOBALS['TL_DCA'][static::$arrField['dbTable']]['config']['_table'] ?: static::$arrField['dbTable'];
+                $arrQueries = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::convertComboWizardToModelValues(static::$arrField['dbWizardFilterSettings'],$strTable);
+                $arrOptions['column'] = $arrQueries['column'];
+                $arrOptions['value'] = $arrQueries['value'];
+                break;
+            case 'expert':
+                static::$arrField['dbFilterValue'] = \Controller::replaceInsertTags(static::$arrField['dbFilterValue']);
+                $arrOptions['column'] = explode(';',\StringUtil::decodeEntities(static::$arrField['dbFilterColumn']));
+                $arrOptions['value'] = explode(';',\StringUtil::decodeEntities(static::$arrField['dbFilterValue']));
+                if ((is_array($arrOptions['value']) && !empty($arrOptions['value']))) {
+                    $intIndex = -1;
+                    $arrOptions['value'] = array_filter($arrOptions['value'], function ($strValue) use (&$intIndex, $arrOptions) {
+                        $intIndex = $intIndex + 1;
+                        if ($strValue === '' || $strValue === null) {
+                            unset($arrOptions['column'][ $intIndex ]);
+                            return false;
+                        }
+                        return true;
+                    });
+                    if (empty($arrOptions['value'])) {
+                        unset($arrOptions['value'] );
+                        unset($arrOptions['column']);
+                    }
+                }
+                break;
+        }
+
+        if (empty($arrOptions['value'])) {
+            unset($arrOptions['value'] );
+            unset($arrOptions['column']);
+        }
+
+        return $arrOptions;
     }
 
     public static function setParameter( $arrField, $objDataContainer = null ) {

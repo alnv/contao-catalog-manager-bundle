@@ -298,4 +298,9 @@ class Catalog {
 
         return $arrReturn;
     }
+
+    public function getOperators() {
+
+        return array_keys( $GLOBALS['CM_OPERATORS'] );
+    }
 }

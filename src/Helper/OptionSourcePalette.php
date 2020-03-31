@@ -6,7 +6,7 @@ class OptionSourcePalette {
 
     public static function getPalette() {
 
-        return 'dbTable,dbKey,dbLabel';
+        return 'dbTable,dbKey,dbLabel,dbFilterType';
     }
 
     public static function getFields() {
@@ -51,6 +51,50 @@ class OptionSourcePalette {
                 ],
                 'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDbFields' ],
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
+            ],
+            'dbFilterType' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterType'],
+                'inputType' => 'radio',
+                'default' => 'wizard',
+                'eval' => [
+                    'tl_class' => 'clr',
+                    'submitOnChange' => true
+                ],
+                'options' => [ 'wizard', 'expert' ],
+                'reference' => &$GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'],
+                'exclude' => true,
+                'sql' => "varchar(12) NOT NULL default 'wizard'"
+            ],
+            'dbFilterColumn' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterColumn'],
+                'inputType' => 'textarea',
+                'eval' => [
+                    'tl_class' => 'clr'
+                ],
+                'exclude' => true,
+                'sql' => "mediumtext NULL"
+            ],
+            'dbFilterValue' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'],
+                'inputType' => 'textarea',
+                'eval' => [
+                    'tl_class' => 'clr'
+                ],
+                'exclude' => true,
+                'sql' => "mediumtext NULL"
+            ],
+            'dbWizardFilterSettings' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'],
+                'inputType' => 'comboWizard',
+                'eval' => [
+                    'tl_class' => 'clr',
+                    'mandatory' => false,
+                    'options2_callback' => ['catalogmanager.datacontainer.catalog', 'getOperators'],
+                    'enableField' => true,
+                    'enableGroup' => true
+                ],
+                'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
+                'sql' => ['type' => 'blob', 'notnull' => false ]
             ]
         ];
     }
