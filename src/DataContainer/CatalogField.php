@@ -29,7 +29,11 @@ class CatalogField {
 
     public function getFieldTypes() {
 
-        return $GLOBALS['CM_FIELDS'];
+        $arrReturn = [];
+        foreach ($GLOBALS['CM_FIELDS'] as $strType) {
+            $arrReturn[$strType] = $strType;
+        }
+        return $arrReturn;
     }
 
     public function getRoles( \DataContainer $dc ) {
