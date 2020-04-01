@@ -3,7 +3,14 @@
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbTable'] = [ 'Tabelle', '' ];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbKey'] = [ 'Datenbankwert', '' ];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbLabel'] = [ 'Bezeichnung', '' ];
-
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterType'] = [ 'Eingabetyp', '' ];
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterColumn'] = [ 'Spalten', '' ];
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'] = [ 'Werte', '' ];
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'] = [ 'Filtereinstellungen', '' ];
+$GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'] = [
+    'expert' => 'Experte',
+    'wizard' => 'Wizard (Klassisch)'
+];
 $GLOBALS['TL_LANG']['MSC']['tstamp'] = [ 'Änderungsdatum', 'Datum und Uhrzeit der letzten Änderung.' ];
 $GLOBALS['TL_LANG']['MSC']['start'] = [ 'Anzeigen ab', 'Den Artikel erst ab diesem Datum anzeigen.' ];
 $GLOBALS['TL_LANG']['MSC']['stop'] = [ 'Anzeigen bis', 'Den Artikel nur bis zu diesem Datum anzeigen.' ];

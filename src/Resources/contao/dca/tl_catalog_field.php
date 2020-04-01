@@ -54,7 +54,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption' ],
+        '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter' ],
         'default' => '{general_settings},name,type',
         'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',
         'text' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,size;{published_legend},published',
@@ -67,6 +67,9 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,multiple,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
     ],
     'subpalettes' => [
+        'dbFilter' => 'dbFilterType',
+        'dbFilterType_expert' => 'dbFilterColumn,dbFilterValue',
+        'dbFilterType_wizard' => 'dbWizardFilterSettings',
         'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => 'optionsDcaWizard',
         'optionsSource_dbOptions' => \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getPalette()
@@ -81,10 +84,10 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'type' => 'belongsTo',
                 'load' => 'lazy'
             ],
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
@@ -103,7 +106,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getFieldTypes' ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
             'save_callback' => [
-                [ 'catalogmanager.datacontainer.catalogfield', 'changeFieldType' ]
+                ['catalogmanager.datacontainer.catalogfield', 'changeFieldType']
             ],
             'filter' => true,
             'exclude' => true,
@@ -336,4 +339,4 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     ]
 ];
 
-array_insert( $GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getFields() );
+array_insert($GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getFields());

@@ -3,7 +3,6 @@
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 use BackendTemplate;
@@ -90,7 +89,7 @@ class Listing extends \Module {
 
         $arrAddress['state'] = Toolkit::getValueFromUrl( \Input::get('state') );
         $arrAddress['country'] = Toolkit::getValueFromUrl( \Input::get('country') );
-        $objAddressBuilder = new AddressBuilder( $arrAddress );
+        $objAddressBuilder = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
         $strAddress = $objAddressBuilder->getAddress();
         $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
