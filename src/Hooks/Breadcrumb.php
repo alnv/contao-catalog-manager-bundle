@@ -4,9 +4,9 @@ namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
 class Breadcrumb {
 
-    public function generateDetailPage( $arrItems ) {
+    public function generateDetailPage($arrItems) {
 
-        if ( !is_array( $GLOBALS['CM_MASTER'] ) ||  empty( $GLOBALS['CM_MASTER'] ) ) {
+        if ( !is_array($GLOBALS['CM_MASTER']) ||  empty($GLOBALS['CM_MASTER']) ) {
             return $arrItems;
         }
 
