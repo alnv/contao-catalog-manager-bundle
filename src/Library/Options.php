@@ -112,6 +112,7 @@ class Options {
 
     protected static function getLabel($strValue, $strFallbackLabel='') {
 
+        $strFallbackLabel = \StringUtil::decodeEntities($strFallbackLabel);
         return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( static::$arrField['dbTable'] . '.option.' . $strValue , $strFallbackLabel));
     }
 }
