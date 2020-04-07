@@ -13,7 +13,6 @@ class MasterModule extends \Module {
         if ( \System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend' ) {
 
             $objTemplate = new \BackendTemplate('be_wildcard');
-
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
@@ -24,7 +23,6 @@ class MasterModule extends \Module {
         }
 
         if ( !$this->cmTable ) {
-
             return null;
         }
 
@@ -33,12 +31,17 @@ class MasterModule extends \Module {
 
     protected function compile() {
 
+        global $objPage;
         $objMaster = new Master( $this->cmTable, [
             'alias' => \Input::get('auto_item'),
             'template' => $this->cmTemplate,
             'id' => $this->id
         ]);
-
-        $this->Template->entities = $objMaster->parse();
+        $arrMasters = $objMaster->parse();
+        foreach ($arrMasters as $arrMaster) {
+            $objPage->pageTitle = $arrMaster['roleResolver']()->getValueByRole('title');
+            $objPage->description = strip_tags($arrMaster['roleResolver']()->getValueByRole('teaser'));
+        }
+        $this->Template->entities = $arrMasters;
     }
 }
