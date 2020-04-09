@@ -307,7 +307,7 @@ class VirtualDataContainerArray extends \System {
         if ( isset( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) && is_array( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) ) {
             foreach ( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback ) {
                 $this->import( $arrCallback[0] );
-                $this->{$arrCallback[0]}->{$arrCallback[1]}( $this->arrCatalog['table'], $this );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrCatalog['table'], $this);
             }
         }
     }
