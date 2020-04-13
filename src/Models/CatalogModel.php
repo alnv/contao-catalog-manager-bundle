@@ -2,12 +2,9 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
-
 class CatalogModel extends \Model {
 
-
     protected static $strTable = 'tl_catalog';
-
 
     public static function findByTableOrModule( $strIdentifier, array $arrOptions=[] ) {
 
@@ -16,7 +13,6 @@ class CatalogModel extends \Model {
 
         return static::findOneBy( $arrColumns, [ $strIdentifier, $strIdentifier, (int) $strIdentifier ], $arrOptions );
     }
-
 
     public static function findChildrenCatalogsById( $strId ) {
 
