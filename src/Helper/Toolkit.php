@@ -42,7 +42,7 @@ class Toolkit {
             if ($arrRole['sql']) {
                 return $arrRole['sql'];
             }
-            switch ( $arrRole['type'] ) {
+            switch ($arrRole['type']) {
                 case 'id':
                     return $arrSql['i10'];
                 case 'gallery':
@@ -57,6 +57,8 @@ class Toolkit {
         switch ( $strType ) {
             case 'color':
                 return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
+            case 'pagepicker':
+                return $arrSql['i10'];
             case 'date':
                 return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
             case 'textarea':

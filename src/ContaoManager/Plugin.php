@@ -9,9 +9,7 @@ use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
-
 class Plugin implements BundlePluginInterface, RoutingPluginInterface {
-
 
     public function getBundles( ParserInterface $parser ) {
 
@@ -25,7 +23,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface {
                 ->setReplace(['contao-catalog-manager-bundle']),
         ];
     }
-
 
     public function getRouteCollection( LoaderResolverInterface $resolver, KernelInterface $kernel ) {
 

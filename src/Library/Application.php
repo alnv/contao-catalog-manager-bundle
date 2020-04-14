@@ -2,14 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-
 class Application {
-
 
     public function initializeBackendModules() {
 
         $objCatalogCollection = new CatalogCollection();
-        $arrCatalogs = $objCatalogCollection->getCatalogs( 'catalog' );
+        $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
 
         foreach ( $arrCatalogs as $arrCatalog ) {
 
@@ -24,21 +22,17 @@ class Application {
         }
     }
 
-
     public function generateBeModConfig( $arrCatalog ) {
 
         $arrTables = [ $arrCatalog['table'] ];
 
         if ( is_array( $arrCatalog['related'] ) && !empty( $arrCatalog['related'] ) ) {
-
             foreach ( $arrCatalog['related'] as $strTable ) {
-
                 $arrTables[] = $strTable;
             }
         }
 
         if ( !isset( $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] ) ) {
-
             $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] = [
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $arrCatalog['module'], $arrCatalog['name'] ),
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $arrCatalog['module'] . '.' . 'description', $arrCatalog['description'] ),
@@ -52,19 +46,16 @@ class Application {
         ];
     }
 
-
     public function initializeDataContainerArrays() {
 
         $strModule = \Input::get('do');
 
         if ( !$strModule ) {
-
             return null;
         }
 
         $this->initializeDataContainerArrayByTable( $strModule );
     }
-
 
     public function initializeDataContainerArrayByTable( $strTable ) {
 

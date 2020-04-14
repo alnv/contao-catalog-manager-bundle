@@ -65,17 +65,14 @@ abstract class CatalogWizard extends \System {
         while ( $objChildCatalogs->next() ) {
 
             if ( $objChildCatalogs->table ) {
-
                 $arrRelated[] = $objChildCatalogs->table;
             }
 
             if ( $objChildCatalogs->enableContentElements && !in_array( 'tl_content', $arrRelated ) ) {
-
                 $arrRelated[] = 'tl_content';
             }
 
             if ( !$intLevel ) {
-
                 $arrChildren[] = $objChildCatalogs->table;
             }
 
@@ -87,7 +84,7 @@ abstract class CatalogWizard extends \System {
 
     protected function getParentCatalogByPid( $strPid ) {
 
-        $objParent = CatalogModel::findByPk( $strPid );
+        $objParent = CatalogModel::findByPk($strPid);
 
         if ( $objParent === null ) {
             return '';
@@ -207,6 +204,21 @@ abstract class CatalogWizard extends \System {
                     'sql' => $arrReturn['sql']
                 ];
                 $arrReturn = $arrEmpty;
+                break;
+
+            case 'pagepicker':
+                $arrReturn['inputType'] = 'pageTree';
+                $arrReturn['foreignKey'] = 'tl_page.title';
+                $arrReturn['eval']['fieldType'] = $blnMultiple ? 'checkbox' : 'radio';
+                if ($blnMultiple) {
+                    $arrReturn['eval']['isSortable'] = true;
+                }
+                $arrReturn['relation'] = [
+                    'type' => $blnMultiple ? 'hasMany' : 'hasOne',
+                    'load' => 'lazy'
+                ];
+                $arrReturn['eval']['tl_class'] = 'clr';
+
                 break;
 
             case 'upload':

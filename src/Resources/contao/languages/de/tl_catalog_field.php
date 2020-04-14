@@ -35,6 +35,7 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
     'text' => 'Textfeld',
     'upload' => 'Upload',
     'textarea' => 'Textarea',
+    'pagepicker' => 'Seitenbaum',
     'empty' => 'Leeres Feld',
     'select' => 'Select-Menü',
     'checkbox' => 'Checkbox-Menü',
