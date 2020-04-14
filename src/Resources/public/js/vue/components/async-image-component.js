@@ -51,7 +51,10 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         })
     },
     mounted: function () {
-        this.fetch();
+        this.src = this.default;
+        if (!this.src) {
+            this.fetch();
+        }
     },
     props: {
         id: {
@@ -68,6 +71,11 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         },
         sticky: {
             type: Object,
+            default: null,
+            required: false
+        },
+        default: {
+            type: String,
             default: null,
             required: false
         }
