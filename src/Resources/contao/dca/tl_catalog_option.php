@@ -3,6 +3,7 @@
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
         'dataContainer' => 'Table',
+        'enableVersioning' => true,
         'closed' => true,
         'onsubmit_callback' => [
             function( \DataContainer $objDataContainer ) {

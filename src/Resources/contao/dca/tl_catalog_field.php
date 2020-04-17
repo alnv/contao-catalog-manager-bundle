@@ -101,7 +101,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'maxlength' => 32,
                 'tl_class' => 'w50',
                 'submitOnChange' => true,
-                'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getFieldTypes' ],

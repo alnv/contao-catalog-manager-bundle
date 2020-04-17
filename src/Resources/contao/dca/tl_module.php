@@ -185,8 +185,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     'inputType' => 'pageTree',
     'eval' => [
-        'tl_class' => 'w50 clr',
-        'mandatory' => true
+        'tl_class' => 'w50 clr'
     ],
     'foreignKey' => 'tl_page.title',
     'relation' => [
