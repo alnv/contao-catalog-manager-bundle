@@ -4,9 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
-
 class Search {
-
 
     public function getSearchablePages( $arrPages, $intRoot = 0, $blnIsSitemap = false ) {
 
@@ -51,7 +49,6 @@ class Search {
 
         return $arrPages;
     }
-
 
     protected function parseFilter( $objModules ) {
 

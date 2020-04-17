@@ -1,4 +1,7 @@
 services:
+  catalogmanager.hooks.widget:
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\Widget
+    public: true
   catalogmanager.datacontainer.catalog:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog
     public: true

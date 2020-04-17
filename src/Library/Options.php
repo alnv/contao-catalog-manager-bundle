@@ -21,7 +21,7 @@ class Options {
         return self::$arrInstances[ $strInstanceId ];
     }
 
-    public static function getOptions() {
+    public static function getOptions($blnAsAssoc=false) {
 
         $arrReturn = [];
         switch ( static::$arrField['optionsSource'] ) {
@@ -35,7 +35,16 @@ class Options {
                     return $arrReturn;
                 }
                 while ( $objOptions->next() ) {
-                    $arrReturn[$objOptions->value] = self::getLabel($objOptions->value, $objOptions->label);;
+                    $strLabel = self::getLabel($objOptions->value, $objOptions->label);
+                    $strValue = $objOptions->value;
+                    if ($blnAsAssoc) {
+                        $arrReturn[] = [
+                            'value' => $strValue,
+                            'label' => $strLabel
+                        ];
+                        continue;
+                    }
+                    $arrReturn[$strValue] = $strLabel;
                 }
                 break;
             case 'dbOptions':
@@ -48,9 +57,16 @@ class Options {
                     return $arrReturn;
                 }
                 while ( $objEntities->next() ) {
-                    $strKey = $objEntities->{static::$arrField['dbKey']};
+                    $strValue = $objEntities->{static::$arrField['dbKey']};
                     $strLabel = $objEntities->{static::$arrField['dbLabel']};
-                    $arrReturn[$strKey] = self::getLabel($strKey, $strLabel);
+                    if ($blnAsAssoc) {
+                        $arrReturn[] = [
+                            'value' => $strValue,
+                            'label' => $strLabel
+                        ];
+                        continue;
+                    }
+                    $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                 }
                 return $arrReturn;
                 break;
