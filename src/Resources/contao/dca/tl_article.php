@@ -1,14 +1,5 @@
 <?php
 
-foreach ( $GLOBALS['TL_DCA']['tl_article']['palettes'] as $strPalette => $strFields ) {
-    if ( in_array( $strPalette, [ '__selector__' ] ) ) {
-        continue;
-    }
-    \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-        ->addField('cmHideOnDetailPage', 'title_legend', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-        ->applyToPalette($strPalette,'tl_article');
-}
-
 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
     ->addField('cmHideOnDetailPage', 'alias', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->applyToPalette('default','tl_article');
