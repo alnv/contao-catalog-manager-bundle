@@ -122,7 +122,7 @@ class Listing extends \Module {
         switch ( $this->cmFilterType ) {
             case 'wizard':
                 \Controller::loadDataContainer($this->cmTable);
-                $arrQueries = Toolkit::convertComboWizardToModelValues( $this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] );
+                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
@@ -134,15 +134,15 @@ class Listing extends \Module {
                     $intIndex = -1;
                     $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
                         $intIndex = $intIndex + 1;
-                        if ( $strValue === '' || $strValue === null ) {
-                            unset( $this->arrOptions['column'][ $intIndex ] );
+                        if ($strValue === '' || $strValue === null) {
+                            unset($this->arrOptions['column'][ $intIndex ]);
                             return false;
                         }
                         return true;
                     });
-                    if ( empty( $this->arrOptions['value'] ) ) {
-                        unset( $this->arrOptions['value'] );
-                        unset( $this->arrOptions['column'] );
+                    if (empty($this->arrOptions['value'])) {
+                        unset($this->arrOptions['value']);
+                        unset($this->arrOptions['column']);
                     }
                 }
                 break;

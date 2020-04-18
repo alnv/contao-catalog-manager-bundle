@@ -396,15 +396,15 @@ class Toolkit {
             'option4' => 'group'
         ]);
 
-        if ( !is_array( $arrJson ) || empty( $arrJson ) ) {
+        if (!is_array($arrJson) || empty($arrJson)) {
             return $arrReturn;
         }
 
-        foreach ( $arrJson as $intIndex => $arrQuery ) {
+        foreach ($arrJson as $intIndex => $arrQuery) {
 
-            if ( isset( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ] ) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'] ) {
+            if ( isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token']) {
 
-                if ( $arrQuery['group'] || $blnInitialGroup ) {
+                if ($arrQuery['group'] || $blnInitialGroup) {
                     $strName = 'group' . $intIndex;
                 }
 
@@ -414,9 +414,9 @@ class Toolkit {
 
                 $varValue = $arrQuery['value'];
 
-                if ( $varValue !== '' || $varValue !== null ) {
+                if ($varValue !== '' || $varValue !== null) {
                     $objIt = new \InsertTags();
-                    $varValue = $objIt->replace( $varValue, true );
+                    $varValue = $objIt->replace($varValue, true);
                 }
 
                 $arrColumns = [];

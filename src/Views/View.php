@@ -130,12 +130,10 @@ abstract class View extends \Controller {
         $objTotal = $objModel->findAll($arrOptions);
 
         if ( $objTotal !== null ) {
-
             $numTotal = $objTotal->count();
         }
 
         if ( !$numTotal ) {
-
             return null;
         }
 
@@ -145,7 +143,6 @@ abstract class View extends \Controller {
             $intLimit = $this->arrOptions['limit'] * $intOffset;
 
             if ( $intLimit > $numTotal ) {
-
                 $intLimit = $numTotal;
             }
 
@@ -158,14 +155,12 @@ abstract class View extends \Controller {
         $numOffset = $this->arrOptions['offset'];
 
         if ( $this->arrOptions['offset'] ) {
-
             $numTotal -= $numOffset;
         }
 
         $numOffset = $this->getPageNumber();
 
         if ( $this->arrOptions['limit'] > 0 && $this->arrOptions['offset'] ) {
-
             $numOffset += round( $this->arrOptions['offset'] / $this->arrOptions['limit'] );
         }
 
@@ -299,7 +294,6 @@ abstract class View extends \Controller {
     public function getPagination() {
 
         if ( !$this->arrOptions['pagination'] ) {
-
             return '';
         }
 
