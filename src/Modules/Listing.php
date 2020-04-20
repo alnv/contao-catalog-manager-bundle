@@ -194,8 +194,12 @@ class Listing extends \Module {
 
     protected function setMasterPage() {
 
-        if ( !$this->cmMaster || !$this->cmMasterPage ) {
+        if ( !$this->cmMaster ) {
             return null;
+        }
+        if (!$this->cmMasterPage) {
+            global $objPage;
+            $this->cmMasterPage = $objPage->id;
         }
 
         $this->arrOptions['masterPage'] = $this->cmMasterPage;
