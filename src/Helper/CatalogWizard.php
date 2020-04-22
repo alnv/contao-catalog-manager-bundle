@@ -226,9 +226,6 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['eval']['filesOnly'] = true;
                 $arrReturn['eval']['fieldType'] = 'radio';
-                if ( $blnMultiple ) {
-                    $arrReturn['eval']['fieldType'] = 'checkbox';
-                }
                 $arrReturn['eval']['storeFile'] = '1';
                 $arrReturn['eval']['extensions'] = $arrField['extensions'];
                 $arrReturn['eval']['useHomeDir'] = $arrField['useHomeDir'];
@@ -236,7 +233,7 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
                 $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid( $arrField['uploadFolder'] );
-                if ( $arrReturn['eval']['role'] ) {
+                if ($arrReturn['eval']['role']) {
                     $objRoleResolver = RoleResolver::getInstance(null);
                     switch ($objRoleResolver->getRole($arrReturn['eval']['role'])['type']) {
                         case 'image':
@@ -250,6 +247,8 @@ abstract class CatalogWizard extends \System {
                             $arrReturn['eval']['filesOnly'] = false;
                             $arrReturn['eval']['isGallery'] = true;
                             $arrReturn['eval']['tl_class'] = 'clr';
+                            $arrReturn['eval']['fieldType'] = 'checkbox';
+                            $arrReturn['eval']['multiple'] = true;
                             if ( $arrField['imageSize'] ) {
                                 $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
                             }
@@ -257,15 +256,22 @@ abstract class CatalogWizard extends \System {
                                 $arrReturn['eval']['orderField'] = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND role=?')->limit(1)->execute($arrCatalog['id'],'orderSRC')->fieldname;
                             }
                             break;
+                        case 'files':
                         case 'file':
-                            $arrReturn['eval']['isFile'] = '1';
+                            $arrReturn['eval']['files'] = true;
+                            $arrReturn['eval']['filesOnly'] = true;
+                            $arrReturn['eval']['isFile'] = true;
+                            if ($arrReturn['eval']['role'] === 'files') {
+                                $arrReturn['eval']['fieldType'] = 'checkbox';
+                                $arrReturn['eval']['multiple'] = true;
+                            }
                             break;
                     }
                 }
                 break;
         }
 
-        if (isset($GLOBALS['TL_HOOKS']['parseCatalogField'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalogField'])) {
+        if (isset($GLOBALS['TL_HOOKS']['parseCatalogField']) && is_array($GLOBALS['TL_HOOKS']['parseCatalogField'])) {
             foreach ( $GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback ) {
                 $this->import($arrCallback[0]);
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $arrField, $this);

@@ -7,7 +7,7 @@ class Image {
     public static function getImage( $strUuid, $intSize = null, &$arrImages=[] ) {
 
         $objContainer = \System::getContainer();
-        $arrUuids = \StringUtil::deserialize( $strUuid, true );
+        $arrUuids = \StringUtil::deserialize($strUuid, true);
 
         foreach ( $arrUuids as $strUuid ) {
 

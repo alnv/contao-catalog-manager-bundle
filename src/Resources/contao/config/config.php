@@ -140,6 +140,14 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'type' => 'image'
     ],
+    'files' => [
+        'group' => 'article',
+        'type' => 'files'
+    ],
+    'file' => [
+        'group' => 'article',
+        'type' => 'file'
+    ],
     'gallery' => [
         'group' => 'article',
         'type' => 'gallery'

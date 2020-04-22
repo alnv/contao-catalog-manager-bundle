@@ -232,16 +232,22 @@ class Toolkit {
                     return Image::getUuids($varValue);
                 }
                 $strSizeId = null;
-                if ( isset( $arrField['imageSize'] ) && $arrField['imageSize'] ) {
+                if (isset( $arrField['imageSize'] ) && $arrField['imageSize']) {
                     $strSizeId = $arrField['imageSize'];
                 }
-                if ( isset( $arrField['isImage'] ) && $arrField['isImage'] === true ) {
-                    return Image::getImage( $varValue, $strSizeId );
+                if (isset( $arrField['isImage'] ) && $arrField['isImage'] === true) {
+                    return Image::getImage($varValue, $strSizeId);
                 }
-                if ( isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true ) {
-                    return Image::getImage( $varValue, $strSizeId );
+                if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
+                    return Image::getImage($varValue, $strSizeId); // @todo order by
                 }
-                return []; // @todo files
+                if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
+                    return Image::getImage($varValue, $strSizeId);
+                }
+                if ( isset($arrField['isFile']) && $arrField['isFile'] === true) {
+                    return File::getFile($varValue); // @todo order by
+                }
+                return [];
                 break;
             case 'pageTree':
                 return ''; // @todo parse url

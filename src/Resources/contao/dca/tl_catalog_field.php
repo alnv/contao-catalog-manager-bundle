@@ -65,7 +65,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'radio' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple;{options_legend},optionsSource;{published_legend},published',
         'pagepicker' => '{general_settings},name,type;fieldname,role,mandatory,multiple,{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,multiple,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published'
     ],
     'subpalettes' => [
         'dbFilter' => 'dbFilterType',

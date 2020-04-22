@@ -212,14 +212,14 @@ abstract class View extends \Controller {
 
         foreach ( $arrEntity as $strField => $varValue ) {
 
-            $strParsedValue = $this->parseField( $varValue, $strField, $arrEntity, $this->arrOptions['fastMode'] );
+            $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, $this->arrOptions['fastMode']);
             if ( $strParsedValue !== $varValue ) {
                 if (\Validator::isBinaryUuid($varValue)) {
                     $varValue = \StringUtil::binToUuid($varValue);
                 }
-                $arrRow['origin'][ $strField ] = $varValue;
+                $arrRow['origin'][$strField] = $varValue;
             }
-            $arrRow[ $strField ] = $strParsedValue;
+            $arrRow[$strField] = $strParsedValue;
         }
 
         $arrRow['roleResolver'] = function () use ( $arrRow ) {
