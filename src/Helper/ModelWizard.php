@@ -10,7 +10,7 @@ class ModelWizard {
 
     public function __construct( $strTable ) {
 
-        $strModel = \Model::getClassFromTable( $strTable );
+        $strModel = \Model::getClassFromTable($strTable);
 
         if ( $strModel && $this->modelExist($strModel) ) {
             $this->objModel = new $strModel();

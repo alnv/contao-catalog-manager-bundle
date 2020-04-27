@@ -40,9 +40,10 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'href' => 'table=tl_catalog_field',
                 'icon' => 'edit.gif'
             ],
-            'copy' => [
-                'href' => 'act=copy',
-                'icon' => 'copy.gif'
+            'cut' => [
+                'href' => 'act=paste&amp;mode=cut',
+                'icon' => 'cut.svg',
+                'attributes' => 'onclick="Backend.getScrollOffset()"'
             ],
             'delete' => [
                 'href' => 'act=delete',
@@ -98,6 +99,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'maxlength' => 128,
                 'doNotCopy' => true,
                 'tl_class' => 'w50',
+                'decodeEntities' => true
             ],
             'search' => true,
             'sorting' => true,
@@ -110,6 +112,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'maxlength' => 120,
                 'doNotCopy' => true,
                 'tl_class' => 'w50',
+                'decodeEntities' => true
             ],
             'search' => true,
             'exclude' => true,

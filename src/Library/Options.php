@@ -48,7 +48,7 @@ class Options {
                 }
                 break;
             case 'dbOptions':
-                $objModel = new ModelWizard( static::$arrField['dbTable'] );
+                $objModel = new ModelWizard(static::$arrField['dbTable']);
                 $objModel = $objModel->getModel();
                 $arrModelOptions = [];
                 array_insert($arrModelOptions, 0, self::setFilter());

@@ -35,3 +35,6 @@ services:
   catalogmanager.hooks.search:
       class: Alnv\ContaoCatalogManagerBundle\Hooks\Search
       public: true
+  catalogmanager.hooks.formfields:
+      class: Alnv\ContaoCatalogManagerBundle\Hooks\FormFields
+      public: true

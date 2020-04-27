@@ -212,17 +212,18 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['fieldType'] = $blnMultiple ? 'checkbox' : 'radio';
                 if ($blnMultiple) {
                     $arrReturn['eval']['isSortable'] = true;
+                    $arrReturn['eval']['csv'] = ',';
                 }
                 $arrReturn['relation'] = [
                     'type' => $blnMultiple ? 'hasMany' : 'hasOne',
                     'load' => 'lazy'
                 ];
                 $arrReturn['eval']['tl_class'] = 'clr';
-
                 break;
 
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
+                $arrReturn['filter'] = false;
                 $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['eval']['filesOnly'] = true;
                 $arrReturn['eval']['fieldType'] = 'radio';

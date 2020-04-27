@@ -34,8 +34,8 @@ class Application {
 
         if ( !isset( $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] ) ) {
             $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $arrCatalog['module'], $arrCatalog['name'] ),
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $arrCatalog['module'] . '.' . 'description', $arrCatalog['description'] ),
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'], $arrCatalog['name']),
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'] . '.' . 'description', $arrCatalog['description']),
             ];
         }
 
