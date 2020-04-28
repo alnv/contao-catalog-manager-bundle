@@ -71,32 +71,31 @@ class CatalogField {
 
         $objDatabase = \Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
-        $strSql = Toolkit::getSql( $strType, $objDataContainer->activeRecord->row() );
-        $objCatalog = CatalogModel::findByPk( $objDataContainer->activeRecord->pid );
+        $arrActiveRecord = $objDataContainer->activeRecord->row();
+        if (\Input::post('role')) {
+            $arrActiveRecord['role'] = \Input::post('role');
+        }
+        $strSql = Toolkit::getSql($strType, $arrActiveRecord);
+        $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
 
         if ( !$strFieldname || $objCatalog == null ) {
-
             return '';
         }
 
         $strTable = $objCatalog->table;
 
         if ( $strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists( $strFieldname, $strTable, true ) ) {
-
             return $strFieldname;
         }
 
         if ( $strFieldname != $objDataContainer->activeRecord->fieldname && $objDataContainer->activeRecord->fieldname ) {
-
             if ( !$objDatabaseBuilder->renameFieldname( $objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql ) ) {
-
                 throw new \Exception( sprintf( 'fieldname "%s" already exists in %s.', $strFieldname, $strTable ) );
             }
         }
 
         if ( !$objDatabaseBuilder->createFieldIfNotExist( $strFieldname, $strTable, $strSql ) && !$objDataContainer->activeRecord->fieldname ) {
-
             throw new \Exception( sprintf( 'fieldname "%s" already exists in %s.', $strFieldname, $strTable ) );
         }
 

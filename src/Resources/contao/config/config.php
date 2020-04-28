@@ -293,5 +293,13 @@ $GLOBALS['CM_ROLES'] = [
     'sku' => [
         'group' => 'product',
         'type' => 'string'
+    ],
+    'decimal' => [
+        'group' => 'number',
+        'type' => 'float'
+    ],
+    'integer' => [
+        'group' => 'number',
+        'type' => 'int'
     ]
 ];

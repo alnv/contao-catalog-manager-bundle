@@ -26,27 +26,30 @@ class Toolkit {
             'c1' => "char(1) NOT NULL default ''",
             'i10' => "int(10) unsigned NOT NULL default '0'",
             'i10NullAble' => "int(10) unsigned NULL",
+            'float' => "decimal(12,2) NOT NULL default '0.00'",
             'text' => "text NULL",
             'longtext' => "longtext NULL",
             'blob' => "blob NULL"
         ];
     }
 
-    public static function getSql( $strType, $arrOptions = [] ) {
+    public static function getSql($strType, $arrOptions = []) {
 
         $arrSql = static::getSqlTypes();
         $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
-
         if ( is_array($arrRole) && !empty($arrRole) ) {
             if ($arrRole['sql']) {
                 return $arrRole['sql'];
             }
             switch ($arrRole['type']) {
+                case 'int':
                 case 'id':
                     return $arrSql['i10'];
                 case 'gallery':
                     return $arrSql['blob'];
+                case 'float':
+                    return $arrSql['float'];
             }
         }
 
