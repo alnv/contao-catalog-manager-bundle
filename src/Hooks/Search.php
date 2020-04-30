@@ -6,44 +6,42 @@ use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
 class Search {
 
-    public function getSearchablePages( $arrPages, $intRoot = 0, $blnIsSitemap = false ) {
+    public function getSearchablePages($arrPages, $intRoot=0, $blnIsSitemap=false) {
 
         $objDatabase = \Database::getInstance();
         $objModules = $objDatabase->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing','1');
 
-        if ( !$objModules->numRows ) {
-
+        if (!$objModules->numRows) {
             return $arrPages;
         }
 
-        while ( $objModules->next() ) {
+        while ($objModules->next()) {
 
             $strTable = $objModules->cmTable;
             $strPage = $objModules->cmMasterPage;
-            $objPage = \PageModel::findWithDetails( $strPage );
-
-            if ( !$strTable || $objPage === null ) {
-
+            if (!$strPage) {
                 continue;
             }
 
-            $arrFilter = $this->parseFilter( $objModules );
-            $objListing = new Listing( $strTable, [
+            $objPage = \PageModel::findWithDetails($strPage);
+            if ( !$strTable || $objPage === null ) {
+                continue;
+            }
+
+            $arrFilter = $this->parseFilter($objModules);
+            $objListing = new Listing($strTable, [
                 'language' => $objPage->language,
                 'column' => $arrFilter['column'],
                 'value' => $arrFilter['value']
             ]);
 
-            foreach ( $objListing->parse() as $arrEntity ) {
-
+            foreach ($objListing->parse() as $arrEntity) {
                 $strAlias = $arrEntity['alias'];
-
                 if ( !$strAlias ) {
-
                     continue;
                 }
-
-                $arrPages[] = $objPage->getAbsoluteUrl( '/' . $strAlias );
+                var_dump($strAlias);
+                $arrPages[] = $objPage->getAbsoluteUrl('/'.$strAlias);
             }
         }
 
