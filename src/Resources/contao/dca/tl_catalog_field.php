@@ -152,7 +152,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getRoles' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getRoles'],
             'search' => true,
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']

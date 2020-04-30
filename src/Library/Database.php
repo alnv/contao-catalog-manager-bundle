@@ -2,26 +2,20 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-
 class Database {
 
-
     protected $objDatabase = null;
-
 
     public function __construct() {
 
         if ( $this->objDatabase === null ) {
-
             $this->objDatabase = \Database::getInstance();
         }
     }
 
-
     public function createTableIfNotExist( $strTable ) {
 
         if ( $this->objDatabase->tableExists( $strTable, true ) ) {
-
             return false;
         }
 
@@ -41,33 +35,25 @@ class Database {
         return true;
     }
 
-
     public function createCustomFieldsIfNotExists( $strTable ) {
 
         if ( !$this->objDatabase->tableExists( $strTable, true ) ) {
-
             return null;
         }
 
         if ( is_array( $GLOBALS['CM_CUSTOM_FIELDS'] ) && !empty( $GLOBALS['CM_CUSTOM_FIELDS'] ) ) {
-
             foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strField => $arrField ) {
-
                 if ( isset( $arrField['table'] ) && $arrField['table'] !== $strTable ) {
-
                     continue;
                 }
-
-                $this->createFieldIfNotExist( $strField, $strTable, $arrField['sql'] );
+                $this->createFieldIfNotExist($strField, $strTable, $arrField['sql']);
             }
         }
     }
 
-
     public function renameTable( $strOldTable, $strNewTable ) {
 
         if ( $this->objDatabase->tableExists( $strNewTable, true ) ) {
-
             return false;
         }
 
@@ -76,11 +62,9 @@ class Database {
         return true;
     }
 
-
     public function deleteTable( $strTable ) {
 
         if ( !$this->objDatabase->tableExists( $strTable ) ) {
-
             return false;
         }
 
@@ -89,11 +73,9 @@ class Database {
         return true;
     }
 
-
     public function createFieldIfNotExist( $strField, $strTable, $strSql ) {
 
         if ( $this->objDatabase->fieldExists( $strField, $strTable, true ) ) {
-
             return false;
         }
 
@@ -101,7 +83,6 @@ class Database {
 
         return true;
     }
-
 
     public function renameFieldname( $strOldField, $strNewField, $strTable, $strSql ) {
 
@@ -119,7 +100,6 @@ class Database {
 
         return true;
     }
-
 
     public function changeFieldType( $strField, $strTable, $strSql ) {
 
