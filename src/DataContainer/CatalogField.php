@@ -89,14 +89,19 @@ class CatalogField {
             return $strFieldname;
         }
 
-        if ( $strFieldname != $objDataContainer->activeRecord->fieldname && $objDataContainer->activeRecord->fieldname ) {
+        if ($objDataContainer->activeRecord->fieldname && $strFieldname != $objDataContainer->activeRecord->fieldname) {
             if ( !$objDatabaseBuilder->renameFieldname( $objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql ) ) {
                 throw new \Exception( sprintf( 'fieldname "%s" already exists in %s.', $strFieldname, $strTable ) );
             }
         }
 
-        if ( !$objDatabaseBuilder->createFieldIfNotExist( $strFieldname, $strTable, $strSql ) && !$objDataContainer->activeRecord->fieldname ) {
-            throw new \Exception( sprintf( 'fieldname "%s" already exists in %s.', $strFieldname, $strTable ) );
+        $objCatalogField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findBy(
+            ['tl_catalog_field.pid=?', 'tl_catalog_field.id!=?', 'tl_catalog_field.fieldname=?'],
+            [$arrActiveRecord['pid'], $arrActiveRecord['id'], $strFieldname]
+        );
+
+        if ($objCatalogField !== null && !$objDatabaseBuilder->createFieldIfNotExist( $strFieldname, $strTable, $strSql ) && !$objDataContainer->activeRecord->fieldname) {
+            throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
         }
 
         return $strFieldname;

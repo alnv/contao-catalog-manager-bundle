@@ -29,6 +29,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['flagField'] = [ 'Sortierfeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['sortingType'] = [ 'Sortierung', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['order'] = [ 'Sortierfelder', 'Eines oder mehrere Felder, anhand derer die Tabelle sortiert wird.' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'GeoCoding aktivieren', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint'] = 'Es können nur leere Tabellen verschoben werden.';
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
     'fixed' => 'Feste Sortierung',

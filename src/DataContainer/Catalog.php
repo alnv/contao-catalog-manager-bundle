@@ -16,6 +16,21 @@ class Catalog {
         return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] );
     }
 
+    public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes){
+
+        if (!$arrRow['table']) {
+            return '';
+        }
+
+        $objEntities = \Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'] )->limit(1)->execute();
+
+        if ($objEntities->numRows) {
+            return '<a title="'. \StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) .'">' . \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';
+        }
+
+        return '<a href="' . \Backend::addToUrl($href . '&amp;id=' . $arrRow['id']) . '" title="' . \StringUtil::specialchars($strTitle) . '"' . $attributes . '>' . \Image::getHtml($strIcon, $strLabel) . '</a> ';
+    }
+
     public function getDataContainers() {
 
         return $GLOBALS['CM_DATA_CONTAINERS'];

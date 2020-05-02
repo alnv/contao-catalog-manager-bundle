@@ -7,8 +7,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'tl_catalog_field'
         ],
         'onsubmit_callback' => [
-            [ 'catalogmanager.datacontainer.catalog', 'generateModulename' ],
-            [ 'catalogmanager.datacontainer.catalog', 'createCustomFields' ]
+            ['catalogmanager.datacontainer.catalog', 'generateModulename'],
+            ['catalogmanager.datacontainer.catalog', 'createCustomFields']
         ],
         'ondelete_callback' => [
             [ 'catalogmanager.datacontainer.catalog', 'deleteTable' ]
@@ -43,7 +43,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',
                 'icon' => 'cut.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset()"'
+                'attributes' => 'onclick="Backend.getScrollOffset()"',
+                'button_callback' => ['\Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog', 'getCutOperationButton']
             ],
             'delete' => [
                 'href' => 'act=delete',
