@@ -34,7 +34,7 @@ const AsyncImageComponent = Vue.component( 'async-image', {
             if ( this.sticky.hasOwnProperty('marginTop') ) {
                 this.$el.setAttribute('data-margin-top', this.sticky['marginTop']);
             }
-            new Sticky(this.$el);
+            new Sticky('.async-image-component');
         }
     },
     watch: {
@@ -81,7 +81,7 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         }
     },
     template:
-        '<div class="async-image-component">' +
+        '<div class="async-image-component" ref="image">' +
             '<slot>' +
                 '<div class="ce_image block">' +
                     '<figure v-if="src"><img :src="src" :alt="alt"></figure>' +
