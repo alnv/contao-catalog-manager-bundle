@@ -22,7 +22,7 @@ class Catalog {
             return '';
         }
 
-        $objEntities = \Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'] )->limit(1)->execute();
+        $objEntities = \Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'])->limit(1)->execute();
 
         if ($objEntities->numRows) {
             return '<a title="'. \StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) .'">' . \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';

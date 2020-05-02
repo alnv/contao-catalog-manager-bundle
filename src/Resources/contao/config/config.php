@@ -46,6 +46,7 @@ $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'g
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = ['catalogmanager.hooks.element', 'isVisibleElement'];
 $GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget','getAttributesFromDca'];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePages'];
+$GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePagesByPagesRoles'];
 $GLOBALS['TL_HOOKS']['generateBreadcrumb'][] = ['catalogmanager.hooks.breadcrumb', 'generateDetailPage'];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'initializeBackendModules'];
 $GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'generateDataContainerArray'];
@@ -301,5 +302,9 @@ $GLOBALS['CM_ROLES'] = [
     'integer' => [
         'group' => 'number',
         'type' => 'int'
+    ],
+    'pages' => [
+        'group' => 'product',
+        'type' => 'array'
     ]
 ];

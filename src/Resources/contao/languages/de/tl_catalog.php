@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['dataContainer'] = [ 'Data Container auswähle
 $GLOBALS['TL_LANG']['tl_catalog']['headerFields'] = [ 'Header-Felder', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['flagField'] = [ 'Sortierfeld', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['sortingType'] = [ 'Sortierung', '' ];
+$GLOBALS['TL_LANG']['tl_catalog']['validAliasCharacters'] = [ 'Gültige Alias-Zeichen', 'Hier können Sie einen individuellen Zeichensatz für automatisch erstellte Aliase auswählen.' ];
 $GLOBALS['TL_LANG']['tl_catalog']['order'] = [ 'Sortierfelder', 'Eines oder mehrere Felder, anhand derer die Tabelle sortiert wird.' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'GeoCoding aktivieren', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint'] = 'Es können nur leere Tabellen verschoben werden.';

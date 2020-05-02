@@ -50,11 +50,8 @@ class CatalogField {
             case 'date':
 
                 $arrDateRoles = [];
-
                 foreach ( $GLOBALS['CM_ROLES'] as $strRole => $arrRole ) {
-
                     if ( $arrRole['group'] == 'date' ) {
-
                         $arrDateRoles[] = $strRole;
                     }
                 }

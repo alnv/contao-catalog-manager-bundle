@@ -6,6 +6,41 @@ use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
 class Search {
 
+    public function getSearchablePagesByPagesRoles($arrPages, $intRoot=0, $blnIsSitemap=false) {
+
+        $objCatalogFields = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findAll([
+            'column' => ['tl_catalog_field.role=?'],
+            'value' => ['pages']
+        ]);
+        if ($objCatalogFields === null) {
+            return $arrPages;
+        }
+
+        while ($objCatalogFields->next()) {
+            $strFieldname = $objCatalogFields->fieldname;
+            if (!$strFieldname) {
+                continue;
+            }
+            $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findAll(['tl_catalog.id=?'], [$objCatalogFields->pid]);
+            if ($objCatalog === null) {
+                continue;
+            }
+            $strTable = $objCatalog->table;
+            if (!$strTable) {
+                continue;
+            }
+            $objListing = new Listing($strTable, []);
+            foreach ($objListing->parse() as $arrEntity) {
+                if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
+                    foreach ($arrEntity[$strFieldname] as $arrUrls) {
+                        $arrPages[] = $arrUrls['absolute'];
+                    }
+                }
+            }
+        }
+        return $arrPages;
+    }
+
     public function getSearchablePages($arrPages, $intRoot=0, $blnIsSitemap=false) {
 
         $objDatabase = \Database::getInstance();
@@ -24,7 +59,7 @@ class Search {
             }
 
             $objPage = \PageModel::findWithDetails($strPage);
-            if ( !$strTable || $objPage === null ) {
+            if (!$strTable || $objPage === null) {
                 continue;
             }
 
@@ -40,7 +75,6 @@ class Search {
                 if ( !$strAlias ) {
                     continue;
                 }
-                var_dump($strAlias);
                 $arrPages[] = $objPage->getAbsoluteUrl('/'.$strAlias);
             }
         }

@@ -11,7 +11,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ['catalogmanager.datacontainer.catalog', 'createCustomFields']
         ],
         'ondelete_callback' => [
-            [ 'catalogmanager.datacontainer.catalog', 'deleteTable' ]
+            ['catalogmanager.datacontainer.catalog', 'deleteTable']
         ],
         'sql' => [
             'keys' => [
@@ -68,7 +68,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     'palettes' => [
         '__selector__' => [ 'type', 'mode', 'sortingType' ],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
+        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
         'modifier' => '{type_settings},type;{general_settings},name;'
     ],
     'subpalettes' => [
@@ -167,6 +167,21 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDataContainers' ],
             'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => 'Table']
+        ],
+        'validAliasCharacters' => [
+            'inputType' => 'select',
+            'default' => '0-9a-zA-Z',
+            'eval' => [
+                'includeBlankOption' => true,
+                'decodeEntities' => true,
+                'chosen' => true,
+                'tl_class' => 'w50'
+            ],
+            'options_callback' => static function() {
+                return \System::getContainer()->get('contao.slug.valid_characters')->getOptions();
+            },
+            'exclude' => true,
+            'sql' => "varchar(255) NOT NULL default '0-9a-zA-Z'"
         ],
         'mode' => [
             'inputType' => 'select',

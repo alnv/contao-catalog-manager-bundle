@@ -206,7 +206,7 @@ class Toolkit {
         return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
 
-    public static function parseCatalogValue( $varValue, $arrField, $arrValues = [], $blnStringFormat = false, $blnFastMode = false ) {
+    public static function parseCatalogValue( $varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false ) {
 
         if ( $varValue === '' || $varValue === null ) {
             return $varValue;
@@ -253,7 +253,23 @@ class Toolkit {
                 return [];
                 break;
             case 'pageTree':
-                return ''; // @todo parse url
+                if (!$varValue) {
+                    return '';
+                }
+                $arrValues = [];
+                $varValue = explode(',', $varValue);
+                foreach ($varValue as $strPageId) {
+                    $objPage = \PageModel::findByPk($strPageId);
+                    if ($objPage === null) {
+                        continue;
+                    }
+                    $arrValues[$strPageId] = [
+                        'url' => $objPage->getFrontendUrl(),
+                        'master' => $objPage->getFrontendUrl('/'.$arrCatalog['alias']),
+                        'absolute' => $objPage->getAbsoluteUrl('/'.$arrCatalog['alias'])
+                    ];
+                }
+                return $arrValues;
                 break;
         }
 
@@ -368,8 +384,17 @@ class Toolkit {
             return md5(time());
         }
 
+        $strValidChars = 'a-zA-Z0-9';
+        $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
+        if ($objCatalog === null) {
+            return md5(time());
+        }
+        if ($objCatalog->validAliasCharacters) {
+            $strValidChars = $objCatalog->validAliasCharacters;
+        }
+
         $objSlugGenerator = new \Ausi\SlugGenerator\SlugGenerator((new \Ausi\SlugGenerator\SlugOptions)
-            ->setValidChars('a-zA-Z0-9')
+            ->setValidChars($strValidChars)
             ->setLocale('de')
             ->setDelimiter('_'));
         $strValue = $objSlugGenerator->generate($strValue);
