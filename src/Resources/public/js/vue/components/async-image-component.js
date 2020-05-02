@@ -21,7 +21,7 @@ const AsyncImageComponent = Vue.component( 'async-image', {
                     this.src = objResponse.body.src;
                     this.alt = objResponse.body.alt;
                 }
-            });
+            }.bind(this));
         },
         onChange: function () {
             //
