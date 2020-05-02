@@ -6,6 +6,13 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
 class Catalog {
 
+    public function addIcon($arrRow, $strLabel, \DataContainer $objDataContainer=null, $strAttributes='', $blnReturnImage=false, $blnProtected=false) {
+
+        $strIcon = 'bundles/alnvcontaoassetsmanager/icons/'. ($arrRow['pid'] ? 'sub' : '') .'module-icon.svg';
+        $strAttributes .= 'class="resize-image"';
+        return \Image::getHtml($strIcon, $strLabel, $strAttributes) . ' '. $strLabel .'<span style="color:#999;padding-left:3px">['. $arrRow['table'] .']</span>';
+    }
+
     public function getCatalogTypes() {
 
         return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] );

@@ -12,12 +12,6 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_option'
             ]
         ],
-        'catalog-option' => [
-            'name' => 'catalog-option-bundle',
-            'tables' => [
-                'tl_catalog_option'
-            ]
-        ],
         'catalog-element' => [
             'name' => 'catalog-element-bundle',
             'tables' => [

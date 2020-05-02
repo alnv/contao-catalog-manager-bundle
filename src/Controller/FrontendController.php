@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Controller;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -17,16 +18,16 @@ class FrontendController extends Controller {
     /**
      *
      * @Route("/view-listing/{module}/{page}", name="view-listing")
-     * @Method({"GET"})
+     * @Method({"POST"})
      */
     public function getViewListing( $module, $page ) {
         global $objPage;
         $objPage = \PageModel::findByPK( $page )->loadDetails();
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
-        $strListing = \Controller::getFrontendModule( $module );
-        $strListing = \Controller::replaceInsertTags( $strListing );
-        return new JsonResponse([ 'template' => $strListing ]);
+        $strListing = \Controller::getFrontendModule($module);
+        $strListing = \Controller::replaceInsertTags($strListing);
+        return new JsonResponse(['template' => Toolkit::compress($strListing)]);
     }
 
     /**
@@ -34,7 +35,7 @@ class FrontendController extends Controller {
      * @Route("/view-map/{module}/{page}", name="view-map")
      * @Method({"GET"})
      */
-    public function getViewMap( $module, $page ) {
+    public function getViewMap($module, $page) {
         global $objPage;
         $objPage = \PageModel::findByPK( $page )->loadDetails();
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
@@ -58,7 +59,7 @@ class FrontendController extends Controller {
             'alias' => \Input::post('id'),
             'id' => '1'
         ]);
-        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance( \Input::post('table'), $objEntity->parse()[0] );
+        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(\Input::post('table'), $objEntity->parse()[0]);
         $arrImage = $objRoleResolver->getValueByRole(\Input::post('role'));
         if ( is_array( $arrImage ) && !empty( $arrImage ) ) {
             $arrReturn['src'] = $arrImage[0]['img']['srcset'];

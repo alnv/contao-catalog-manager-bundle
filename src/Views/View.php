@@ -5,7 +5,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Views;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
-use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 
 abstract class View extends \Controller {
 
@@ -20,7 +19,7 @@ abstract class View extends \Controller {
 
         $this->strTable = $strTable;
         $this->initializeDataContainer();
-        $this->dcaExtractor = new DcaExtractor( $strTable );
+        $this->dcaExtractor = new \Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor($strTable);
 
         foreach ( $arrOptions as $strName => $varValue ) {
             switch ( $strName ) {
@@ -171,11 +170,11 @@ abstract class View extends \Controller {
     protected function initializeDataContainer() {
 
         $objApplication = new Application();
-        $objApplication->initializeDataContainerArrayByTable( $this->strTable );
+        $objApplication->initializeDataContainerArrayByTable($this->strTable);
 
-        if ( !isset( $GLOBALS['TL_DCA'][ $this->strTable ] ) ) {
+        if (!isset($GLOBALS['TL_DCA'][ $this->strTable ])) {
 
-            \Controller::loadDataContainer( $this->strTable );
+            \Controller::loadDataContainer($this->strTable);
         }
     }
 
@@ -185,15 +184,27 @@ abstract class View extends \Controller {
         $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language' ];
 
         foreach ( $arrOptions as $strOption ) {
-            if ( isset( $this->arrOptions[ $strOption ] ) ) {
-                $arrReturn[ $strOption ] = $this->arrOptions[ $strOption ];
+            if ( isset($this->arrOptions[ $strOption ])) {
+                $arrReturn[$strOption] = $this->arrOptions[$strOption];
+            }
+        }
+
+        if ($this->dcaExtractor->hasVisibility() == true && !$this->arrOptions['ignoreVisibility']) {
+            if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
+                $arrReturn['column'] = [];
+            }
+            $blnIsPreview = defined('BE_USER_LOGGED_IN') && BE_USER_LOGGED_IN === true;
+            if (!$blnIsPreview) {
+                $intTime = \Date::floorToMinute();
+                $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
+                $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
             }
         }
 
         if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
             foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
                 $this->import( $arrCallback[0] );
-                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrReturn, $this->strTable, $this->arrOptions );
+                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);
             }
         }
 
@@ -314,7 +325,7 @@ abstract class View extends \Controller {
             foreach ( $GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback ) {
 
                 $this->import( $arrCallback[0] );
-                $this->{$arrCallback[0]}->{$arrCallback[1]}( $this->arrEntities, $this );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrEntities, $this);
             }
         }
 

@@ -52,14 +52,16 @@ class Listing extends \Module {
         $this->setDistance();
         $this->setMasterPage();
         $this->setPagination();
+        $this->setIgnoreVisibility();
 
-        // @todo check visibility by data container >hasVisibilityFields<
-        // @todo impl optional visibility parameter
-        // @todo add visibility query in View Class
-
-        $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing( $this->cmTable, $this->arrOptions );
+        $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->cmTable, $this->arrOptions);
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();
+    }
+
+    protected function setIgnoreVisibility() {
+
+        $this->arrOptions['ignoreVisibility'] = $this->cmIgnoreVisibility ? true : false;
     }
 
     protected function setDistance() {

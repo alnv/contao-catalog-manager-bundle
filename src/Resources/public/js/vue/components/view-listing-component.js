@@ -2,7 +2,6 @@ const viewListingComponent = Vue.component( 'view-listing', {
     data: function () {
         return {
             view: null,
-            // shareData: [],
             parameters: {
                 reload: 0,
                 order: {}
@@ -14,9 +13,10 @@ const viewListingComponent = Vue.component( 'view-listing', {
             if (!strUrl) {
                 strUrl = '/catalog-manager/view-listing/' + this.module + '/' + this.page;
             }
-            this.$http.get( strUrl, {
-                params: this.parameters
-            }).then(function ( objResponse ) {
+            this.$http.post( strUrl, this.parameters, {
+                emulateJSON: true,
+                'Content-Type': 'application/x-www-form-urlencoded'
+                }).then(function ( objResponse ) {
                 if ( objResponse.body && objResponse.ok ) {
                     this.view = objResponse.body.template;
                     this.$parent.clearAlert();

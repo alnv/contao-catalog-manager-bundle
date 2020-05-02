@@ -16,11 +16,11 @@ class ActiveInsertTag {
 
             $strDefault = null;
             $blnUseDefault = false;
-            $varValue = Toolkit::getValueFromUrl( \Input::get( $arrFragments[1] ) ); // @todo post
+            $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
 
             if ( isset( $arrFragments[2] ) && strpos( $arrFragments[2], '?' ) !== false ) {
 
-                $arrParams = Toolkit::parseParametersFromString( $arrFragments[2] );
+                $arrParams = Toolkit::parseParametersFromString($arrFragments[2]);
 
                 foreach ( $arrParams as $strParam ) {
 

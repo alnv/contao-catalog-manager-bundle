@@ -25,10 +25,13 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     'list' => [
         'sorting' => [
             'mode' => 5,
-            'panelLayout' => 'filter;sort,search,limit'
+            'icon' => '/bundles/alnvcontaoassetsmanager/icons/model-icon.svg',
+            'panelLayout' => 'filter;sort,search'
         ],
         'label' => [
-            'fields' => ['name']
+            'fields' => ['name'],
+            'format' => '%s',
+            'label_callback' => ['catalogmanager.datacontainer.catalog', 'addIcon']
         ],
         'operations' => [
             'edit' => [
@@ -38,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'fields' => [
                 'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_field',
-                'icon' => 'edit.gif'
+                'icon' => '/bundles/alnvcontaoassetsmanager/icons/fields-icon.svg'
             ],
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',

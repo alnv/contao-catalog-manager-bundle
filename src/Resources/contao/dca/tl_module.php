@@ -11,7 +11,7 @@ $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilterType_wizard'] = 'cmWizar
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmTemplate;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmInfoContent;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmMaster,cmFilter,cmIgnoreVisibility,cmPagination,cmLimit,cmOffset,cmInfoContent;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'inputType' => 'select',
@@ -40,6 +40,15 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'sql' => "varchar(255) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
+    'inputType' => 'checkbox',
+    'eval' => [
+        'multiple' => false,
+        'tl_class' => 'clr'
+    ],
+    'exclude' => true,
+    'sql' => "char(1) NOT NULL default ''"
+];
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreVisibility'] = [
     'inputType' => 'checkbox',
     'eval' => [
         'multiple' => false,

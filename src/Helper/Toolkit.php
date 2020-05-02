@@ -18,6 +18,22 @@ class Toolkit {
         return $varValue;
     }
 
+    public static function compress($strTemplate) {
+
+        $strTemplate = str_replace(["\r\n", "\r"], "\n", $strTemplate);
+        $arrLines = explode("\n", $strTemplate);
+        $arrNewLines = [];
+        foreach ($arrLines as $strLine) {
+            if(!empty($strLine))
+                $arrNewLines[] = trim($strLine);
+        }
+        return implode($arrNewLines);
+    }
+
+    public static function getFilterValue($strField) {
+        return \Input::get($strField) ?: \Input::post($strField);
+    }
+
     public static function getSqlTypes() {
 
         return [
