@@ -402,11 +402,10 @@ class Toolkit {
 
         $strValidChars = 'a-zA-Z0-9';
         $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
-        if ($objCatalog === null) {
-            return md5(time());
-        }
-        if ($objCatalog->validAliasCharacters) {
-            $strValidChars = $objCatalog->validAliasCharacters;
+        if ($objCatalog !== null) {
+            if ($objCatalog->validAliasCharacters) {
+                $strValidChars = $objCatalog->validAliasCharacters;
+            }
         }
 
         $objSlugGenerator = new \Ausi\SlugGenerator\SlugGenerator((new \Ausi\SlugGenerator\SlugOptions)
