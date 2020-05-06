@@ -22,6 +22,23 @@ class DynModel extends \Model {
         parent::__construct($objResult);
     }
 
+    public static function findByIdOrAlias($varId, array $arrOptions=[]) {
+
+        $t = static::$strTable;
+        if (!isset($arrOptions['column']) && !is_array($arrOptions['column'])) {
+            $arrOptions['column'] = [];
+        }
+        if (!isset($arrOptions['value']) && !is_array($arrOptions['value'])) {
+            $arrOptions['value'] = [];
+        }
+        $arrOptions['column'][] = !preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
+        $arrOptions['value'][] = $varId;
+        $arrOptions['limit'] = 1;
+        $arrOptions['return'] = 'Model';
+
+        return static::find($arrOptions);
+    }
+
     protected static function buildFindQuery( array $arrOptions ) {
 
         $objBase = \DcaExtractor::getInstance( $arrOptions['table'] );
