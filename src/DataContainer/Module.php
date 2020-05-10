@@ -9,7 +9,7 @@ class Module {
         return (new \Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog())->getTables();
     }
 
-    public function getFields( $dc = null ) {
+    public function getFields($dc = null) {
 
         $arrReturn = [];
 
@@ -21,14 +21,13 @@ class Module {
             return $arrReturn;
         }
 
-        \System::loadLanguageFile($dc->activeRecord->cmTable);
+        \System::loadLanguageFile($dc->activeRecord->cmTable, \Input::post('language'));
         \Controller::loadDataContainer($dc->activeRecord->cmTable);
 
-        foreach ( $GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField ) {
+        foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
 
-            $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
+            $arrReturn[$strField] = is_array($arrField['label']) ? $arrField['label'][0] : $strField;
         }
-
         return $arrReturn;
     }
 

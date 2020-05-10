@@ -101,16 +101,16 @@ class Catalog extends CatalogWizard {
             ],
             'tstamp' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.tstamp', $GLOBALS['TL_LANG']['MSC']['tstamp'][0] ),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.tstamp', $GLOBALS['TL_LANG']['MSC']['tstamp'][1] )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.tstamp', $GLOBALS['TL_LANG']['MSC']['tstamp']),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.tstamp', '')
                 ],
                 'flag' => 6,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'published' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.published', $GLOBALS['TL_LANG']['MSC']['published'][0] ),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.published', $GLOBALS['TL_LANG']['MSC']['published'][1] )
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.published', $GLOBALS['TL_LANG']['MSC']['published']),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.published', '')
                 ],
                 'inputType' => 'checkbox',
                 'eval' => [
