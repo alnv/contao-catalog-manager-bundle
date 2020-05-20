@@ -6,6 +6,11 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 class Toolkit {
 
+    public static function getLabel($strItem) {
+
+        return is_array($GLOBALS['TL_LANG']['MSC'][$strItem]) ? $GLOBALS['TL_LANG']['MSC'][$strItem][0] : $GLOBALS['TL_LANG']['MSC'][$strItem];
+    }
+
     public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {
 
         if ( is_array( $varValue ) ) {
@@ -191,10 +196,10 @@ class Toolkit {
                 $strTemplate .= $strValue;
                 continue;
             }
-            $arrLabels[] = strtoupper( $strField ) . ': ' . $strValue;
+            $arrLabels[] = $strValue;
         }
 
-        $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ', ' ) .')</span>' . '</div>';
+        $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ' - ' ) .')</span>' . '</div>';
 
         return $strTemplate;
     }

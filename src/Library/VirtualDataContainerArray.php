@@ -63,7 +63,6 @@ class VirtualDataContainerArray extends \System {
 
         if ( $this->arrCatalog['sortingType'] ) {
             if ( $this->arrCatalog['sortingType'] == 'fixed' ) {
-
                 $arrList['sorting']['mode'] = 1;
                 $arrList['sorting']['flag'] = (int) $this->arrCatalog['flag'];
                 $arrList['sorting']['fields'] = [ $this->arrCatalog['flagField'] ];
@@ -75,37 +74,30 @@ class VirtualDataContainerArray extends \System {
             }
 
             if ( $this->arrCatalog['sortingType'] == 'switchable' ) {
-
                 $arrSortingFields = [];
                 $arrList['sorting']['mode'] = 2;
                 $arrList['sorting']['fields'] = [];
 
                 foreach ( $this->arrCatalog['order'] as $arrOrder ) {
-
                     if ( isset( $arrOrder['field'] ) && $arrOrder['field'] ) {
-
                         $arrList['sorting']['fields'][] = $arrOrder['field'] . ( $arrOrder['order'] ? ' ' . $arrOrder['order'] : '' );
                         $arrSortingFields[] = $arrOrder['field'];
                     }
                 }
 
                 if ( empty( $arrList['labels']['fields'] ) ) {
-
                     $arrList['labels']['fields'] = $arrSortingFields;
                 }
             }
         }
 
         if ( count( $arrList['labels']['fields'] ) > 1 && !$arrList['labels']['showColumns'] ) {
-
             $arrList['labels']['label_callback'] = function ( $arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false  ) use ( $arrList ) {
-
                 return Toolkit::renderRow( $arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields );
             };
         }
 
         if ( $this->arrCatalog['mode'] == 'parent' ) {
-
             $arrList['sorting']['mode'] = 4;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] =  function ( $arrRow ) use ( $arrList ) {
@@ -116,7 +108,6 @@ class VirtualDataContainerArray extends \System {
         }
 
         if ( $this->arrCatalog['mode'] == 'tree' ) {
-
             $arrList['sorting']['mode'] = 5;
             $arrList['sorting']['fields'] = ['sorting'];
             $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon
@@ -141,7 +132,6 @@ class VirtualDataContainerArray extends \System {
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['sorting'] = $arrList['sorting'];
 
         if ( $this->arrCatalog['enableCopy'] ) {
-
             array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, [
                 'copy' => [
                     'href' => 'act=copy',
@@ -151,7 +141,6 @@ class VirtualDataContainerArray extends \System {
         }
 
         if ( $this->arrCatalog['enableVisibility'] ) {
-
             array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], count( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'] ) - 1, [
                 'toggle' => [
                     'icon' => 'visible.gif',
@@ -304,9 +293,9 @@ class VirtualDataContainerArray extends \System {
         $this->setFields();
         $this->setLabels();
 
-        if ( isset( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) && is_array( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback ) {
-                $this->import( $arrCallback[0] );
+        if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
+            foreach ($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback) {
+                $this->import($arrCallback[0]);
                 $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrCatalog['table'], $this);
             }
         }
