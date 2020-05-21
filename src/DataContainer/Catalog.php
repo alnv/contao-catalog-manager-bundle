@@ -20,7 +20,7 @@ class Catalog {
 
     public function getSortingTypes() {
 
-        return array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] );
+        return array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType']);
     }
 
     public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes){

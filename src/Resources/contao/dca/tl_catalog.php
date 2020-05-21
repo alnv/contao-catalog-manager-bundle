@@ -76,7 +76,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     ],
     'subpalettes' => [
         'sortingType_fixed' => 'flagField,flag',
-        'sortingType_switchable' => 'order,flag',
+        'sortingType_switchable' => 'order',
+        'sortingType_none' => '',
         'mode_list' => 'sortingType,columns,showColumns',
         'mode_parent' => 'headerFields,sortingType,columns',
         'mode_tree'=> 'columns'
@@ -285,7 +286,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'chosen' => true,
                 'maxlength' => 32,
                 'tl_class' => 'w50',
-                'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
             'exclude' => true,

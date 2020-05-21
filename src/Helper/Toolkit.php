@@ -174,12 +174,12 @@ class Toolkit {
             }, $arrOrder ) ) );
     }
 
-    public static function renderRow( $arrRow, $arrLabelFields, $arrCatalog, $arrFields ) {
+    public static function renderRow($arrRow, $arrLabelFields, $arrCatalog, $arrFields) {
 
         $arrColumns = [];
 
         foreach ( $arrLabelFields as $strField ) {
-            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
+            $arrColumns[$strField] = static::parseCatalogValue($arrRow[ $strField ], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
         }
 
         if ( count( $arrColumns ) < 2 ) {

@@ -33,6 +33,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'GeoCoding aktivieren',
 $GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint'] = 'Es können nur leere Tabellen verschoben werden.';
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
+    'none' => 'Keine Sortierung',
     'fixed' => 'Feste Sortierung',
     'switchable' => 'Variable Sortierung'
 ];
