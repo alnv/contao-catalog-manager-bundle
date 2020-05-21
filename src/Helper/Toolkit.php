@@ -227,7 +227,7 @@ class Toolkit {
         return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
 
-    public static function parseCatalogValue( $varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false ) {
+    public static function parseCatalogValue($varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false) {
 
         if ( $varValue === '' || $varValue === null ) {
             return $varValue;
@@ -256,6 +256,10 @@ class Toolkit {
                     return Image::getUuids($varValue);
                 }
                 $strSizeId = null;
+                $arrOrderField = [];
+                if ($arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
+                    $arrOrderField = Image::getUuids($arrCatalog[$arrField['orderField']]);
+                }
                 if (isset( $arrField['imageSize'] ) && $arrField['imageSize']) {
                     $strSizeId = $arrField['imageSize'];
                 }
@@ -263,13 +267,15 @@ class Toolkit {
                     return Image::getImage($varValue, $strSizeId);
                 }
                 if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
-                    return Image::getImage($varValue, $strSizeId); // @todo order by
+                    $arrImages = [];
+                    return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
                 if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
-                    return Image::getImage($varValue, $strSizeId);
+                    $arrImages = [];
+                    return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
                 if ( isset($arrField['isFile']) && $arrField['isFile'] === true) {
-                    return File::getFile($varValue); // @todo order by
+                    return File::getFile($varValue);
                 }
                 return [];
                 break;
