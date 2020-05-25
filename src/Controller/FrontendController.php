@@ -20,14 +20,14 @@ class FrontendController extends Controller {
      * @Route("/view-listing/{module}/{page}", name="view-listing")
      * @Method({"POST"})
      */
-    public function getViewListing( $module, $page ) {
+    public function getViewListing($module, $page) {
         global $objPage;
-        $objPage = \PageModel::findByPK( $page )->loadDetails();
+        $objPage = \PageModel::findByPK($page)->loadDetails();
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
         $strListing = \Controller::getFrontendModule($module);
         $strListing = \Controller::replaceInsertTags($strListing);
-        return new JsonResponse(['template' => Toolkit::compress($strListing)]);
+        return new JsonResponse(['template' => Toolkit::compress($strListing), 'limit' => \Cache::get('limit_' . $module), 'max' => (\Cache::get('max_' . $module) ? true : false)]);
     }
 
     /**
@@ -40,8 +40,8 @@ class FrontendController extends Controller {
         $objPage = \PageModel::findByPK( $page )->loadDetails();
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
-        $strListing = \Controller::getFrontendModule( $module );
-        return new JsonResponse([ 'locations' => $strListing ]);
+        $strListing = \Controller::getFrontendModule($module);
+        return new JsonResponse(['locations' => $strListing]);
     }
 
     /**

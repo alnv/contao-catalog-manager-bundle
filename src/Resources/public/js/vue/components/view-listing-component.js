@@ -17,18 +17,21 @@ const viewListingComponent = Vue.component( 'view-listing', {
                 emulateJSON: true,
                 'Content-Type': 'application/x-www-form-urlencoded'
                 }).then(function ( objResponse ) {
-                if ( objResponse.body && objResponse.ok ) {
+                if (objResponse.body && objResponse.ok) {
                     this.view = objResponse.body.template;
                     this.$parent.clearAlert();
+                    if (objResponse.body.max && this.reload) {
+                        this.reload = false;
+                    }
                 }
-                if ( !objResponse.ok ) {
+                if (!objResponse.ok) {
                     this.$parent.setErrorAlert( '', this );
                 }
-            });
+            }.bind(this));
         },
         onChange: function (shared) {
             this.addSharedParameters(shared);
-            if ( this.view ) {
+            if (this.view) {
                 this.$parent.setLoadingAlert( '', this );
             }
             this.fetch();

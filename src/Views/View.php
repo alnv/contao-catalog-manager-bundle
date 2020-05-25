@@ -118,8 +118,7 @@ abstract class View extends \Controller {
 
     protected function paginate() {
 
-        if ( !$this->arrOptions['pagination'] && !\Input::get('reload') ) {
-
+        if ( !$this->arrOptions['pagination'] && !\Input::post('reload') ) {
             return null;
         }
 
@@ -128,25 +127,26 @@ abstract class View extends \Controller {
         $arrOptions['limit'] = 0;
         $arrOptions['offset'] = 0;
 
-        $objModel = new ModelWizard( $this->strTable );
+        $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
         $objTotal = $objModel->findAll($arrOptions);
 
         if ( $objTotal !== null ) {
             $numTotal = $objTotal->count();
+            \Cache::set('limit_' . $this->arrOptions['id'], $numTotal);
         }
 
         if ( !$numTotal ) {
             return null;
         }
 
-        if ( \Input::get('reload') ) { // vue reload
+        if (\Input::post('reload')) {
 
-            $intOffset = (int) \Input::get('reload') + 1;
+            $intOffset = (int) \Input::post('reload') + 1;
             $intLimit = $this->arrOptions['limit'] * $intOffset;
-
-            if ( $intLimit > $numTotal ) {
+            if ($intLimit > $numTotal) {
                 $intLimit = $numTotal;
+                \Cache::set('max_' . $this->arrOptions['id'], true);
             }
 
             $this->arrOptions['offset'] = 0;
