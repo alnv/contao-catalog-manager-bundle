@@ -14,7 +14,7 @@ class CatalogModel extends \Model {
         return static::findOneBy( $arrColumns, [ $strIdentifier, $strIdentifier, (int) $strIdentifier ], $arrOptions );
     }
 
-    public static function findChildrenCatalogsById( $strId ) {
+    public static function findChildrenCatalogsById($strId) {
 
         $strT = static::$strTable;
         $objChildTables = \Database::getInstance()
@@ -27,5 +27,17 @@ class CatalogModel extends \Model {
         }
 
         return static::createCollectionFromDbResult( $objChildTables, 'tl_catalog' );
+    }
+
+    public static function findParentCatalogByTable($strTable) {
+
+        $strT = static::$strTable;
+        $objParent = \Database::getInstance()->prepare('SELECT * FROM ' . $strT . ' WHERE id=(SELECT pid FROM '. $strT .' WHERE `table`=? LIMIT 1)')->limit(1)->execute($strTable);
+
+        if ($objParent->numRows < 1) {
+            return null;
+        }
+
+        return static::createCollectionFromDbResult($objParent, 'tl_catalog');
     }
 }

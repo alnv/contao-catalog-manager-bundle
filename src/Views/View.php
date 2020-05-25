@@ -71,6 +71,10 @@ abstract class View extends \Controller {
                     $this->arrOptions['having'] = $varValue;
                     break;
 
+                case 'ignoreVisibility':
+                    $this->arrOptions['ignoreVisibility'] = $varValue;
+                    break;
+
                 case 'order':
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
                     if ( !$this->arrOptions['order'] ) {
@@ -211,7 +215,7 @@ abstract class View extends \Controller {
         return $arrReturn;
     }
 
-    protected function parseEntity( $arrEntity ) {
+    protected function parseEntity($arrEntity) {
 
         $arrRow = [];
         $arrRow['origin'] = [];
@@ -245,6 +249,21 @@ abstract class View extends \Controller {
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
         };
 
+        $arrRow['getParent'] = function () use ($arrRow) {
+
+            if (!isset($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) || !$GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) {
+                return [];
+            }
+
+            $objMaster = new Master($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'], [
+                'alias' => $arrRow['pid'],
+                'ignoreVisibility' => true,
+                'limit' => 1
+            ]);
+
+            return $objMaster->parse()[0];
+        };
+
         $arrRow['getContentElements'] = function () use ( $arrRow ) {
             $strReturn = '';
             $objContent = \ContentModel::findPublishedByPidAndTable($arrRow['id'], $this->strTable);
@@ -252,7 +271,7 @@ abstract class View extends \Controller {
                 return $strReturn;
             }
             while ($objContent->next()) {
-                $strReturn .= $this->getContentElement( $objContent->current() );
+                $strReturn .= $this->getContentElement($objContent->current());
             }
             return $strReturn;
         };
@@ -330,6 +349,16 @@ abstract class View extends \Controller {
         }
 
         return $this->arrEntities;
+    }
+
+    public function getTable() {
+
+        return $this->strTable;
+    }
+
+    public function getModuleId() {
+
+        return $this->arrOptions['id'];
     }
 
     abstract public function parse();
