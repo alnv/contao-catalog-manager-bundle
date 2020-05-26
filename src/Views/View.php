@@ -249,12 +249,51 @@ abstract class View extends \Controller {
             return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
         };
 
-        $arrRow['getParent'] = function () use ($arrRow) {
-
-            if (!isset($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) || !$GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) {
+        $arrRow['getRelated'] = function ($strField) use ($arrRow) {
+            if (!isset($arrRow[$strField]) || empty($arrRow[$strField])) {
+                return [];
+            }
+            if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField])) {
+                return [];
+            }
+            if (!is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation']) || empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'])) {
                 return [];
             }
 
+            $arrColumns = [];
+            $arrValues = [];
+            foreach ($arrRow[$strField] as $varValue) {
+                if (is_string($varValue)) {
+                    $arrValues[] = $varValue;
+                    continue;
+                }
+                if (is_array($varValue) && isset($varValue['value'])) {
+                    $arrValues[] = $varValue['value'];
+                    continue;
+                }
+                $varValue = array_values($varValue);
+                foreach ($varValue as $strValue) {
+                    $arrValues[] = $strValue;
+                }
+            }
+
+            $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
+            foreach ($arrValues as $strValue) {
+                $arrColumns[] = 'FIND_IN_SET(?, '. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
+            }
+            $objList = new Listing($arrRelation['table'], [
+                'ignoreVisibility' => true,
+                'column' => $arrColumns,
+                'value' => $arrValues
+            ]);
+
+            return $objList->parse();
+        };
+
+        $arrRow['getParent'] = function () use ($arrRow) {
+            if (!isset($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) || !$GLOBALS['TL_DCA'][$this->strTable]['config']['ptable']) {
+                return [];
+            }
             $objMaster = new Master($GLOBALS['TL_DCA'][$this->strTable]['config']['ptable'], [
                 'alias' => $arrRow['pid'],
                 'ignoreVisibility' => true,

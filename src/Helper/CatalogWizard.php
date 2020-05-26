@@ -141,6 +141,14 @@ abstract class CatalogWizard extends \System {
                 $objOptions::setParameter( $arrField, $objDataContainer );
                 return $objOptions::getOptions();
             };
+            if ($arrField['optionsSource'] == 'dbOptions') {
+                $arrReturn['relation'] = [
+                    'load' => 'lazy',
+                    'field' => $arrField['dbKey'],
+                    'table' => $GLOBALS['TL_DCA'][$arrField['dbTable']]['config']['_table'] ?: $arrField['dbTable'],
+                    'type' => $blnMultiple ? 'hasMany' : 'hasOne'
+                ];
+            }
         }
 
         switch ($arrField['type']) {
