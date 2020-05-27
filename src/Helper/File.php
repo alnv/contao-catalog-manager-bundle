@@ -55,6 +55,7 @@ class File {
                     'meta' => $arrMeta,
                     'extension' => $objFile->extension,
                     'path' => $objFile->dirname,
+                    'urlpath' => $objFile->path,
                     'filesize'  => \Controller::getReadableSize($objFile->filesize)
                 ];
             }
