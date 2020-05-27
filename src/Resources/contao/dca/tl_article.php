@@ -1,8 +1,9 @@
 <?php
 
 \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addField('cmHideOnDetailPage', 'alias', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
+    ->addField('cmHide', 'author', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->applyToPalette('default','tl_article');
+
 $GLOBALS['TL_DCA']['tl_article']['palettes']['default'] = str_replace('author;', 'author;{catalog_legend},cmContentElement,cmContentElementPosition;', $GLOBALS['TL_DCA']['tl_article']['palettes']['default']);
 
 $GLOBALS['TL_DCA']['tl_article']['fields']['cmContentElement'] = [
@@ -29,11 +30,17 @@ $GLOBALS['TL_DCA']['tl_article']['fields']['cmContentElementPosition'] = [
     'sql' => ['type' => 'string', 'length' => 16, 'default' => 'before']
 ];
 $GLOBALS['TL_DCA']['tl_article']['fields']['cmHideOnDetailPage'] = [
-    'inputType' => 'checkbox',
+    'sql' => "char(1) NOT NULL default ''"
+];
+$GLOBALS['TL_DCA']['tl_article']['fields']['cmHide'] = [
+    'inputType' => 'select',
     'eval' => [
         'multiple' => false,
-        'tl_class' => 'w50 m12'
+        'tl_class' => 'w50',
+        'includeBlankOption' => true
     ],
+    'options' => ['autoitem', 'default'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_article']['reference']['cmHide'],
     'exclude' => true,
-    'sql' => "char(1) NOT NULL default ''"
+    'sql' => "varchar(16) NOT NULL default ''"
 ];
