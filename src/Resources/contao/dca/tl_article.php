@@ -4,7 +4,7 @@
     ->addField('cmHide', 'author', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
     ->applyToPalette('default','tl_article');
 
-$GLOBALS['TL_DCA']['tl_article']['palettes']['default'] = str_replace('author;', 'author;{catalog_legend},cmContentElement,cmContentElementPosition;', $GLOBALS['TL_DCA']['tl_article']['palettes']['default']);
+$GLOBALS['TL_DCA']['tl_article']['palettes']['default'] = str_replace('cmHide;', 'cmHide;{catalog_legend:hide},cmContentElement,cmContentElementPosition;', $GLOBALS['TL_DCA']['tl_article']['palettes']['default']);
 
 $GLOBALS['TL_DCA']['tl_article']['fields']['cmContentElement'] = [
     'inputType' => 'select',
