@@ -14,12 +14,15 @@ class Element {
             return $blnIsVisible;
         }
 
-        if ( $objRequest->get('_scope') == 'frontend' ) {
+        if ($objRequest->get('_scope') == 'frontend') {
             if ($objElement->cmHideOnDetailPage && $_GET['auto_item']) { // backwards
                 return false;
             }
+            if (!$objElement->cmHide) {
+                return $blnIsVisible;
+            }
             switch ($objElement->cmHide) {
-                case 'autoItem':
+                case 'autoitem':
                     if ($_GET['auto_item']) {
                         return false;
                     }
