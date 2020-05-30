@@ -167,19 +167,31 @@ class Toolkit {
 
         $arrColumns = [];
 
-        foreach ( $arrLabelFields as $strField ) {
+        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField']) {
+            if (!in_array($arrCatalog['flagField'], $arrColumns)) {
+                $arrLabelFields[] = $arrCatalog['sortingType'] !== 'none' ? $arrCatalog['flagField'] : '-';
+            }
+        }
+
+        foreach ($arrLabelFields as $strField) {
+
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[ $strField ], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
         }
 
-        if ( count( $arrColumns ) < 2 ) {
-            return array_values( $arrColumns )[0];
+        if ($arrCatalog['showColumns']) {
+
+            return $arrColumns;
+        }
+
+        if (count($arrColumns) < 2) {
+            return array_values($arrColumns)[0];
         }
 
         $intIndex = -1;
         $arrLabels = [];
         $strTemplate = '<div class="tl_content_left">';
 
-        foreach ( $arrColumns as $strField => $strValue ) {
+        foreach ($arrColumns as $strField => $strValue) {
             $intIndex += 1;
             if ( !$intIndex ) {
                 $strTemplate .= $strValue;

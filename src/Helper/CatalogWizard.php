@@ -173,6 +173,7 @@ abstract class CatalogWizard extends \System {
             case 'date':
                 $arrReturn['flag'] = 6;
                 $arrReturn['inputType'] = 'text';
+                $arrReturn['eval']['tl_class'] = 'w50 wizard';
                 if ($arrReturn['eval']['rgxp'] && in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
                     $arrReturn['eval']['dateFormat'] = \Date::getFormatFromRgxp($arrReturn['eval']['rgxp']);
                 }

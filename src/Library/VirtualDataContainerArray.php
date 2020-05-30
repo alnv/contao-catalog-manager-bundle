@@ -87,7 +87,7 @@ class VirtualDataContainerArray extends \System {
         }
 
         if (count($arrList['labels']['fields']) > 0) {
-            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false ) use ( $arrList ) {
+            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
         }
@@ -121,8 +121,8 @@ class VirtualDataContainerArray extends \System {
             ]);
         }
 
-        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['label'] = $arrList['labels'];
-        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['sorting'] = $arrList['sorting'];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['label'] = $arrList['labels'];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['sorting'] = $arrList['sorting'];
 
         if ( $this->arrCatalog['enableCopy'] ) {
             array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, [
