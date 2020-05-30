@@ -54,51 +54,40 @@ class Toolkit {
         ];
     }
 
-    public static function getSql($strType, $arrOptions = []) {
+    public static function getRgxp($strType, $arrOptions = []) {
 
-        $arrSql = static::getSqlTypes();
         $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
-        if ( is_array($arrRole) && !empty($arrRole) ) {
-            if ($arrRole['sql']) {
-                return $arrRole['sql'];
-            }
-            switch ($arrRole['type']) {
-                case 'int':
-                case 'id':
-                    return $arrSql['i10'];
-                case 'gallery':
-                    return $arrSql['blob'];
-                case 'float':
-                    return $arrSql['float'];
-            }
+
+        if (isset($arrRole['rgxp']) && $arrRole['rgxp']) {
+
+            return $arrRole['rgxp'];
         }
+
+        return '';
+    }
+
+    public static function getSql($strType, $arrOptions = []) {
+
+        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
+        $arrRole = $objRoleResolver->getRole($arrOptions['role']);
+
+        if (isset($arrRole['sql']) && $arrRole['sql']) {
+
+            return sprintf( $arrRole['sql'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
+        }
+
+        $arrSql = static::getSqlTypes();
 
         if ( $arrOptions['multiple'] ) {
             return $arrSql['blob'];
         }
 
-        switch ( $strType ) {
+        switch ($strType) {
             case 'color':
-                return sprintf( $arrSql['vc8'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-            case 'pagepicker':
-                return $arrSql['i10'];
+                return sprintf($arrSql['vc8'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
             case 'date':
-                return sprintf( $arrSql['i10NullAble'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-            case 'textarea':
-                if ( $arrOptions['tinyMce'] ) {
-                    return $arrSql['longtext'];
-                }
-                return $arrSql['text'];
-            case 'text':
-            case 'radio':
-            case 'select':
-                return sprintf( $arrSql['vc255'], ( $arrOptions['default'] ? $arrOptions['default'] : '' ) );
-            case 'checkbox':
-                if ( !$arrOptions['multiple'] ) {
-                    return $arrSql['c1'];
-                }
-                return $arrSql['blob'];
+                return sprintf( $arrSql['i10NullAble'], ($arrOptions['default'] ? $arrOptions['default'] : '' ));
             default:
                 return $arrSql['blob'];
         }

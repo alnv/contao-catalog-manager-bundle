@@ -97,11 +97,13 @@ abstract class CatalogWizard extends \System {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 
-        if ( \Cache::has( $strIdentifier ) ) {
-            return \Cache::get( $strIdentifier );
+        if (\Cache::has( $strIdentifier)) {
+
+            return \Cache::get($strIdentifier);
         }
 
-        if ( !$arrField['type'] ) {
+        if (!$arrField['type']) {
+
             return null;
         }
 
@@ -127,20 +129,23 @@ abstract class CatalogWizard extends \System {
                 'mandatory' => $arrField['mandatory'] ? true : false,
                 'size' => $arrField['size'] ? intval( $arrField['size'] ) : 1
             ],
-            'sql' => Toolkit::getSql( $arrField['type'], $arrField )
+            'sql' => Toolkit::getSql($arrField['type'], $arrField)
         ];
 
-        if ( $arrField['includeBlankOption'] ) {
+        if ($arrField['includeBlankOption']) {
+
             $arrReturn['eval']['includeBlankOption'] = true;
             $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
         }
 
         if (in_array($arrField['type'], ['select', 'radio', 'checkbox'])) {
+
             $arrReturn['options_callback'] = function ($objDataContainer = null) use ($arrField) {
                 $objOptions = Options::getInstance( $arrField['fieldname'] . '.' . $arrField['pid'] );
                 $objOptions::setParameter( $arrField, $objDataContainer );
                 return $objOptions::getOptions();
             };
+
             if ($arrField['optionsSource'] == 'dbOptions') {
                 $arrReturn['relation'] = [
                     'load' => 'lazy',
@@ -151,10 +156,16 @@ abstract class CatalogWizard extends \System {
             }
         }
 
+        if ($strRgxp = Toolkit::getRgxp($arrField['type'], $arrField)) {
+
+            $arrReturn['eval']['rgxp'] = $strRgxp;
+        }
+
         switch ($arrField['type']) {
+
             case 'text':
                 $arrReturn['inputType'] = 'text';
-                if ( $arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1 ) {
+                if ($arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1) {
                     $arrReturn['eval']['tl_class'] = 'long clr';
                 }
                 break;
@@ -162,13 +173,8 @@ abstract class CatalogWizard extends \System {
             case 'date':
                 $arrReturn['flag'] = 6;
                 $arrReturn['inputType'] = 'text';
-                if ( $arrReturn['eval']['role'] ) {
-                    $objRoleResolver = RoleResolver::getInstance(null);
-                    $strRgxp = $objRoleResolver->getRole($arrReturn['eval']['role'])['type'];
-                    if ( in_array( $strRgxp, [ 'date', 'time', 'datim' ] ) ) {
-                        $arrReturn['eval']['rgxp'] = $strRgxp;
-                    }
-                    $arrReturn['eval']['dateFormat'] = \Date::getFormatFromRgxp( $strRgxp );
+                if ($arrReturn['eval']['rgxp'] && in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
+                    $arrReturn['eval']['dateFormat'] = \Date::getFormatFromRgxp($arrReturn['eval']['rgxp']);
                 }
                 $arrReturn['eval']['datepicker'] = true;
                 break;
@@ -191,8 +197,8 @@ abstract class CatalogWizard extends \System {
             case 'checkbox':
                 $arrReturn['inputType'] = 'checkbox';
                 $arrReturn['eval']['tl_class'] = 'clr';
-                if ( !$blnMultiple ) {
-                    unset( $arrReturn['options_callback'] );
+                if (!$blnMultiple) {
+                    unset($arrReturn['options_callback']);
                 }
                 break;
 

@@ -95,210 +95,245 @@ $GLOBALS['CM_OPERATORS'] = [
 $GLOBALS['CM_ROLES'] = [
     'miscellaneous' => [
         'group' => 'miscellaneous',
-        'type' => 'string'
+        'sql' => "blob NULL",
     ],
     'title' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
+    'headline' => [
+        'group' => 'article',
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
+    'page' => [
+        'group' => 'article',
+        'rgxp' => 'natural',
+        'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'member' => [
         'group' => 'member',
-        'type' => 'id'
+        'rgxp' => 'natural',
+        'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'group' => [
         'group' => 'member',
-        'type' => 'array'
+        'sql' => "blob NULL",
     ],
     'subtitle' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'tags' => [
         'group' => 'article',
-        'type' => 'array'
+        'sql' => "blob NULL",
     ],
     'alias' => [
         'group' => 'article',
-        'type' => 'string'
+        'rgxp' => 'alias',
+        'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'type' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'teaser' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "text NULL"
     ],
     'content' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "longtext NULL"
     ],
     'image' => [
         'group' => 'article',
-        'type' => 'image'
+        'sql' => "blob NULL"
     ],
     'files' => [
         'group' => 'article',
-        'type' => 'files'
+        'sql' => "blob NULL"
     ],
     'file' => [
         'group' => 'article',
-        'type' => 'file'
+        'sql' => "blob NULL"
     ],
     'gallery' => [
         'group' => 'article',
-        'type' => 'gallery'
+        'sql' => "blob NULL"
     ],
     'orderSRC' => [
         'group' => 'article',
-        'type' => 'array'
+        'sql' => "blob NULL"
     ],
     'hero' => [
         'group' => 'article',
-        'type' => 'image'
+        'sql' => "blob NULL"
     ],
     'duration' => [
         'group' => 'article',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'price' => [
         'group' => 'shop',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'vpe' => [
         'group' => 'shop',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'ean' => [
         'group' => 'shop',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'package' => [
         'group' => 'shop',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'category' => [
         'group' => 'article',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'author' => [
         'group' => 'article',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'location' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'street' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'streetNumber' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(16) NOT NULL default '%s'"
     ],
     'city' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'zip' => [
         'group' => 'address',
-        'type' => 'string'
+        'rgxp' => 'alnum',
+        'sql' => "varchar(12) NOT NULL default '%s'"
     ],
     'state' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'country' => [
         'group' => 'address',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'firstname' => [
         'group' => 'person',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'lastname' => [
         'group' => 'person',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'email' => [
         'group' => 'contact',
-        'type' => 'email'
+        'rgxp' => 'email',
+        'sql' => "varchar(128) NOT NULL default '%s'"
+    ],
+    'emails' => [
+        'group' => 'contact',
+        'rgxp' => 'emails',
+        'sql' => "text NULL"
     ],
     'url' => [
         'group' => 'contact',
-        'type' => 'url'
+        'rgxp' => 'url',
+        'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'phone' => [
         'group' => 'contact',
-        'type' => 'string'
+        'rgxp' => 'phone',
+        'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'mobile' => [
         'group' => 'contact',
-        'type' => 'string'
+        'rgxp' => 'phone',
+        'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'avatar' => [
         'group' => 'person',
-        'type' => 'image'
+        'sql' => "blob NULL"
     ],
     'company' => [
         'group' => 'contact',
-        'type' => 'string'
+        'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'startDate' => [
         'group' => 'date',
-        'type' => 'date'
+        'rgxp' => 'date',
+        'sql' => "int(10) unsigned NULL"
     ],
     'startTime' => [
         'group' => 'date',
-        'type' => 'time'
+        'rgxp' => 'time',
+        'sql' => "int(10) unsigned NULL"
     ],
     'endDate' => [
         'group' => 'date',
-        'type' => 'date'
+        'rgxp' => 'date',
+        'sql' => "int(10) unsigned NULL"
     ],
     'endTime' => [
         'group' => 'date',
-        'type' => 'time'
+        'rgxp' => 'time',
+        'sql' => "int(10) unsigned NULL"
     ],
     'date' => [
         'group' => 'date',
-        'type' => 'date'
+        'rgxp' => 'date',
+        'sql' => "int(10) unsigned NULL"
     ],
     'datim' => [
         'group' => 'date',
-        'type' => 'datim'
+        'rgxp' => 'datim',
+        'sql' => "int(10) unsigned NULL"
     ],
     'time' => [
         'group' => 'date',
-        'type' => 'time'
+        'rgxp' => 'time',
+        'sql' => "int(10) unsigned NULL"
     ],
     'latitude' => [
         'group' => 'geo',
-        'type' => 'float'
+        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
     ],
     'longitude'=> [
         'group' => 'geo',
-        'type' => 'float'
+        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
     ],
     'gender' => [
         'group' => 'person',
-        'type' => 'string'
+        'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'sku' => [
         'group' => 'product',
-        'type' => 'string'
+        'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'decimal' => [
         'group' => 'number',
-        'type' => 'float'
+        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
     ],
     'integer' => [
         'group' => 'number',
-        'type' => 'int'
+        'rgxp' => 'natural',
+        'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'pages' => [
         'group' => 'product',
-        'type' => 'array'
+        'sql' => "blob NULL"
     ]
 ];

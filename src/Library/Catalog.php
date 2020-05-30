@@ -157,6 +157,7 @@ class Catalog extends CatalogWizard {
                 ],
                 'eval' => [
                     'doNotCopy' => true,
+                    'rgxp' => 'alias',
                     'role' => 'alias'
                 ],
                 'search' => true,
@@ -167,7 +168,8 @@ class Catalog extends CatalogWizard {
 
     protected function setCustomFields() {
 
-        if ( !is_array( $GLOBALS['CM_CUSTOM_FIELDS'] ) || empty( $GLOBALS['CM_CUSTOM_FIELDS'] ) ) {
+        if ( !is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
+
             return null;
         }
 

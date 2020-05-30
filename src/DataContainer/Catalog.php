@@ -269,13 +269,13 @@ class Catalog {
 
         \Database::getInstance()->prepare('UPDATE '. $strTable .' %s WHERE id=?')->set([
             'tstamp' => time(),
-            'published' => ( $blnVisible ? '1' : '' )
+            'published' => ($blnVisible ? '1' : '')
         ])->execute($intId);
 
         if ( $objDataContainer ) {
 
             $objDataContainer->activeRecord->tstamp = $intTime;
-            $objDataContainer->activeRecord->published = ( $blnVisible ? '1' : '' );
+            $objDataContainer->activeRecord->published = ($blnVisible ? '1' : '');
         }
 
         if (is_array($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'])) {
@@ -302,11 +302,13 @@ class Catalog {
 
         $arrReturn = [];
 
-        if ( $dc === null ) {
+        if ($dc === null) {
+
             return $arrReturn;
         }
 
-        if ( $dc->activeRecord === null || !$dc->activeRecord->dbTable ) {
+        if ($dc->activeRecord === null || !$dc->activeRecord->dbTable) {
+
             return $arrReturn;
         }
 
