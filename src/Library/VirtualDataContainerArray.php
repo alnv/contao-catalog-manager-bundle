@@ -53,7 +53,7 @@ class VirtualDataContainerArray extends \System {
             $arrList['sorting']['panelLayout'] = 'filter,search,sort;limit';
         }
 
-        if ( $this->arrCatalog['showColumns'] ) {
+        if ($this->arrCatalog['showColumns']) {
             $arrList['labels']['showColumns'] = true;
         }
 
@@ -95,7 +95,7 @@ class VirtualDataContainerArray extends \System {
         if ( $this->arrCatalog['mode'] == 'parent' ) {
             $arrList['sorting']['mode'] = 4;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
-            $arrList['sorting']['child_record_callback'] =  function ( $arrRow ) use ( $arrList ) {
+            $arrList['sorting']['child_record_callback'] =  function ($arrRow) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
 

@@ -174,17 +174,15 @@ class Toolkit {
         }
 
         foreach ($arrLabelFields as $strField) {
-
-            $arrColumns[$strField] = static::parseCatalogValue($arrRow[ $strField ], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
-        }
-
-        if ($arrCatalog['showColumns']) {
-
-            return $arrColumns;
+            $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
         }
 
         if (count($arrColumns) < 2) {
             return array_values($arrColumns)[0];
+        }
+
+        if ($arrCatalog['showColumns'] && $arrCatalog['mode'] == 'list') {
+            return $arrColumns;
         }
 
         $intIndex = -1;
@@ -192,15 +190,20 @@ class Toolkit {
         $strTemplate = '<div class="tl_content_left">';
 
         foreach ($arrColumns as $strField => $strValue) {
+            if ($strValue === '' || $strValue === null) {
+                continue;
+            }
             $intIndex += 1;
-            if ( !$intIndex ) {
+            if (!$intIndex) {
                 $strTemplate .= $strValue;
                 continue;
             }
             $arrLabels[] = $strValue;
         }
 
-        $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ' - ' ) .')</span>' . '</div>';
+        if (!empty($arrLabels)) {
+            $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ' - ' ) .')</span>' . '</div>';
+        }
 
         return $strTemplate;
     }
