@@ -484,12 +484,6 @@ class Toolkit {
                 }
 
                 $arrColumns = [];
-                if ($varValue && is_string($varValue)) {
-                    preg_match('/(\d+)(,\s*\d+)*/', $varValue, $arrMatch);
-                    if (!empty($arrMatch)) {
-                        $varValue = explode(',', $varValue);
-                    }
-                }
                 $varValue = is_array($varValue) ? $varValue : \StringUtil::deserialize($varValue, true);
                 foreach ($varValue as $strIndex => $strValue) {
                     if (isset( $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
