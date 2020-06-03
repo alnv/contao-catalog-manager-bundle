@@ -30,6 +30,8 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
     ]
 ]);
 
+$GLOBALS['TL_CTE']['includes']['component'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentComponent';
+
 $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js' );
 $objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
@@ -70,6 +72,9 @@ $GLOBALS['CM_OPERATORS'] = [
     ],
     'findInSet' => [
         'token' => 'FIND_IN_SET(##field##,##value##)'
+    ],
+    'reversedFindInSet' => [
+        'token' => 'FIND_IN_SET(##value##,##field##)'
     ],
     'regexp' => [
         'token' => '##field## REGEXP ##value##'

@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_DCA']['tl_content']['palettes']['component'] = '{type_legend},type;{include_legend},module;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
+
 if (\Input::get('do')) {
     $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule( \Input::get('do'), [
         'limit' => 1

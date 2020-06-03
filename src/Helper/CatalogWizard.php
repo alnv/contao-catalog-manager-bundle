@@ -127,7 +127,7 @@ abstract class CatalogWizard extends \System {
                 'role' => $arrField['role'] ?: '',
                 'useAsAlias' => $arrField['useAsAlias'] ?: '',
                 'mandatory' => $arrField['mandatory'] ? true : false,
-                'size' => $arrField['size'] ? intval( $arrField['size'] ) : 1
+                'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
         ];
