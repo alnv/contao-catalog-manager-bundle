@@ -11,6 +11,7 @@ class PageLayout {
         }
 
         $this->getMasterByPageId($objPage->id);
+        $this->setMetaInformation();
     }
     
     public function getMasterByPageId($strPageId,$strAlias=null) {
@@ -35,6 +36,17 @@ class PageLayout {
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
         ]))->parse()[0];
+    }
+
+    protected function setMetaInformation() {
+
+        if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
+            return null;
+        }
+
+        global $objPage;
+        $objPage->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
+        $objPage->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
     }
 
     protected function searchTableAndReturnTable($strPageId) {

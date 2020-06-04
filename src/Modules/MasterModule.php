@@ -31,17 +31,11 @@ class MasterModule extends \Module {
 
     protected function compile() {
 
-        global $objPage;
         $objMaster = new Master( $this->cmTable, [
             'alias' => \Input::get('auto_item'),
             'template' => $this->cmTemplate,
             'id' => $this->id
         ]);
-        $arrMasters = $objMaster->parse();
-        foreach ($arrMasters as $arrMaster) {
-            $objPage->pageTitle = $arrMaster['roleResolver']()->getValueByRole('title');
-            $objPage->description = strip_tags($arrMaster['roleResolver']()->getValueByRole('teaser'));
-        }
-        $this->Template->entities = $arrMasters;
+        $this->Template->entities = $objMaster->parse();
     }
 }
