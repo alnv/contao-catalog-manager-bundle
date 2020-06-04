@@ -25,25 +25,18 @@ class Listing extends \Module {
             return $objTemplate->parse();
         }
 
-        if ( !$this->cmTable ) {
-
+        if (!$this->cmTable) {
             return null;
         }
 
-        if ( \Input::get('auto_item') && $this->cmMasterModule ) { // @todo impl formModule
-
-            return \Controller::getFrontendModule( $this->cmMasterModule );
+        if (\Input::get('auto_item') && $this->cmMasterModule) {
+            return \Controller::getFrontendModule($this->cmMasterModule);
         }
 
         return parent::generate();
     }
 
-    protected function compile() {
-
-        $this->arrOptions = [
-            'template' => $this->cmTemplate,
-            'id' => $this->id
-        ];
+    public function setOptions() {
 
         $this->setOrder();
         $this->setGroup();
@@ -53,7 +46,26 @@ class Listing extends \Module {
         $this->setMasterPage();
         $this->setPagination();
         $this->setIgnoreVisibility();
+    }
 
+    public function getOptions() {
+
+        return $this->arrOptions;
+    }
+
+    public function getTable() {
+
+        return $this->cmTable;
+    }
+
+    protected function compile() {
+
+        $this->arrOptions = [
+            'template' => $this->cmTemplate,
+            'id' => $this->id
+        ];
+
+        $this->setOptions();
         $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->cmTable, $this->arrOptions);
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();

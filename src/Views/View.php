@@ -193,8 +193,8 @@ abstract class View extends \Controller {
             }
         }
 
-        if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
+        if ( isset($GLOBALS['TL_HOOKS']['getModelOptions']) && is_array($GLOBALS['TL_HOOKS']['getModelOptions'])) {
+            foreach ($GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback) {
                 $this->import( $arrCallback[0] );
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);
             }
@@ -221,32 +221,33 @@ abstract class View extends \Controller {
         $arrRow['origin'] = [];
         $arrRow['_table'] = $this->strTable;
 
-        if ( $this->arrOptions['masterPage'] ) {
-            $arrRow['masterUrl'] = Toolkit::parseDetailLink( $this->arrMasterPage, $arrEntity['alias'] );
+        if ($this->arrOptions['masterPage']) {
+            $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias']);
         }
 
-        foreach ( $arrEntity as $strField => $varValue ) {
-
+        foreach ($arrEntity as $strField => $varValue) {
             $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, $this->arrOptions['fastMode']);
-            if ( $strParsedValue !== $varValue ) {
-                if (\Validator::isBinaryUuid($varValue)) {
-                    $varValue = \StringUtil::binToUuid($varValue);
+            if ($strParsedValue !== $varValue) {
+                if (!in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'], ['multiColumnWizard', 'fileTree'])) {
+                    if (\Validator::isBinaryUuid($varValue)) {
+                        $varValue = \StringUtil::binToUuid($varValue);
+                    }
+                    $arrRow['origin'][$strField] = $varValue;
                 }
-                $arrRow['origin'][$strField] = $varValue;
             }
             $arrRow[$strField] = $strParsedValue;
         }
 
-        $arrRow['roleResolver'] = function () use ( $arrRow ) {
-            return \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance( $this->strTable, $arrRow );
+        $arrRow['roleResolver'] = function () use ($arrRow) {
+            return \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance($this->strTable, $arrRow);
         };
 
-        $arrRow['shareButtons'] = function () use ( $arrRow ) {
-            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ShareButtons( $arrRow ) )->getShareButtons();
+        $arrRow['shareButtons'] = function () use ($arrRow) {
+            return (new \Alnv\ContaoCatalogManagerBundle\Library\ShareButtons($arrRow))->getShareButtons();
         };
 
-        $arrRow['iCalendarUrl'] = function () use ( $arrRow ) {
-            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar( $arrRow ) )->getICalendarUrl();
+        $arrRow['iCalendarUrl'] = function () use ($arrRow) {
+            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar($arrRow))->getICalendarUrl();
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
@@ -276,7 +277,6 @@ abstract class View extends \Controller {
                     $arrValues[] = $strValue;
                 }
             }
-
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
             foreach ($arrValues as $strValue) {
                 $arrColumns[] = 'FIND_IN_SET(?, '. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
@@ -352,7 +352,7 @@ abstract class View extends \Controller {
 
     protected function parseField( $varValue, $strField, $arrValues, $blnFastMode ) {
 
-        return Toolkit::parseCatalogValue( $varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues, false, $blnFastMode );
+        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues, false, $blnFastMode);
     }
 
     protected function getPageNumber() {

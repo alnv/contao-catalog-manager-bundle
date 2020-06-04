@@ -193,6 +193,9 @@ class Toolkit {
             if ($strValue === '' || $strValue === null) {
                 continue;
             }
+            if (in_array($strField, ['sorting'])) {
+                continue;
+            }
             $intIndex += 1;
             if (!$intIndex) {
                 $strTemplate .= $strValue;
@@ -215,15 +218,15 @@ class Toolkit {
         $strTemplate = '';
         $strImage = 'articles';
 
-        foreach ( $arrLabelFields as $strField ) {
-            $arrColumns[ $strField ] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
+        foreach ($arrLabelFields as $strField) {
+            $arrColumns[$strField] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
         }
 
-        if ( count( $arrColumns ) < 2 ) {
-            return array_values( $arrColumns )[0];
+        if (count($arrColumns) < 2) {
+            return array_values($arrColumns)[0];
         }
 
-        foreach ( $arrColumns as $strField => $strValue ) {
+        foreach ($arrColumns as $strField => $strValue) {
             $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
             $intIndex += 1;
         }
@@ -237,51 +240,59 @@ class Toolkit {
             return $varValue;
         }
 
-        if ( !isset( $arrField['type'] ) ) {
+        if (!isset($arrField['type'])) {
             return $varValue;
         }
 
-        switch ( $arrField['type'] ) {
+        switch ($arrField['type']) {
             case 'text':
                 return $arrField['value'];
                 break;
             case 'checkbox':
             case 'select':
             case 'radio':
-                $varValue = !is_array( $arrField['value'] ) ? [ $arrField['value'] ] : $arrField['value'];
-                $arrOptionValues =  static::getSelectedOptions( $varValue, $arrField['options'] );
+                $varValue = !is_array($arrField['value']) ? [$arrField['value']] : $arrField['value'];
+                $arrOptionValues =  static::getSelectedOptions($varValue, $arrField['options']);
                 if ( $blnStringFormat ) {
                     return static::parse( $arrOptionValues );
                 }
                 return $arrOptionValues;
                 break;
             case 'fileTree':
-                if ($blnFastMode) {
-                    return Image::getUuids($varValue);
-                }
                 $strSizeId = null;
                 $arrOrderField = [];
                 if ($arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
                     $arrOrderField = Image::getUuids($arrCatalog[$arrField['orderField']]);
                 }
-                if (isset( $arrField['imageSize'] ) && $arrField['imageSize']) {
+                if (isset($arrField['imageSize']) && $arrField['imageSize']) {
                     $strSizeId = $arrField['imageSize'];
                 }
-                if (isset( $arrField['isImage'] ) && $arrField['isImage'] === true) {
-                    return Image::getImage($varValue, $strSizeId);
+                if ($blnFastMode) {
+                    return Image::getUuids($varValue);
                 }
-                if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
+                if ($arrField['isImage'] || $arrField['isGallery']) {
+                    if ($blnFastMode) {
+                        return Image::getUuids($varValue);
+                    }
                     $arrImages = [];
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
-                if (isset( $arrField['isGallery'] ) && $arrField['isGallery'] === true) {
-                    $arrImages = [];
-                    return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
-                }
-                if ( isset($arrField['isFile']) && $arrField['isFile'] === true) {
+                if ($arrField['isFile']) {
                     return File::getFile($varValue);
                 }
                 return [];
+                break;
+            case 'multiColumnWizard':
+                $arrReturn = [];
+                $varEntities = \StringUtil::deserialize($varValue, true);
+                foreach ($varEntities as $arrEntity) {
+                    $arrRow = [];
+                    foreach ($arrEntity as $strField => $strValue) {
+                        $arrRow[$strField] = static::parseCatalogValue($strValue, \Widget::getAttributesFromDca($arrField['columnFields'][$strField], $strField, $strValue, $strField, null), $arrCatalog, true, true);;
+                    }
+                    $arrReturn[] = $arrRow;
+                }
+                return $arrReturn;
                 break;
             case 'pageTree':
                 if (!$varValue) {

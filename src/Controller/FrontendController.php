@@ -32,6 +32,35 @@ class FrontendController extends Controller {
 
     /**
      *
+     * @Route("/json-listing/{module}/{page}", name="json-listing")
+     * @Method({"POST"})
+     */
+    public function getJsonListing($module, $page) {
+
+        global $objPage;
+        $objPage = \PageModel::findByPK($page)->loadDetails();
+        (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
+        $objPage->ajaxContext = true;
+        $objModule = \ModuleModel::findByPk($module);
+
+        if ($objModule === null) {
+            return new JsonResponse([]);
+        }
+
+        $strClass = \Module::findClass($objModule->type);
+        if (!class_exists($strClass)) {
+            return new JsonResponse([]);
+        }
+
+        $objModule = new $strClass($objModule);
+        $objModule->setOptions();
+        $arrOptions = $objModule->getOptions();
+
+        return new JsonResponse(['results'=>(new \Alnv\ContaoCatalogManagerBundle\Views\Listing($objModule->getTable(), $arrOptions))->parse()]);
+    }
+
+    /**
+     *
      * @Route("/view-map/{module}/{page}", name="view-map")
      * @Method({"GET"})
      */

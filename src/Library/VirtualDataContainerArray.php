@@ -247,11 +247,11 @@ class VirtualDataContainerArray extends \System {
 
     protected function setOperations() {
 
-        if ( empty( $this->arrCatalog['ctable'] ) || !is_array( $this->arrCatalog['ctable'] ) ) {
+        if (empty($this->arrCatalog['ctable']) || !is_array($this->arrCatalog['ctable'])) {
             return null;
         }
 
-        foreach ( $this->arrCatalog['ctable'] as $strTable ) {
+        foreach ($this->arrCatalog['ctable'] as $strTable) {
             $strTitle = '';
             $strDescription = '';
             $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
