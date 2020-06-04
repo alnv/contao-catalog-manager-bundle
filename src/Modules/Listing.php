@@ -129,12 +129,12 @@ class Listing extends \Module {
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-                $this->cmValue =  \Controller::replaceInsertTags( $this->cmValue );
-                $this->arrOptions['column'] = explode( ';', \StringUtil::decodeEntities( $this->cmColumn ) );
-                $this->arrOptions['value'] = explode( ';', \StringUtil::decodeEntities( $this->cmValue ) );
-                if ( ( is_array( $this->arrOptions['value'] ) && !empty( $this->arrOptions['value'] ) ) ) {
+                $this->cmValue =  \Controller::replaceInsertTags($this->cmValue);
+                $this->arrOptions['column'] = explode(';', \StringUtil::decodeEntities($this->cmColumn));
+                $this->arrOptions['value'] = explode(';', \StringUtil::decodeEntities($this->cmValue));
+                if ((is_array($this->arrOptions['value']) && !empty( $this->arrOptions['value']))) {
                     $intIndex = -1;
-                    $this->arrOptions['value'] = array_filter( $this->arrOptions['value'], function ( $strValue ) use ( &$intIndex ) {
+                    $this->arrOptions['value'] = array_filter($this->arrOptions['value'], function ($strValue) use (&$intIndex) {
                         $intIndex = $intIndex + 1;
                         if ($strValue === '' || $strValue === null) {
                             unset($this->arrOptions['column'][ $intIndex ]);

@@ -1,0 +1,7 @@
+<?php if ($this->detailModule && $this->active): ?>
+    {{insert_module::<?= $this->detailModule ?>}}
+<?php else: ?>
+    <div class="ce_component block v-component">
+        <view-listing module="<?= $this->module ?>" page="<?= $this->page ?>"></view-listing>
+    </div>
+<?php endif; ?>
