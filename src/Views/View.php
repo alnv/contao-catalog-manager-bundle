@@ -215,6 +215,16 @@ abstract class View extends \Controller {
         return $arrReturn;
     }
 
+    protected function validOrigin($strValue, $strField) {
+        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard') {
+            return false;
+        }
+        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
+            return false;
+        }
+        return true;
+    }
+
     protected function parseEntity($arrEntity) {
 
         $arrRow = [];
@@ -228,7 +238,7 @@ abstract class View extends \Controller {
         foreach ($arrEntity as $strField => $varValue) {
             $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, $this->arrOptions['fastMode']);
             if ($strParsedValue !== $varValue) {
-                if (!in_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'], ['multiColumnWizard', 'fileTree'])) {
+                if ($this->validOrigin($varValue, $strField)) {
                     if (\Validator::isBinaryUuid($varValue)) {
                         $varValue = \StringUtil::binToUuid($varValue);
                     }
