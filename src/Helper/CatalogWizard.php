@@ -199,6 +199,7 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['inputType'] = 'checkbox';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 if (!$blnMultiple) {
+                    $arrReturn['eval']['tl_class'] = 'w50 m12';
                     unset($arrReturn['options_callback']);
                 }
                 break;
