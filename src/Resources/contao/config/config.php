@@ -141,6 +141,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
+    'checkbox' => [
+        'group' => 'article',
+        'sql' => "char(1) NOT NULL default ''"
+    ],
     'teaser' => [
         'group' => 'article',
         'sql' => "text NULL"
