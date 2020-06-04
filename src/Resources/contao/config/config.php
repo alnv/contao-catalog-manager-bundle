@@ -155,18 +155,22 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'image' => [
         'group' => 'article',
+        'type' => 'image',
         'sql' => "blob NULL"
     ],
     'files' => [
         'group' => 'article',
+        'type' => 'files',
         'sql' => "blob NULL"
     ],
     'file' => [
         'group' => 'article',
+        'type' => 'file',
         'sql' => "blob NULL"
     ],
     'gallery' => [
         'group' => 'article',
+        'type' => 'gallery',
         'sql' => "blob NULL"
     ],
     'orderSRC' => [
