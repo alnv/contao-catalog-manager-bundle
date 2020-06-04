@@ -10,7 +10,7 @@ class Master extends View {
 
         $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
-        $objEntity = $objModel->findByIdOrAlias($this->arrOptions['alias'], []);
+        $objEntity = $objModel->findByIdOrAlias($this->arrOptions['alias'], $this->getModelOptions());
 
         if ( $objEntity !== null ) {
             $this->parseEntity($objEntity->row());
