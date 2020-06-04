@@ -149,6 +149,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'sql' => "longtext NULL"
     ],
+    'description' => [
+        'group' => 'article',
+        'sql' => "text NULL"
+    ],
     'image' => [
         'group' => 'article',
         'sql' => "blob NULL"
@@ -236,6 +240,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'address',
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
+    'fullname' => [
+        'group' => 'person',
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
     'firstname' => [
         'group' => 'person',
         'sql' => "varchar(128) NOT NULL default '%s'"
@@ -260,6 +268,11 @@ $GLOBALS['CM_ROLES'] = [
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'phone' => [
+        'group' => 'contact',
+        'rgxp' => 'phone',
+        'sql' => "varchar(32) NOT NULL default '%s'"
+    ],
+    'fax' => [
         'group' => 'contact',
         'rgxp' => 'phone',
         'sql' => "varchar(32) NOT NULL default '%s'"
