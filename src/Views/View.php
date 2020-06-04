@@ -193,6 +193,13 @@ abstract class View extends \Controller {
             }
         }
 
+        if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
+            foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
+                $this->import( $arrCallback[0] );
+                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);
+            }
+        }
+
         if ($this->dcaExtractor->hasVisibility() == true && !$this->arrOptions['ignoreVisibility']) {
             if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
                 $arrReturn['column'] = [];
@@ -202,13 +209,6 @@ abstract class View extends \Controller {
                 $intTime = \Date::floorToMinute();
                 $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
-            }
-        }
-
-        if ( isset( $GLOBALS['TL_HOOKS']['getModelOptions'] ) && is_array( $GLOBALS['TL_HOOKS']['getModelOptions'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback ) {
-                $this->import( $arrCallback[0] );
-                $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);
             }
         }
 

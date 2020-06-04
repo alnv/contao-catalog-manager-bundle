@@ -8,7 +8,7 @@ class Master extends View {
 
     public function parse() {
 
-        $objModel = new ModelWizard( $this->strTable );
+        $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
         $objEntity = $objModel->findByIdOrAlias($this->arrOptions['alias'], $this->getModelOptions());
 
