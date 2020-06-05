@@ -55,7 +55,7 @@ class FrontendController extends Controller {
         $objModule = new $strClass($objModule);
         $objModule->setOptions();
         $arrOptions = $objModule->getOptions();
-
+        $arrOptions['id'] = $module;
         return new JsonResponse(['results'=>(new \Alnv\ContaoCatalogManagerBundle\Views\Listing($objModule->getTable(), $arrOptions))->parse()]);
     }
 

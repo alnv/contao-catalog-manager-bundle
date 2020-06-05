@@ -292,7 +292,6 @@ abstract class View extends \Controller {
                 $arrColumns[] = 'FIND_IN_SET(?, '. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
             }
             $objList = new Listing($arrRelation['table'], [
-                'ignoreVisibility' => true,
                 'column' => $arrColumns,
                 'value' => $arrValues
             ]);
@@ -325,8 +324,8 @@ abstract class View extends \Controller {
             return $strReturn;
         };
 
-        if ( isset( $GLOBALS['TL_HOOKS']['parseEntity'] ) && is_array($GLOBALS['TL_HOOKS']['parseEntity'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['parseEntity'] as $arrCallback ) {
+        if (isset($GLOBALS['TL_HOOKS']['parseEntity']) && is_array($GLOBALS['TL_HOOKS']['parseEntity'])) {
+            foreach ($GLOBALS['TL_HOOKS']['parseEntity'] as $arrCallback) {
                 if (is_array($arrCallback)) {
                     $this->import($arrCallback[0]);
                     $this->{$arrCallback[0]}->{$arrCallback[1]}($arrRow, $this->strTable, $this->arrOptions, $this);
@@ -388,10 +387,8 @@ abstract class View extends \Controller {
 
     public function getEntities() {
 
-        if ( isset( $GLOBALS['TL_HOOKS']['parseViewEntities'] ) && is_array( $GLOBALS['TL_HOOKS']['parseViewEntities'] ) ) {
-
-            foreach ( $GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback ) {
-
+        if ( isset($GLOBALS['TL_HOOKS']['parseViewEntities']) && is_array($GLOBALS['TL_HOOKS']['parseViewEntities'])) {
+            foreach ($GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback) {
                 $this->import( $arrCallback[0] );
                 $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrEntities, $this);
             }
