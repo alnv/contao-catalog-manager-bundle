@@ -110,6 +110,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
+    'textfield' => [
+        'group' => 'article',
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
     'page' => [
         'group' => 'article',
         'rgxp' => 'natural',
