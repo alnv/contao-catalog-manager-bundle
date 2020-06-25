@@ -71,13 +71,13 @@ $GLOBALS['CM_OPERATORS'] = [
         'token' => '##field##!=##value##'
     ],
     'findInSet' => [
-        'token' => 'FIND_IN_SET(##field##,LOWER(CAST(##value## AS CHAR)))'
+        'token' => 'FIND_IN_SET(##field##,LOWER(CAST(##value## AS CHAR)))' // @todo impl lower cast to field
     ],
     'reversedFindInSet' => [
-        'token' => 'FIND_IN_SET(LOWER(CAST(##value## AS CHAR)),##field##)'
+        'token' => 'FIND_IN_SET(LOWER(CAST(##value## AS CHAR)),##field##)' // @todo impl lower cast to field
     ],
     'regexp' => [
-        'token' => '##field## REGEXP LOWER(CAST(##value## AS CHAR))'
+        'token' => 'LOWER(CAST(##field## AS CHAR)) REGEXP LOWER(CAST(##value## AS CHAR))'
     ],
     'between' => [
         'token' => '##field## BETWEEN ##value## AND ##value##',
