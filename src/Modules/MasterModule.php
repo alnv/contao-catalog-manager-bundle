@@ -36,6 +36,12 @@ class MasterModule extends \Module {
             'template' => $this->cmTemplate,
             'id' => $this->id
         ]);
-        $this->Template->entities = $objMaster->parse();
+
+        $arrMaster = $objMaster->parse();
+        if (empty($arrMaster)) {
+            throw new \CoreBundle\Exception\PageNotFoundException('Page not found: ' . \Environment::get('uri'));
+        }
+
+        $this->Template->entities = $arrMaster;
     }
 }
