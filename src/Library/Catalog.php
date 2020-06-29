@@ -75,7 +75,7 @@ class Catalog extends CatalogWizard {
     protected function setDefaultFields() {
 
         \System::loadLanguageFile('default');
-        array_insert( $this->arrFields, count( $this->arrFields ), [
+        $arrDefault  = [
             'id' => [
                 'label' => [
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.id', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('id')),
@@ -163,7 +163,16 @@ class Catalog extends CatalogWizard {
                 'search' => true,
                 'sql' => "varchar(128) NOT NULL default ''"
             ]
-        ]);
+        ];
+        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) && $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) {
+            $arrDefault['pid']['relation'] = [
+                'load' => 'lazy',
+                'field' => 'id',
+                'table' => $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable'],
+                'type' => 'belongsTo'
+            ];
+        }
+        array_insert( $this->arrFields, count( $this->arrFields ), $arrDefault);
     }
 
     protected function setCustomFields() {
