@@ -560,4 +560,9 @@ class Toolkit {
         $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( \Input::get('do') );
         return $objCatalog->getCatalog()['table'];
     }
+
+    public static function convertArrayItemsToPlaceholders($arrArray, $strPlaceholder='?') {
+
+        return implode(",", array_fill(0, count($arrArray), $strPlaceholder));
+    }
 }

@@ -346,7 +346,7 @@ abstract class View extends \Controller {
             $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
             if ( !isset( $this->arrEntities[ $strGroup ] ) ) {
                 $this->arrEntities[ $strGroup ] = [
-                    'headline' => $arrRow[ $this->arrOptions['groupBy'] ],
+                    'headline' => \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($arrRow[$this->arrOptions['groupBy']]),
                     'hl' => $this->arrOptions['groupByHl'],
                     'entities' => []
                 ];
@@ -361,7 +361,7 @@ abstract class View extends \Controller {
 
     protected function parseField( $varValue, $strField, $arrValues, $blnFastMode ) {
 
-        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca( $this->dcaExtractor->getField( $strField ), $strField, $varValue, $strField, $this->strTable ), $arrValues, false, $blnFastMode);
+        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode);
     }
 
     protected function getPageNumber() {
