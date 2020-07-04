@@ -2,7 +2,8 @@ const AsyncImageComponent = Vue.component( 'async-image', {
     data: function () {
         return {
             src: null,
-            alt: ''
+            alt: '',
+            sticky: null
         }
     },
     methods: {
@@ -20,6 +21,7 @@ const AsyncImageComponent = Vue.component( 'async-image', {
                 if ( objResponse.body ) {
                     this.src = objResponse.body.src;
                     this.alt = objResponse.body.alt;
+                    this.setSticky();
                 }
             }.bind(this));
         },
@@ -27,14 +29,16 @@ const AsyncImageComponent = Vue.component( 'async-image', {
             //
         },
         setSticky: function () {
-            if ( typeof Sticky === 'undefined' || !this.sticky ) {
+            if (typeof Sticky === 'undefined' || !this.sticky) {
                 return null;
             }
             this.$el.classList.add('is-sticky');
             if ( this.sticky.hasOwnProperty('marginTop') ) {
                 this.$el.setAttribute('data-margin-top', this.sticky['marginTop']);
             }
-            new Sticky('.async-image-component');
+            setTimeout(function () {
+                this.sticky = new Sticky('.async-image-component');
+            }.bind(this),250)
         }
     },
     watch: {
@@ -47,7 +51,9 @@ const AsyncImageComponent = Vue.component( 'async-image', {
     },
     updated: function () {
         this.$nextTick(function () {
-            this.setSticky();
+            if (!this.sticky) {
+                this.sticky.update();
+            }
         })
     },
     mounted: function () {

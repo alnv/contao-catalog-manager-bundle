@@ -71,10 +71,10 @@ $GLOBALS['CM_OPERATORS'] = [
         'token' => '##field##!=##value##'
     ],
     'findInSet' => [
-        'token' => 'FIND_IN_SET(##field##,LOWER(CAST(##value## AS CHAR)))' // @todo impl lower cast to field
+        'token' => 'FIND_IN_SET(##field##,##value##)'
     ],
     'reversedFindInSet' => [
-        'token' => 'FIND_IN_SET(LOWER(CAST(##value## AS CHAR)),##field##)' // @todo impl lower cast to field
+        'token' => 'FIND_IN_SET(##value##,##field##)'
     ],
     'regexp' => [
         'token' => 'LOWER(CAST(##field## AS CHAR)) REGEXP LOWER(CAST(##value## AS CHAR))'
@@ -296,6 +296,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'avatar' => [
         'group' => 'person',
+        'type' => 'image',
         'sql' => "blob NULL"
     ],
     'company' => [
