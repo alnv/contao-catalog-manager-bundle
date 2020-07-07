@@ -187,6 +187,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'hero' => [
         'group' => 'article',
+        'type' => 'image',
         'sql' => "blob NULL"
     ],
     'duration' => [
