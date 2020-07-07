@@ -14,8 +14,7 @@ class CatalogField {
         $arrUploadTypes = \StringUtil::trimsplit(',', strtolower(\Config::get('uploadTypes')));
         $arrNotAllowed = array_diff($arrExtensions, $arrUploadTypes);
 
-        if ( 0 !== count( $arrNotAllowed ) ) {
-
+        if (0 !== count($arrNotAllowed)) {
             throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['forbiddenExtensions'], implode(', ', $arrNotAllowed)));
         }
 
@@ -48,23 +47,20 @@ class CatalogField {
         switch ( $dc->activeRecord->type ) {
 
             case 'date':
-
                 $arrDateRoles = [];
                 foreach ( $GLOBALS['CM_ROLES'] as $strRole => $arrRole ) {
                     if ( $arrRole['group'] == 'date' ) {
                         $arrDateRoles[] = $strRole;
                     }
                 }
-
                 return $arrDateRoles;
-
                 break;
         }
 
         return $arrRoles;
     }
 
-    public function watchFieldname( $strFieldname, \DataContainer $objDataContainer ) {
+    public function watchFieldname($strFieldname, \DataContainer $objDataContainer) {
 
         $objDatabase = \Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
@@ -76,8 +72,12 @@ class CatalogField {
         $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
 
-        if ( !$strFieldname || $objCatalog == null ) {
-            return '';
+        if (!$strFieldname || $objCatalog == null) {
+            throw new \Exception(sprintf('somethin went wrong'));
+        }
+
+        if (in_array($strFieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
+            return $strFieldname;
         }
 
         $strTable = $objCatalog->table;
@@ -88,10 +88,11 @@ class CatalogField {
 
         if ($objDataContainer->activeRecord->fieldname && $strFieldname != $objDataContainer->activeRecord->fieldname) {
             if (!$objDatabaseBuilder->renameFieldname( $objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql)) {
-                throw new \Exception( sprintf( 'fieldname "%s" already exists in %s.', $strFieldname, $strTable ) );
+                throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
             }
             return $strFieldname;
         }
+
         /*
         $objCatalogField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findBy(
             ['tl_catalog_field.pid=?', 'tl_catalog_field.id!=?', 'tl_catalog_field.fieldname=?'],
@@ -109,21 +110,22 @@ class CatalogField {
 
     public function changeFieldType( $strValue, \DataContainer $objDataContainer ) {
 
-        if ( !$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname ) {
-
+        if (!$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname) {
             return $strValue;
         }
 
-        $objCatalog = CatalogModel::findByPk( $objDataContainer->activeRecord->pid );
-
+        $objCatalog = CatalogModel::findByPk( $objDataContainer->activeRecord->pid);
         if ( $objCatalog == null ) {
+            return $strValue;
+        }
 
+        if (in_array($objDataContainer->activeRecord->fieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
             return $strValue;
         }
 
         $strSql = Toolkit::getSql( $objDataContainer->activeRecord->type, $objDataContainer->activeRecord->row() );
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
-        $objDatabaseBuilder->changeFieldType( $objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql );
+        $objDatabaseBuilder->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;
     }
@@ -135,13 +137,11 @@ class CatalogField {
         $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
 
         if ( !$objImagesSize->numRows ) {
-
             return $arrReturn;
         }
 
         while ( $objImagesSize->next() ) {
-
-            $arrReturn[ $objImagesSize->id ] = $objImagesSize->name;
+            $arrReturn[$objImagesSize->id] = $objImagesSize->name;
         }
 
         return $arrReturn;
