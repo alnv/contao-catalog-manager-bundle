@@ -274,7 +274,7 @@ class VirtualDataContainerArray extends \System {
 
     public function generate() {
 
-        if ( empty( $this->arrCatalog ) ) {
+        if (empty($this->arrCatalog)) {
             return null;
         }
 
