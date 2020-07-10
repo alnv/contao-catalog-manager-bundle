@@ -13,9 +13,9 @@ class Catalog extends CatalogWizard {
     protected $arrCatalog = [];
     protected $strIdentifier = null;
 
-    public function __construct( $strIdentifier ) {
+    public function __construct($strIdentifier) {
 
-        if ( $strIdentifier === null ) {
+        if ($strIdentifier === null) {
             return null;
         }
 
@@ -74,8 +74,49 @@ class Catalog extends CatalogWizard {
 
     protected function setDefaultFields() {
 
+        array_insert($this->arrFields, count($this->arrFields), $this->getDefaultFields());
+    }
+
+    protected function setCustomFields() {
+
+        if ( !is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
+
+            return null;
+        }
+
+        $arrFields = [];
+
+        foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField ) {
+
+            if ( isset( $arrField['table'] ) && $this->arrCatalog['table'] != $arrField['table'] ) {
+                continue;
+            }
+
+            unset( $arrField['index'] );
+
+            if ( !isset( $arrField['label'] ) ) {
+                $arrField['label'] = [
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
+                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )
+                ];
+            }
+
+            $arrFields[ $strFieldname ] = $arrField;
+        }
+
+        array_insert( $this->arrFields, 0, $arrFields );
+    }
+
+    public function getDefaultFieldnames() {
+
+        return array_keys($this->getDefaultFields());
+    }
+
+    public function getDefaultFields() {
+
         \System::loadLanguageFile('default');
-        $arrDefault  = [
+
+        $arrReturn  = [
             'id' => [
                 'label' => [
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.id', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('id')),
@@ -165,43 +206,14 @@ class Catalog extends CatalogWizard {
             ]
         ];
         if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) && $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) {
-            $arrDefault['pid']['relation'] = [
+            $arrReturn['pid']['relation'] = [
                 'load' => 'lazy',
                 'field' => 'id',
                 'table' => $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable'],
                 'type' => 'belongsTo'
             ];
         }
-        array_insert( $this->arrFields, count( $this->arrFields ), $arrDefault);
-    }
 
-    protected function setCustomFields() {
-
-        if ( !is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
-
-            return null;
-        }
-
-        $arrFields = [];
-
-        foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField ) {
-
-            if ( isset( $arrField['table'] ) && $this->arrCatalog['table'] != $arrField['table'] ) {
-                continue;
-            }
-
-            unset( $arrField['index'] );
-
-            if ( !isset( $arrField['label'] ) ) {
-                $arrField['label'] = [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )
-                ];
-            }
-
-            $arrFields[ $strFieldname ] = $arrField;
-        }
-
-        array_insert( $this->arrFields, 0, $arrFields );
+        return $arrReturn;
     }
 }

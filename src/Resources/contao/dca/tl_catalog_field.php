@@ -103,11 +103,9 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getFieldTypes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getFieldTypes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
-            'save_callback' => [
-                ['catalogmanager.datacontainer.catalogfield', 'changeFieldType']
-            ],
+            'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'changeFieldType']],
             'filter' => true,
             'exclude' => true,
             'sorting' => true,

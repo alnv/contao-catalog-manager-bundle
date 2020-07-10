@@ -137,8 +137,8 @@ $GLOBALS['CM_ROLES'] = [
         'sql' => "blob NULL",
     ],
     'alias' => [
-        'group' => 'article',
         'rgxp' => 'alias',
+        'group' => 'article',
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'type' => [
@@ -187,6 +187,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'hero' => [
         'group' => 'article',
+        'type' => 'image',
         'sql' => "blob NULL"
     ],
     'duration' => [
