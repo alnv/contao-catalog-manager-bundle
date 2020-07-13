@@ -437,7 +437,7 @@ class Toolkit {
         $objSlugGenerator = new \Ausi\SlugGenerator\SlugGenerator((new \Ausi\SlugGenerator\SlugOptions)
             ->setValidChars($strValidChars)
             ->setLocale('de')
-            ->setDelimiter('_'));
+            ->setDelimiter('-'));
         $strValue = $objSlugGenerator->generate($strValue);
 
         if ( strlen( $strValue ) > 100 ) {
