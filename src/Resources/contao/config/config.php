@@ -102,6 +102,10 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'miscellaneous',
         'sql' => "blob NULL",
     ],
+    'hasmany' => [
+        'group' => 'relation',
+        'sql' => "blob NULL"
+    ],
     'title' => [
         'group' => 'article',
         'sql' => "varchar(255) NOT NULL default '%s'"
@@ -332,6 +336,10 @@ $GLOBALS['CM_ROLES'] = [
     'datim' => [
         'group' => 'date',
         'rgxp' => 'datim',
+        'sql' => "int(10) unsigned NULL"
+    ],
+    'hasone' => [
+        'group' => 'relation',
         'sql' => "int(10) unsigned NULL"
     ],
     'time' => [
