@@ -25,7 +25,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'icon' => 'header.gif'
             ],
             'copy' => [
-                'href' => 'act=copy',
+                'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.gif'
             ],
             'delete' => [

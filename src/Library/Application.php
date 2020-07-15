@@ -9,16 +9,13 @@ class Application {
         $objCatalogCollection = new CatalogCollection();
         $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
 
-        foreach ( $arrCatalogs as $arrCatalog ) {
-
-            if ( !$arrCatalog['navigation'] ) {
-
+        foreach ($arrCatalogs as $arrCatalog) {
+            if (!$arrCatalog['navigation']) {
                 continue;
             }
-
             $arrModule = [];
-            $arrModule[ $arrCatalog['module'] ] = $this->generateBeModConfig( $arrCatalog );
-            array_insert( $GLOBALS['BE_MOD'][ $arrCatalog['navigation'] ], (int) $arrCatalog['position'], $arrModule );
+            $arrModule[$arrCatalog['module']] = $this->generateBeModConfig($arrCatalog);
+            array_insert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
         }
     }
 
