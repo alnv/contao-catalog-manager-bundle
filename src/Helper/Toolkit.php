@@ -73,13 +73,12 @@ class Toolkit {
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['sql']) && $arrRole['sql']) {
-
-            return sprintf( $arrRole['sql'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
+            return sprintf($arrRole['sql'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
         }
 
         $arrSql = static::getSqlTypes();
 
-        if ( $arrOptions['multiple'] ) {
+        if ($arrOptions['multiple']) {
             return $arrSql['blob'];
         }
 

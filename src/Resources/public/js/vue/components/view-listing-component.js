@@ -1,4 +1,4 @@
-const viewListingComponent = Vue.component( 'view-listing', {
+const viewListingComponent = Vue.component('view-listing', {
     data: function () {
         return {
             view: null,
@@ -111,40 +111,12 @@ const viewListingComponent = Vue.component( 'view-listing', {
             this.$parent.setLoadingAlert( '', this );
             this.fetch();
         },
-        /*
-        collectShareData: function () {
-            this.shareData = [];
-            var arrShares = this.$refs.view.querySelectorAll('*[data-share]');
-            for ( var i = 0; i < arrShares.length; i++ ) {
-                var objShare = arrShares[i];
-                var strShare = objShare.dataset['share'];
-                if ( strShare === null || strShare === '' ) {
-                    continue;
-                }
-                if ( this.shareData.indexOf( strShare ) === -1 ) {
-                    this.shareData.push( strShare );
-                }
-            }
-        }
-        */
-    },
-    watch: {
-        /*
-        shareData : {
-            handler: function () {
-                this.$parent.shared['listingShareData'] = this.shareData;
-                this.$parent.onChange(this);
-            },
-            deep: true
-        }
-        */
     },
     updated: function () {
         this.$nextTick(function () {
             this.sortable();
             this.pagination();
             this.setMasonryLayout();
-            // this.collectShareData();
         })
     },
     mounted: function () {

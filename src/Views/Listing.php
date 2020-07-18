@@ -11,7 +11,6 @@ class Listing extends View {
         $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
         $objEntities = $objModel->findAll($this->getModelOptions());
-
         if ($objEntities !== null) {
             while ($objEntities->next()) {
                 $this->parseEntity($objEntities->row());

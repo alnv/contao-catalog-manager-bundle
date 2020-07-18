@@ -2,9 +2,10 @@
 
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
+        'closed' => true,
         'dataContainer' => 'Table',
         'enableVersioning' => true,
-        'closed' => true,
+        'ptable' => 'tl_catalog_field',
         'onsubmit_callback' => [
             function(\DataContainer $objDataContainer) {
                 if (!$objDataContainer->activeRecord || !\Input::get('dcaWizard')) {
@@ -26,7 +27,6 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
             }
         ],
-        'onload_callback' => [],
         'sql' => [
             'keys' => [
                 'id' => [
@@ -39,43 +39,34 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     ],
     'list' => [
         'sorting' => [
-            'mode' => 1,
-            'flag' => 4,
-            'fields' => [ 'pid' ],
-            'panelLayout' => 'filter;sort,search,limit'
-        ],
-        'label' => [
-            'fields' => [ 'label' ]
+            'mode' => 4,
+            'fields' => ['sorting'],
+            'headerFields' => ['name', 'type', 'fieldname', 'role'],
+            'child_record_callback' => function($arrRow) {
+                return $arrRow['label'] . '<span style="color:#999;padding-left:3px">['. $arrRow['value'] .']</span>';
+            }
         ],
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.gif'
+                'icon' => 'header.gif',
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog_option']['edit']
             ],
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog_option']['delete'],
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
                 'icon' => 'show.gif'
             ]
-        ],
-        'global_operations' => [
-            'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            ]
         ]
     ],
     'palettes' => [
-        '__selector__' => [],
         'default' => 'label,value'
     ],
-    'subpalettes' => [],
     'fields' => [
         'id' => [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]

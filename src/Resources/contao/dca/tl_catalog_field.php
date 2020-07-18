@@ -15,9 +15,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'list' => [
         'sorting' => [
             'mode' => 4,
-            'fields' => [ 'sorting' ],
-            'headerFields' => [ 'type', 'name', 'table' ],
-            'child_record_callback'   => [ 'catalogmanager.datacontainer.catalogfield', 'listFields' ]
+            'fields' => ['sorting'],
+            'headerFields' => ['type', 'name', 'table'],
+            'child_record_callback'   => ['catalogmanager.datacontainer.catalogfield', 'listFields']
+        ],
+        'label' => [
+            'fields' => ['name'],
+            'format' => '%s',
+            'label_callback' => ['catalogmanager.datacontainer.catalog', 'addIcon']
         ],
         'operations' => [
             'edit' => [
@@ -166,7 +171,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'spaceToUnderscore' => true,
             ],
             'save_callback' => [
-                [ 'catalogmanager.datacontainer.catalogfield', 'watchFieldname' ]
+                ['catalogmanager.datacontainer.catalogfield', 'watchFieldname']
             ],
             'search' => true,
             'exclude' => true,
@@ -195,8 +200,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'eval' => [
                 'showOperations' => true,
                 'orderField' => 'sorting ASC',
-                'fields' => ['id','label','value'],
-                'operations' => ['edit','delete']
+                'operations' => ['edit','delete'],
+                'fields' => ['id','label','value']
             ]
         ],
         'multiple' => [

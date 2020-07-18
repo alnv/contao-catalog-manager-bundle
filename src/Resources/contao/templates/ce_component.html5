@@ -2,6 +2,6 @@
     {{insert_module::<?= $this->detailModule ?>}}
 <?php else: ?>
     <div class="ce_component block v-component">
-        <view-listing module="<?= $this->module ?>" page="<?= $this->page ?>"></view-listing>
+        <view-listing module="<?= $this->module ?>" page="<?= $this->page ?>" :reload="true"></view-listing>
     </div>
 <?php endif; ?>

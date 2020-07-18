@@ -96,20 +96,22 @@ class Database {
             return $this->createFieldIfNotExist($strNewField, $strTable, $strSql);
         }
 
-        $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s CHANGE `%s` `%s` %s', $strTable, $strOldField, $strNewField, $strSql ) )->execute();
+        $this->objDatabase->prepare(sprintf( 'ALTER TABLE %s CHANGE `%s` `%s` %s', $strTable, $strOldField, $strNewField, $strSql))->execute();
 
         return true;
     }
 
-    public function changeFieldType( $strField, $strTable, $strSql ) {
+    public function changeFieldType($strField, $strTable, $strSql) {
 
-        if ( !$this->objDatabase->fieldExists( $strField, $strTable, true ) ) {
-
+        if (!$this->objDatabase->fieldExists($strField, $strTable, true)) {
             return null;
         }
 
-        //todo try and catch block
-        $this->objDatabase->prepare( sprintf( 'ALTER TABLE %s MODIFY COLUMN %s %s', $strTable, $strField, $strSql ) )->execute();
+        try {
+            $this->objDatabase->prepare(sprintf( 'ALTER TABLE %s MODIFY COLUMN %s %s', $strTable, $strField, $strSql))->execute();
+        } catch (\Exception $exception) {
+            //
+        }
 
         return true;
     }
