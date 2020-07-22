@@ -5,17 +5,17 @@ namespace Alnv\ContaoCatalogManagerBundle\Modules;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
-use BackendTemplate;
-use System;
+class Listing extends \Hybrid {
 
-class Listing extends \Module {
-
+    protected $objModel;
+    protected $strKey = 'id';
     protected $arrOptions = [];
+    protected $strTable = 'tl_module';
 
     public function generate() {
 
-        if ( System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend' ) {
-            $objTemplate = new BackendTemplate('be_wildcard');
+        if (\System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend') {
+            $objTemplate = new \BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
@@ -32,6 +32,9 @@ class Listing extends \Module {
         if (\Input::get('auto_item') && $this->cmMasterModule) {
             return \Controller::getFrontendModule($this->cmMasterModule);
         }
+
+        $this->strKey = $this->type;
+        $this->typePrefix = $this->strTable == 'tl_module' ? 'mod_' : 'ce_';
 
         return parent::generate();
     }
@@ -221,7 +224,7 @@ class Listing extends \Module {
 
     protected function setFormPage() {
 
-        if ( !$this->cmForm || !$this->cmFormPage ) {
+        if (!$this->cmForm || !$this->cmFormPage) {
             return null;
         }
 

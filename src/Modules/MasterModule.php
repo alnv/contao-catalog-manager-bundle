@@ -10,7 +10,7 @@ class MasterModule extends \Module {
 
     public function generate() {
 
-        if ( \System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend' ) {
+        if ( \System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
 
             $objTemplate = new \BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;

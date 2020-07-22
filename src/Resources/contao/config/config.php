@@ -30,12 +30,14 @@ array_insert( $GLOBALS['FE_MOD'], 2, [
     ]
 ]);
 
-$GLOBALS['TL_CTE']['includes']['component'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentComponent';
+$GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
+$GLOBALS['TL_CTE']['catalog-manager-bundle']['component'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentComponent';
+$GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentListView';
 
 $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js' );
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js' );
-$objCatalogAssetsManager->addIfNotExist( 'bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js' );
+$objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js');
+$objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js');
+$objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js');
 
 $GLOBALS['TL_HOOKS']['compileArticle'][] = ['catalogmanager.hooks.article', 'compileArticle'];
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'generateMaster'];

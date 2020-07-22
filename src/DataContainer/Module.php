@@ -26,7 +26,8 @@ class Module {
 
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
 
-            $arrReturn[$strField] = is_array($arrField['label']) ? $arrField['label'][0] : $strField;
+            $strValue = is_array($arrField['label']) ? $arrField['label'][0] : $strField;
+            $arrReturn[$strField] = \StringUtil::decodeEntities($strValue);
         }
         return $arrReturn;
     }

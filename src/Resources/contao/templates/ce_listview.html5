@@ -1,0 +1,7 @@
+<?php $this->extend('block_searchable'); ?>
+<?php $this->block('content'); ?>
+<?php foreach ( $this->entities as $arrEntity ): ?>
+    <!-- feel free to define your own list -->
+<?php endforeach; ?>
+<?= $this->pagination ?>
+<?php $this->endblock(); ?>
