@@ -187,13 +187,13 @@ abstract class View extends \Controller {
         $arrReturn = [];
         $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language' ];
 
-        foreach ( $arrOptions as $strOption ) {
-            if ( isset($this->arrOptions[ $strOption ])) {
+        foreach ($arrOptions as $strOption) {
+            if (isset($this->arrOptions[ $strOption ])) {
                 $arrReturn[$strOption] = $this->arrOptions[$strOption];
             }
         }
 
-        if ( isset($GLOBALS['TL_HOOKS']['getModelOptions']) && is_array($GLOBALS['TL_HOOKS']['getModelOptions'])) {
+        if (isset($GLOBALS['TL_HOOKS']['getModelOptions']) && is_array($GLOBALS['TL_HOOKS']['getModelOptions'])) {
             foreach ($GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback) {
                 $this->import( $arrCallback[0] );
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);

@@ -2,7 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class PageLayout {
+class PageLayout extends \System {
+
+    public function __construct() {
+
+        parent::__construct();
+    }
 
     public function generateMaster( \PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular ) {
 
@@ -11,7 +16,6 @@ class PageLayout {
         }
 
         $this->getMasterByPageId($objPage->id);
-        $this->setMetaInformation();
     }
     
     public function getMasterByPageId($strPageId,$strAlias=null) {
@@ -36,9 +40,11 @@ class PageLayout {
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
         ]))->parse()[0];
+
+        $this->setMetaInformation($strTable);
     }
 
-    protected function setMetaInformation() {
+    protected function setMetaInformation($strTable=null) {
 
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return null;
@@ -47,6 +53,13 @@ class PageLayout {
         global $objPage;
         $objPage->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
         $objPage->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
+
+        if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
+            foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {
+                $this->import( $arrCallback[0] );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}($objPage, $strTable);
+            }
+        }
     }
 
     protected function searchTableAndReturnTable($strPageId) {
