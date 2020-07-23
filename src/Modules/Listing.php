@@ -35,6 +35,9 @@ class Listing extends \Hybrid {
 
         $this->strKey = $this->type;
         $this->typePrefix = $this->strTable == 'tl_module' ? 'mod_' : 'ce_';
+        if ($this->customTpl && TL_MODE == 'FE') {
+            $this->strTemplate = $this->customTpl;
+        }
 
         return parent::generate();
     }
