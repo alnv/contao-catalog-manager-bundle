@@ -9,7 +9,7 @@ class RoleResolver extends \System {
     public static $arrEntity = null;
     protected static $arrInstances = [];
 
-    public static function getInstance( $strTable, $arrEntity = [] ) {
+    public static function getInstance($strTable, $arrEntity = []) {
 
         if ( $strTable === null ) {
             return new self;
@@ -68,43 +68,55 @@ class RoleResolver extends \System {
         return $arrRoles;
     }
 
-    public function getRole( $strRolename ) {
+    public function getRole($strRolename) {
 
-        return $GLOBALS['CM_ROLES'][ $strRolename ];
+        return $GLOBALS['CM_ROLES'][$strRolename];
     }
 
-    public function getValueByRole( $strRolename ) {
+    public function getValueByRole($strRolename) {
 
-        if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
+        if (!isset(self::$arrRoles[$strRolename])) {
             return '';
         }
 
-        return self::$arrRoles[ $strRolename ]['value'];
+        return self::$arrRoles[$strRolename]['value'];
     }
 
-    public function getFieldByRole( $strRolename ) {
+    public function getFieldByRole($strRolename) {
 
-        if ( !isset( self::$arrRoles[ $strRolename ] ) ) {
+        if (!isset(self::$arrRoles[$strRolename])) {
             return '';
         }
 
-        return self::$arrRoles[ $strRolename ]['name'];
+        return self::$arrRoles[$strRolename]['name'];
     }
 
-    public function getGeoCodingAddress() {
+    public function getFieldsByRoles($arrRoles) {
 
-        $arrAddress = [];
-        $arrAddressFields = [ 'street', 'streetNumber', 'zip', 'city', 'state', 'country' ];
-
-        foreach ( $arrAddressFields as $strAddressField ) {
-
-            if ( isset( self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ] ) ) {
-                $arrAddress[ $strAddressField ] = self::$arrEntity[ self::$arrRoles[ $strAddressField ]['name'] ];
+        $arrReturn = [];
+        foreach ($arrRoles as $strRole) {
+            $strValue = $this->getValueByRole($strRole);
+            if ($strValue) {
+                $arrReturn[$strRole] = $strValue;
             }
         }
 
-        $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder( $arrAddress );
-        return $objAddress->getAddress();
+        return empty($arrReturn) ? null : $arrReturn;
+    }
+
+    public function getGeoCodingAddress($strDelimiter=', ') {
+
+        $arrAddress = [];
+        $arrAddressRoles = ['street', 'streetNumber', 'zip', 'city', 'state', 'country'];
+
+        foreach ($arrAddressRoles as $strRole) {
+            if ($strValue = $this->getValueByRole($strRole)) {
+                $arrAddress[$strRole] = $strValue;
+            }
+        }
+
+        $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
+        return $objAddress->getAddress($strDelimiter);
     }
 
     public function getGeoCodingFields() {

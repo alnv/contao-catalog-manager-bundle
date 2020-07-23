@@ -282,6 +282,11 @@ $GLOBALS['CM_ROLES'] = [
         'rgxp' => 'url',
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
+    'website' => [
+        'group' => 'contact',
+        'rgxp' => 'url',
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
     'phone' => [
         'group' => 'contact',
         'rgxp' => 'phone',

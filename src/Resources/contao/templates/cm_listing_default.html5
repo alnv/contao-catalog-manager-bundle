@@ -1,15 +1,15 @@
 <div class="cm_listing default">
-    <?php if ( $this->masterUrl ): ?><a href="<?= $this->masterUrl ?>"><?php endif; ?>
-    <?php if ( $strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($this->roleResolver()->getValueByRole('image'))): ?>
+    <?php if ($this->masterUrl): ?><a href="<?= $this->masterUrl ?>"><?php endif; ?>
+    <?php if ($strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($this->roleResolver()->getValueByRole('image'))): ?>
         <figure>
             <img src="<?= $strImage ?>" alt="">
         </figure>
     <?php endif; ?>
-    <?php if ( $strTitle = $this->roleResolver()->getValueByRole('title') ): ?>
+    <?php if ($strTitle = $this->roleResolver()->getValueByRole('title')): ?>
         <h3><?= $strTitle ?></h3>
     <?php endif; ?>
-    <?php if ( $strTeaser = $this->roleResolver()->getValueByRole('teaser') ): ?>
+    <?php if ($strTeaser = $this->roleResolver()->getValueByRole('teaser')): ?>
         <div class="teaser"><?= $strTeaser ?></div>
     <?php endif; ?>
-    <?php if ( $this->masterUrl ): ?></a><?php endif; ?>
+    <?php if ($this->masterUrl): ?></a><?php endif; ?>
 </div>

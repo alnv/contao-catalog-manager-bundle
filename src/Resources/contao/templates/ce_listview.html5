@@ -1,7 +1,29 @@
 <?php $this->extend('block_searchable'); ?>
 <?php $this->block('content'); ?>
 <?php foreach ( $this->entities as $arrEntity ): ?>
-    <!-- feel free to define your own list -->
+    <?php if ($strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($arrEntity['roleResolver']()->getValueByRole('image'))): ?>
+        <figure><img src="<?= $strImage ?>" alt=""></figure>
+    <?php endif; ?>
+    <?php if ($strTitle = $arrEntity['roleResolver']()->getValueByRole('title')): ?>
+        <h3><?= $strTitle ?></h3>
+    <?php endif; ?>
+    <?php if ($strSubtitle = $arrEntity['roleResolver']()->getValueByRole('subtitle')): ?>
+        <p class="subtitle"><?= $strSubtitle ?></p>
+    <?php endif;  ?>
+    <?php if ($strTeaser = $arrEntity['roleResolver']()->getValueByRole('teaser')): ?>
+        <div class="teaser"><?= $strTeaser ?></div>
+    <?php endif; ?>
+    <?php if ($arrAddress = $arrEntity['roleResolver']()->getGeoCodingAddress('</br>')): ?>
+        <p class="address"><?= $arrAddress ?></p>
+    <?php endif; ?>
+    <?php if ($arrContact = $arrEntity['roleResolver']()->getFieldsByRoles(['email', 'phone', 'mobile', 'website'])): ?>
+        <div class="contact">
+            <p><?php foreach ($arrContact as $strValue): ?><?= $strValue ?>{{br}}<?php endforeach; ?></p>
+        </div>
+    <?php endif; ?>
+    <?php if ($this->masterUrl): ?>
+        <a href="<?= $this->masterUrl ?>"><?= $GLOBALS['TL_LANG']['MSC']['more'] ?></a>
+    <?php endif; ?>
 <?php endforeach; ?>
 <?= $this->pagination ?>
 <?php $this->endblock(); ?>
