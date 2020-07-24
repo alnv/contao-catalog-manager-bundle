@@ -27,14 +27,14 @@ class Options {
         switch ( static::$arrField['optionsSource'] ) {
             case 'options':
                 $objOptions = CatalogOptionModel::findAll([
-                    'column' => [ 'pid=?' ],
-                    'value' => [ static::$arrField['id'] ],
+                    'column' => ['pid=?'],
+                    'value' => [static::$arrField['id']],
                     'order' => 'sorting ASC'
                 ]);
                 if ( $objOptions === null ) {
                     return $arrReturn;
                 }
-                while ( $objOptions->next() ) {
+                while ($objOptions->next()) {
                     $strLabel = self::getLabel($objOptions->value, $objOptions->label);
                     $strValue = $objOptions->value;
                     if ($blnAsAssoc) {
@@ -56,7 +56,7 @@ class Options {
                 if ( $objEntities === null ) {
                     return $arrReturn;
                 }
-                while ( $objEntities->next() ) {
+                while ($objEntities->next()) {
                     $strValue = $objEntities->{static::$arrField['dbKey']};
                     $strLabel = $objEntities->{static::$arrField['dbLabel']};
                     if ($blnAsAssoc) {
@@ -105,7 +105,7 @@ class Options {
                         return true;
                     });
                     if (empty($arrOptions['value'])) {
-                        unset($arrOptions['value'] );
+                        unset($arrOptions['value']);
                         unset($arrOptions['column']);
                     }
                 }

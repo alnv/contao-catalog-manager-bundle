@@ -253,8 +253,8 @@ class Toolkit {
             case 'radio':
                 $varValue = !is_array($arrField['value']) ? [$arrField['value']] : $arrField['value'];
                 $arrOptionValues =  static::getSelectedOptions($varValue, $arrField['options']);
-                if ( $blnStringFormat ) {
-                    return static::parse( $arrOptionValues );
+                if ($blnStringFormat) {
+                    return static::parse($arrOptionValues);
                 }
                 return $arrOptionValues;
                 break;
@@ -318,21 +318,35 @@ class Toolkit {
         return $arrField['value'];
     }
 
-    public static function getSelectedOptions( $arrValues, $arrOptions ) {
+    public static function getSelectedOptions($arrValues, $arrOptions) {
 
         $arrReturn = [];
-
-        if ( !is_array( $arrOptions ) || !is_array( $arrValues ) ) {
-            return [];
+        if (!is_array($arrOptions) || !is_array($arrValues)) {
+            return $arrReturn;
         }
 
-        foreach ( $arrOptions as $arrValue ) {
-            if ( in_array( $arrValue['value'], $arrValues ) ) {
-                $arrReturn[] = $arrValue;
+        $arrTemp = [];
+        foreach ($arrOptions as $arrValue) {
+            if (in_array($arrValue['value'], $arrValues)) {
+                $arrTemp[$arrValue['value']] = $arrValue;
             }
         }
 
+        foreach ($arrValues as $strValue) {
+            $arrReturn[] = $arrTemp[$strValue];
+        }
+
         return $arrReturn;
+    }
+
+    public function cmp($a, $b){
+        $strKey = 'value';
+        if($a[$strKey] < $b[$strKey]){
+            return 1;
+        }else if($a[$strKey] > $b[$strKey]){
+            return -1;
+        }
+        return 0;
     }
 
     public static function saveGeoCoordinates( $strTable, $arrActiveRecord ) {

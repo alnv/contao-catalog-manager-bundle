@@ -287,12 +287,14 @@ abstract class View extends \Controller {
                 }
             }
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
+            $strField = $arrRelation['table'] .'.'. $arrRelation['field'];
             foreach ($arrValues as $strValue) {
-                $arrColumns[] = 'FIND_IN_SET(?,'. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
+                $arrColumns[] = 'FIND_IN_SET(?,'. $strField .')';
             }
             $objList = new Listing($arrRelation['table'], [
                 'column' => [implode('OR ', $arrColumns)],
-                'value' => $arrValues
+                'value' => $arrValues,
+                'order' => 'FIELD('. $strField .', '. implode(',', $arrValues) .')' // @exp.
             ]);
 
             return $objList->parse();
