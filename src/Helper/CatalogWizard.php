@@ -110,7 +110,6 @@ abstract class CatalogWizard extends \System {
         $blnMultiple = $arrField['multiple'] ? true : false;
         $arrField['description'] = trim(strip_tags($arrField['description']));
         $arrReturn = [
-            'exclude' => true,
             'filter' => $blnMultiple,
             'search' => !$blnMultiple,
             'sorting' => !$blnMultiple,
