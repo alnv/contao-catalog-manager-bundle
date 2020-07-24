@@ -138,11 +138,11 @@ abstract class CatalogWizard extends \System {
             $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
         }
 
-        if (in_array($arrField['type'], ['select', 'radio', 'checkbox'])) {
+        if (in_array($arrField['type'], ['select', 'radio', 'checkbox', 'checkboxWizard'])) {
 
             $arrReturn['options_callback'] = function ($objDataContainer = null) use ($arrField) {
-                $objOptions = Options::getInstance( $arrField['fieldname'] . '.' . $arrField['pid'] );
-                $objOptions::setParameter( $arrField, $objDataContainer );
+                $objOptions = Options::getInstance($arrField['fieldname'] . '.' . $arrField['pid']);
+                $objOptions::setParameter($arrField, $objDataContainer);
                 return $objOptions::getOptions();
             };
 
@@ -162,7 +162,6 @@ abstract class CatalogWizard extends \System {
         }
 
         switch ($arrField['type']) {
-
             case 'text':
                 $arrReturn['inputType'] = 'text';
                 if ($arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1) {
@@ -179,22 +178,23 @@ abstract class CatalogWizard extends \System {
                 }
                 $arrReturn['eval']['datepicker'] = true;
                 break;
-
             case 'color':
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['colorpicker'] = true;
                 break;
-
             case 'select':
                 $arrReturn['inputType'] = 'select';
                 $arrReturn['eval']['chosen'] = true;
                 break;
-
             case 'radio':
                 $arrReturn['inputType'] = 'radio';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 break;
-
+            case 'checkboxWizard':
+                $arrReturn['inputType'] = 'checkboxWizard';
+                $arrReturn['eval']['tl_class'] = 'clr';
+                $arrReturn['multiple'] = true;
+                break;
             case 'checkbox':
                 $arrReturn['inputType'] = 'checkbox';
                 $arrReturn['eval']['tl_class'] = 'clr';
@@ -203,7 +203,6 @@ abstract class CatalogWizard extends \System {
                     unset($arrReturn['options_callback']);
                 }
                 break;
-
             case 'textarea':
                 $arrReturn['inputType'] = 'textarea';
                 $arrReturn['eval']['tl_class'] = 'clr';
@@ -211,7 +210,6 @@ abstract class CatalogWizard extends \System {
                     $arrReturn['eval']['rte'] = 'tinyMCE';
                 }
                 break;
-
             case 'empty':
                 $arrEmpty = [
                     'label' => $arrReturn['label'],
@@ -222,7 +220,6 @@ abstract class CatalogWizard extends \System {
                 ];
                 $arrReturn = $arrEmpty;
                 break;
-
             case 'pagepicker':
                 $arrReturn['inputType'] = 'pageTree';
                 $arrReturn['foreignKey'] = 'tl_page.title';
@@ -237,7 +234,6 @@ abstract class CatalogWizard extends \System {
                 ];
                 $arrReturn['eval']['tl_class'] = 'clr';
                 break;
-
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
                 $arrReturn['filter'] = false;

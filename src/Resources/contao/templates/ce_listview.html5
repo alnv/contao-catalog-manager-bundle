@@ -1,6 +1,6 @@
 <?php $this->extend('block_searchable'); ?>
 <?php $this->block('content'); ?>
-<?php foreach ( $this->entities as $arrEntity ): ?>
+<?php foreach ($this->entities as $arrEntity): ?>
     <?php if ($strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($arrEntity['roleResolver']()->getValueByRole('image'))): ?>
         <figure><img src="<?= $strImage ?>" alt=""></figure>
     <?php endif; ?>
@@ -9,7 +9,7 @@
     <?php endif; ?>
     <?php if ($strSubtitle = $arrEntity['roleResolver']()->getValueByRole('subtitle')): ?>
         <p class="subtitle"><?= $strSubtitle ?></p>
-    <?php endif;  ?>
+    <?php endif; ?>
     <?php if ($strTeaser = $arrEntity['roleResolver']()->getValueByRole('teaser')): ?>
         <div class="teaser"><?= $strTeaser ?></div>
     <?php endif; ?>

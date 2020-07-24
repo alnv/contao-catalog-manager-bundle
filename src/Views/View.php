@@ -270,7 +270,6 @@ abstract class View extends \Controller {
             if (!is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation']) || empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'])) {
                 return [];
             }
-
             $arrColumns = [];
             $arrValues = [];
             foreach ($arrRow[$strField] as $varValue) {
@@ -289,10 +288,10 @@ abstract class View extends \Controller {
             }
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
             foreach ($arrValues as $strValue) {
-                $arrColumns[] = 'FIND_IN_SET(?, '. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
+                $arrColumns[] = 'FIND_IN_SET(?,'. $arrRelation['table'] .'.'. $arrRelation['field'] .')';
             }
             $objList = new Listing($arrRelation['table'], [
-                'column' => $arrColumns,
+                'column' => [implode('OR ', $arrColumns)],
                 'value' => $arrValues
             ]);
 

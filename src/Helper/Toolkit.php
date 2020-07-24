@@ -247,6 +247,7 @@ class Toolkit {
             case 'text':
                 return $arrField['value'];
                 break;
+            case 'checkboxWizard':
             case 'checkbox':
             case 'select':
             case 'radio':
