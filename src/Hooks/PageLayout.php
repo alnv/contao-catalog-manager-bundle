@@ -11,7 +11,7 @@ class PageLayout extends \System {
 
     public function generateMaster( \PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular ) {
 
-        if ( !isset($_GET['auto_item']) && ! $_GET['auto_item']) {
+        if (!isset($_GET['auto_item']) && ! $_GET['auto_item']) {
             return null;
         }
 
@@ -25,8 +25,8 @@ class PageLayout extends \System {
         }
         $strTable = null;
         $strMasterPageId = $strPageId;
-        $objModule = \Database::getInstance()->prepare( 'SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?' )->execute('listing','1',$strPageId);
-        if ( !$objModule->numRows ) {
+        $objModule = \Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
+        if (!$objModule->numRows) {
             $strTable = $this->searchTableAndReturnTable($strPageId);
             if (!$strTable) {
                 return null;
@@ -77,6 +77,19 @@ class PageLayout extends \System {
                 return $strTable;
             }
         }
+        $objContent = \ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article');
+        if ($objContent == null) {
+            return null;
+        }
+        while ($objContent->next()) {
+            if (!in_array($objContent->type, ['listview'])) {
+                continue;
+            }
+            if (!$objContent->cmTable) {
+                continue;
+            }
+            return $objContent->cmTable;
+        }
         return null;
     }
 
@@ -90,7 +103,7 @@ class PageLayout extends \System {
                 if ($objModule == null) {
                     continue;
                 }
-                if ($objModule->cmMaster) {
+                if ($objModule->cmMaster || $objModule->type == 'master') {
                     return $objModule->cmTable;
                 }
             }

@@ -21,8 +21,8 @@
             <p><?php foreach ($arrContact as $strValue): ?><?= $strValue ?>{{br}}<?php endforeach; ?></p>
         </div>
     <?php endif; ?>
-    <?php if ($this->masterUrl): ?>
-        <a href="<?= $this->masterUrl ?>"><?= $GLOBALS['TL_LANG']['MSC']['more'] ?></a>
+    <?php if ($arrEntity['masterUrl']): ?>
+        <a href="<?= $arrEntity['masterUrl'] ?>"><?= $GLOBALS['TL_LANG']['MSC']['more'] ?></a>
     <?php endif; ?>
 <?php endforeach; ?>
 <?= $this->pagination ?>

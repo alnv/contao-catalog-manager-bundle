@@ -33,7 +33,7 @@ abstract class View extends \Controller {
 
                 case 'masterPage':
                     $objPage = \PageModel::findByPk( $varValue );
-                    if ( $objPage !== null ) {
+                    if ($objPage !== null) {
                         $this->arrMasterPage = $objPage->row();
                         $this->arrOptions['masterPage'] = true;
                     }
@@ -313,7 +313,7 @@ abstract class View extends \Controller {
             return $objMaster->parse()[0];
         };
 
-        $arrRow['getContentElements'] = function () use ( $arrRow ) {
+        $arrRow['getContentElements'] = function () use ($arrRow) {
             $strReturn = '';
             $objContent = \ContentModel::findPublishedByPidAndTable($arrRow['id'], $this->strTable);
             if ( $objContent === null ) {
