@@ -9,9 +9,7 @@ $GLOBALS['TL_DCA']['tl_catalog_element'] = [
         'enableVersioning' => true,
         'sql' => [
             'keys' => [
-                'id' => [
-                    'id' => 'primary'
-                ]
+                'id' => 'primary'
             ]
         ]
     ],

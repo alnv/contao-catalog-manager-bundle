@@ -16,9 +16,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'pid' => 'index',
-                'table' => 'index',
-                'module' => 'index'
+                'pid,table,module' => 'index'
             ]
         ]
     ],

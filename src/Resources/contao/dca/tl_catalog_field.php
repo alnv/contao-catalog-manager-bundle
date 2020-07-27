@@ -7,8 +7,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'pid' => 'index',
-                'fieldname' => 'index'
+                'pid,fieldname' => 'index'
             ]
         ]
     ],

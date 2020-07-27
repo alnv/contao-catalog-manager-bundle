@@ -29,11 +29,8 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
         ],
         'sql' => [
             'keys' => [
-                'id' => [
-                    'id' => 'primary',
-                    'pid' => 'index',
-                    'value' => 'index'
-                ]
+                'id' => 'primary',
+                'pid,value' => 'index'
             ]
         ]
     ],
