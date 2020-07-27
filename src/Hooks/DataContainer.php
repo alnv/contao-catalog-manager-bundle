@@ -10,14 +10,14 @@ class DataContainer {
     public function generateDataContainerArray( $strTable ) {
 
         $objRequest = \System::getContainer()->get( 'request_stack' )->getCurrentRequest();
-        if ( !$objRequest ) {
+        if (!$objRequest) {
             return null;
         }
-        if ( $objRequest->get('_route') == 'contao_install' ) {
+        if ($objRequest->get('_route') == 'contao_install') {
             return null;
         }
 
-        if ( $strTable && !isset($GLOBALS['TL_DCA'][$strTable]) ) {
+        if ($strTable && !isset($GLOBALS['TL_DCA'][$strTable])) {
             $objCatalog = CatalogModel::findByTableOrModule( $strTable );
             if ( $objCatalog !== null ) {
                 $objVirtualDataContainerArray = new Application();

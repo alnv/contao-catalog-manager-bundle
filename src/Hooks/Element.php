@@ -6,11 +6,11 @@ use Contao\CoreBundle\DataContainer\PaletteManipulator;
 
 class Element {
 
-    public function isVisibleElement($objElement, $blnIsVisible) {
+    public function isVisibleElement(&$objElement, $blnIsVisible) {
 
-        $objRequest = \System::getContainer()->get( 'request_stack' )->getCurrentRequest();
+        $objRequest = \System::getContainer()->get('request_stack')->getCurrentRequest();
 
-        if ( $objRequest === null ) {
+        if ($objRequest === null) {
             return $blnIsVisible;
         }
 
@@ -38,11 +38,11 @@ class Element {
         return $blnIsVisible;
     }
 
-    public function onloadCallback( \DataContainer $dc ) {
+    public function onloadCallback(\DataContainer $dc) {
 
-        foreach ($GLOBALS['TL_DCA'][ $dc->table ]['palettes'] as $strPalette => $strField) {
+        foreach ($GLOBALS['TL_DCA'][$dc->table]['palettes'] as $strPalette => $strField) {
 
-            if (in_array($strPalette, [ '__selector__', 'default' ])) {
+            if (in_array($strPalette, ['__selector__', 'default'])) {
                 continue;
             }
 

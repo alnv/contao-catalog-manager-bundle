@@ -7,21 +7,17 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 class Listing extends \Hybrid {
 
-    protected $objModel;
-    protected $strKey = 'id';
-    protected $arrOptions = [];
-    protected $strTable = 'tl_module';
+    protected $objModel = null;
 
     public function generate() {
 
-        if (\System::getContainer()->get( 'request_stack' )->getCurrentRequest()->get('_scope') == 'backend') {
+        if (\System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
             $objTemplate = new \BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
             $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . strtoupper( $GLOBALS['TL_LANG']['FMD'][$this->type][0] ) . ' ###';
-
+            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['FMD'][$this->type][0]) . ' ###';
             return $objTemplate->parse();
         }
 
@@ -92,7 +88,7 @@ class Listing extends \Hybrid {
         $objRoleResolver = RoleResolver::getInstance( $this->cmTable );
         $arrGeoCodingFields = $objRoleResolver->getGeoCodingFields();
 
-        if ( empty( $arrGeoCodingFields ) ) {
+        if (empty($arrGeoCodingFields)) {
             return false;
         }
 
@@ -103,19 +99,19 @@ class Listing extends \Hybrid {
             'city' => Toolkit::getValueFromUrl( \Input::get('city') ),
         ];
 
-        if ( empty( array_filter( $arrAddress ) ) ) {
+        if (empty(array_filter($arrAddress))) {
             return false;
         }
 
-        $arrAddress['state'] = Toolkit::getValueFromUrl( \Input::get('state') );
-        $arrAddress['country'] = Toolkit::getValueFromUrl( \Input::get('country') );
+        $arrAddress['state'] = Toolkit::getValueFromUrl(\Input::get('state'));
+        $arrAddress['country'] = Toolkit::getValueFromUrl(\Input::get('country'));
         $objAddressBuilder = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
         $strAddress = $objAddressBuilder->getAddress();
         $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
 
-        if ( $arrGeoCoding !== null ) {
+        if ($arrGeoCoding !== null) {
 
             $this->arrOptions['distance'] = [
                 'latCord' => $arrGeoCoding['latitude'],

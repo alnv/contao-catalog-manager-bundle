@@ -9,25 +9,29 @@ class RoleResolver extends \System {
     public static $arrEntity = null;
     protected static $arrInstances = [];
 
-    public static function getInstance($strTable, $arrEntity = []) {
+    public static function getInstance($strTable, $arrEntity=[]) {
 
-        if ( $strTable === null ) {
+        if ($strTable === null) {
             return new self;
         }
 
-        $strInstanceKey = $strTable . ( $arrEntity['id'] ? '_' . $arrEntity['id'] : '' );
+        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
 
-        if ( !array_key_exists( $strInstanceKey, self::$arrInstances ) ) {
+        if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
             self::$strTable = $strTable;
             self::$arrEntity = $arrEntity;
-            self::$arrRoles = static::setRoles();
-            self::$arrInstances[ $strInstanceKey ] = new self;
+            self::$arrInstances[$strInstanceKey] = new self;
         }
 
-        return self::$arrInstances[ $strInstanceKey ];
+        if (!\Cache::has($strInstanceKey)) {
+            \Cache::set($strInstanceKey, static::setRoles());
+        }
+        self::$arrRoles =\Cache::get($strInstanceKey);
+
+        return self::$arrInstances[$strInstanceKey];
     }
 
-    protected function setRoles() {
+    protected static function setRoles() {
 
         \Controller::loadDataContainer(self::$strTable);
         \System::loadLanguageFile(self::$strTable);
@@ -35,32 +39,32 @@ class RoleResolver extends \System {
         $arrRoles = [];
         $arrFields = $GLOBALS['TL_DCA'][self::$strTable]['fields'] ?: [];
 
-        if ( empty( $arrFields ) ) {
+        if (empty($arrFields)) {
             return $arrRoles;
         }
 
-        foreach ( $arrFields as $strFieldname => $arrField ) {
+        foreach ($arrFields as $strFieldname => $arrField) {
 
-            if ( !isset( $arrField['eval'] ) ) {
+            if (!isset($arrField['eval'])) {
                 continue;
             }
 
-            if ( !$arrField['eval']['role'] ) {
+            if (!$arrField['eval']['role']) {
                 continue;
             }
 
-            $arrRoles[ $arrField['eval']['role'] ] = [
+            $arrRoles[$arrField['eval']['role']] = [
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
-                'role' => $GLOBALS['CM_ROLES'][ $arrField['eval']['role'] ],
-                'value' => isset( self::$arrEntity[ $strFieldname ] ) ? self::$arrEntity[ $strFieldname ] : ''
+                'role' => $GLOBALS['CM_ROLES'][$arrField['eval']['role']],
+                'value' => isset(self::$arrEntity[$strFieldname]) ? self::$arrEntity[$strFieldname] : ''
             ];
         }
 
-        if ( isset( $GLOBALS['TL_HOOKS']['roleResolverSetRoles'] ) && is_array($GLOBALS['TL_HOOKS']['roleResolverSetRoles'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['roleResolverSetRoles'] as $arrCallback ) {
+        if (isset($GLOBALS['TL_HOOKS']['roleResolverSetRoles']) && is_array($GLOBALS['TL_HOOKS']['roleResolverSetRoles'])) {
+            foreach ($GLOBALS['TL_HOOKS']['roleResolverSetRoles'] as $arrCallback) {
                 $arrRoles = static::importStatic($arrCallback[0])->{$arrCallback[1]}($arrRoles, self::$arrEntity, self::$strTable);
             }
         }
@@ -122,28 +126,32 @@ class RoleResolver extends \System {
     public function getGeoCodingFields() {
 
         $arrReturn = [];
-        $arrGeoRoles = [ 'latitude', 'longitude' ];
+        $arrGeoRoles = ['latitude', 'longitude'];
 
-        foreach ( $arrGeoRoles as $strRole ) {
-            $arrReturn[ $strRole ] = self::$arrRoles[ $strRole ]['name'];
+        foreach ($arrGeoRoles as $strRole) {
+            $arrReturn[$strRole] = self::$arrRoles[$strRole]['name'];
         }
 
         return $arrReturn;
     }
 
-    protected function getKeyValueByRoles( $arrRoles ) {
+    protected function getKeyValueByRoles($arrRoles) {
 
         $arrReturn = [];
 
-        foreach ( $arrRoles as $strRole ) {
+        foreach ($arrRoles as $strRole) {
 
-            if ( !isset( self::$arrRoles[ $strRole ][ 'name' ] ) ) {
+            if (!isset(self::$arrRoles[$strRole]['name'])) {
                 continue;
             }
 
-            $arrReturn[ self::$arrRoles[ $strRole ][ 'name' ] ] = self::$arrEntity[ self::$arrRoles[ $strRole ]['name'] ];
+            $arrReturn[self::$arrRoles[ $strRole ]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
         }
 
         return $arrReturn;
     }
+
+    private function __construct(){}
+    private function __clone(){}
+    private function __wakeup(){}
 }

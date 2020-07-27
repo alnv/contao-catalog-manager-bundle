@@ -257,7 +257,7 @@ abstract class View extends \Controller {
         };
 
         $arrRow['iCalendarUrl'] = function () use ($arrRow) {
-            return ( new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar($arrRow))->getICalendarUrl();
+            return (new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar($arrRow))->getICalendarUrl();
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
