@@ -143,7 +143,14 @@ class Catalog extends CatalogWizard {
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.tstamp', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('tstamp')),
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.tstamp', '')
                 ],
+                'inputType' => 'text',
+                'eval' => [
+                    'rgxp'=>'datim',
+                    'datepicker' => true,
+                    'tl_class' => 'w50 wizard'
+                ],
                 'flag' => 6,
+                'exclude' => true,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'published' => [
