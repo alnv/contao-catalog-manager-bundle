@@ -58,7 +58,7 @@ class Options {
                 }
                 while ($objEntities->next()) {
                     $strValue = $objEntities->{static::$arrField['dbKey']};
-                    $strLabel = $objEntities->{static::$arrField['dbLabel']};
+                    $strLabel = static::getCleanLabel($objEntities->{static::$arrField['dbLabel']}, static::$arrField['dbLabel'], static::$arrField['dbTable']);
                     if ($blnAsAssoc) {
                         $arrReturn[] = [
                             'value' => $strValue,
@@ -77,6 +77,17 @@ class Options {
         }
 
         return $arrReturn;
+    }
+
+    protected static function getCleanLabel($strValue, $strField, $strTable) {
+        if (!$strTable || !$strField) {
+            return $strValue;
+        }
+        \System::loadLanguageFile($strTable);
+        \Controller::loadDataContainer($strTable);
+        $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
+
+        return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strValue, \Widget::getAttributesFromDca($arrField, $strField, $strValue, $strField, $strTable), [], true);
     }
 
     protected static function setFilter() {

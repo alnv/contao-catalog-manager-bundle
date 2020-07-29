@@ -235,7 +235,7 @@ class Toolkit {
 
     public static function parseCatalogValue($varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false) {
 
-        if ( $varValue === '' || $varValue === null ) {
+        if ($varValue === '' || $varValue === null) {
             return $varValue;
         }
 
