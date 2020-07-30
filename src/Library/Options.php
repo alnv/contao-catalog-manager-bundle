@@ -13,12 +13,12 @@ class Options {
 
     public static function getInstance( $strInstanceId ) {
 
-        if ( !array_key_exists( $strInstanceId, self::$arrInstances ) ) {
+        if (!array_key_exists($strInstanceId, self::$arrInstances)) {
 
-            self::$arrInstances[ $strInstanceId ] = new self;
+            self::$arrInstances[$strInstanceId] = new self;
         }
 
-        return self::$arrInstances[ $strInstanceId ];
+        return self::$arrInstances[$strInstanceId];
     }
 
     public static function getOptions($blnAsAssoc=false) {
@@ -139,7 +139,8 @@ class Options {
 
     protected static function getLabel($strValue, $strFallbackLabel='') {
 
+        $strTable = static::$arrField['dbTable'] ?: 'option';
         $strFallbackLabel = \StringUtil::decodeEntities($strFallbackLabel);
-        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( static::$arrField['dbTable'] . '.option.' . $strValue , $strFallbackLabel));
+        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($strTable . '.' . static::$arrField['fieldname'] . '.' . $strValue, $strFallbackLabel));
     }
 }

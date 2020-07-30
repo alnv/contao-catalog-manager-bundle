@@ -4,11 +4,11 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 class MasterInsertTag {
 
-    public function replace( $strFragment ) {
+    public function replace($strFragment) {
 
-        $arrFragments = explode( '::', $strFragment );
+        $arrFragments = explode('::', $strFragment);
 
-        if ( is_array( $arrFragments ) && $arrFragments[0] == 'MASTER' && isset( $arrFragments[1] ) ) {
+        if (is_array($arrFragments) && $arrFragments[0] == 'MASTER' && isset($arrFragments[1])) {
 
             if (empty($GLOBALS['CM_MASTER'])) {
 
