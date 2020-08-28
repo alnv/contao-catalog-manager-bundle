@@ -51,7 +51,7 @@ const AsyncImageComponent = Vue.component( 'async-image', {
     },
     updated: function () {
         this.$nextTick(function () {
-            if (!this.sticky) {
+            if (this.sticky) {
                 this.sticky.update();
             }
         })
