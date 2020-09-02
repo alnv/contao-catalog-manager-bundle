@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use function Clue\StreamFilter\fun;
 
 class VirtualDataContainerArray extends \System {
 
@@ -83,6 +84,13 @@ class VirtualDataContainerArray extends \System {
                 if ( empty( $arrList['labels']['fields'] ) ) {
                     $arrList['labels']['fields'] = $arrSortingFields;
                 }
+            }
+
+            if (in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable']) && !$this->arrCatalog['showColumns']) {
+                $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, \DataContainer $dc) {
+                    $strReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
+                    return $strReturn ?: '-';
+                };
             }
         }
 
@@ -178,25 +186,25 @@ class VirtualDataContainerArray extends \System {
 
     protected function setLabels() {
 
-        foreach ( $this->arrFields as $strFieldname => $arrField ) {
+        foreach ($this->arrFields as $strFieldname => $arrField) {
 
-            if ( isset( $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] ) ) {
+            if (isset($GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ])) {
                 continue;
             }
 
-            $GLOBALS['TL_LANG'][ $this->arrCatalog['table'] ][ $strFieldname ] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $arrField['name'] ),
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description' . $strFieldname, $arrField['name'] )
+            $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname] = [
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $arrField['name']),
+                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $arrField['name'])
             ];
         }
     }
 
     protected function generateEmptyDataContainer() {
 
-        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ] = [
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = [
             'config' => [
                 'onsubmit_callback' => [
-                    function( \DataContainer $objDataContainer ) {
+                    function(\DataContainer $objDataContainer) {
                         if ($objDataContainer->activeRecord) {
                             Toolkit::saveAlias($objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog);
                         }

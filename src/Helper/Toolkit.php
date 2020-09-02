@@ -166,7 +166,7 @@ class Toolkit {
 
         $arrColumns = [];
 
-        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField']) {
+        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField'] && $arrCatalog['showColumns']) {
             if (!in_array($arrCatalog['flagField'], $arrColumns)) {
                 $arrLabelFields[] = $arrCatalog['sortingType'] !== 'none' ? $arrCatalog['flagField'] : '-';
             }
@@ -210,7 +210,7 @@ class Toolkit {
         return $strTemplate;
     }
 
-    public static function renderTreeRow( $arrRow, $strLabel, $arrLabelFields, $arrCatalog, $arrFields ) {
+    public static function renderTreeRow($arrRow, $strLabel, $arrLabelFields, $arrCatalog, $arrFields) {
 
         $intIndex = 0;
         $arrColumns = [];
@@ -246,7 +246,6 @@ class Toolkit {
         switch ($arrField['type']) {
             case 'text':
                 return $arrField['value'];
-                break;
             case 'checkboxWizard':
             case 'checkbox':
             case 'select':
@@ -257,7 +256,6 @@ class Toolkit {
                     return static::parse($arrOptionValues);
                 }
                 return $arrOptionValues;
-                break;
             case 'fileTree':
                 $strSizeId = null;
                 $arrOrderField = [];
@@ -271,9 +269,6 @@ class Toolkit {
                     return Image::getUuids($varValue);
                 }
                 if ($arrField['isImage'] || $arrField['isGallery']) {
-                    if ($blnFastMode) {
-                        return Image::getUuids($varValue);
-                    }
                     $arrImages = [];
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
@@ -281,7 +276,6 @@ class Toolkit {
                     return File::getFile($varValue);
                 }
                 return [];
-                break;
             case 'multiColumnWizard':
                 $arrReturn = [];
                 $varEntities = \StringUtil::deserialize($varValue, true);
@@ -293,7 +287,6 @@ class Toolkit {
                     $arrReturn[] = $arrRow;
                 }
                 return $arrReturn;
-                break;
             case 'pageTree':
                 if (!$varValue) {
                     return '';
@@ -312,7 +305,6 @@ class Toolkit {
                     ];
                 }
                 return $arrValues;
-                break;
         }
 
         return $arrField['value'];

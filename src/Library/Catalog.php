@@ -66,7 +66,7 @@ class Catalog extends CatalogWizard {
         $arrReturn = [];
 
         foreach ( $this->arrFields as $strFieldname => $arrField ) {
-            $arrReturn[ $strFieldname ] = $blnLabelOnly ? $arrField['label'][0] : $strFieldname;
+            $arrReturn[ $strFieldname ] = $blnLabelOnly ? \StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
         }
 
         return $arrReturn;
