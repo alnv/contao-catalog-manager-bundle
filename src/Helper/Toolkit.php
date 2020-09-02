@@ -269,9 +269,6 @@ class Toolkit {
                     return Image::getUuids($varValue);
                 }
                 if ($arrField['isImage'] || $arrField['isGallery']) {
-                    if ($blnFastMode) {
-                        return Image::getUuids($varValue);
-                    }
                     $arrImages = [];
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
