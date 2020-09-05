@@ -110,8 +110,6 @@ abstract class CatalogWizard extends \System {
         $blnMultiple = $arrField['multiple'] ? true : false;
         $arrField['description'] = trim(strip_tags($arrField['description']));
         $arrReturn = [
-            'filter' => $blnMultiple,
-            'search' => !$blnMultiple,
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
@@ -162,6 +160,8 @@ abstract class CatalogWizard extends \System {
 
         switch ($arrField['type']) {
             case 'text':
+                $arrReturn['search'] = true;
+                $arrReturn['sorting'] = true;
                 $arrReturn['inputType'] = 'text';
                 if ($arrReturn['eval']['multiple'] && $arrReturn['eval']['size'] > 1) {
                     $arrReturn['eval']['tl_class'] = 'long clr';
@@ -170,6 +170,7 @@ abstract class CatalogWizard extends \System {
 
             case 'date':
                 $arrReturn['flag'] = 6;
+                $arrReturn['sorting'] = true;
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['tl_class'] = 'w50 wizard';
                 if ($arrReturn['eval']['rgxp'] && in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
@@ -178,23 +179,28 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['datepicker'] = true;
                 break;
             case 'color':
+                $arrReturn['search'] = true;
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['colorpicker'] = true;
                 break;
             case 'select':
+                $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'select';
                 $arrReturn['eval']['chosen'] = true;
                 break;
             case 'radio':
+                $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'radio';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 break;
             case 'checkboxWizard':
+                $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'checkboxWizard';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['multiple'] = true;
                 break;
             case 'checkbox':
+                $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'checkbox';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 if (!$blnMultiple) {
@@ -203,6 +209,7 @@ abstract class CatalogWizard extends \System {
                 }
                 break;
             case 'textarea':
+                $arrReturn['search'] = true;
                 $arrReturn['inputType'] = 'textarea';
                 $arrReturn['eval']['tl_class'] = 'clr';
                 if ( $arrField['rte'] ) {
@@ -220,6 +227,7 @@ abstract class CatalogWizard extends \System {
                 $arrReturn = $arrEmpty;
                 break;
             case 'pagepicker':
+                $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'pageTree';
                 $arrReturn['foreignKey'] = 'tl_page.title';
                 $arrReturn['eval']['fieldType'] = $blnMultiple ? 'checkbox' : 'radio';
@@ -235,7 +243,6 @@ abstract class CatalogWizard extends \System {
                 break;
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
-                $arrReturn['filter'] = false;
                 $arrReturn['eval']['tl_class'] = 'clr';
                 $arrReturn['eval']['filesOnly'] = true;
                 $arrReturn['eval']['fieldType'] = 'radio';

@@ -122,6 +122,7 @@ class Catalog extends CatalogWizard {
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.id', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('id')),
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.id', '')
                 ],
+                'search' => true,
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
@@ -149,7 +150,7 @@ class Catalog extends CatalogWizard {
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'exclude' => true,
+                'sorting' => true,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'published' => [
@@ -164,7 +165,6 @@ class Catalog extends CatalogWizard {
                     'tl_class' => 'clr'
                 ],
                 'filter' => true,
-                'exclude' => true,
                 'sql' => "char(1) NOT NULL default ''"
             ],
             'start' => [
@@ -179,7 +179,6 @@ class Catalog extends CatalogWizard {
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'stop' => [
@@ -194,7 +193,6 @@ class Catalog extends CatalogWizard {
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'alias' => [
