@@ -13,7 +13,7 @@ const viewListingComponent = Vue.component('view-listing', {
             if (!strUrl) {
                 strUrl = '/catalog-manager/view-listing/' + this.module + '/' + this.page;
             }
-            this.$http.post( strUrl, this.parameters, {
+            this.$http.post(strUrl, this.parameters, {
                 emulateJSON: true,
                 'Content-Type': 'application/x-www-form-urlencoded'
                 }).then(function ( objResponse ) {
@@ -111,6 +111,13 @@ const viewListingComponent = Vue.component('view-listing', {
             this.$parent.setLoadingAlert( '', this );
             this.fetch();
         },
+        setParams: function () {
+            for (var name in this.params) {
+                if (this.params.hasOwnProperty(name)) {
+                    this.parameters[name] = this.params[name];
+                }
+            }
+        }
     },
     updated: function () {
         this.$nextTick(function () {
@@ -120,6 +127,7 @@ const viewListingComponent = Vue.component('view-listing', {
         })
     },
     mounted: function () {
+        this.setParams();
         if (!this.awaitOnChange) {
             if (typeof this.$parent.shared !== 'undefined') {
                 this.addSharedParameters(this.$parent.shared);
@@ -157,6 +165,11 @@ const viewListingComponent = Vue.component('view-listing', {
             type: String,
             required: false,
             default: 'Mehr laden'
+        },
+        params: {
+            type: Object,
+            default: {},
+            required: false
         }
     },
     template:
