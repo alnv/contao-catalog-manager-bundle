@@ -216,8 +216,12 @@ abstract class View extends \Controller {
     }
 
     protected function validOrigin($strValue, $strField) {
-        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard') {
-            return false;
+        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
+            foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'] as $arrField) {
+                if ($arrField['inputType'] == 'fileTree') {
+                    return false;
+                }
+            }
         }
         if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
             return false;
