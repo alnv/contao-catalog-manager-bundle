@@ -250,7 +250,10 @@ class Toolkit {
             case 'checkbox':
             case 'select':
             case 'radio':
-                $varValue = !is_array($arrField['value']) ? [$arrField['value']] : $arrField['value'];
+                if ($arrField['csv']) {
+                    $arrField['value'] = explode($arrField['csv'], $arrField['value']);
+                }
+                $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
                 $arrOptionValues =  static::getSelectedOptions($varValue, $arrField['options']);
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
