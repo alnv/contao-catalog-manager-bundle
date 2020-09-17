@@ -69,6 +69,8 @@ class Listing extends \Hybrid {
 
         $this->setOptions();
         $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->cmTable, $this->arrOptions);
+
+        $this->Template->rows = $objListing->countRows();
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();
     }

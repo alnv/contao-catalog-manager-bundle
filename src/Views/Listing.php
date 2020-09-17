@@ -19,4 +19,17 @@ class Listing extends View {
 
         return $this->getEntities();
     }
+
+    public function countRows() {
+
+        $objModel = new ModelWizard($this->strTable);
+        $objModel = $objModel->getModel();
+        $arrOptions = $this->getModelOptions();
+        unset($arrOptions['limit']);
+        $objEntities = $objModel->findAll($arrOptions);
+        if ($objEntities === null) {
+            return 0;
+        }
+        return $objEntities->count();
+    }
 }
