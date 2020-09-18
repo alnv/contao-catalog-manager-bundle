@@ -52,6 +52,9 @@ class Options {
                 $objModel = $objModel->getModel();
                 $arrModelOptions = [];
                 array_insert($arrModelOptions, 0, self::setFilter());
+                if (static::$arrField['dbOrderField']) {
+                    $arrModelOptions['order'] = static::$arrField['dbOrderField'] . ' ' . (static::$arrField['dbOrder'] ? strtoupper(static::$arrField['dbOrder']) : 'ASC');
+                }
                 $objEntities = $objModel->findAll($arrModelOptions);
                 if ( $objEntities === null ) {
                     return $arrReturn;
@@ -69,11 +72,9 @@ class Options {
                     $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                 }
                 return $arrReturn;
-                break;
 
             default:
                 return $arrReturn;
-                break;
         }
 
         return $arrReturn;

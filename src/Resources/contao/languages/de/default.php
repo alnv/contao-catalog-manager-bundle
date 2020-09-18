@@ -7,9 +7,15 @@ $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterType'] = [ 'Eingabetyp', '' ];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterColumn'] = [ 'Spalten', '' ];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'] = [ 'Werte', '' ];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'] = [ 'Filtereinstellungen', '' ];
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'] = ['Sortierungsfeld', ''];
+$GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'] = ['Reihenfolge', ''];
 $GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'] = [
     'expert' => 'Experte',
     'wizard' => 'Wizard (Klassisch)'
+];
+$GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbOrder'] = [
+    'asc' => 'Aufsteigend',
+    'desc' => 'Absteigend'
 ];
 $GLOBALS['TL_LANG']['MSC']['tstamp'] = [ 'Änderungsdatum', 'Datum und Uhrzeit der letzten Änderung.' ];
 $GLOBALS['TL_LANG']['MSC']['start'] = [ 'Anzeigen ab', 'Den Artikel erst ab diesem Datum anzeigen.' ];

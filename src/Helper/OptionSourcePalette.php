@@ -6,7 +6,7 @@ class OptionSourcePalette {
 
     public static function getPalette() {
 
-        return 'dbTable,dbKey,dbLabel,dbFilterType';
+        return 'dbTable,dbKey,dbLabel,dbFilterType,dbOrderField,dbOrder';
     }
 
     public static function getFields() {
@@ -95,6 +95,35 @@ class OptionSourcePalette {
                 ],
                 'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
                 'sql' => ['type' => 'blob', 'notnull' => false ]
+            ],
+            'dbOrderField' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'],
+                'inputType' => 'select',
+                'default' => 'id',
+                'eval' => [
+                    'chosen' => true,
+                    'maxlength' => 128,
+                    'mandatory' => false,
+                    'tl_class' => 'w50',
+                    'includeBlankOption' => true
+                ],
+                'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDbFields' ],
+                'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
+            ],
+            'dbOrder' => [
+                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'],
+                'inputType' => 'select',
+                'default' => 'asc',
+                'eval' => [
+                    'chosen' => true,
+                    'maxlength' => 128,
+                    'mandatory' => false,
+                    'tl_class' => 'w50',
+                    'includeBlankOption' => true
+                ],
+                'options' => ['asc', 'desc'],
+                'reference' => &$GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbOrder'],
+                'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ]
         ];
     }
