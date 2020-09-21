@@ -42,6 +42,9 @@ const viewListingComponent = Vue.component('view-listing', {
                     this.parameters[name] = shared[name];
                 }
             }
+            if (this.reload) {
+                this.parameters['reload'] = true;
+            }
         },
         sortable: function () {
             var objSortable = this.$refs.view.querySelector('.sortable');

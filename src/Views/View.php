@@ -118,7 +118,7 @@ abstract class View extends \Controller {
 
     protected function paginate() {
 
-        if ( !$this->arrOptions['pagination'] && !\Input::post('reload') ) {
+        if (!$this->arrOptions['pagination'] && !\Input::post('reload')) {
             return null;
         }
 
@@ -131,27 +131,24 @@ abstract class View extends \Controller {
         $objModel = $objModel->getModel();
         $objTotal = $objModel->findAll($arrOptions);
 
-        if ( $objTotal !== null ) {
+        if ($objTotal !== null) {
             $numTotal = $objTotal->count();
             \Cache::set('limit_' . $this->arrOptions['id'], $numTotal);
         }
 
-        if ( !$numTotal ) {
-            return null;
-        }
-
         if (\Input::post('reload')) {
-
             $intOffset = (int) \Input::post('reload') + 1;
             $intLimit = $this->arrOptions['limit'] * $intOffset;
             if ($intLimit > $numTotal) {
                 $intLimit = $numTotal;
                 \Cache::set('max_' . $this->arrOptions['id'], true);
             }
-
             $this->arrOptions['offset'] = 0;
             $this->arrOptions['limit'] = $intLimit;
+            return null;
+        }
 
+        if (!$numTotal) {
             return null;
         }
 
@@ -163,11 +160,11 @@ abstract class View extends \Controller {
 
         $numOffset = $this->getPageNumber();
 
-        if ( $this->arrOptions['limit'] > 0 && $this->arrOptions['offset'] ) {
+        if ($this->arrOptions['limit'] > 0 && $this->arrOptions['offset']) {
             $numOffset += round( $this->arrOptions['offset'] / $this->arrOptions['limit'] );
         }
 
-        $this->arrOptions['offset'] = ( $numOffset - 1 ) * $this->arrOptions['limit'];
+        $this->arrOptions['offset'] = ($numOffset - 1) * $this->arrOptions['limit'];
         $this->arrOptions['total'] = $numTotal;
     }
 
