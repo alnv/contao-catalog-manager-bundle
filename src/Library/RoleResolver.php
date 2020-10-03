@@ -53,12 +53,17 @@ class RoleResolver extends \System {
                 continue;
             }
 
-            $arrRoles[$arrField['eval']['role']] = [
+            $strRole = $arrField['eval']['role'] ?: '';
+            if (!$strRole) {
+                continue;
+            }
+
+            $arrRoles[$strRole] = [
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
-                'role' => $GLOBALS['CM_ROLES'][$arrField['eval']['role']],
+                'role' => $GLOBALS['CM_ROLES'][$strRole],
                 'value' => isset(self::$arrEntity[$strFieldname]) ? self::$arrEntity[$strFieldname] : ''
             ];
         }

@@ -2,14 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class PageLayout extends \System {
+class PageLayout extends \Contao\System {
 
     public function __construct() {
-
         parent::__construct();
     }
 
-    public function generateMaster( \PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular ) {
+    public function generateMaster(\PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular) {
 
         if (!isset($_GET['auto_item']) && ! $_GET['auto_item']) {
             return null;

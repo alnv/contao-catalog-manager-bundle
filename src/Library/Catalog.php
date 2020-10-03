@@ -73,8 +73,12 @@ class Catalog extends CatalogWizard {
     }
 
     protected function setDefaultFields() {
-
-        array_insert($this->arrFields, count($this->arrFields), $this->getDefaultFields());
+        foreach ($this->getDefaultFields() as $strAlias => $arrField) {
+            if (isset($this->arrFields[$strAlias])) {
+                continue;
+            }
+            $this->arrFields[$strAlias] = $arrField;
+        }
     }
 
     protected function setCustomFields() {
