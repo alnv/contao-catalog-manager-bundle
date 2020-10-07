@@ -52,6 +52,7 @@ $GLOBALS['TL_HOOKS']['loadDataContainer'][] = ['catalogmanager.hooks.datacontain
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag', 'replace'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag', 'replace'];
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags', 'replace'];
 $GLOBALS['TL_HOOKS']['compileFormFields'][] = ['catalogmanager.hooks.formfields', 'compileFormFields'];
 $GLOBALS['TL_HOOKS']['loadFormField'][] = ['catalogmanager.hooks.formfields', 'loadFormField'];
 
