@@ -151,10 +151,13 @@ abstract class CatalogWizard extends \System {
                     'type' => $blnMultiple ? 'hasMany' : 'hasOne'
                 ];
             }
+
+            if ($arrField['csv']) {
+                $arrReturn['eval']['csv'] = ',';
+            }
         }
 
         if ($strRgxp = Toolkit::getRgxp($arrField['type'], $arrField)) {
-
             $arrReturn['eval']['rgxp'] = $strRgxp;
         }
 
