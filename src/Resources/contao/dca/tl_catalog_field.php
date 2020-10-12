@@ -100,7 +100,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ],
         'type' => [
             'inputType' => 'select',
-            'default' => 'table',
             'eval' => [
                 'chosen' => true,
                 'maxlength' => 32,
