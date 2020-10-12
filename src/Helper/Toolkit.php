@@ -506,7 +506,7 @@ class Toolkit {
                 $arrColumns = [];
                 $varValue = is_array($varValue) ? $varValue : \StringUtil::deserialize($varValue, true);
                 foreach ($varValue as $strIndex => $strValue) {
-                    if (isset( $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
+                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
                             $arrColumns[] = \StringUtil::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
                                 'field' => $strTable . '.' . $arrQuery['field'],

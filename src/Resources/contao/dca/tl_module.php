@@ -134,6 +134,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
     'eval' => [
         'tl_class' => 'long',
         'mandatory' => true,
+        'allowHtml' => true,
         'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOperators' ],
         'enableField' => true,
         'enableGroup' => true

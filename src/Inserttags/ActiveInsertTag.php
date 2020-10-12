@@ -27,11 +27,16 @@ class ActiveInsertTag extends \Controller {
                             $blnUseDefault = true;
                             $strDefault = $strOption;
                             break;
+                        case 'csv':
+                            if ($varValue !== '') {
+                                $varValue = serialize(explode(',', $varValue));
+                            }
+                            break;
                     }
                 }
             }
 
-            if ($blnUseDefault && ( $varValue === '' || $varValue === null)) {
+            if ($blnUseDefault && ($varValue === '' || $varValue === null)) {
                 $varValue = $strDefault;
             }
 
