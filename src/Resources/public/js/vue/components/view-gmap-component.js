@@ -11,11 +11,12 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
     methods: {
         fetch: function () {
             this.removeMarkers();
-            this.$http.get( '/catalog-manager/view-map/' + this.module + '/' + this.page, {
+            this.$http.get('/catalog-manager/view-map/' + this.module + '/' + this.page, {
                 params: this.parameters
             }).then(function ( objResponse ) {
-                if ( objResponse.body && objResponse.ok ) {
-                    this.locations = JSON.parse( objResponse.body.locations );
+                if (objResponse.body && objResponse.ok) {
+                    console.log(objResponse.body.locations)
+                    this.locations = JSON.parse(objResponse.body.locations);
                     this.initMap();
                     this.$parent.clearAlert();
                 }
@@ -40,6 +41,7 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
         },
         setMarkers: function() {
             this.bounds = new google.maps.LatLngBounds();
+
             for (var i=0;i<this.locations.length;i++) {
                 var strTemplate = this.locations[i]['map']['infoContent'];
                 var objPosition = new google.maps.LatLng(this.locations[i]['map']['latitude'],this.locations[i]['map']['longitude']);
