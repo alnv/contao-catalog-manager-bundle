@@ -32,7 +32,7 @@ abstract class View extends \Controller {
                     break;
 
                 case 'masterPage':
-                    $objPage = \PageModel::findByPk( $varValue );
+                    $objPage = \PageModel::findByPk($varValue);
                     if ($objPage !== null) {
                         $this->arrMasterPage = $objPage->row();
                         $this->arrOptions['masterPage'] = true;
@@ -40,7 +40,7 @@ abstract class View extends \Controller {
                     break;
 
                 case 'formPage':
-                    $objPage = \PageModel::findByPk( $varValue );
+                    $objPage = \PageModel::findByPk($varValue);
                     if ( $objPage !== null ) {
                         $this->arrFormPage = $objPage->row();
                         $this->arrOptions['formPage'] = true;
@@ -338,22 +338,22 @@ abstract class View extends \Controller {
             }
         }
 
-        if ( $this->arrOptions['template'] ) {
-            $objTemplate = new \FrontendTemplate( $this->arrOptions['template'] );
-            $objTemplate->setData( $arrRow );
+        if ($this->arrOptions['template']) {
+            $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
+            $objTemplate->setData($arrRow);
             $arrRow['template'] =  $objTemplate->parse();
         }
 
-        if ( $this->arrOptions['groupBy'] ) {
+        if ($this->arrOptions['groupBy']) {
             $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
-            if ( !isset( $this->arrEntities[ $strGroup ] ) ) {
-                $this->arrEntities[ $strGroup ] = [
+            if (!isset( $this->arrEntities[$strGroup])) {
+                $this->arrEntities[$strGroup] = [
                     'headline' => \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($arrRow[$this->arrOptions['groupBy']]),
                     'hl' => $this->arrOptions['groupByHl'],
                     'entities' => []
                 ];
             }
-            $this->arrEntities[ $strGroup ]['entities'][] = $arrRow;
+            $this->arrEntities[$strGroup]['entities'][] = $arrRow;
         } else {
             $this->arrEntities[] = $arrRow;
         }

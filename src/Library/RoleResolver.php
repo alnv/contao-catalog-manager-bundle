@@ -26,7 +26,7 @@ class RoleResolver extends \System {
         if (!\Cache::has($strInstanceKey)) {
             \Cache::set($strInstanceKey, static::setRoles());
         }
-        self::$arrRoles =\Cache::get($strInstanceKey);
+        self::$arrRoles = \Cache::get($strInstanceKey);
 
         return self::$arrInstances[$strInstanceKey];
     }
@@ -55,6 +55,10 @@ class RoleResolver extends \System {
 
             $strRole = $arrField['eval']['role'] ?: '';
             if (!$strRole) {
+                continue;
+            }
+
+            if (isset($arrRoles[$strRole])) {
                 continue;
             }
 
