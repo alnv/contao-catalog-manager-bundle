@@ -8,16 +8,16 @@ class ModelWizard {
 
     protected $objModel = null;
 
-    public function __construct( $strTable ) {
+    public function __construct($strTable) {
 
         $strModel = \Model::getClassFromTable($strTable);
 
-        if ( $strModel && $this->modelExist($strModel) ) {
+        if ($strModel && $this->modelExist($strModel)) {
             $this->objModel = new $strModel();
             return null;
         }
 
-        if ( isset($GLOBALS['CM_MODELS'][ $strTable ]) && $this->modelExist($GLOBALS['CM_MODELS'][ $strTable ]) ) {
+        if (isset($GLOBALS['CM_MODELS'][$strTable]) && $this->modelExist($GLOBALS['CM_MODELS'][$strTable])) {
             $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][ $strTable ]();
             $objMultilingualDynModel->createDynTable( $strTable );
             $this->objModel = $objMultilingualDynModel;
@@ -25,7 +25,7 @@ class ModelWizard {
         }
 
         $objDynModel = new DynModel();
-        $objDynModel->createDynTable( $strTable );
+        $objDynModel->createDynTable($strTable);
         $this->objModel = $objDynModel;
     }
 
@@ -36,7 +36,7 @@ class ModelWizard {
 
     protected function modelExist($strModel) {
 
-        if ( strpos($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') !== false ) {
+        if (strpos($strModel,'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
             return false;
         }
 
