@@ -9,6 +9,11 @@ class OptionSourcePalette {
         return 'dbTable,dbKey,dbLabel,dbFilterType,dbOrderField,dbOrder';
     }
 
+    public static function getActivePalette() {
+
+        return 'dbTable,dbKey,dbFilterType,dbOrderField,dbOrder';
+    }
+
     public static function getFields() {
 
         return [
@@ -29,14 +34,13 @@ class OptionSourcePalette {
             'dbKey' => [
                 'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbKey'],
                 'inputType' => 'select',
-                'default' => 'id',
                 'eval' => [
                     'chosen' => true,
                     'maxlength' => 128,
                     'mandatory' => true,
                     'tl_class' => 'w50 clr'
                 ],
-                'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDbFields' ],
+                'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbLabel' => [
@@ -60,7 +64,7 @@ class OptionSourcePalette {
                     'tl_class' => 'clr',
                     'submitOnChange' => true
                 ],
-                'options' => [ 'wizard', 'expert' ],
+                'options' => ['wizard', 'expert'],
                 'reference' => &$GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'],
                 'exclude' => true,
                 'sql' => "varchar(12) NOT NULL default 'wizard'"

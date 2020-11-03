@@ -4,13 +4,13 @@ namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
 class FormFields {
 
-    public function compileFormFields($arrFields) {
+    public function compileFormFields($arrFields, $strFormId, $objForm) {
 
-        foreach ( $arrFields as $objField ) {
+        foreach ($arrFields as $objField) {
 
             $arrOptions = $this->getOptions($objField->type, $objField);
 
-            if ( $arrOptions == null ) {
+            if ($arrOptions == null) {
                 continue;
             }
 
@@ -36,6 +36,7 @@ class FormFields {
 
         if (in_array($strType, ['select','checkbox','radio']) && $objField->optionsSource) {
             switch ($objField->optionsSource) {
+                case 'dbActiveOptions':
                 case 'dbOptions':
                     $objOptions = \Alnv\ContaoCatalogManagerBundle\Library\Options::getInstance($objField->name . '.' . $objField->pid);
                     $objOptions::setParameter($objField->row(), null);
@@ -49,7 +50,6 @@ class FormFields {
                         ]);
                     }
                     return $arrOptions;
-                    break;
             }
         }
 

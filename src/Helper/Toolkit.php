@@ -11,7 +11,7 @@ class Toolkit {
         return is_array($GLOBALS['TL_LANG']['MSC'][$strItem]) ? $GLOBALS['TL_LANG']['MSC'][$strItem][0] : $GLOBALS['TL_LANG']['MSC'][$strItem];
     }
 
-    public static function parse( $varValue, $strDelimiter = ', ', $strField = 'label' ) {
+    public static function parse($varValue, $strDelimiter = ', ', $strField = 'label') {
 
         if ( is_array( $varValue ) ) {
             $arrValues = array_map( function ( $arrValue ) use ( $strField ) {
