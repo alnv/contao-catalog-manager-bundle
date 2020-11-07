@@ -109,7 +109,6 @@ class Options {
 
     protected static function getValue($strValue, $strField, $strTable) {
 
-        \Controller::loadDataContainer($strTable);
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
         if ($arrField['eval'] && isset($arrField['eval']['multiple']) && $arrField['eval']['multiple'] === true) {
@@ -128,7 +127,8 @@ class Options {
         $arrModelOptions = [];
         array_insert($arrModelOptions, 0, self::setFilter());
         if (self::$arrField['dbOrderField']) {
-            $arrModelOptions['order'] = self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
+            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?: self::$arrField['dbTable'];
+            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
         return $objModel->findAll($arrModelOptions);
     }
@@ -138,8 +138,7 @@ class Options {
         if (!$strTable || !$strField) {
             return $strValue;
         }
-        \System::loadLanguageFile($strTable);
-        \Controller::loadDataContainer($strTable);
+
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
         return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strValue, \Widget::getAttributesFromDca($arrField, $strField, $strValue, $strField, $strTable), [], true);
@@ -150,7 +149,6 @@ class Options {
         $arrOptions = [];
         switch (self::$arrField['dbFilterType']) {
             case 'wizard':
-                \Controller::loadDataContainer(self::$arrField['dbTable']);
                 $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?: self::$arrField['dbTable'];
                 $arrQueries = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'],$strTable);
                 $arrOptions['column'] = $arrQueries['column'];
@@ -190,6 +188,11 @@ class Options {
 
         self::$arrField = $arrField;
         self::$arrDataContainer = $objDataContainer;
+
+        if (self::$arrField['dbTable']) {
+            \System::loadLanguageFile(self::$arrField['dbTable']);
+            \Controller::loadDataContainer(self::$arrField['dbTable']);
+        }
     }
 
     protected static function getLabel($strValue, $strFallbackLabel='') {
