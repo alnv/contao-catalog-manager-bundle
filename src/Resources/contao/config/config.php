@@ -76,8 +76,14 @@ $GLOBALS['CM_OPERATORS'] = [
     'findInSet' => [
         'token' => 'FIND_IN_SET(##field##,##value##)'
     ],
+    'notFindInSet' => [
+        'token' => 'NOT FIND_IN_SET(##field##,##value##)'
+    ],
     'reversedFindInSet' => [
         'token' => 'FIND_IN_SET(##value##,##field##)'
+    ],
+    'reversedNotFindInSet' => [
+        'token' => 'NOT FIND_IN_SET(##value##,##field##)'
     ],
     'regexp' => [
         'token' => 'LOWER(CAST(##field## AS CHAR)) REGEXP LOWER(CAST(##value## AS CHAR))'
