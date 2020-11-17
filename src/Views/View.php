@@ -182,7 +182,7 @@ abstract class View extends \Controller {
     protected function getModelOptions() {
 
         $arrReturn = [];
-        $arrOptions = [ 'limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language' ];
+        $arrOptions = ['limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language'];
 
         foreach ($arrOptions as $strOption) {
             if (isset($this->arrOptions[ $strOption ])) {
@@ -288,7 +288,9 @@ abstract class View extends \Controller {
                 }
             }
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
-            $strField = $arrRelation['table'] .'.'. $arrRelation['field'];
+            \Controller::loadDataContainer($arrRelation['table']);
+            $strTable = isset($GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table']) ? $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] : $arrRelation['table'];
+            $strField = $strTable .'.'. $arrRelation['field'];
             foreach ($arrValues as $strValue) {
                 $arrColumns[] = 'FIND_IN_SET(?,'. $strField .')';
             }

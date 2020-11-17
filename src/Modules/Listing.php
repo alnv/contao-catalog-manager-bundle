@@ -82,12 +82,11 @@ class Listing extends \Hybrid {
 
     protected function setDistance() {
 
-        if ( !$this->cmRadiusSearch ) {
-
+        if (!$this->cmRadiusSearch) {
             return false;
         }
 
-        $objRoleResolver = RoleResolver::getInstance( $this->cmTable );
+        $objRoleResolver = RoleResolver::getInstance($this->cmTable);
         $arrGeoCodingFields = $objRoleResolver->getGeoCodingFields();
 
         if (empty($arrGeoCodingFields)) {
@@ -95,10 +94,10 @@ class Listing extends \Hybrid {
         }
 
         $arrAddress = [
-            'street' => Toolkit::getValueFromUrl( \Input::get('street') ),
-            'streetNumber' => Toolkit::getValueFromUrl( \Input::get('streetNumber') ),
-            'zip' => Toolkit::getValueFromUrl( \Input::get('zip') ),
-            'city' => Toolkit::getValueFromUrl( \Input::get('city') ),
+            'street' => Toolkit::getValueFromUrl(\Input::get('street')),
+            'streetNumber' => Toolkit::getValueFromUrl(\Input::get('streetNumber')),
+            'zip' => Toolkit::getValueFromUrl(\Input::get('zip')),
+            'city' => Toolkit::getValueFromUrl(\Input::get('city')),
         ];
 
         if (empty(array_filter($arrAddress))) {
@@ -109,9 +108,9 @@ class Listing extends \Hybrid {
         $arrAddress['country'] = Toolkit::getValueFromUrl(\Input::get('country'));
         $objAddressBuilder = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
         $strAddress = $objAddressBuilder->getAddress();
-        $strRadius = Toolkit::getValueFromUrl( \Input::get('radius') ) ?: 15;
+        $strRadius = Toolkit::getValueFromUrl(\Input::get('radius')) ?: 15;
         $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
-        $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress( 'google-geocoding', $strAddress );
+        $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
         if ($arrGeoCoding !== null) {
 
@@ -133,11 +132,11 @@ class Listing extends \Hybrid {
 
     protected function setFilter() {
 
-        if ( !$this->cmFilter ) {
+        if (!$this->cmFilter) {
             return null;
         }
 
-        switch ( $this->cmFilterType ) {
+        switch ($this->cmFilterType) {
             case 'wizard':
                 \Controller::loadDataContainer($this->cmTable);
                 $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
