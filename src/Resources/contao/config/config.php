@@ -103,7 +103,11 @@ $GLOBALS['CM_OPERATORS'] = [
 $GLOBALS['CM_ROLES'] = [
     'miscellaneous' => [
         'group' => 'miscellaneous',
-        'sql' => "blob NULL",
+        'sql' => "blob NULL"
+    ],
+    'serializejson' => [
+        'group' => 'miscellaneous',
+        'sql' => "mediumblob NULL"
     ],
     'title' => [
         'group' => 'article',
