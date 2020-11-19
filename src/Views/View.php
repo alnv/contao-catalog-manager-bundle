@@ -284,6 +284,9 @@ abstract class View extends \Controller {
                 }
                 $varValue = array_values($varValue);
                 foreach ($varValue as $strValue) {
+                    if ($strValue == '' || $strValue == null) {
+                        continue;
+                    }
                     $arrValues[] = $strValue;
                 }
             }
@@ -292,8 +295,16 @@ abstract class View extends \Controller {
             $strTable = isset($GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table']) ? $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] : $arrRelation['table'];
             $strField = $strTable .'.'. $arrRelation['field'];
             foreach ($arrValues as $strValue) {
+                if ($strValue == '' || $strValue == null) {
+                    continue;
+                }
                 $arrColumns[] = 'FIND_IN_SET(?,'. $strField .')';
             }
+
+            if (empty($arrValues)) {
+                return [];
+            }
+
             $objList = new Listing($arrRelation['table'], [
                 'column' => [implode('OR ', $arrColumns)],
                 'value' => $arrValues,
