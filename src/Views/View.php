@@ -381,7 +381,7 @@ abstract class View extends \Controller {
 
     protected function getPageNumber() {
 
-        return (int) \Input::get( 'page_e' . $this->arrOptions['id'] );
+        return (int) \Input::get('page_e' . $this->arrOptions['id']);
     }
 
     public function getPagination() {

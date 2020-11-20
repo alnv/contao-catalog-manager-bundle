@@ -4,7 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 class File {
 
-    public static function getFile($strUuid, &$arrFiles=[]) {
+    public static function getFile($strUuid, &$arrFiles=[], $arrOrderField=[]) {
 
         $arrValues = \StringUtil::deserialize($strUuid, true);
         $objFiles = \FilesModel::findMultipleByUuids($arrValues);
@@ -104,6 +104,21 @@ class File {
                     ];
                 }
             }
+        }
+
+        if (!empty($arrOrderField)) {
+            $arrOrder = array_map( function () {}, array_flip($arrOrderField));
+            foreach ($arrFiles as $strKey => $arrValue) {
+                if (array_key_exists($arrValue['uuid'], $arrOrder)) {
+                    $arrOrder[$arrValue['uuid']] = $arrValue;
+                    unset($arrFiles[$strKey]);
+                }
+            }
+            if (!empty( $arrImages)) {
+                $arrOrder = array_merge($arrOrder, array_values($arrImages));
+            }
+            $arrFiles = array_values(array_filter($arrOrder));
+            unset($arrOrder);
         }
 
         return $arrFiles;
