@@ -276,7 +276,8 @@ class Toolkit {
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
                 if ($arrField['isFile']) {
-                    return File::getFile($varValue);
+                    $arrFiles = [];
+                    return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }
                 return [];
             case 'multiColumnWizard':
