@@ -325,32 +325,37 @@ $GLOBALS['CM_ROLES'] = [
     'startDate' => [
         'group' => 'date',
         'rgxp' => 'date',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
     ],
     'startTime' => [
         'group' => 'date',
         'rgxp' => 'time',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
     ],
     'endDate' => [
         'group' => 'date',
         'rgxp' => 'date',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
     ],
     'endTime' => [
         'group' => 'date',
         'rgxp' => 'time',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
     ],
     'date' => [
         'group' => 'date',
         'rgxp' => 'date',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
     ],
     'datim' => [
         'group' => 'date',
         'rgxp' => 'datim',
-        'sql' => "int(10) unsigned NULL"
+        'sql' => "int(11) signed NULL"
+    ],
+    'time' => [
+        'group' => 'date',
+        'rgxp' => 'time',
+        'sql' => "int(11) signed NULL"
     ],
     'hasone' => [
         'group' => 'relation',
@@ -359,11 +364,6 @@ $GLOBALS['CM_ROLES'] = [
     'hasmany' => [
         'group' => 'relation',
         'sql' => "blob NULL"
-    ],
-    'time' => [
-        'group' => 'date',
-        'rgxp' => 'time',
-        'sql' => "int(10) unsigned NULL"
     ],
     'latitude' => [
         'group' => 'geo',
