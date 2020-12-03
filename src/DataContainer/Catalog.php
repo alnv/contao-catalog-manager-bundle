@@ -30,8 +30,9 @@ class Catalog {
         }
 
         $objEntities = \Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'])->limit(1)->execute();
+        $objPid = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND fieldname=? AND published=?')->limit(1)->execute($arrRow['id'], 'pid', '1');
 
-        if ($objEntities->numRows) {
+        if ($objEntities->numRows && !$objPid->numRows) {
             return '<a title="'. \StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) .'">' . \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';
         }
 
