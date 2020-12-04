@@ -4,6 +4,20 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 class File {
 
+    public static function sendFileToBrowser($arrFiles) {
+
+        $strFile = \Input::get('file');
+        if (!$strFile) {
+            return null;
+        }
+
+        foreach ($arrFiles as $arrFile) {
+            if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
+                \Controller::sendFileToBrowser($strFile);
+            }
+        }
+    }
+
     public static function getFile($strUuid, &$arrFiles=[], $arrOrderField=[]) {
 
         $arrValues = \StringUtil::deserialize($strUuid, true);
