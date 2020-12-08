@@ -23,6 +23,7 @@ class FrontendController extends Controller {
     public function getViewListing($module, $page) {
         global $objPage;
         $objPage = \PageModel::findByPK($page)->loadDetails();
+        $GLOBALS['TL_LANGUAGE'] = $objPage->language;
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
         $strListing = \Controller::getFrontendModule($module);
@@ -39,6 +40,7 @@ class FrontendController extends Controller {
 
         global $objPage;
         $objPage = \PageModel::findByPK($page)->loadDetails();
+        $GLOBALS['TL_LANGUAGE'] = $objPage->language;
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
         $objPage->ajaxContext = true;
         $objModule = \ModuleModel::findByPk($module);
