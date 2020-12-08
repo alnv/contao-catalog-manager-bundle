@@ -64,7 +64,7 @@ $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
-$GLOBALS['CM_FIELDS'] = [ 'text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'empty'];
+$GLOBALS['CM_FIELDS'] = [ 'text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'explanation', 'empty'];
 
 $GLOBALS['CM_OPERATORS'] = [
     'equal' => [

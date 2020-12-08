@@ -60,6 +60,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'palettes' => [
         '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter' ],
         'default' => '{general_settings},name,type',
+        'explanation' => '{general_settings},name,type,fieldname,text;{published_legend},published',
         'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',
         'text' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,size;{published_legend},published',
         'date' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{published_legend},published',
@@ -169,6 +170,15 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'search' => true,
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        ],
+        'text' => [
+            'inputType' => 'textarea',
+            'eval' => [
+                'rte' => 'tinyMCE',
+                'mandatory' => true,
+                'tl_class' => 'clr'
+            ],
+            'sql' => 'text NULL'
         ],
         'optionsSource' => [
             'inputType' => 'radio',

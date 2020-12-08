@@ -93,17 +93,15 @@ abstract class CatalogWizard extends \System {
         return $objParent->table;
     }
 
-    public function parseField( $arrField, $arrCatalog = [] ) {
+    public function parseField($arrField, $arrCatalog = []) {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 
         if (\Cache::has( $strIdentifier)) {
-
             return \Cache::get($strIdentifier);
         }
 
         if (!$arrField['type']) {
-
             return null;
         }
 
@@ -130,13 +128,11 @@ abstract class CatalogWizard extends \System {
         ];
 
         if ($arrField['includeBlankOption']) {
-
             $arrReturn['eval']['includeBlankOption'] = true;
             $arrReturn['eval']['blankOptionLabel'] = $arrField['blankOptionLabel'];
         }
 
         if (in_array($arrField['type'], ['select', 'radio', 'checkbox', 'checkboxWizard'])) {
-
             $arrReturn['options_callback'] = function ($objDataContainer = null) use ($arrField) {
                 $objOptions = Options::getInstance($arrField['fieldname'] . '.' . $arrField['pid']);
                 $objOptions::setParameter($arrField, $objDataContainer);
@@ -162,6 +158,10 @@ abstract class CatalogWizard extends \System {
         }
 
         switch ($arrField['type']) {
+            case 'explanation':
+                $arrReturn['inputType'] = 'explanation';
+                $arrReturn['eval']['text'] = $arrField['text'];
+                break;
             case 'text':
                 $arrReturn['search'] = true;
                 $arrReturn['sorting'] = true;
@@ -170,7 +170,6 @@ abstract class CatalogWizard extends \System {
                     $arrReturn['eval']['tl_class'] = 'long clr';
                 }
                 break;
-
             case 'date':
                 $arrReturn['flag'] = 6;
                 $arrReturn['sorting'] = true;
