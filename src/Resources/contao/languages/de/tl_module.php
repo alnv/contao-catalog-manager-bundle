@@ -22,7 +22,7 @@ $GLOBALS['TL_LANG']['tl_module']['cmFilterType'] = [ 'Eingabetyp', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmWizardFilterSettings'] = [ 'Filtereinstellungen', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmInfoContent'] = ['Info-Fenster Inhalt', ''];
 $GLOBALS['TL_LANG']['tl_module']['cmOrder'] = ['Sortierung', ''];
-$GLOBALS['TL_LANG']['tl_module']['cmIgnoreVisibility'] = ['Unveröffentlichte Einträge anzeigen', ''];
+$GLOBALS['TL_LANG']['tl_module']['cmIgnoreVisibility'] = ['Elemente immer anzeigen', 'Auch unveröffentlichte Daten werden angezeigt'];
 
 $GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'] = [
     'expert' => 'Experte',
