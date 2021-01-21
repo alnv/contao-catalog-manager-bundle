@@ -103,6 +103,14 @@ $GLOBALS['CM_OPERATORS'] = [
     ],
     'lowerEqual' => [
         'token' => '##field##<=##value##'
+    ],
+    'isNotEmpty' => [
+        'token' => '(##field##!="" OR ##field## IS NOT NULL)',
+        'empty' => true
+    ],
+    'isEmpty' => [
+        'token' => '(##field##="" OR ##field## IS NULL)',
+        'empty' => true
     ]
 ];
 

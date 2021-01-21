@@ -509,6 +509,7 @@ class Toolkit {
                 $arrColumns = [];
                 $varValue = is_array($varValue) ? $varValue : \StringUtil::deserialize($varValue, true);
                 foreach ($varValue as $strIndex => $strValue) {
+
                     if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
                             $arrColumns[] = \StringUtil::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
@@ -521,6 +522,10 @@ class Toolkit {
                             'field' => $strTable . '.' . $arrQuery['field'],
                             'value' => '?'
                         ]);
+                    }
+
+                    if (is_bool($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] == true) {
+                        continue;
                     }
 
                     $arrValues[] = $strValue;
