@@ -397,7 +397,7 @@ abstract class View extends \Controller {
 
     public function getAddUrl() {
 
-        return Toolkit::parseDetailLink( $this->arrFormPage, '' );
+        return Toolkit::parseDetailLink($this->arrFormPage, '');
     }
 
     public function getEntities() {

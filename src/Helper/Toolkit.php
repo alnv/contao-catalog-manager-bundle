@@ -513,13 +513,13 @@ class Toolkit {
                     if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
                             $arrColumns[] = \StringUtil::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
-                                'field' => $strTable . '.' . $arrQuery['field'],
+                                'field' => ($strTable ? '.'.$strTable:'') . $arrQuery['field'],
                                 'value' => '?'
                             ]);
                         }
                     } else {
                         $arrColumns[] = \StringUtil::parseSimpleTokens( $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token'], [
-                            'field' => $strTable . '.' . $arrQuery['field'],
+                            'field' => ($strTable ? '.'.$strTable:'') . $arrQuery['field'],
                             'value' => '?'
                         ]);
                     }
