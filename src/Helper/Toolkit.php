@@ -240,11 +240,9 @@ class Toolkit {
         if ($varValue === '' || $varValue === null) {
             return $varValue;
         }
-
-        if (!isset($arrField['type'])) {
+        if (!isset($arrField['type']) && !$arrField['value']) {
             return $varValue;
         }
-
         switch ($arrField['type']) {
             case 'text':
                 return $arrField['value'];
