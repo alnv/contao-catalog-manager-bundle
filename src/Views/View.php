@@ -31,6 +31,10 @@ abstract class View extends \Controller {
                     $this->arrOptions['alias'] = $varValue;
                     break;
 
+                case 'isForm':
+                    $this->arrOptions['isForm'] = (bool) $varValue;
+                    break;
+
                 case 'masterPage':
                     $objPage = \PageModel::findByPk($varValue);
                     if ($objPage !== null) {
@@ -376,7 +380,7 @@ abstract class View extends \Controller {
 
     protected function parseField( $varValue, $strField, $arrValues, $blnFastMode ) {
 
-        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode);
+        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode, $this->arrOptions['isForm']);
     }
 
     protected function getPageNumber() {

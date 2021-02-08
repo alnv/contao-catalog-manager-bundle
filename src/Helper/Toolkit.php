@@ -235,7 +235,7 @@ class Toolkit {
         return \Image::getHtml( $strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
 
-    public static function parseCatalogValue($varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false) {
+    public static function parseCatalogValue($varValue, $arrField, $arrCatalog=[], $blnStringFormat=false, $blnFastMode=false, $blnIsForm=false) {
 
         if ($varValue === '' || $varValue === null) {
             return $varValue;
@@ -257,6 +257,9 @@ class Toolkit {
                 $arrOptionValues =  static::getSelectedOptions($varValue, $arrField['options']);
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
+                }
+                if ($blnIsForm && $arrField['type'] == 'checkbox' && $arrField['multiple'] == false) {
+                    return $arrField['value'];
                 }
                 return $arrOptionValues;
             case 'fileTree':
