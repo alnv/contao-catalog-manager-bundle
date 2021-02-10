@@ -13,6 +13,11 @@ class File {
 
         foreach ($arrFiles as $arrFile) {
             if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
+                if (isset($GLOBALS['TL_HOOKS']['postDownload']) && is_array($GLOBALS['TL_HOOKS']['postDownload'])) {
+                    foreach ($GLOBALS['TL_HOOKS']['postDownload'] as $arrCallback) {
+                        (new $arrCallback[0])->{$arrCallback[1]}($strFile);
+                    }
+                }
                 \Controller::sendFileToBrowser($strFile);
             }
         }

@@ -211,7 +211,7 @@ class Listing extends \Hybrid {
 
     protected function setMasterPage() {
 
-        if ( !$this->cmMaster ) {
+        if (!$this->cmMaster) {
             return null;
         }
         if (!$this->cmMasterPage) {
