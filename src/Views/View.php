@@ -378,7 +378,7 @@ abstract class View extends \Controller {
         return $arrEntity;
     }
 
-    protected function parseField( $varValue, $strField, $arrValues, $blnFastMode ) {
+    protected function parseField($varValue, $strField, $arrValues, $blnFastMode) {
 
         return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode, $this->arrOptions['isForm']);
     }
