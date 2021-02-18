@@ -15,13 +15,13 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'sorting' => [
             'mode' => 4,
             'fields' => ['sorting'],
+            'panelLayout' => 'filter;search,limit',
             'headerFields' => ['type', 'name', 'table'],
-            'child_record_callback'   => ['catalogmanager.datacontainer.catalogfield', 'listFields']
+            'child_record_callback'  => ['catalogmanager.datacontainer.catalogfield', 'listFields']
         ],
         'label' => [
-            'fields' => ['name'],
-            'format' => '%s',
-            'label_callback' => ['catalogmanager.datacontainer.catalog', 'addIcon']
+            'fields' => ['name', 'fieldname', 'type'],
+            'showColumns' => true
         ],
         'operations' => [
             'edit' => [
@@ -29,7 +29,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'icon' => 'header.gif'
             ],
             'copy' => [
-                'href' => 'act=paste&amp;mode=copy',
+               'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.gif'
             ],
             'delete' => [
@@ -40,8 +40,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'toggle' => [
                 'icon' => 'visible.gif',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => [ 'catalogmanager.datacontainer.catalog', 'toggleIcon' ],
-                'showInHeader' => true
+                'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
             ],
             'show' => [
                 'href' => 'act=show',
