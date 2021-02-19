@@ -10,11 +10,13 @@ class File {
         if (!$strFile) {
             return null;
         }
-
+        if (!is_array($arrFiles) || empty($arrFiles)) {
+            return null;
+        }
         foreach ($arrFiles as $arrFile) {
             if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
-                if (isset($GLOBALS['TL_HOOKS']['postDownload']) && is_array($GLOBALS['TL_HOOKS']['postDownload'])) {
-                    foreach ($GLOBALS['TL_HOOKS']['postDownload'] as $arrCallback) {
+                if (isset($GLOBALS['TL_HOOKS']['beforeDownload']) && is_array($GLOBALS['TL_HOOKS']['beforeDownload'])) {
+                    foreach ($GLOBALS['TL_HOOKS']['beforeDownload'] as $arrCallback) {
                         (new $arrCallback[0])->{$arrCallback[1]}($strFile);
                     }
                 }
