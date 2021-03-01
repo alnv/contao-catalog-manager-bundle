@@ -88,6 +88,9 @@ $GLOBALS['CM_OPERATORS'] = [
     'regexp' => [
         'token' => 'LOWER(CAST(##field## AS CHAR)) REGEXP LOWER(CAST(##value## AS CHAR))'
     ],
+    'notregexp' => [
+        'token' => 'LOWER(CAST(##field## AS CHAR)) NOT REGEXP LOWER(CAST(##value## AS CHAR))'
+    ],
     'between' => [
         'token' => '##field## BETWEEN ##value## AND ##value##',
         'valueNumber' => 2
