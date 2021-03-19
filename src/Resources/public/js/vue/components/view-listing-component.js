@@ -1,7 +1,6 @@
 const viewListingComponent = Vue.component('view-listing', {
     data: function () {
         return {
-            view: null,
             parameters: {
                 reload: 0,
                 order: {}
@@ -26,6 +25,9 @@ const viewListingComponent = Vue.component('view-listing', {
                 }
                 if (!objResponse.ok) {
                     this.$parent.setErrorAlert( '', this );
+                }
+                if (this.onLoad) {
+                    this.onLoad();
                 }
             }.bind(this));
         },
@@ -115,7 +117,7 @@ const viewListingComponent = Vue.component('view-listing', {
             this.fetch();
         },
         setParams: function () {
-            for (var name in this.params) {
+            for (let name in this.params) {
                 if (this.params.hasOwnProperty(name)) {
                     this.parameters[name] = this.params[name];
                 }
@@ -135,7 +137,9 @@ const viewListingComponent = Vue.component('view-listing', {
             if (typeof this.$parent.shared !== 'undefined') {
                 this.addSharedParameters(this.$parent.shared);
             }
-            this.fetch();
+            if (!this.view) {
+                this.fetch();
+            }
         }
     },
     props: {
@@ -164,6 +168,11 @@ const viewListingComponent = Vue.component('view-listing', {
             default: false,
             required: false
         },
+        loader: {
+            type: Boolean,
+            default: true,
+            required: false
+        },
         reloadButton: {
             type: String,
             required: false,
@@ -173,12 +182,22 @@ const viewListingComponent = Vue.component('view-listing', {
             type: Object,
             default: {},
             required: false
+        },
+        view: {
+            type: String,
+            default: null,
+            required: false
+        },
+        onLoad: {
+            type: Function,
+            default: null,
+            required: false
         }
     },
     template:
     '<div class="view-component" ref="view">' +
         '<div class="view-component-container" v-if="view" v-html="view"></div>' +
         '<div v-if="reload && view" class="reload block"><button v-on:click.prevent="listReload">{{ reloadButton }}</button></div>' +
-        '<loading v-if="!view"></loading>' +
+        '<loading v-if="!view && loader"></loading>' +
     '</div>'
 });
