@@ -1,7 +1,7 @@
 <?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
     <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:100%">
-        <button>DSGVO Text</button> <!-- impl dsgvo text -->
+        <button>Datenschutzbestimmungen zustimmen</button>
     </div>
     <script defer async>
         var getInfoCallback = function (map, content) {
@@ -18,11 +18,11 @@
             if ( typeof arrLocations === 'undefined' || !arrLocations.length ) {
                 return null;
             }
-            for (var i=0;i<arrLocations.length;i++) {
-                if ( !arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude'] ) {
+            for (let i=0;i<arrLocations.length;i++) {
+                if (!arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude']) {
                     continue;
                 }
-                var strTemplate = ''; // @todo
+                var strTemplate = arrLocations[i]['map']['infoContent'];
                 var objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'],arrLocations[i]['map']['longitude']);
                 var objMarker = new google.maps.Marker({
                     title: arrLocations[i]['map']['title'],
@@ -35,8 +35,8 @@
             objMap.fitBounds(objBounds);
         };
         (function () {
-            var objMapDocument = document.getElementById("<?= $strUniqueId ?>");
-            var loadGMap = function () {
+            let objMapDocument = document.getElementById("<?= $strUniqueId ?>");
+            let loadGMap = function () {
                 if (typeof google !== 'undefined') {
                     initMap();
                     return null;
@@ -48,7 +48,7 @@
                 objScript.async = true;
                 document.body.appendChild(objScript);
             };
-            var objDataProtectionButton = objMapDocument.querySelector('button');
+            let objDataProtectionButton = objMapDocument.querySelector('button');
             if (objDataProtectionButton && !localStorage.getItem('data-protection-gmap-accepted')) {
                 objDataProtectionButton.addEventListener('click', function () {
                     loadGMap();
