@@ -14,6 +14,7 @@ class MapModule extends \Alnv\ContaoCatalogManagerBundle\Modules\Listing {
         $this->arrOptions = [
             'infoContent' => $this->cmInfoContent ?: ''
         ];
+        $this->setOrder();
         $this->setFilter();
         $this->setMasterPage();
         if (!$this->setDistance()) {

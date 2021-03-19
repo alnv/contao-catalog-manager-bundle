@@ -15,7 +15,6 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
                 params: this.parameters
             }).then(function ( objResponse ) {
                 if (objResponse.body && objResponse.ok) {
-                    console.log(objResponse.body.locations)
                     this.locations = JSON.parse(objResponse.body.locations);
                     this.initMap();
                     this.$parent.clearAlert();
@@ -149,7 +148,12 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
                 width: '100%'
             },
             required: false
-        }
+        },
+        loader: {
+            type: Boolean,
+            default: true,
+            required: false
+        },
     },
     template:
         '<div class="view-gmap-component">' +
@@ -159,6 +163,6 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
                 '</div>' +
             '</transition>' +
             '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
-            '<loading v-if="!locations.length && !useDataPrivacyMode"></loading>' +
+            '<loading v-if="!locations.length && !useDataPrivacyMode && loader"></loading>' +
         '</div>'
 });
