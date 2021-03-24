@@ -42,7 +42,7 @@
                     return null;
                 }
                 var objScript = document.createElement('script');
-                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=&callback=initMap'; //@impl maps api
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= \Config::get('googleMapsApiKey') ?>&callback=initMap'; //@impl maps api
                 objScript.id = "script_<?= $strUniqueId ?>";
                 objScript.defer = true;
                 objScript.async = true;

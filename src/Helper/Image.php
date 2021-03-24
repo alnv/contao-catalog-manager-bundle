@@ -35,7 +35,12 @@ class Image {
 
             $arrMeta = [];
             if ($objFile->meta) {
-                $arrMeta = \Frontend::getMetaData($objFile->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale());
+                $strLanguage = $GLOBALS['TL_LANGUAGE'];
+                $objRequest = $objContainer->get('request_stack')->getCurrentRequest();
+                if (is_callable([$objRequest, 'getLocale'])) {
+                    $strLanguage = $objContainer->get('request_stack')->getCurrentRequest()->getLocale();
+                }
+                $arrMeta = \Frontend::getMetaData($objFile->meta, $strLanguage);
             }
 
             $strStaticUrl = $objContainer->get('contao.assets.files_context')->getStaticUrl();
@@ -47,10 +52,10 @@ class Image {
                 'sources' => $objPicture->getSources($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
             ];
 
-            if ( !empty( $arrMeta ) ) {
-                foreach ( $arrMeta as $strField => $strLabel ) {
+            if (!empty($arrMeta)) {
+                foreach ($arrMeta as $strField => $strLabel) {
                     if ($strField === 'link') {
-                        $strLabel = \Controller::replaceInsertTags( $strLabel );
+                        $strLabel = \Controller::replaceInsertTags($strLabel);
                     }
                     $arrPicture[$strField] = $strLabel;
                 }

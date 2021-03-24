@@ -12,7 +12,7 @@ class Options {
     protected static $strInstanceId = null;
     protected static $arrDataContainer = null;
 
-    public function getInstance($strInstanceId) {
+    public static function getInstance($strInstanceId) {
 
         if (!array_key_exists($strInstanceId, static::$arrInstances)) {
             static::$strInstanceId = $strInstanceId;
