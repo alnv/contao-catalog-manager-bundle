@@ -27,6 +27,10 @@ class Options {
         $arrTemps = [];
         $arrReturn = [];
 
+        if (\Cache::has(static::$strInstanceId)) {
+            return \Cache::get(static::$strInstanceId);
+        }
+
         switch (self::$arrField['optionsSource']) {
             case 'options':
                 $objOptions = CatalogOptionModel::findAll([
@@ -74,7 +78,9 @@ class Options {
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
+                \Cache::set(static::$strInstanceId, $arrReturn);
                 return $arrReturn;
+
             case 'dbActiveOptions':
                 $arrField = self::$arrField;
                 $objEntities = self::getEntities();
@@ -102,8 +108,13 @@ class Options {
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
+
+                \Cache::set(static::$strInstanceId, $arrReturn);
                 return $arrReturn;
         }
+
+        \Cache::set(static::$strInstanceId, $arrReturn);
+
         return $arrReturn;
     }
 

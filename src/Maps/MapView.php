@@ -11,6 +11,7 @@ abstract class MapView {
 
         $this->strTable = $strTable;
         $this->arrOptions = $arrOptions;
+        $this->arrOptions['isForm'] = true;
     }
 
     protected function getLocations() {

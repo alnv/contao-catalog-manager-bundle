@@ -14,6 +14,7 @@ abstract class View extends \Controller {
     protected $arrOptions = [];
     protected $arrEntities = [];
     protected $dcaExtractor = null;
+    protected $arrHashTable = [];
 
     public function __construct( $strTable, $arrOptions = [] ) {
 
@@ -380,7 +381,12 @@ abstract class View extends \Controller {
 
     protected function parseField($varValue, $strField, $arrValues, $blnFastMode) {
 
-        return Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode, $this->arrOptions['isForm']);
+        $strHash = md5($varValue . $strField);
+        if (\Cache::has($strHash)) {
+            return \Cache::get($strHash);
+        }
+        \Cache::set($strHash, Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode, $this->arrOptions['isForm']));
+        return \Cache::get($strHash);
     }
 
     protected function getPageNumber() {
