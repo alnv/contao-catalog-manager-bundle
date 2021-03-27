@@ -10,12 +10,14 @@ class VirtualDataContainerArray extends \System {
     protected $arrCatalog = [];
     protected $arrFields = [];
 
-    public function __construct( $strModule ) {
+    public function __construct($strModule) {
 
-        $objCatalog = new Catalog( $strModule );
+        $objCatalog = new Catalog($strModule);
         $this->arrCatalog = $objCatalog->getCatalog();
         $this->arrFields = $objCatalog->getFields();
         $this->generateEmptyDataContainer();
+
+        return parent::__construct();
     }
 
     protected function setConfig() {

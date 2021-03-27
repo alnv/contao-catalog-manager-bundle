@@ -11,19 +11,19 @@ abstract class CatalogWizard extends \System {
 
     protected $arrCache = [];
 
-    protected function parseCatalog( $arrCatalog ) {
+    protected function parseCatalog($arrCatalog) {
 
         $strIdentifier = 'catalog_' . $arrCatalog['table'];
-        if ( \Cache::has( $strIdentifier ) ) {
-            return \Cache::get( $strIdentifier );
+        if (\Cache::has( $strIdentifier)) {
+            return \Cache::get($strIdentifier);
         }
 
         $arrRelated = [];
         $arrChildren = [];
-        $this->getRelatedTablesByCatalog( $arrCatalog, $arrRelated, $arrChildren );
-        $arrCatalog['columns'] = \StringUtil::deserialize( $arrCatalog['columns'], true );
-        $arrCatalog['headerFields'] = \StringUtil::deserialize( $arrCatalog['headerFields'], true );
-        $arrCatalog['order'] = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $arrCatalog['order'], [
+        $this->getRelatedTablesByCatalog($arrCatalog, $arrRelated, $arrChildren);
+        $arrCatalog['columns'] = \StringUtil::deserialize($arrCatalog['columns'], true);
+        $arrCatalog['headerFields'] = \StringUtil::deserialize($arrCatalog['headerFields'], true);
+        $arrCatalog['order'] = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($arrCatalog['order'], [
             'option' => 'field',
             'option2' => 'order'
         ]);
@@ -32,53 +32,51 @@ abstract class CatalogWizard extends \System {
         $arrCatalog['ctable'] = $arrChildren;
         $arrCatalog['_table'] = $arrCatalog['table'];
 
-        if ( $arrCatalog['pid'] ) {
-            $arrCatalog['ptable'] = $this->getParentCatalogByPid( $arrCatalog['pid'] );
+        if ($arrCatalog['pid']) {
+            $arrCatalog['ptable'] = $this->getParentCatalogByPid($arrCatalog['pid']);
         }
 
-        if ( $arrCatalog['enableContentElements'] ) {
+        if ($arrCatalog['enableContentElements']) {
             $arrCatalog['ctable'][] = 'tl_content';
             $arrCatalog['related'][] = 'tl_content';
         }
 
-        if ( isset( $GLOBALS['TL_HOOKS']['parseCatalog'] ) && is_array( $GLOBALS['TL_HOOKS']['parseCatalog'] ) ) {
-            foreach ( $GLOBALS['TL_HOOKS']['parseCatalog'] as $arrCallback ) {
-                $this->import( $arrCallback[0] );
+        if (isset($GLOBALS['TL_HOOKS']['parseCatalog']) && is_array($GLOBALS['TL_HOOKS']['parseCatalog'])) {
+            foreach ($GLOBALS['TL_HOOKS']['parseCatalog'] as $arrCallback) {
+                $this->import($arrCallback[0]);
                 $arrCatalog = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrCatalog, $this );
             }
         }
 
-        \Cache::set( $strIdentifier, $arrCatalog );
+        \Cache::set($strIdentifier, $arrCatalog);
 
         return $arrCatalog;
     }
 
-    protected function getRelatedTablesByCatalog( $arrCatalog, &$arrRelated, &$arrChildren, $intLevel = 0 ) {
+    protected function getRelatedTablesByCatalog($arrCatalog, &$arrRelated, &$arrChildren, $intLevel=0) {
 
-        $objChildCatalogs = CatalogModel::findChildrenCatalogsById( $arrCatalog['id'] );
+        $objChildCatalogs = CatalogModel::findChildrenCatalogsById($arrCatalog['id']);
 
-        if ( $objChildCatalogs === null ) {
-
+        if ($objChildCatalogs === null) {
             return null;
         }
 
-        while ( $objChildCatalogs->next() ) {
+        $blnFirstCall = !$intLevel;
+        while ($objChildCatalogs->next()) {
 
-            if ( $objChildCatalogs->table ) {
-                $arrRelated[] = $objChildCatalogs->table;
-            }
-
-            if ( $objChildCatalogs->enableContentElements && !in_array( 'tl_content', $arrRelated ) ) {
+            if ($objChildCatalogs->enableContentElements && !in_array('tl_content', $arrRelated)) {
                 $arrRelated[] = 'tl_content';
             }
 
-            if ( !$intLevel ) {
-                $arrChildren[] = $objChildCatalogs->table;
+            if ($objChildCatalogs->table) {
+                $arrRelated[] = $objChildCatalogs->table;
+                if ($blnFirstCall) {
+                    $arrChildren [] = $objChildCatalogs->table;
+                }
             }
 
             $intLevel++;
-
-            self::getRelatedTablesByCatalog( $objChildCatalogs->row(), $arrRelated, $arrChildren, $intLevel );
+            self::getRelatedTablesByCatalog($objChildCatalogs->row(), $arrRelated, $arrChildren, $intLevel);
         }
     }
 

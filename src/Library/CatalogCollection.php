@@ -30,6 +30,8 @@ class CatalogCollection extends CatalogWizard {
             $this->arrTypes[$objCatalogs->type][] = $objCatalogs->table;
             $this->arrCatalogs[$objCatalogs->table] = $this->parseCatalog($objCatalogs->row());
         }
+
+       parent::__construct();
     }
 
 

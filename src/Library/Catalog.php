@@ -49,6 +49,7 @@ class Catalog extends CatalogWizard {
         }
 
         $this->setDefaultFields();
+        return parent::__construct();
     }
 
     public function getCatalog() {
@@ -61,11 +62,11 @@ class Catalog extends CatalogWizard {
         return $this->arrFields;
     }
 
-    public function getNaturalFields( $blnLabelOnly = true ) {
+    public function getNaturalFields($blnLabelOnly = true) {
 
         $arrReturn = [];
 
-        foreach ( $this->arrFields as $strFieldname => $arrField ) {
+        foreach ($this->arrFields as $strFieldname => $arrField) {
             $arrReturn[ $strFieldname ] = $blnLabelOnly ? \StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
         }
 
@@ -90,15 +91,14 @@ class Catalog extends CatalogWizard {
 
         $arrFields = [];
 
-        foreach ( $GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField ) {
-
-            if ( isset( $arrField['table'] ) && $this->arrCatalog['table'] != $arrField['table'] ) {
+        foreach ($GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField) {
+            if (isset($arrField['table']) && $this->arrCatalog['table'] != $arrField['table']) {
                 continue;
             }
 
-            unset( $arrField['index'] );
+            unset($arrField['index']);
 
-            if ( !isset( $arrField['label'] ) ) {
+            if (!isset($arrField['label'])) {
                 $arrField['label'] = [
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
                     Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )
