@@ -32,19 +32,26 @@ class Module {
         return $arrReturn;
     }
 
-    public function getListTemplates( \DataContainer $dc ) {
+    public function getListTemplates(\DataContainer $dc) {
 
-        if ( $dc == null ) {
-
+        if ($dc == null) {
             return [];
         }
 
-        if ( !$dc->activeRecord->type ) {
-
+        if (!$dc->activeRecord->type) {
             return [];
         }
 
-        return \Controller::getTemplateGroup( 'cm_' . $dc->activeRecord->type . '_' );
+        switch ($dc->activeRecord->type) {
+            case 'listing-map':
+                $strType = 'map_view';
+                break;
+            default:
+                $strType = $dc->activeRecord->type;
+                break;
+        }
+
+        return \Controller::getTemplateGroup('cm_' . $strType . '_');
     }
 
     public function getOrderByStatements() {
