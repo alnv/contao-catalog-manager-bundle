@@ -13,8 +13,8 @@ class GMap extends MapView {
         if ($objPage->ajaxContext) {
             return json_encode($arrLocations, 512);
         }
-
-        $objTemplate = new \FrontendTemplate('cm_map_view_gmap');
+        
+        $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
         $objTemplate->setData([
             'locations' => $arrLocations,
             'varLocations' => json_encode($arrLocations, 512)

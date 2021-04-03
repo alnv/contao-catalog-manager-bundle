@@ -12,7 +12,8 @@ class MapModule extends \Alnv\ContaoCatalogManagerBundle\Modules\Listing {
     protected function compile() {
 
         $this->arrOptions = [
-            'infoContent' => $this->cmInfoContent ?: ''
+            'infoContent' => $this->cmInfoContent ?: '',
+            'template' => $this->cmTemplate ?: 'cm_map_view_gmap'
         ];
         $this->setOrder();
         $this->setFilter();
