@@ -109,8 +109,8 @@ abstract class CatalogWizard extends \System {
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
-                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $arrField['fieldname'], $arrField['name']),
-                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.' . $arrField['fieldname'], $arrField['description']),
+                Translation::getInstance()->translate(($this->arrCatalog['table']?$this->arrCatalog['table'].'.':'') . 'field.title.' . $arrField['fieldname'], $arrField['name']),
+                Translation::getInstance()->translate(($this->arrCatalog['table']?$this->arrCatalog['table'].'.':'') . '.field.description.' . $arrField['fieldname'], $arrField['description']),
             ],
             'eval' => [
                 'tl_class' => 'w50',
