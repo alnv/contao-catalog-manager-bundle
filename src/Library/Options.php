@@ -14,6 +14,10 @@ class Options {
 
     public static function getInstance($strInstanceId) {
 
+        if (!$strInstanceId) {
+            $strInstanceId = uniqid();
+        }
+
         if (!array_key_exists($strInstanceId, static::$arrInstances)) {
             static::$strInstanceId = $strInstanceId;
             static::$arrInstances[$strInstanceId] = new static;
@@ -22,13 +26,19 @@ class Options {
         return static::$arrInstances[$strInstanceId];
     }
 
+    protected static function getGetterId() {
+
+        return (self::$arrField['fieldname']?self::$arrField['fieldname'] . '.':'') . (self::$arrField['id']?:static::$strInstanceId);
+    }
+
     public static function getOptions($blnAsAssoc=false) {
 
         $arrTemps = [];
         $arrReturn = [];
-
-        if (\Cache::has(static::$strInstanceId)) {
-            return \Cache::get(static::$strInstanceId);
+        $strGetter = static::getGetterId();
+        
+        if (\Cache::has($strGetter)) {
+            return \Cache::get($strGetter);
         }
 
         switch (self::$arrField['optionsSource']) {
@@ -78,7 +88,7 @@ class Options {
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
-                \Cache::set(static::$strInstanceId, $arrReturn);
+                \Cache::set($strGetter, $arrReturn);
                 return $arrReturn;
 
             case 'dbActiveOptions':
@@ -109,11 +119,11 @@ class Options {
                     }
                 }
 
-                \Cache::set(static::$strInstanceId, $arrReturn);
+                \Cache::set($strGetter, $arrReturn);
                 return $arrReturn;
         }
 
-        \Cache::set(static::$strInstanceId, $arrReturn);
+        \Cache::set($strGetter, $arrReturn);
 
         return $arrReturn;
     }
