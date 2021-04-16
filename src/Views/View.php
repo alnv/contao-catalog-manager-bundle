@@ -381,12 +381,14 @@ abstract class View extends \Controller {
 
     protected function parseField($varValue, $strField, $arrValues, $blnFastMode) {
 
-        $strHash = md5($varValue . $strField);
+        $strHash = md5($strField.$varValue);
         if (\Cache::has($strHash)) {
-            return \Cache::get($strHash);
+            $arrAttribute = \Cache::get($strHash);
+        } else {
+            $arrAttribute = \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
+            \Cache::set($strHash, $arrAttribute);
         }
-        \Cache::set($strHash, Toolkit::parseCatalogValue($varValue, \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable), $arrValues, false, $blnFastMode, $this->arrOptions['isForm']));
-        return \Cache::get($strHash);
+        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, $this->arrOptions['isForm']);
     }
 
     protected function getPageNumber() {
