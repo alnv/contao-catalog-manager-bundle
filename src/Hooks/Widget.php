@@ -16,7 +16,7 @@ class Widget {
                         array_insert($arrAttributes['options'], 0, [
                             [
                                 'value' => null,
-                                'label' => $arrAttributes['blankOptionLabel'] ?: '-'
+                                'label' => \Controller::replaceInsertTags($arrAttributes['blankOptionLabel']) ?: '-'
                             ]
                         ]);
                     }

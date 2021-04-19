@@ -45,7 +45,7 @@ class FormFields {
                         array_insert($arrOptions, 0, [
                             [
                                 'value' => null,
-                                'label' => $objField->blankOptionLabel ?: '-'
+                                'label' => \Controller::replaceInsertTags($objField->blankOptionLabel) ?: '-'
                             ]
                         ]);
                     }
