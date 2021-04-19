@@ -81,7 +81,7 @@ class Options {
                         if ($blnAsAssoc) {
                             $arrReturn[] = [
                                 'value' => $strValue,
-                                'label' => $strLabel
+                                'label' => self::getLabel($strValue, $strLabel)
                             ];
                             continue;
                         }
@@ -111,7 +111,7 @@ class Options {
                         if ($blnAsAssoc) {
                             $arrReturn[] = [
                                 'value' => $strValue,
-                                'label' => $strLabel
+                                'label' => self::getLabel($strValue, $strLabel)
                             ];
                             continue;
                         }
@@ -220,6 +220,6 @@ class Options {
 
         $strTable = self::$arrField['dbTable'] ?: 'option';
         $strFallbackLabel = \StringUtil::decodeEntities($strFallbackLabel);
-        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate(($strTable?$strTable.'.':'') . self::$arrField['fieldname'] . '.' . $strValue, $strFallbackLabel));
+        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate(($strTable?$strTable.'.':'') . (self::$arrField['fieldname']?:self::$arrField['dbKey']) . '.' . $strValue, $strFallbackLabel));
     }
 }
