@@ -31,11 +31,19 @@ const viewListingComponent = Vue.component('view-listing', {
                 }
             }.bind(this));
         },
+        setHash: function () {
+            if (!this.hash) {
+                return null;
+            }
+            window.location.hash = this.parameters[this.hash] ? this.parameters[this.hash] : '';
+            console.log(window.location.hash)
+        },
         onChange: function (shared) {
             this.addSharedParameters(shared);
             if (this.view) {
                 this.$parent.setLoadingAlert( '', this );
             }
+            this.setHash();
             this.fetch();
         },
         addSharedParameters: function(shared) {
@@ -122,6 +130,9 @@ const viewListingComponent = Vue.component('view-listing', {
                     this.parameters[name] = this.params[name];
                 }
             }
+            if (this.hash) {
+                this.parameters[this.hash] = window.location.hash ? window.location.hash.substr(1) : '';
+            }
         }
     },
     updated: function () {
@@ -146,6 +157,11 @@ const viewListingComponent = Vue.component('view-listing', {
         awaitOnChange: {
             type: Boolean,
             default: false,
+            required: false
+        },
+        hash: {
+            type: String,
+            default: '',
             required: false
         },
         module: {
