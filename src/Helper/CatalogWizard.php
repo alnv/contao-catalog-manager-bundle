@@ -197,7 +197,7 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'checkboxWizard';
                 $arrReturn['eval']['tl_class'] = 'clr';
-                $arrReturn['multiple'] = true;
+                $arrReturn['eval']['multiple'] = true;
                 break;
             case 'checkbox':
                 $arrReturn['filter'] = true;
