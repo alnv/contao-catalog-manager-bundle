@@ -23,6 +23,14 @@ class Inserttags {
                     return '';
                 }
                 return $objDbUser->{$strField};
+            case 'timestamp':
+                $strMethod = $arrFragments[1] ?: 'tstamp';
+                $strStrToTimeParameter = $arrFragments[2] ?: '';
+                if ($strStrToTimeParameter) {
+                    return strtotime($strStrToTimeParameter, (new \Date())->{$strMethod});
+                } else {
+                    return (new \Date())->{$strMethod};
+                }
         }
 
         return false;
