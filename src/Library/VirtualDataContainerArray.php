@@ -52,7 +52,7 @@ class VirtualDataContainerArray extends \System {
             ]
         ];
 
-        if ( $this->arrCatalog['enablePanel'] ) {
+        if ($this->arrCatalog['enablePanel']) {
             $arrList['sorting']['panelLayout'] = 'filter,search,sort;limit';
         }
 
@@ -60,26 +60,26 @@ class VirtualDataContainerArray extends \System {
             $arrList['labels']['showColumns'] = true;
         }
 
-        if ( !empty( $this->arrCatalog['columns'] ) ) {
+        if (!empty( $this->arrCatalog['columns'])) {
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
         }
 
         if ($this->arrCatalog['sortingType']) {
-            if ( $this->arrCatalog['sortingType'] == 'fixed' ) {
+            if ($this->arrCatalog['sortingType'] == 'fixed') {
                 $arrList['sorting']['mode'] = 1;
                 $arrList['sorting']['flag'] = (int) $this->arrCatalog['flag'];
                 $arrList['sorting']['fields'] = [ $this->arrCatalog['flagField'] ];
-                if ( empty( $arrList['labels']['fields'] ) ) {
+                if (empty( $arrList['labels']['fields'])) {
                     $arrList['labels']['fields'] = [ $this->arrCatalog['flagField'] ];
                 }
             }
-            if ( $this->arrCatalog['sortingType'] == 'switchable' ) {
+            if ($this->arrCatalog['sortingType'] == 'switchable') {
                 $arrSortingFields = [];
                 $arrList['sorting']['mode'] = 2;
                 $arrList['sorting']['fields'] = [];
-                foreach ( $this->arrCatalog['order'] as $arrOrder ) {
-                    if ( isset( $arrOrder['field'] ) && $arrOrder['field'] ) {
-                        $arrList['sorting']['fields'][] = $arrOrder['field'] . ( $arrOrder['order'] ? ' ' . $arrOrder['order'] : '' );
+                foreach ($this->arrCatalog['order'] as $arrOrder) {
+                    if (isset($arrOrder['field']) && $arrOrder['field']) {
+                        $arrList['sorting']['fields'][] = $arrOrder['field'] . ($arrOrder['order'] ? ' ' . $arrOrder['order'] : '');
                         $arrSortingFields[] = $arrOrder['field'];
                     }
                 }
@@ -90,8 +90,8 @@ class VirtualDataContainerArray extends \System {
 
             if (in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable']) && !$this->arrCatalog['showColumns']) {
                 $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, \DataContainer $dc) {
-                    $strReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
-                    return $strReturn ?: '-';
+                    $varReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
+                    return $varReturn ?: '-';
                 };
             }
         }
@@ -102,7 +102,7 @@ class VirtualDataContainerArray extends \System {
             };
         }
 
-        if ( $this->arrCatalog['mode'] == 'parent' ) {
+        if ($this->arrCatalog['mode'] == 'parent') {
             $arrList['sorting']['mode'] = 4;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] =  function ($arrRow) use ($arrList) {
@@ -112,7 +112,7 @@ class VirtualDataContainerArray extends \System {
             $arrList['labels']['showColumns'] = false;
         }
 
-        if ( $this->arrCatalog['mode'] == 'tree' ) {
+        if ($this->arrCatalog['mode'] == 'tree') {
             $arrList['sorting']['mode'] = 5;
             $arrList['sorting']['fields'] = ['sorting'];
             $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon

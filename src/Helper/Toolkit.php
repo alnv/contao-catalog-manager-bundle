@@ -176,6 +176,24 @@ class Toolkit {
 
         foreach ($arrLabelFields as $strField) {
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
+            if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
+                switch ($arrFields[$strField]['eval']['role']) {
+                    case 'pages':
+                    case 'page':
+                        if (!is_array($arrColumns[$strField])) {
+                            break;
+                        }
+                        $arrPages = [];
+                        $arrPageIds = array_keys($arrColumns[$strField]);
+                        foreach ($arrPageIds as $strPageId) {
+                            if ($objPage = \PageModel::findByPk($strPageId)) {
+                                $arrPages[] = $objPage->pageTitle ?: $objPage->title;
+                            }
+                        }
+                        $arrColumns[$strField] = implode(', ', $arrPages);
+                        break;
+                }
+            }
         }
 
         if (count($arrColumns) < 2) {
