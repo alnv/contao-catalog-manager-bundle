@@ -82,8 +82,8 @@ abstract class View extends \Controller {
 
                 case 'order':
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
-                    if ( !$this->arrOptions['order'] ) {
-                        unset( $this->arrOptions['order'] );
+                    if (!$this->arrOptions['order']) {
+                        unset($this->arrOptions['order']);
                     }
                     break;
 

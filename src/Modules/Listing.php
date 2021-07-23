@@ -168,8 +168,8 @@ class Listing extends \Hybrid {
 
     protected function setOrder() {
 
-        if ( $this->cmOrder ) {
-            $strOrder = Toolkit::getOrderByStatementFromArray( \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $this->cmOrder, [
+        if ($this->cmOrder) {
+            $strOrder = Toolkit::getOrderByStatementFromArray(\Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'
             ]));
