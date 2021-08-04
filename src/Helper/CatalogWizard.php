@@ -240,6 +240,13 @@ abstract class CatalogWizard extends \System {
                     'load' => 'lazy'
                 ];
                 $arrReturn['eval']['tl_class'] = 'clr';
+                if ($arrReturn['eval']['rgxp'] == 'url') {
+                    $arrReturn['inputType'] = 'text';
+                    $arrReturn['eval']['dcaPicker'] = true;
+                    unset($arrReturn['relation']);
+                    unset($arrReturn['foreignKey']);
+                    unset($arrReturn['eval']['fieldType']);
+                }
                 break;
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
