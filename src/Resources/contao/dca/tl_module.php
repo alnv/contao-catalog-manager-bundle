@@ -102,6 +102,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
     'eval' => [
         'tl_class' => 'w50',
         'mandatory' => false,
+        'decodeEntities' => true,
         'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOrderByStatements' ]
     ],
     'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
@@ -135,7 +136,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
         'tl_class' => 'long',
         'mandatory' => true,
         'allowHtml' => true,
-        'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOperators' ],
+        'options2_callback' => ['catalogmanager.datacontainer.module', 'getOperators'],
         'enableField' => true,
         'enableGroup' => true
     ],
