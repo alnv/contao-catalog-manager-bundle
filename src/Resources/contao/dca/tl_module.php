@@ -103,7 +103,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
         'tl_class' => 'w50',
         'mandatory' => false,
         'decodeEntities' => true,
-        'options2_callback' => [ 'catalogmanager.datacontainer.module', 'getOrderByStatements' ]
+        'options2_callback' => ['catalogmanager.datacontainer.module', 'getOrderByStatements']
     ],
     'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
     'sql' => ['type' => 'blob', 'notnull' => false ]
