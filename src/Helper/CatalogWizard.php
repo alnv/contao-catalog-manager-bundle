@@ -160,6 +160,11 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['inputType'] = 'explanation';
                 $arrReturn['eval']['text'] = $arrField['text'];
                 break;
+            case 'listWizard':
+                $arrReturn['inputType'] = 'listWizard';
+                $arrReturn['eval']['multiple'] = true;
+                $arrReturn['eval']['tl_class'] = 'clr';
+                break;
             case 'text':
                 $arrReturn['search'] = true;
                 $arrReturn['sorting'] = true;

@@ -44,7 +44,8 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
     'checkbox' => 'Checkbox-Menü',
     'radio' => 'Radio-Button-Menü',
     'customOptionWizard' => 'Options Wizard',
-    'checkboxWizard' => 'Checkbox Wizard'
+    'checkboxWizard' => 'Checkbox Wizard',
+    'listWizard' => 'List wizard'
 ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'options' => 'Options',

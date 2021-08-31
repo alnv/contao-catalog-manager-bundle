@@ -37,24 +37,24 @@ class CatalogField {
 
     public function getRoles( \DataContainer $dc ) {
 
-        $arrRoles = array_keys( $GLOBALS['CM_ROLES'] );
+        $arrRoles = array_keys($GLOBALS['CM_ROLES']);
 
-        if ( !$dc->activeRecord->type ) {
+        if (!$dc->activeRecord->type) {
 
             return $arrRoles;
         }
 
-        switch ( $dc->activeRecord->type ) {
-
+        switch ($dc->activeRecord->type) {
             case 'date':
                 $arrDateRoles = [];
-                foreach ( $GLOBALS['CM_ROLES'] as $strRole => $arrRole ) {
-                    if ( $arrRole['group'] == 'date' ) {
+                foreach ($GLOBALS['CM_ROLES'] as $strRole => $arrRole) {
+                    if ($arrRole['group'] == 'date') {
                         $arrDateRoles[] = $strRole;
                     }
                 }
                 return $arrDateRoles;
-                break;
+            case 'listWizard':
+                return ['miscellaneous'];
         }
 
         return $arrRoles;
