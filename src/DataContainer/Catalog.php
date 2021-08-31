@@ -101,16 +101,15 @@ class Catalog {
         return $objCatalog->getNaturalFields();
     }
 
-    public function generateModulename( \DataContainer $objDataContainer ) {
+    public function generateModulename(\DataContainer $objDataContainer) {
 
-        if ( $objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table ) {
-
+        if ($objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table) {
             return null;
         }
 
         $objDatabase = \Database::getInstance();
-        $strModulename = 'module_' . strtolower( $objDataContainer->activeRecord->table );
-        $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id = ?')->set([ 'tstamp' => time(), 'module' => $strModulename ])->execute( $objDataContainer->id );
+        $strModulename = 'module_' . strtolower($objDataContainer->activeRecord->table);
+        $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
     }
 
     public function getNavigation() {

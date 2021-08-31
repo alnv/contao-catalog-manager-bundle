@@ -4,12 +4,14 @@ $GLOBALS['TL_DCA']['tl_content']['palettes']['component'] = '{type_legend},type;
 $GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 if (\Input::get('do')) {
-    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule( \Input::get('do'), [
+    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule(\Input::get('do'), [
         'limit' => 1
     ]);
     if ($objCatalog !== null) {
         if ($objCatalog->enableContentElements) {
             $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = $objCatalog->table;
+        } else {
+            $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = \Input::get('table');
         }
     }
 }
