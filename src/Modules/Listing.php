@@ -139,7 +139,7 @@ class Listing extends \Hybrid {
         switch ($this->cmFilterType) {
             case 'wizard':
                 \Controller::loadDataContainer($this->cmTable);
-                $arrQueries = Toolkit::convertComboWizardToModelValues(\StringUtil::decodeEntities($this->cmWizardFilterSettings), $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
+                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;

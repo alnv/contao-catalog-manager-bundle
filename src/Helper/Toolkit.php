@@ -488,14 +488,19 @@ class Toolkit {
         return $strValue;
     }
 
-    public static function convertComboWizardToModelValues( $strValue, $strTable = '' ) {
+    public static function convertComboWizardToModelValues($strValue, $strTable = '') {
 
         $arrReturn = [];
         $arrValues = [];
         $arrQueries = [];
         $strName = 'group0';
         $blnInitialGroup = true;
-        $arrJson = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson( $strValue, [
+
+        if (is_string($strValue)) {
+            $strValue = \StringUtil::decodeEntities($strValue);
+        }
+
+        $arrJson = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($strValue, [
             'option' => 'field',
             'option2' => 'operator',
             'option3' => 'value',
