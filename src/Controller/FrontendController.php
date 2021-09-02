@@ -2,10 +2,9 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Controller;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -13,7 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
  *
  * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
  */
-class FrontendController extends Controller {
+class FrontendController extends \Contao\CoreBundle\Controller\AbstractController {
 
     /**
      *
@@ -21,6 +20,7 @@ class FrontendController extends Controller {
      * @Method({"POST"})
      */
     public function getViewListing($module, $page) {
+
         global $objPage;
         $objPage = \PageModel::findByPK($page)->loadDetails();
         $GLOBALS['TL_LANGUAGE'] = $objPage->language;
@@ -67,6 +67,7 @@ class FrontendController extends Controller {
      * @Method({"GET"})
      */
     public function getViewMap($module, $page) {
+
         global $objPage;
         $objPage = \PageModel::findByPK($page)->loadDetails();
         (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
@@ -81,6 +82,7 @@ class FrontendController extends Controller {
      * @Method({"POST"})
      */
     public function getAsyncImage() {
+
         $this->container->get( 'contao.framework' )->initialize();
         $arrReturn = [
             'src' => null,
@@ -105,6 +107,7 @@ class FrontendController extends Controller {
      * @Method({"GET"})
      */
     public function getICalendar() {
+
         $this->container->get( 'contao.framework' )->initialize();
         global $objPage;
         $objPage = \PageModel::findByPK( \Input::get('p') )->loadDetails();
