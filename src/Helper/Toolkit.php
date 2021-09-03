@@ -323,11 +323,18 @@ class Toolkit {
                     if ($objPage === null) {
                         continue;
                     }
-                    $arrValues[$strPageId] = [
-                        'url' => $objPage->getFrontendUrl(),
-                        'master' => $objPage->getFrontendUrl('/'.$arrCatalog['alias']),
-                        'absolute' => $objPage->getAbsoluteUrl('/'.$arrCatalog['alias'])
-                    ];
+                    if ($blnStringFormat) {
+                        $arrValues[] = $objPage->pageTitle ?: $objPage->title;
+                    } else {
+                        $arrValues[$strPageId] = [
+                            'url' => $objPage->getFrontendUrl(),
+                            'master' => $objPage->getFrontendUrl('/'.$arrCatalog['alias']),
+                            'absolute' => $objPage->getAbsoluteUrl('/'.$arrCatalog['alias'])
+                        ];
+                    }
+                }
+                if ($blnStringFormat) {
+                    return implode(', ', $arrValues);
                 }
                 return $arrValues;
         }
