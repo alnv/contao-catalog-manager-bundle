@@ -275,10 +275,10 @@ class VirtualDataContainerArray extends \System {
                     \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
                     \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?:$strTitle)),
                 ],
-                'href' => 'table=' . $strTable,
+                'href' => 'table=' . $strTable . '&sourceTable='.$this->arrCatalog['table'],
                 'icon' => 'edit.gif'
             ];
-            array_insert( $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['list']['operations'], 1, $arrOperation );
+            array_insert( $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }
     }
 
