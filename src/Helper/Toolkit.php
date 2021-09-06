@@ -13,11 +13,11 @@ class Toolkit {
 
     public static function parse($varValue, $strDelimiter = ', ', $strField = 'label') {
 
-        if ( is_array( $varValue ) ) {
-            $arrValues = array_map( function ( $arrValue ) use ( $strField ) {
-                return $arrValue[ $strField ];
-            }, $varValue );
-            return implode( $strDelimiter, $arrValues );
+        if (is_array($varValue)) {
+            $arrValues = array_map(function ($arrValue) use ($strField) {
+                return is_array($arrValue) ? $arrValue[$strField] : $arrValue;
+            }, $varValue);
+            return implode($strDelimiter, $arrValues);
         }
 
         return $varValue;
@@ -415,39 +415,39 @@ class Toolkit {
         return false;
     }
 
-    public function saveAlias( $arrActiveRecord, $arrFields, $arrCatalog ) {
+    public static function saveAlias($arrActiveRecord, $arrFields, $arrCatalog) {
 
-        if ( !$arrActiveRecord['id'] ) {
+        if (!$arrActiveRecord['id']) {
             return null;
         }
 
         $arrValues = [];
         $objDatabase = \Database::getInstance();
 
-        foreach ( $arrFields as $strFieldname => $arrField ) {
-            if ( !isset( $arrField['eval'] ) ) {
+        foreach ($arrFields as $strFieldname => $arrField) {
+            if (!isset( $arrField['eval'])) {
                 continue;
             }
 
-            if ( !$arrField['eval']['useAsAlias'] ) {
+            if (!$arrField['eval']['useAsAlias']) {
                 continue;
             }
 
-            if ( isset( $arrActiveRecord[ $strFieldname ] ) && $arrActiveRecord[ $strFieldname ] !== '' && $arrActiveRecord[ $strFieldname ] !== null ) {
-                $arrValues[] = $arrActiveRecord[ $strFieldname ];
+            if (isset( $arrActiveRecord[ $strFieldname ] ) && $arrActiveRecord[ $strFieldname ] !== '' && $arrActiveRecord[ $strFieldname ] !== null) {
+                $arrValues[] = $arrActiveRecord[$strFieldname];
             }
         }
 
-        if ( empty( $arrValues ) ) {
-            $strAlias = md5( time() . '/' . ( $arrActiveRecord['id'] ?: '' ) );
+        if (empty($arrValues)) {
+            $strAlias = md5(time() . '/' . ( $arrActiveRecord['id'] ?: '' ));
         } else {
-            $strAlias = implode( '-', $arrValues );
+            $strAlias = implode('-', $arrValues);
         }
 
         $arrSet = [];
-        $arrSet[ 'tstamp' ] = time();
-        $arrSet[ 'alias' ] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], $arrActiveRecord['pid']);
-        $objDatabase->prepare( 'UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?' )->set($arrSet)->execute($arrActiveRecord['id']);
+        $arrSet['tstamp'] = time();
+        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], $arrActiveRecord['pid']);
+        $objDatabase->prepare('UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
     public static function generateAlias($strValue,$strAliasField='alias',$strTable=null,$strId=null,$strPid=null) {

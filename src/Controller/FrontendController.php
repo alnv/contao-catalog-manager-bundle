@@ -24,7 +24,12 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         global $objPage;
         $objPage = \PageModel::findByPK($page)->loadDetails();
         $GLOBALS['TL_LANGUAGE'] = $objPage->language;
-        (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page,\Input::get('item'));
+
+        if (isset($_POST['requestUrl'])) {
+            \Environment::set('request', (\Input::post('requestUrl')?:''));
+        }
+
+        (new \Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout())->getMasterByPageId($page, \Input::get('item'));
         $objPage->ajaxContext = true;
         $strListing = \Controller::getFrontendModule($module);
         $strListing = \Controller::replaceInsertTags($strListing);
