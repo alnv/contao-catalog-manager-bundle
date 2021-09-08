@@ -110,7 +110,7 @@ class File {
 
                     $arrFiles[$objSubfiles->path] = [
                         'id' => $objSubfiles->id,
-                        'uuid' => $objSubfiles->uuid,
+                        'uuid' => \StringUtil::binToUuid($objSubfiles->uuid),
                         'name' => $objFile->basename,
                         'title' => \StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                         'link' => $arrMeta['title'],

@@ -18,17 +18,15 @@ class PageInsertTag {
         return false;
     }
 
-    protected function getCurrentAndAllSubPages($strId) {
+    protected function getCurrentAndAllSubPages($strId, &$arrReturn=[]) {
 
         $objPage = \PageModel::findByPk($strId);
         if ($objPage === null) {
-            return [];
+            return $arrReturn;
         }
-        $arrReturn = [];
         $arrReturn[] = $strId;
         if ($objNext = \PageModel::findPublishedByPid($objPage->id)) {
             while ($objNext->next()) {
-                $arrReturn[] = $objNext->id;
                 $this->getCurrentAndAllSubPages($objNext->id, $arrReturn);
             }
         }
