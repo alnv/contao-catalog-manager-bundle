@@ -90,8 +90,8 @@ const AsyncImageComponent = Vue.component( 'async-image', {
         '<div class="async-image-component" ref="image">' +
             '<slot>' +
                 '<div class="ce_image block">' +
-                    '<figure v-if="src"><img :src="src" :alt="alt"></figure>' +
-                    '<loading v-if="!src"></loading>' +
+                    '<figure v-if="src"><img :src="src" :alt="alt"><slot name="image-inner"></slot></figure>' +
+                    // '<loading v-if="!src"></loading>' +
                 '</div>' +
             '</slot>' +
         '</div>'
