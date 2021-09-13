@@ -12,7 +12,20 @@ class PageInsertTag {
 
             global $objPage;
 
-            return serialize($this->getCurrentAndAllSubPages($objPage->id));
+            $strPageId = $objPage->id;
+            if (isset($arrFragments[1]) && strpos($arrFragments[1], '?') !== false) {
+                $arrParams = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseParametersFromString($arrFragments[1]);
+                foreach ($arrParams as $strParam) {
+                    list($strKey, $strOption) = explode('=', $strParam);
+                    switch ($strKey) {
+                        case 'useParent':
+                            $strPageId = $objPage->pid;
+                            break;
+                    }
+                }
+            }
+
+            return serialize($this->getCurrentAndAllSubPages($strPageId));
         }
 
         return false;
