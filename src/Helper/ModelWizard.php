@@ -12,6 +12,10 @@ class ModelWizard {
 
         $strModel = \Model::getClassFromTable($strTable);
 
+        if (strpos($strModel,'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
+            $strModel = '';
+        }
+
         if ($strModel && $this->modelExist($strModel)) {
             $this->objModel = new $strModel();
             return null;
