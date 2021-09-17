@@ -18,6 +18,7 @@ class Breadcrumb {
         $arrItem['href'] = $GLOBALS['CM_MASTER']['masterUrl'];
         $arrItem['link'] = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
         $arrItem['title'] = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
+        $arrItems[$intLastItemId]['data']['title'] = $arrItem['title'];
         $arrItem['data'] = $arrItems[$intLastItemId]['data'];
 
         if ($arrItems[$intLastItemId]['data']['requireItem']) {
