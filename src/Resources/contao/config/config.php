@@ -154,6 +154,10 @@ $GLOBALS['CM_ROLES'] = [
         'rgxp' => 'natural',
         'sql' => "int(10) unsigned NULL"
     ],
+    'groups' => [
+        'group' => 'member',
+        'sql' => "blob NULL"
+    ],
     'subtitle' => [
         'group' => 'article',
         'sql' => "varchar(255) NOT NULL default '%s'"
