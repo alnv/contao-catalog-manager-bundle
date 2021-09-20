@@ -4,7 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
-class ActiveInsertTag extends \Controller {
+class ActiveInsertTag extends \System {
 
     public function replace( $strFragment ) {
 
