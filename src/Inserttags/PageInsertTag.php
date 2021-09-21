@@ -21,6 +21,11 @@ class PageInsertTag {
                         case 'useParent':
                             $strPageId = $objPage->pid;
                             break;
+                        case 'translate':
+                            if ($objPage->languageMain) {
+                                $strPageId = $objPage->languageMain;
+                            }
+                            break;
                     }
                 }
             }
