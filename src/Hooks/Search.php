@@ -41,7 +41,7 @@ class Search {
         return $arrPages;
     }
 
-    public function getSearchablePages($arrPages, $intRoot=0, $blnIsSitemap=false) {
+    public function getSearchablePages($arrPages, $intRoot=0, $blnIsSitemap=false, $strLanguage='') {
 
         $objDatabase = \Database::getInstance();
         $objModules = $objDatabase->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing','1');
@@ -63,16 +63,21 @@ class Search {
                 continue;
             }
 
+            if ($objPage->language != $strLanguage) {
+                continue;
+            }
+
             $arrFilter = $this->parseFilter($objModules);
+
             $objListing = new Listing($strTable, [
                 'language' => $objPage->language,
-                'column' => $arrFilter['column'],
-                'value' => $arrFilter['value']
+                'column' => isset($arrFilter['column']) ? $arrFilter['column'] : null,
+                'value' => isset($arrFilter['value']) ? $arrFilter['value'] : null
             ]);
 
             foreach ($objListing->parse() as $arrEntity) {
                 $strAlias = $arrEntity['alias'];
-                if ( !$strAlias ) {
+                if (!$strAlias) {
                     continue;
                 }
                 $arrPages[] = $objPage->getAbsoluteUrl('/'.$strAlias);
@@ -82,20 +87,19 @@ class Search {
         return $arrPages;
     }
 
-    protected function parseFilter( $objModules ) {
+    protected function parseFilter($objModules) {
 
         $arrReturn = [
             'column' => [],
             'value' => []
         ];
 
-        if ( !$objModules->cmFilter ) {
-
+        if (!$objModules->cmFilter) {
             return $arrReturn;
         }
 
-        $arrReturn['column'] = explode( ';', \StringUtil::decodeEntities( $objModules->cmColumn ) );
-        $arrReturn['value'] = explode( ';', \StringUtil::decodeEntities( $objModules->cmValue ) );
+        $arrReturn['column'] = explode(';', \StringUtil::decodeEntities($objModules->cmColumn));
+        $arrReturn['value'] = explode(';', \StringUtil::decodeEntities($objModules->cmValue));
 
         if ( is_array( $arrReturn['value'] ) && !empty( is_array( $arrReturn['value'] ) ) ) {
 
