@@ -36,7 +36,14 @@ class Toolkit {
     }
 
     public static function getFilterValue($strField) {
-        return \Input::get($strField) ?: \Input::post($strField);
+
+        $varValue = \Input::get($strField) ?: \Input::post($strField);
+
+        if (is_array($varValue)) {
+            $varValue = array_filter($varValue);
+        }
+
+        return $varValue;
     }
 
     public static function getSqlTypes() {
@@ -136,12 +143,12 @@ class Toolkit {
 
     public static function getValueFromUrl( $arrValue ) {
 
-        if ( $arrValue === '' || $arrValue === null ) {
+        if ($arrValue === '' || $arrValue === null) {
             return '';
         }
 
-        if ( is_array( $arrValue ) ) {
-            return serialize( $arrValue );
+        if (is_array( $arrValue)) {
+            return serialize($arrValue);
         }
 
         return $arrValue;
