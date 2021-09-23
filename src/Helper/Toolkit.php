@@ -103,25 +103,27 @@ class Toolkit {
 
         $arrPage = null;
 
+        if ($varPage instanceof \PageModel) {}
+
         if (is_numeric($varPage) && $varPage) {
             $objPage = \PageModel::findByPk($varPage);
             if ($objPage !== null) {
-                return $objPage->getFrontendUrl($objPage, ($strAlias ? '/'.$strAlias : ''));
+                return $objPage->getFrontendUrl(($strAlias ? '/'.$strAlias : ''));
+            }
+        }
+
+        if (is_array($varPage) && isset($varPage['id'])) {
+            $objPage = \PageModel::findByPk($varPage['id']);
+            if ($objPage !== null) {
+                return $objPage->getFrontendUrl(($strAlias ? '/'.$strAlias : ''));
             }
         }
 
         if ($varPage instanceof \PageModel) {
-            return $varPage->getFrontendUrl($objPage, ($strAlias ? '/'.$strAlias : ''));
+            return $varPage->getFrontendUrl(($strAlias ? '/'.$strAlias : ''));
         }
 
         return '';
-
-        /*
-        if (is_array($varPage) && !empty($varPage)) {
-            $arrPage = $varPage;
-        }
-        return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
-        */
     }
 
     public static function parseImage($varImage) {
