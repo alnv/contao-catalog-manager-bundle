@@ -99,21 +99,29 @@ class Toolkit {
         }
     }
 
-    public static function parseDetailLink( $varPage, $strAlias ) {
+    public static function parseDetailLink($varPage, $strAlias) {
 
         $arrPage = null;
-        if ( is_numeric( $varPage ) && $varPage ) {
-            $objPage = \PageModel::findByPk( $varPage );
-            if ( $objPage !== null ) {
-                $arrPage = $objPage->row();
+
+        if (is_numeric($varPage) && $varPage) {
+            $objPage = \PageModel::findByPk($varPage);
+            if ($objPage !== null) {
+                return $objPage->getFrontendUrl($objPage, ($strAlias ? '/'.$strAlias : ''));
             }
         }
 
-        if ( is_array( $varPage ) && !empty( $varPage ) ) {
-            $arrPage = $varPage;
+        if ($varPage instanceof \PageModel) {
+            return $varPage->getFrontendUrl($objPage, ($strAlias ? '/'.$strAlias : ''));
         }
 
+        return '';
+
+        /*
+        if (is_array($varPage) && !empty($varPage)) {
+            $arrPage = $varPage;
+        }
         return \Controller::generateFrontendUrl( $arrPage, $strAlias ? '/' . $strAlias : '' );
+        */
     }
 
     public static function parseImage($varImage) {
