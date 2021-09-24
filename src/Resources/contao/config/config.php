@@ -144,6 +144,14 @@ $GLOBALS['CM_ROLES'] = [
         'rgxp' => 'natural',
         'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
+    'pages' => [
+        'group' => 'article',
+        'sql' => "blob NULL"
+    ],
+    'redirects' => [
+        'group' => 'article',
+        'sql' => "blob NULL"
+    ],
     'member' => [
         'group' => 'member',
         'rgxp' => 'natural',
@@ -406,9 +414,5 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'number',
         'rgxp' => 'natural',
         'sql' => "int(10) unsigned NOT NULL default '0'"
-    ],
-    'pages' => [
-        'group' => 'product',
-        'sql' => "blob NULL"
     ]
 ];

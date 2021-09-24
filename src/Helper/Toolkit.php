@@ -195,6 +195,7 @@ class Toolkit {
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
             if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
                 switch ($arrFields[$strField]['eval']['role']) {
+                    case 'redirects':
                     case 'pages':
                     case 'page':
                         if (!is_array($arrColumns[$strField])) {

@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
 class Search {
@@ -54,6 +55,7 @@ class Search {
 
             $strTable = $objModules->cmTable;
             $strPage = $objModules->cmMasterPage;
+
             if (!$strPage) {
                 continue;
             }
@@ -68,7 +70,6 @@ class Search {
             }
 
             $arrFilter = $this->parseFilter($objModules);
-
             $objListing = new Listing($strTable, [
                 'language' => $objPage->language,
                 'column' => isset($arrFilter['column']) ? $arrFilter['column'] : null,
@@ -94,44 +95,36 @@ class Search {
             'value' => []
         ];
 
-        if (!$objModules->cmFilter) {
-            return $arrReturn;
-        }
-
-        $arrReturn['column'] = explode(';', \StringUtil::decodeEntities($objModules->cmColumn));
-        $arrReturn['value'] = explode(';', \StringUtil::decodeEntities($objModules->cmValue));
-
-        if ( is_array( $arrReturn['value'] ) && !empty( is_array( $arrReturn['value'] ) ) ) {
-
-            $arrReturn['value'] = array_map( function ( $strValue ) {
-
-                return \Controller::replaceInsertTags( $strValue );
-
-            }, $arrReturn['value'] );
-        }
-
-        if ( ( is_array( $arrReturn['value'] ) && !empty( $arrReturn['value'] ) ) ) {
-
-            $intIndex = -1;
-            $arrReturn['value'] = array_filter( $arrReturn['value'], function ( $strValue ) use ( &$intIndex, &$arrReturn ) {
-
-                $intIndex = $intIndex + 1;
-
-                if ( $strValue === '' || $strValue === null ) {
-
-                    unset( $arrReturn['column'][ $intIndex ] );
-
-                    return false;
-                }
-
-                return true;
-            });
-
-            if ( empty( $arrReturn['value'] ) ) {
-
-                unset( $arrReturn['value'] );
-                unset( $arrReturn['column'] );
+        if ($objModules->cmFilter) {
+            switch ($objModules->cmFilterType) {
+                case 'wizard':
+                    \Controller::loadDataContainer($objModules->cmTable);
+                    $arrQueries = Toolkit::convertComboWizardToModelValues($objModules->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$objModules->cmTable]['config']['_table']);
+                    $arrReturn['column'] = $arrQueries['column'];
+                    $arrReturn['value'] = $arrQueries['value'];
+                    break;
+                case 'expert':
+                    $objModules->cmValue = \Controller::replaceInsertTags($objModules->cmValue);
+                    $arrReturn['column'] = explode(';', \StringUtil::decodeEntities($objModules->cmColumn));
+                    $arrReturn['value'] = explode(';', \StringUtil::decodeEntities($objModules->cmValue));
+                    if ((is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
+                        $intIndex = -1;
+                        $arrReturn['value'] = array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
+                            $intIndex = $intIndex + 1;
+                            if ($strValue === '' || $strValue === null) {
+                                unset($arrReturn['column'][$intIndex]);
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
+                    break;
             }
+        }
+
+        if (empty($arrReturn['value'])) {
+            unset($arrReturn['value']);
+            unset($arrReturn['column']);
         }
 
         return $arrReturn;
