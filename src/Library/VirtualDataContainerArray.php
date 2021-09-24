@@ -23,22 +23,23 @@ class VirtualDataContainerArray extends \System {
     protected function setConfig() {
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['_table'] = $this->arrCatalog['table'];
-        if (  $this->arrCatalog['ptable'] ) {
+        if ( $this->arrCatalog['ptable']) {
             $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ptable'] = $this->arrCatalog['ptable'];
         }
 
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['ctable'] = $this->arrCatalog['ctable'];
         $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
 
-        if ( $this->arrCatalog['enableGeocoding'] ) {
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function( \DataContainer $objDataContainer ) {
+        if ($this->arrCatalog['enableGeocoding']) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function(\DataContainer $objDataContainer) {
                 if ($objDataContainer->activeRecord) {
                     Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
                 }
             };
         }
 
-        $GLOBALS['TL_DCA'][ $this->arrCatalog['table'] ]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = true;
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
     }
 
     protected function setList() {
