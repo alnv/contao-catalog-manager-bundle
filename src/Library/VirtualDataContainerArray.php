@@ -38,6 +38,19 @@ class VirtualDataContainerArray extends \System {
             };
         }
 
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onload_callback'][] = function($objDataContainer=null) {
+            if (!$objDataContainer) {
+                return null;
+            }
+            if ($objDataContainer->id) {
+                $objActiveRecord = \Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
+                if (!$objActiveRecord->numRows) {
+                    return null;
+                }
+                \Cache::set('activeRecord', $objActiveRecord->row());
+            }
+        };
+
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = true;
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
     }

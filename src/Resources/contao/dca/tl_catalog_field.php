@@ -65,8 +65,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'date' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{published_legend},published',
         'color' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{published_legend},published',
         'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,rte;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,csv,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,submitOnChange,csv,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,submitOnChange;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
         'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,csv;{options_legend},optionsSource;{published_legend},published',
         'checkboxWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,csv;{options_legend},optionsSource;{published_legend},published',
         'pagepicker' => '{general_settings},name,type;fieldname,role,mandatory,multiple,{published_legend},published',
@@ -334,6 +334,14 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'eval' => [
                 'tl_class' => 'clr'
             ],
+            'sql' => "char(1) NOT NULL default ''"
+        ],
+        'submitOnChange' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+            ],
+            'filter' => true,
             'sql' => "char(1) NOT NULL default ''"
         ]
     ]

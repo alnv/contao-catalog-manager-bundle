@@ -192,11 +192,13 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'select';
                 $arrReturn['eval']['chosen'] = true;
+                $arrReturn['eval']['submitOnChange'] = $arrField['submitOnChange'] ? true : false;
                 break;
             case 'radio':
                 $arrReturn['filter'] = true;
                 $arrReturn['inputType'] = 'radio';
                 $arrReturn['eval']['tl_class'] = 'clr';
+                $arrReturn['eval']['submitOnChange'] = $arrField['submitOnChange'] ? true : false;
                 break;
             case 'checkboxWizard':
                 $arrReturn['filter'] = true;

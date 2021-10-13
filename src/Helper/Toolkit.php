@@ -37,7 +37,12 @@ class Toolkit {
 
     public static function getFilterValue($strField) {
 
+        $arrActiveRecord = \Cache::get('activeRecord');
         $varValue = \Input::get($strField) ?: \Input::post($strField);
+
+        if (!$varValue && !empty($arrActiveRecord)) {
+            $varValue = $arrActiveRecord[$strField];
+        }
 
         if (is_array($varValue)) {
             $varValue = array_filter($varValue);
