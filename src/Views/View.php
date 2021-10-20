@@ -88,13 +88,13 @@ abstract class View extends \Controller {
                     break;
 
                 case 'column':
-                    if ( is_array( $varValue ) && !empty( $varValue ) ) {
+                    if (is_array($varValue) && !empty($varValue)) {
                         $this->arrOptions['column'] = $varValue;
                     }
                     break;
 
                 case 'value':
-                    if ( is_array( $varValue ) && !empty( $varValue ) ) {
+                    if (is_array($varValue) && !empty($varValue)) {
                         $this->arrOptions['value'] = $varValue;
                     }
                     break;
@@ -159,7 +159,7 @@ abstract class View extends \Controller {
 
         $numOffset = $this->arrOptions['offset'];
 
-        if ( $this->arrOptions['offset'] ) {
+        if ($this->arrOptions['offset']) {
             $numTotal -= $numOffset;
         }
 
