@@ -16,10 +16,30 @@ class MasterInsertTag {
                 return $strDefault;
             }
 
-            $varValue = $GLOBALS['CM_MASTER'][$arrFragments[1]];
+            $strFieldname = explode('>', \StringUtil::decodeEntities(($arrFragments[1]?:'')));
+
+            switch ($strFieldname[0]) {
+                case 'getParent':
+                        $varValue = $GLOBALS['CM_MASTER']['getParent']()[$strFieldname[1]];
+                        break;
+                case 'getArray':
+                        if (is_array($GLOBALS['CM_MASTER'][$strFieldname[1]]) && isset($strFieldname[2])) {
+                            $strValue = '';
+                            foreach ($GLOBALS['CM_MASTER'][$strFieldname[1]] as $arrEntity) {
+                                $strValue .= $arrEntity[$strFieldname[2]] ?: '';
+                            }
+                            $varValue = $strValue;
+                        }
+                        break;
+                    default;
+                        $varValue = $GLOBALS['CM_MASTER'][$strFieldname[0]];
+                        break;
+            }
+
             if ($varValue == null) {
                 return $strDefault;
             }
+
             if (is_array($varValue)) {
                 if ($strValue = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue)) {
                     return $strValue;

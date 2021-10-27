@@ -62,6 +62,7 @@ class PageLayout extends \Contao\System {
     }
 
     protected function searchTableAndReturnTable($strPageId) {
+
         $objArticles = \ArticleModel::findByPid($strPageId);
         if ($objArticles == null) {
             return null;
