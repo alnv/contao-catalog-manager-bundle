@@ -33,7 +33,7 @@ class MasterInsertTag {
                     if (is_array($arrArray) && isset($strFieldname[2])) {
                         $arrValues = [];
                         foreach ($arrArray as $arrEntity) {
-                            $arrValues[] = $arrEntity[$strFieldname[2]] ?: '';
+                            $arrValues[] = $arrEntity[$strFieldname[2]] ? \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($arrEntity[$strFieldname[2]]) : '';
                         }
                         $varValue = implode(',', $arrValues);
                     }
@@ -49,10 +49,10 @@ class MasterInsertTag {
 
             if (is_array($varValue)) {
                 if ($strValue = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue)) {
-                    return $strValue;
+                    return $strValue ?: $strDefault;
                 }
                 if ($strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue)) {
-                    return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue);
+                    return $strImage ?: $strDefault;
                 }
             }
 
