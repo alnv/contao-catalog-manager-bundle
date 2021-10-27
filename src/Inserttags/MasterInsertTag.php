@@ -31,11 +31,11 @@ class MasterInsertTag {
                         $arrArray = $GLOBALS['CM_MASTER'][$strFieldname[1]];
                     }
                     if (is_array($arrArray) && isset($strFieldname[2])) {
-                        $strValue = '';
+                        $arrValues = [];
                         foreach ($arrArray as $arrEntity) {
-                            $strValue .= $arrEntity[$strFieldname[2]] ?: '';
+                            $arrValues[] = $arrEntity[$strFieldname[2]] ?: '';
                         }
-                        $varValue = $strValue;
+                        $varValue = implode(',', $arrValues);
                     }
                     break;
                 default;
