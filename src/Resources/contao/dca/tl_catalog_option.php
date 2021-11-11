@@ -23,8 +23,8 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 $objActive = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_option WHERE id=?')->limit(1)->execute($objDataContainer->activeRecord->id);
                 $arrSet = [];
                 $arrSet['tstamp'] = time();
-                $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid);
-                \Database::getInstance()->prepare( 'UPDATE tl_catalog_option %s WHERE id=?' )->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
+                \Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
             }
         ],
         'sql' => [
@@ -87,7 +87,6 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             ],
             'search' => true,
             'sorting' => true,
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 255, 'default' => '']
         ],
         'value' => [
@@ -100,7 +99,6 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             ],
             'search' => true,
             'sorting' => true,
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ]
     ]

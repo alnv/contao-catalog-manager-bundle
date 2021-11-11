@@ -100,8 +100,8 @@ class Catalog extends CatalogWizard {
 
             if (!isset($arrField['label'])) {
                 $arrField['label'] = [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0] ),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1] )
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0]),
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1])
                 ];
             }
 

@@ -2,6 +2,7 @@
 
 $GLOBALS['TL_LANG']['MOD']['catalog-manager-bundle'] = 'Catalog Manager ' . CATALOG_MANAGER_BUNDLE_VERSION;
 $GLOBALS['TL_LANG']['MOD']['catalog-manager'] = ['Catalog Manager', ''];
+$GLOBALS['TL_LANG']['MOD']['watchlist'] = ['Merkliste', ''];
 $GLOBALS['TL_LANG']['MOD']['catalog-option'] = ['Optionen', '' ];
 $GLOBALS['TL_LANG']['MOD']['catalog-element'] = ['Inhaltselemente', ''];
 $GLOBALS['TL_LANG']['CTE']['component'] = ['Vue Component', ''];

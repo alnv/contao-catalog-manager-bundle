@@ -16,8 +16,21 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
 
     /**
      *
-     * @Route("/view-listing/{module}/{page}", name="view-listing")
-     * @Method({"POST"})
+     * @Route("/watchlist/update", methods={"POST"}, name="update-watchlist")
+     */
+    public function updateWatchlist() {
+
+        $this->container->get('contao.framework')->initialize();
+
+        $arrData = explode(':', base64_decode(\StringUtil::decodeEntities(\Input::post('data'))));
+        list($strIdentifier, $strTable) = $arrData;
+
+        return new JsonResponse(\Alnv\ContaoCatalogManagerBundle\Library\Watchlist::updateWatchlist($strIdentifier, $strTable, \Input::post('items')));
+    }
+
+    /**
+     *
+     * @Route("/view-listing/{module}/{page}", methods={"POST"}, name="view-listing")
      */
     public function getViewListing($module, $page) {
 
@@ -38,8 +51,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
 
     /**
      *
-     * @Route("/json-listing/{module}/{page}", name="json-listing")
-     * @Method({"POST"})
+     * @Route("/json-listing/{module}/{page}", methods={"POST"}, name="json-listing")
      */
     public function getJsonListing($module, $page) {
 
@@ -68,8 +80,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
 
     /**
      *
-     * @Route("/view-map/{module}/{page}", name="view-map")
-     * @Method({"GET"})
+     * @Route("/view-map/{module}/{page}", methods={"GET"}, name="view-map")
      */
     public function getViewMap($module, $page) {
 
@@ -83,8 +94,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
 
     /**
      *
-     * @Route("/async-image", name="async-image")
-     * @Method({"POST"})
+     * @Route("/async-image", methods={"POST"}, name="async-image")
      */
     public function getAsyncImage() {
 
@@ -108,8 +118,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
 
     /**
      *
-     * @Route("/icalendar", name="getICalendar")
-     * @Method({"GET"})
+     * @Route("/icalendar", methods={"GET"}, name="getICalendar")
      */
     public function getICalendar() {
 

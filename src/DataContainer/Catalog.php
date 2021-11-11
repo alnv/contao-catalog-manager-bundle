@@ -84,19 +84,17 @@ class Catalog {
         return $objCatalog->getNaturalFields();
     }
 
-    public function getFields( $objDataContainer = null ) {
+    public function getFields($objDataContainer = null) {
 
-        if ( $objDataContainer === null ) {
-
+        if ($objDataContainer === null) {
             return [];
         }
 
-        if ( !$objDataContainer->activeRecord->table ) {
-
+        if (!$objDataContainer->activeRecord->table) {
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->table );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->table);
 
         return $objCatalog->getNaturalFields();
     }

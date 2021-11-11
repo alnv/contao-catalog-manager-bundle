@@ -36,7 +36,6 @@ const viewListingComponent = Vue.component('view-listing', {
                 return null;
             }
             window.location.hash = this.parameters[this.hash] ? this.parameters[this.hash] : '';
-            console.log(window.location.hash)
         },
         onChange: function (shared) {
             this.addSharedParameters(shared);

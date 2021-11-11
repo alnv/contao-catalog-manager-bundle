@@ -108,7 +108,7 @@ class CatalogField {
         return $strFieldname;
     }
 
-    public function changeFieldType( $strValue, \DataContainer $objDataContainer ) {
+    public function changeFieldType($strValue, \DataContainer $objDataContainer) {
 
         if (!$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname) {
             return $strValue;

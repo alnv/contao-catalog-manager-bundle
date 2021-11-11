@@ -14,7 +14,6 @@ abstract class View extends \Controller {
     protected $arrOptions = [];
     protected $arrEntities = [];
     protected $dcaExtractor = null;
-    protected $arrHashTable = [];
 
     public function __construct( $strTable, $arrOptions = [] ) {
 

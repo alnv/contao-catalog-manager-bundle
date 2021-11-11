@@ -9,6 +9,11 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'id' => 'primary',
                 'pid,fieldname' => 'index'
             ]
+        ],
+        'onsubmit_callback' => [
+            function(\DataContainer $dataContainer) {
+                (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField())->changeFieldType($dataContainer->activeRecord->type, $dataContainer);
+            }
         ]
     ],
     'list' => [
@@ -26,25 +31,25 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.gif'
+                'icon' => 'header.svg'
             ],
             'copy' => [
                'href' => 'act=paste&amp;mode=copy',
-                'icon' => 'copy.gif'
+                'icon' => 'copy.svg'
             ],
             'delete' => [
                 'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
-                'icon' => 'visible.gif',
+                'icon' => 'visible.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
                 'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
             ],
             'show' => [
                 'href' => 'act=show',
-                'icon' => 'show.gif'
+                'icon' => 'show.svg'
             ]
         ],
         'global_operations' => [
@@ -110,7 +115,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getFieldTypes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
-            'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'changeFieldType']],
+            // 'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'changeFieldType']],
             'filter' => true,
             'sorting' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']

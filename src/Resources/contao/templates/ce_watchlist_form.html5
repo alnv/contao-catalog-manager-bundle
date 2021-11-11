@@ -1,0 +1,11 @@
+<div class="v-component">
+    <watchlist-form
+            data="<?= $this->data ?>"
+            units="<?= $this->units ?>"
+            :added="<?= $this->added ? 'true' : 'false' ?>"
+            button-add-label="<?= $this->buttonAddLabel ?>"
+            button-remove-label="<?= $this->buttonRemoveLabel ?>"
+            button-units-label="<?= $this->buttonUnitsLabel ?>"
+            :use-units="<?= $this->useUnits ? 'true' : 'false' ?>"
+    ></watchlist-form>
+</div>

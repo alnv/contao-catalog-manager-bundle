@@ -18,6 +18,12 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_element',
                 'tl_content'
             ]
+        ],
+        'watchlist' => [
+            'name' => 'watchlist',
+            'tables' => [
+                'tl_watchlist'
+            ]
         ]
     ]
 ]);
@@ -35,6 +41,7 @@ $GLOBALS['TL_CTE']['catalog-manager-bundle']['component'] = 'Alnv\ContaoCatalogM
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentListView';
 
 $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
+$objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/watchlist-form-component.js');
 $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js');
 $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js');
 $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js');
@@ -51,6 +58,7 @@ $GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize',
 $GLOBALS['TL_HOOKS']['loadDataContainer'][] = ['catalogmanager.hooks.datacontainer', 'generateDataContainerArray'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag', 'replace'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace'];
+$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag', 'replace'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag', 'replace'];
 $GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags', 'replace'];
 $GLOBALS['TL_HOOKS']['compileFormFields'][] = ['catalogmanager.hooks.formfields', 'compileFormFields'];
@@ -58,6 +66,7 @@ $GLOBALS['TL_HOOKS']['loadFormField'][] = ['catalogmanager.hooks.formfields', 'l
 $GLOBALS['TL_HOOKS']['sqlCompileCommands'][] = ['catalogmanager.hooks.sqlcompilecommands', 'execute'];
 
 $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
+$GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
 

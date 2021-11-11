@@ -1,0 +1,27 @@
+<?php if (!empty($this->items)): ?>
+<div class="ce_watchlist_table block">
+    <?php foreach ($this->items as $arrItem): ?>
+        <?php if (!empty($arrItem['catalog'])): ?>
+            <h2 class="name"><?= $arrItem['catalog']['name'] ?></h2>
+        <?php endif; ?>
+        <table>
+            <thead>
+                <tr>
+                    <th><?= $arrItem['titleLabel'] ?></th>
+                    <th><?= $arrItem['unitLabel'] ?></th>
+                </tr>
+            </thead>
+            <?php if (!empty($arrItem['entities'])): ?>
+                <tbody>
+                    <?php foreach ($arrItem['entities'] as $arrEntity): ?>
+                        <tr>
+                            <td><?= $arrEntity['roleResolver']()->getValueByRole('title') ?></td>
+                            <td><?= $arrEntity['watchlistData']['units'] ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            <?php endif; ?>
+        </table>
+    <?php endforeach;?>
+</div>
+<?php endif; ?>

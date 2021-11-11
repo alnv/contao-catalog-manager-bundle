@@ -85,7 +85,7 @@ class Toolkit {
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['sql']) && $arrRole['sql']) {
-            return sprintf($arrRole['sql'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
+            return sprintf($arrRole['sql'], ($arrOptions['default'] ?: ''));
         }
 
         $arrSql = static::getSqlTypes();
@@ -96,9 +96,9 @@ class Toolkit {
 
         switch ($strType) {
             case 'color':
-                return sprintf($arrSql['vc8'], ($arrOptions['default'] ? $arrOptions['default'] : ''));
+                return sprintf($arrSql['vc8'], ($arrOptions['default'] ?: ''));
             case 'date':
-                return sprintf( $arrSql['i10NullAble'], ($arrOptions['default'] ? $arrOptions['default'] : '' ));
+                return sprintf( $arrSql['i10NullAble'], ($arrOptions['default'] ?: '' ));
             default:
                 return $arrSql['blob'];
         }
@@ -106,9 +106,8 @@ class Toolkit {
 
     public static function parseDetailLink($varPage, $strAlias) {
 
-        $arrPage = null;
-
-        if ($varPage instanceof \PageModel) {}
+        // $arrPage = null;
+        // if ($varPage instanceof \PageModel) {}
 
         if (is_numeric($varPage) && $varPage) {
             $objPage = \PageModel::findByPk($varPage);
@@ -473,9 +472,9 @@ class Toolkit {
         $objDatabase->prepare('UPDATE '. $arrCatalog['table'] .' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
-    public static function generateAlias($strValue,$strAliasField='alias',$strTable=null,$strId=null,$strPid=null) {
+    public static function generateAlias($strValue,$strAliasField='alias',$strTable=null,$strId=null,$strPid=null,$strValidChars='a-zA-Z0-9') {
 
-        $blnAliasFieldExist = $strTable ? \Database::getInstance()->fieldExists($strAliasField, $strTable) : false;
+        $blnAliasFieldExist = $strTable && \Database::getInstance()->fieldExists($strAliasField, $strTable);
 
         if ($strId && $blnAliasFieldExist) {
             $objEntity = \Database::getInstance()->prepare( 'SELECT * FROM ' . $strTable . ' WHERE `id`=?' )->limit(1)->execute($strId);
@@ -487,7 +486,6 @@ class Toolkit {
             return md5(time());
         }
 
-        $strValidChars = 'a-zA-Z0-9';
         $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
         if ($objCatalog !== null) {
             if ($objCatalog->validAliasCharacters) {

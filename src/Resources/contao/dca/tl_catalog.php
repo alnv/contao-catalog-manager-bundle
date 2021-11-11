@@ -34,7 +34,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.gif'
+                'icon' => 'header.svg'
             ],
             'fields' => [
                 'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
@@ -49,12 +49,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'delete' => [
                 'href' => 'act=delete',
-                'icon' => 'delete.gif',
+                'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
-                'icon' => 'show.gif'
+                'icon' => 'show.svg'
             ]
         ],
         'global_operations' => [
@@ -106,7 +106,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'search' => true,
             'sorting' => true,
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'description' => [
@@ -118,7 +117,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'decodeEntities' => true
             ],
             'search' => true,
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 120, 'default' => '']
         ],
         'type' => [
@@ -135,7 +133,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getCatalogTypes' ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['type'],
             'filter' => true,
-            'exclude' => true,
             'sorting' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
@@ -150,11 +147,10 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'spaceToUnderscore' => true
             ],
             'save_callback' => [
-                [ 'catalogmanager.datacontainer.catalog', 'watchTable' ]
+                ['catalogmanager.datacontainer.catalog', 'watchTable']
             ],
             'search' => true,
             'sorting' => true,
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'dataContainer' => [
@@ -167,7 +163,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'mandatory' => true
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDataContainers' ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => 'Table']
         ],
         'validAliasCharacters' => [
@@ -182,7 +177,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'options_callback' => static function() {
                 return \System::getContainer()->get('contao.slug.valid_characters')->getOptions();
             },
-            'exclude' => true,
             'sql' => "varchar(255) NOT NULL default '0-9a-zA-Z'"
         ],
         'mode' => [
@@ -197,7 +191,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getModes' ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 16, 'default' => 'list']
         ],
         'order' => [
@@ -220,7 +213,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFlags' ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['flag'],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 2, 'default' => '1']
         ],
         'flagField' => [
@@ -231,7 +223,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'w50'
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'headerFields' => [
@@ -241,7 +232,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'multiple' => true
             ],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getParentFields' ],
-            'exclude' => true,
             'sql' => ['type' => 'blob', 'notnull' => false ]
         ],
         'showColumns' => [
@@ -250,7 +240,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'sortingType' => [
@@ -264,19 +253,16 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'],
             'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getSortingTypes' ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 16, 'fixed' => true, 'default' => 'fixed']
         ],
         'columns' => [
             'inputType' => 'checkboxWizard',
-            'default' => ['id'],
             'eval' => [
                 'tl_class' => 'clr',
                 'multiple' => true
             ],
-            'exclude' => true,
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'sql' => [ 'type' => 'blob', 'notnull' => false  ]
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getFields'],
+            'sql' => ['type' => 'blob', 'notnull' => false]
         ],
         'navigation' => [
             'inputType' => 'select',
@@ -286,8 +272,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'w50',
                 'includeBlankOption' => true
             ],
-            'exclude' => true,
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getNavigation' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getNavigation'],
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
         'position' => [
@@ -297,7 +282,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'maxlength' => 4,
                 'tl_class' => 'w50'
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 4, 'default' => '']
         ],
         'enableCopy' => [
@@ -306,7 +290,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enablePanel' => [
@@ -316,7 +299,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enableVisibility' => [
@@ -325,7 +307,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enableContentElements' => [
@@ -334,7 +315,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enableGeocoding' => [
@@ -343,7 +323,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => false
             ],
-            'exclude' => true,
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ]
     ]
