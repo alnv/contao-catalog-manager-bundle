@@ -75,7 +75,7 @@ const WatchlistFormComponent = Vue.component('watchlist-form', {
         }
     },
     template:
-        '<div class="ce_watchlist-form">' +
+        '<div class="ce_watchlist-form" v-bind:class="{added:hasItems}">' +
             '<div class="watchlist-form">' +
                 '<div class="watchlist-units" v-if="useUnits">' +
                     '<input type="text"  v-model="items">' +

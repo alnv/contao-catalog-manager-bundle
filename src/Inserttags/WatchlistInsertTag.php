@@ -14,7 +14,7 @@ class WatchlistInsertTag {
         $strType = $arrFragments[0] ?: '';
         $strParams = $arrFragments[1] ?: '';
 
-        if (!in_array($strType, ['WATCHLIST', 'WATCHLIST-TABLE', 'WATCHLIST-RESET'])) {
+        if (!in_array($strType, ['WATCHLIST', 'WATCHLIST-TABLE', 'WATCHLIST-RESET', 'WATCHLIST-COUNT'])) {
             return false;
         }
 
@@ -26,6 +26,9 @@ class WatchlistInsertTag {
                     case 'tables':
                         $arrOptions['tables'] = explode(',', $strOption);
                         break;
+                    case 'total':
+                        $arrOptions['total'] = (bool) $strOption;
+                        break;
                     case 'template':
                         $arrOptions['template'] = $strOption ?: '';
                         break;
@@ -35,6 +38,26 @@ class WatchlistInsertTag {
 
         if ($strType == 'WATCHLIST') {
             return $this->getWatchListIDs($arrOptions);
+        }
+
+        if ($strType == 'WATCHLIST-COUNT') {
+
+            $intCount = 0;
+            $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
+
+            if (!$objWatchlist) {
+                return $intCount;
+            }
+
+            while ($objWatchlist->next()) {
+                if ($arrOptions['total']) {
+                    $intCount += (int) $objWatchlist->units;
+                } else {
+                    $intCount++;
+                }
+            }
+
+            return $intCount;
         }
 
         if ($strType == 'WATCHLIST-TABLE') {
