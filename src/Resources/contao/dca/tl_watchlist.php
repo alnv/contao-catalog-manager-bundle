@@ -18,7 +18,7 @@ $GLOBALS['TL_DCA']['tl_watchlist'] = [
             'panelLayout' => 'filter;sort,search'
         ],
         'label' => [
-            'fields' => ['member', 'session', 'table', 'identifier', 'units', 'sent'],
+            'fields' => ['member', 'session', 'table', 'identifier', 'units', 'sent', 'created_at'],
             'showColumns' => true
         ],
         'operations' => [

@@ -30,6 +30,10 @@ services:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
     public: true
 
+  catalogmanager.datacontainer.catalogpalette:
+    class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette
+    public: true
+
   catalogmanager.hooks.initialize:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\Initialize
     public: true

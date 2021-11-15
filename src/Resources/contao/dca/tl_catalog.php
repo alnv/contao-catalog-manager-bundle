@@ -4,7 +4,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     'config' => [
         'dataContainer' => 'Table',
         'ctable' => [
-            'tl_catalog_field'
+            'tl_catalog_field',
+            'tl_catalog_palette'
         ],
         'onsubmit_callback' => [
             ['catalogmanager.datacontainer.catalog', 'generateModulename'],
@@ -41,6 +42,13 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'href' => 'table=tl_catalog_field',
                 'icon' => '/bundles/alnvcontaoassetsmanager/icons/fields-icon.svg'
             ],
+            /*
+            'palettes' => [
+                'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
+                'href' => 'table=tl_catalog_palette',
+                'icon' => 'tablewizard.svg'
+            ],
+            */
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',
                 'icon' => 'cut.svg',

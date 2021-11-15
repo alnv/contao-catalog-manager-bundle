@@ -9,7 +9,8 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
             'tables' => [
                 'tl_catalog',
                 'tl_catalog_field',
-                'tl_catalog_option'
+                'tl_catalog_option',
+                'tl_catalog_palette'
             ]
         ],
         'catalog-element' => [
@@ -69,12 +70,13 @@ $GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\Ca
 $GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
+$GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';
 
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
-$GLOBALS['CM_FIELDS'] = [ 'text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
+$GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
 
 $GLOBALS['CM_OPERATORS'] = [
     'equal' => [

@@ -2,9 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 
 class WatchlistInsertTag {
 
@@ -15,7 +13,6 @@ class WatchlistInsertTag {
         $arrOptions = [];
         $strType = $arrFragments[0] ?: '';
         $strParams = $arrFragments[1] ?: '';
-
 
         if (!in_array($strType, ['WATCHLIST', 'WATCHLIST-TABLE', 'WATCHLIST-RESET'])) {
             return false;
@@ -29,6 +26,9 @@ class WatchlistInsertTag {
                     case 'tables':
                         $arrOptions['tables'] = explode(',', $strOption);
                         break;
+                    case 'template':
+                        $arrOptions['template'] = $strOption ?: '';
+                        break;
                 }
             }
         }
@@ -41,7 +41,7 @@ class WatchlistInsertTag {
 
             $arrItems = [];
             $arrIdentifiers = [];
-            $objTemplate = new \FrontendTemplate('ce_watchlist_table');
+            $objTemplate = new \FrontendTemplate(($arrOptions['template'] ?:'ce_watchlist_table'));
             $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
 
             if ($objWatchlist) {

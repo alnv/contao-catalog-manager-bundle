@@ -1,30 +1,30 @@
 <?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
     <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:100%">
-        <button>Datenschutzbestimmungen zustimmen</button>
+        <button><?= \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('map.button.dsgvo', 'Datenschutzbestimmungen zustimmen') ?></button>
     </div>
-    <script defer async>
-        var getInfoCallback = function (map, content) {
+    <script defer>
+        let getInfoCallback = function (map, content) {
             var objInfoBox = new google.maps.InfoWindow({content: content});
             return function() {
                 objInfoBox.setContent(content);
                 objInfoBox.open(map, this);
             };
         };
-        var initMap = function () {
-            var arrLocations = <?= $this->varLocations ?>;
-            var objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
-            var objBounds = new google.maps.LatLngBounds();
-            if ( typeof arrLocations === 'undefined' || !arrLocations.length ) {
+        let initMap = function () {
+            let arrLocations = <?= $this->varLocations ?>;
+            let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
+            let objBounds = new google.maps.LatLngBounds();
+            if (typeof arrLocations === 'undefined' || !arrLocations.length) {
                 return null;
             }
             for (let i=0;i<arrLocations.length;i++) {
                 if (!arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude']) {
                     continue;
                 }
-                var strTemplate = arrLocations[i]['map']['infoContent'];
-                var objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'],arrLocations[i]['map']['longitude']);
-                var objMarker = new google.maps.Marker({
+                let strTemplate = arrLocations[i]['map']['infoContent'];
+                let objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'],arrLocations[i]['map']['longitude']);
+                let objMarker = new google.maps.Marker({
                     title: arrLocations[i]['map']['title'],
                     position: objPosition,
                     map: objMap
@@ -41,11 +41,10 @@
                     initMap();
                     return null;
                 }
-                var objScript = document.createElement('script');
-                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= \Config::get('googleMapsApiKey') ?>&callback=initMap'; //@impl maps api
+                let objScript = document.createElement('script');
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= \Config::get('googleMapsApiKey') ?>&callback=initMap';
                 objScript.id = "script_<?= $strUniqueId ?>";
                 objScript.defer = true;
-                objScript.async = true;
                 document.body.appendChild(objScript);
             };
             let objDataProtectionButton = objMapDocument.querySelector('button');
