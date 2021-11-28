@@ -11,6 +11,15 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 if (!$objCurrent) {
                     return null;
                 }
+                if ($objCurrent->type == 'subpalette' && $objCurrent->selector) {
+                    $arrOptions = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objCurrent->selector);
+                    if (!empty($arrOptions)) {
+                        \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                            ->addField('selector_option', 'selector')
+                            ->applyToPalette('subpalette', 'tl_catalog_palette');
+                        $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_option']['options'] = $arrOptions;
+                    }
+                }
                 $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid);
             }
         ],
@@ -19,22 +28,21 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
 
                 $arrFields = [];
                 $intPosition = 0;
-                $arrSubpalettes = [];
-                $arrNewSubpalettes = [];
+                // $arrSubpalettes = [];
+                // $arrNewSubpalettes = [];
                 $arrFieldsets = \StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
-
+                /*
                 foreach (\StringUtil::deserialize($objDataContainer->activeRecord->subpalettes, true) as $arrSubpalette) {
                     $arrSubpalettes[$arrSubpalette['subpalette']] = $arrSubpalette;
                 }
-
+                */
                 foreach (\StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
-
                     if ($arrField['field'] === '__FIELDSET__') {
-
                         $intPosition++;
                         $arrFields[] = 'Fieldset ' . $intPosition;
                     }
 
+                    /*
                     if ($arrField['subpalette']) {
 
                         $objCatalogField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
@@ -66,10 +74,11 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                             ];
                         }
                     }
+                    */
                 }
 
                 $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
-                $objCurrent->subpalettes = serialize($arrNewSubpalettes);
+                // $objCurrent->subpalettes = serialize($arrNewSubpalettes);
 
                 if (count($arrFieldsets) != count($arrFields)) {
                     $arrNewSets = [];
@@ -139,8 +148,12 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'name,fields,fieldsets,subpalettes,published'
+        '__selector__' => ['type'],
+        'default' => 'type,name',
+        'palette' => 'type,name,fields,fieldsets,published',
+        'subpalette' => 'type,name,selector,fields,published'
     ],
+    'subpalettes' => [],
     'fields' => [
         'id' => [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
@@ -154,6 +167,20 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
         'pid' => [
             'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
         ],
+        'type' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 16,
+                'tl_class' => 'w50',
+                'submitOnChange' => true,
+                'includeBlankOption' => true
+            ],
+            'options' => ['palette', 'subpalette'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['reference']['type'],
+            'filter' => true,
+            'sql' => ['type' => 'string', 'length' => 16, 'default' => '']
+        ],
         'name' => [
             'inputType' => 'text',
             'eval' => [
@@ -165,8 +192,30 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'search' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
-        'alias' => [
-            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
+        'selector' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'tl_class' => 'w50',
+                'mandatory' => true,
+                'submitOnChange' => true,
+                'includeBlankOption' => true
+            ],
+            'options_callback'=> ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
+            'filter' => true,
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+        ],
+        'selector_option' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 128,
+                'tl_class' => 'w50',
+                'mandatory' => true,
+                'submitOnChange' => true,
+                'includeBlankOption' => true
+            ],
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'fields' => [
             'inputType' => 'multiColumnWizard',
@@ -194,7 +243,8 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                             'includeBlankOption' => true
                         ],
                         'options' => (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getCssClasses()
-                    ],
+                    ]
+                    /*
                     'subpalette' => [
                         'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['subpalette'],
                         'inputType' => 'checkbox',
@@ -202,6 +252,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                             'multiple' => false
                         ]
                     ]
+                    */
                 ]
             ],
             'sql' => 'blob NULL',
@@ -231,6 +282,16 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             ],
             'sql' => 'blob NULL'
         ],
+        'published' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+                'doNotCopy' => true
+            ],
+            'filter' => true,
+            'sql' => "char(1) NOT NULL default ''"
+        ]
+        /*
         'subpalettes' => [
             'inputType' => 'multiColumnWizard',
             'eval' => [
@@ -259,14 +320,6 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             ],
             'sql' => 'blob NULL'
         ],
-        'published' => [
-            'inputType' => 'checkbox',
-            'eval' => [
-                'tl_class' => 'clr',
-                'doNotCopy' => true
-            ],
-            'filter' => true,
-            'sql' => "char(1) NOT NULL default ''"
-        ]
+        */
     ]
 ];

@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => [ 'type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter' ],
+        '__selector__' => ['type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter'],
         'default' => '{general_settings},name,type',
         'explanation' => '{general_settings},name,type,fieldname,text;{published_legend},published',
         'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',

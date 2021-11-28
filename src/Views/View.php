@@ -15,14 +15,14 @@ abstract class View extends \Controller {
     protected $arrEntities = [];
     protected $dcaExtractor = null;
 
-    public function __construct( $strTable, $arrOptions = [] ) {
+    public function __construct($strTable, $arrOptions = []) {
 
         $this->strTable = $strTable;
         $this->initializeDataContainer();
         $this->dcaExtractor = new \Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor($strTable);
 
-        foreach ( $arrOptions as $strName => $varValue ) {
-            switch ( $strName ) {
+        foreach ($arrOptions as $strName => $varValue) {
+            switch ($strName) {
                 case 'id':
                     $this->arrOptions['id'] = (int) $varValue;
                     break;
@@ -177,7 +177,7 @@ abstract class View extends \Controller {
         $objApplication = new Application();
         $objApplication->initializeDataContainerArrayByTable($this->strTable);
 
-        if (!isset($GLOBALS['TL_DCA'][ $this->strTable ])) {
+        if (!isset($GLOBALS['TL_DCA'][ $this->strTable])) {
 
             \Controller::loadDataContainer($this->strTable);
         }
@@ -397,11 +397,11 @@ abstract class View extends \Controller {
 
     public function getPagination() {
 
-        if ( !$this->arrOptions['pagination'] ) {
+        if (!$this->arrOptions['pagination']) {
             return '';
         }
 
-        $objPagination = new \Pagination( $this->arrOptions['total'], $this->arrOptions['limit'], \Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id'] );
+        $objPagination = new \Pagination($this->arrOptions['total'], $this->arrOptions['limit'], \Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
 
         return $objPagination->generate("\n  ");
     }
