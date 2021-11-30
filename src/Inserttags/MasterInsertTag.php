@@ -23,6 +23,9 @@ class MasterInsertTag {
                 case 'getParent':
                     $varValue = $GLOBALS['CM_MASTER']['getParent']()[$strFieldname[1]];
                     break;
+                case 'origin':
+                    $varValue = $GLOBALS['CM_MASTER']['origin'][$strFieldname[1]];
+                    break;
                 case 'getRelated':
                 case 'getArray':
                     if ($strFieldname[0] == 'getRelated') {
