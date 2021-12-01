@@ -101,7 +101,7 @@ class Database {
         try {
             \Database::getInstance()->prepare(sprintf( 'ALTER TABLE %s MODIFY COLUMN %s %s', $strTable, $strField, $strSql))->execute();
         } catch (\Exception $exception) {
-            //
+            \Message::addError($exception->getMessage());
         }
 
         return true;

@@ -168,6 +168,13 @@ $GLOBALS['CM_ROLES'] = [
         'rgxp' => 'natural',
         'sql' => "int(10) unsigned NULL"
     ],
+    'members' => [
+        'group' => 'member',
+        'eval' => [
+            'csv' => ','
+        ],
+        'sql' => "TINYTEXT NULL"
+    ],
     'group' => [
         'group' => 'member',
         'rgxp' => 'natural',

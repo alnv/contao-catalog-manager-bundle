@@ -306,6 +306,12 @@ abstract class CatalogWizard extends \System {
                 break;
         }
 
+        if (isset($GLOBALS['CM_ROLES'][$arrField['role']]) && isset($GLOBALS['CM_ROLES'][$arrField['role']]['eval'])) {
+            foreach ($GLOBALS['CM_ROLES'][$arrField['role']]['eval'] as $strKey => $strOption) {
+                $arrReturn['eval'][$strKey] = $strOption;
+            }
+        }
+
         if (isset($GLOBALS['TL_HOOKS']['parseCatalogField']) && is_array($GLOBALS['TL_HOOKS']['parseCatalogField'])) {
             foreach ( $GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback ) {
                 $this->import($arrCallback[0]);
