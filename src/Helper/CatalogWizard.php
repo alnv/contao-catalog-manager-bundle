@@ -138,10 +138,16 @@ abstract class CatalogWizard extends \System {
             };
 
             if ($arrField['optionsSource'] == 'dbOptions') {
+
+                $strTable = '';
+                if (isset($GLOBALS['TL_DCA'][$arrField['dbTable']])) {
+                    $strTable = $GLOBALS['TL_DCA'][$arrField['dbTable']]['config']['_table'];
+                }
+
                 $arrReturn['relation'] = [
                     'load' => 'lazy',
                     'field' => $arrField['dbKey'],
-                    'table' => $GLOBALS['TL_DCA'][$arrField['dbTable']]['config']['_table'] ?: $arrField['dbTable'],
+                    'table' => $strTable ?: $arrField['dbTable'],
                     'type' => $blnMultiple ? 'hasMany' : 'hasOne'
                 ];
             }

@@ -199,6 +199,9 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'type' => [
         'group' => 'article',
+        'eval' => [
+            'submitOnChange' => true
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'checkbox' => [

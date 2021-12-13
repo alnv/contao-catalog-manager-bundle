@@ -18,7 +18,7 @@ class OptionSourcePalette {
 
         return [
             'dbTable' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbTable'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbTable'],
                 'inputType' => 'select',
                 'eval' => [
                     'chosen' => true,
@@ -32,7 +32,7 @@ class OptionSourcePalette {
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbKey' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbKey'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbKey'],
                 'inputType' => 'select',
                 'eval' => [
                     'chosen' => true,
@@ -44,7 +44,7 @@ class OptionSourcePalette {
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbLabel' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbLabel'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbLabel'],
                 'inputType' => 'select',
                 'eval' => [
                     'chosen' => true,
@@ -57,7 +57,7 @@ class OptionSourcePalette {
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbFilterType' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterType'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterType'],
                 'inputType' => 'radio',
                 'default' => 'wizard',
                 'eval' => [
@@ -70,7 +70,7 @@ class OptionSourcePalette {
                 'sql' => "varchar(12) NOT NULL default 'wizard'"
             ],
             'dbFilterColumn' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterColumn'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterColumn'],
                 'inputType' => 'textarea',
                 'eval' => [
                     'tl_class' => 'clr'
@@ -79,7 +79,7 @@ class OptionSourcePalette {
                 'sql' => "mediumtext NULL"
             ],
             'dbFilterValue' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'],
                 'inputType' => 'textarea',
                 'eval' => [
                     'tl_class' => 'clr'
@@ -88,7 +88,7 @@ class OptionSourcePalette {
                 'sql' => "mediumtext NULL"
             ],
             'dbWizardFilterSettings' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'],
                 'inputType' => 'comboWizard',
                 'eval' => [
                     'tl_class' => 'clr',
@@ -101,7 +101,7 @@ class OptionSourcePalette {
                 'sql' => ['type' => 'blob', 'notnull' => false ]
             ],
             'dbOrderField' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'],
                 'inputType' => 'select',
                 'default' => 'id',
                 'eval' => [
@@ -115,7 +115,7 @@ class OptionSourcePalette {
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbOrder' => [
-                'label' => $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'],
+                'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'],
                 'inputType' => 'select',
                 'default' => 'asc',
                 'eval' => [

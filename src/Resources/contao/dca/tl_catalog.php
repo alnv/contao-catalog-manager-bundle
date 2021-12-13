@@ -38,22 +38,20 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'icon' => 'header.svg'
             ],
             'fields' => [
-                'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_field',
                 'icon' => '/bundles/alnvcontaoassetsmanager/icons/fields-icon.svg'
             ],
-            /*
             'palettes' => [
-                'label' => $GLOBALS['TL_LANG']['tl_catalog']['fields'],
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_palette',
                 'icon' => 'tablewizard.svg'
             ],
-            */
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',
                 'icon' => 'cut.svg',
                 'attributes' => 'onclick="Backend.getScrollOffset()"',
-                'button_callback' => ['\Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog', 'getCutOperationButton']
+                'button_callback' => ['Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog', 'getCutOperationButton']
             ],
             'delete' => [
                 'href' => 'act=delete',

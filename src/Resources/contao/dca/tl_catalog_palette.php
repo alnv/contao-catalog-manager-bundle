@@ -7,10 +7,12 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
         'ptable' => 'tl_catalog',
         'onload_callback' => [
             function (\DataContainer $objDataContainer) {
+
                 $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
                 if (!$objCurrent) {
                     return null;
                 }
+
                 if ($objCurrent->type == 'subpalette' && $objCurrent->selector) {
                     $arrOptions = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objCurrent->selector);
                     if (!empty($arrOptions)) {
@@ -20,6 +22,14 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                         $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_option']['options'] = $arrOptions;
                     }
                 }
+
+                if ($objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByFieldnameAndPid('type', $objCurrent->pid)) {
+                    \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                        ->addField('selector_type', 'name')
+                        ->applyToPalette('palette', 'tl_catalog_palette');
+                    $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objField->id);
+                }
+
                 $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid);
             }
         ],
@@ -28,58 +38,16 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
 
                 $arrFields = [];
                 $intPosition = 0;
-                // $arrSubpalettes = [];
-                // $arrNewSubpalettes = [];
                 $arrFieldsets = \StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
-                /*
-                foreach (\StringUtil::deserialize($objDataContainer->activeRecord->subpalettes, true) as $arrSubpalette) {
-                    $arrSubpalettes[$arrSubpalette['subpalette']] = $arrSubpalette;
-                }
-                */
+
                 foreach (\StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
                     if ($arrField['field'] === '__FIELDSET__') {
                         $intPosition++;
                         $arrFields[] = 'Fieldset ' . $intPosition;
                     }
-
-                    /*
-                    if ($arrField['subpalette']) {
-
-                        $objCatalogField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
-                        $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByPk($objDataContainer->activeRecord->pid);
-
-                        if (!$objCatalog || !$objCatalogField) {
-                            continue;
-                        }
-
-                        \Controller::loadDataContainer($objCatalog->table);
-
-                        $arrField = $GLOBALS['TL_DCA'][$objCatalog->table]['fields'][$objCatalogField->fieldname];
-                        $arrAttribute = \Widget::getAttributesFromDca($arrField, $objCatalogField->fieldname, '', $objCatalogField->fieldname, $objCatalog->table);
-
-                        if (isset($arrAttribute['options']) && is_array($arrAttribute['options']) && $objCatalogField->optionsSource) {
-                            foreach ($arrAttribute['options'] as $arrOption) {
-                                if (!$arrOption['value']) {
-                                    continue;
-                                }
-                                $arrNewSubpalettes[] = [
-                                    'subpalette' => $arrOption['value'],
-                                    'fields' => $arrSubpalettes[$arrOption['value']]['fields'] ?: [],
-                                ];
-                            }
-                        } else {
-                            $arrNewSubpalettes[] = [
-                                'subpalette' => $objCatalogField->fieldname,
-                                'fields' => $arrSubpalettes[$objCatalogField->fieldname]['fields'] ?: [],
-                            ];
-                        }
-                    }
-                    */
                 }
 
                 $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
-                // $objCurrent->subpalettes = serialize($arrNewSubpalettes);
-
                 if (count($arrFieldsets) != count($arrFields)) {
                     $arrNewSets = [];
                     foreach ($arrFields as $strIndex => $strField) {
@@ -192,6 +160,16 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'search' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
+        'selector_type' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 128,
+                'tl_class' => 'w50',
+                'includeBlankOption' => true
+            ],
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
+        ],
         'selector' => [
             'inputType' => 'select',
             'eval' => [
@@ -229,30 +207,10 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                         'inputType' => 'select',
                         'eval' => [
                             'chosen' => true,
-                            'style' => 'width:250px',
+                            'style' => 'width:100%;max-width:375px',
                             'includeBlankOption' => true
                         ]
-                    ],
-                    'cssClass' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['cssClass'],
-                        'inputType' => 'select',
-                        'eval' => [
-                            'chosen' => true,
-                            'multiple' => true,
-                            'style' => 'width:250px',
-                            'includeBlankOption' => true
-                        ],
-                        'options' => (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getCssClasses()
                     ]
-                    /*
-                    'subpalette' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['subpalette'],
-                        'inputType' => 'checkbox',
-                        'eval' => [
-                            'multiple' => false
-                        ]
-                    ]
-                    */
                 ]
             ],
             'sql' => 'blob NULL',
@@ -268,7 +226,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                         'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['label'],
                         'inputType' => 'text',
                         'eval' => [
-                            'style' => 'width:320px'
+                            'style' => 'width:100%;max-width:400px'
                         ]
                     ],
                     'hide' => [

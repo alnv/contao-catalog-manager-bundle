@@ -132,7 +132,7 @@ class Options {
 
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
-        if ($arrField['eval'] && isset($arrField['eval']['multiple']) && $arrField['eval']['multiple'] === true) {
+        if (isset($arrField['eval']) && $arrField['eval'] && isset($arrField['eval']['multiple']) && $arrField['eval']['multiple'] === true) {
             if (isset($arrField['eval']['csv']) && $arrField['eval']['csv']) {
                 return explode($arrField['eval']['csv'], $strValue);
             }
@@ -148,7 +148,7 @@ class Options {
         $arrModelOptions = [];
         array_insert($arrModelOptions, 0, self::setFilter());
         if (self::$arrField['dbOrderField']) {
-            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?: self::$arrField['dbTable'];
+            $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
             $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
         return $objModel->findAll($arrModelOptions);
@@ -170,10 +170,10 @@ class Options {
         $arrOptions = [];
         switch (self::$arrField['dbFilterType']) {
             case 'wizard':
-                $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?: self::$arrField['dbTable'];
+                $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
                 $arrQueries = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'],$strTable);
-                $arrOptions['column'] = $arrQueries['column'];
-                $arrOptions['value'] = $arrQueries['value'];
+                $arrOptions['column'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
+                $arrOptions['value'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
                 break;
             case 'expert':
                 self::$arrField['dbFilterValue'] = \Controller::replaceInsertTags(self::$arrField['dbFilterValue']);

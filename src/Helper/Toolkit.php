@@ -8,6 +8,10 @@ class Toolkit {
 
     public static function getLabel($strItem) {
 
+        if (!isset($GLOBALS['TL_LANG']['MSC'][$strItem])) {
+            return $strItem;
+        }
+
         return is_array($GLOBALS['TL_LANG']['MSC'][$strItem]) ? $GLOBALS['TL_LANG']['MSC'][$strItem][0] : $GLOBALS['TL_LANG']['MSC'][$strItem];
     }
 
@@ -85,7 +89,7 @@ class Toolkit {
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['sql']) && $arrRole['sql']) {
-            return sprintf($arrRole['sql'], ($arrOptions['default'] ?: ''));
+            return sprintf($arrRole['sql'], (isset($arrOptions['default']) && $arrOptions['default'] ? $arrOptions['default'] : ''));
         }
 
         $arrSql = static::getSqlTypes();
@@ -105,9 +109,6 @@ class Toolkit {
     }
 
     public static function parseDetailLink($varPage, $strAlias) {
-
-        // $arrPage = null;
-        // if ($varPage instanceof \PageModel) {}
 
         if (is_numeric($varPage) && $varPage) {
             $objPage = \PageModel::findByPk($varPage);
@@ -196,6 +197,12 @@ class Toolkit {
         }
 
         foreach ($arrLabelFields as $strField) {
+
+            if (!isset($arrRow[$strField])) {
+                $arrColumns[$strField] = '';
+                continue;
+            }
+
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
             if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
                 switch ($arrFields[$strField]['eval']['role']) {
@@ -290,7 +297,7 @@ class Toolkit {
             case 'checkbox':
             case 'select':
             case 'radio':
-                if ($arrField['csv']) {
+                if (isset($arrField['csv']) && $arrField['csv']) {
                     $arrField['value'] = explode($arrField['csv'], $arrField['value']);
                 }
                 $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
@@ -379,6 +386,9 @@ class Toolkit {
         }
 
         foreach ($arrValues as $strValue) {
+            if (!isset($arrTemp[$strValue])) {
+                continue;
+            }
             $arrReturn[] = $arrTemp[$strValue];
         }
 
@@ -417,13 +427,12 @@ class Toolkit {
             return null;
         }
 
-        if ( $arrGeoCoding !== null && !empty( $arrGeoFields ) ) {
-
+        if ($arrGeoCoding !== null && !empty($arrGeoFields)) {
             $arrSet = [];
-            $arrSet[ 'tstamp' ] = time();
-            $arrSet[ $arrGeoFields['longitude'] ] = $arrGeoCoding['longitude'];
-            $arrSet[ $arrGeoFields['latitude'] ] = $arrGeoCoding['latitude'];
-            $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set( $arrSet )->execute($arrEntity['id']);
+            $arrSet['tstamp'] = time();
+            $arrSet[$arrGeoFields['longitude']] = $arrGeoCoding['longitude'];
+            $arrSet[$arrGeoFields['latitude']] = $arrGeoCoding['latitude'];
+            $objDatabase->prepare( 'UPDATE '. $strTable .' %s WHERE id = ?' )->set($arrSet)->execute($arrEntity['id']);
         }
     }
 
@@ -455,13 +464,13 @@ class Toolkit {
                 continue;
             }
 
-            if (isset( $arrActiveRecord[ $strFieldname ] ) && $arrActiveRecord[ $strFieldname ] !== '' && $arrActiveRecord[ $strFieldname ] !== null) {
+            if (isset($arrActiveRecord[$strFieldname]) && $arrActiveRecord[$strFieldname] !== '' && $arrActiveRecord[$strFieldname] !== null) {
                 $arrValues[] = $arrActiveRecord[$strFieldname];
             }
         }
 
         if (empty($arrValues)) {
-            $strAlias = md5(time() . '/' . ( $arrActiveRecord['id'] ?: '' ));
+            $strAlias = md5(time() . '/' . ($arrActiveRecord['id'] ?: ''));
         } else {
             $strAlias = implode('-', $arrValues);
         }
@@ -541,14 +550,14 @@ class Toolkit {
 
         foreach ($arrJson as $intIndex => $arrQuery) {
 
-            if ( isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][ $arrQuery['operator'] ]['token']) {
+            if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
 
                 if ($arrQuery['group'] || $blnInitialGroup) {
                     $strName = 'group' . $intIndex;
                 }
 
-                if ( !isset( $arrQueries[ $strName ] ) ) {
-                    $arrQueries[ $strName ] = [];
+                if (!isset( $arrQueries[$strName])) {
+                    $arrQueries[$strName] = [];
                 }
 
                 $varValue = $arrQuery['value'];
@@ -583,16 +592,16 @@ class Toolkit {
                     $arrValues[] = $strValue;
                 }
 
-                if ( !empty( $arrColumns ) ) {
-                    if ( count( $arrColumns ) > 1 ) {
-                        $strColumn = '(' . implode( ' OR ', $arrColumns ) . ')';
+                if (!empty($arrColumns)) {
+                    if (count( $arrColumns ) > 1) {
+                        $strColumn = '(' . implode(' OR ', $arrColumns) . ')';
                     } else {
                         $strColumn = $arrColumns[0];
                     }
-                    $arrQueries[ $strName ][] = $strColumn;
+                    $arrQueries[$strName][] = $strColumn;
                 }
 
-                if ( $arrQuery['group'] ) {
+                if ($arrQuery['group']) {
                     $blnInitialGroup = false;
                 }
             }
@@ -601,13 +610,13 @@ class Toolkit {
         $arrReturn['column'] = [];
         $arrReturn['value'] = $arrValues;
 
-        foreach ( $arrQueries as $arrQuery ) {
+        foreach ($arrQueries as $arrQuery) {
 
-            if ( empty( $arrQuery ) ) {
+            if (empty($arrQuery)) {
                 continue;
             }
-            if ( count( $arrQuery ) > 1 ) {
-                $arrReturn['column'][] = '(' . implode( ' OR ', $arrQuery ) . ')';
+            if (count($arrQuery) > 1) {
+                $arrReturn['column'][] = '(' . implode(' OR ', $arrQuery) . ')';
             } else {
                 $arrReturn['column'][] = $arrQuery[0];
             }
@@ -626,7 +635,7 @@ class Toolkit {
             return \Input::get('table');
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( \Input::get('do') );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(\Input::get('do'));
         return $objCatalog->getCatalog()['table'];
     }
 

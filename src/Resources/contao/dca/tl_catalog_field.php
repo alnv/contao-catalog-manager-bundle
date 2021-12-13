@@ -194,7 +194,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'includeBlankOption' => true
             ],
             'options' => [ 'options', 'dbOptions' ],
-            'reference' => $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
+            'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'optionsDcaWizard' => [
