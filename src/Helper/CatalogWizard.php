@@ -80,7 +80,7 @@ abstract class CatalogWizard extends \System {
         }
     }
 
-    protected function getParentCatalogByPid( $strPid ) {
+    protected function getParentCatalogByPid($strPid) {
 
         $objParent = CatalogModel::findByPk($strPid);
 
@@ -325,7 +325,7 @@ abstract class CatalogWizard extends \System {
             }
         }
 
-        \Cache::set( $strIdentifier, $arrReturn );
+        \Cache::set($strIdentifier, $arrReturn);
 
         return $arrReturn;
     }

@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                     $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objField->id);
                 }
 
-                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid);
+                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
             }
         ],
         'onsubmit_callback' => [
@@ -77,9 +77,11 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
         'sorting' => [
             'mode' => 4,
             'fields' => ['sorting'],
-            'headerFields' => ['id', 'name', 'table'],
+            'headerFields' => ['name', 'table'],
             'child_record_callback' => function($arrRow) {
-                return $arrRow['name'];
+                $arrTypes = $GLOBALS['TL_LANG']['tl_catalog_palette']['reference']['type'] ?: [];
+                return $arrRow['name'] .
+                    (isset($arrTypes[$arrRow['type']]) ? ' <span style="background:#f0c674;color:#fff;border-radius:5px;padding:3px;font-size:12px;">'.$arrTypes[$arrRow['type']].'</span>' : '');
             }
         ],
         'operations' => [
@@ -176,12 +178,13 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'chosen' => true,
                 'tl_class' => 'w50',
                 'mandatory' => true,
+                'doNotCopy' => true,
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
             'options_callback'=> ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
             'filter' => true,
-            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+            'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'selector_option' => [
             'inputType' => 'select',
@@ -190,6 +193,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'maxlength' => 128,
                 'tl_class' => 'w50',
                 'mandatory' => true,
+                'doNotCopy' => true,
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
@@ -249,35 +253,5 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'filter' => true,
             'sql' => "char(1) NOT NULL default ''"
         ]
-        /*
-        'subpalettes' => [
-            'inputType' => 'multiColumnWizard',
-            'eval' => [
-                'tl_class' => 'clr long',
-                'decodeEntities' => true,
-                'options2_callback' => ['catalogmanager.datacontainer.catalogpalette', 'getCssClasses'],
-                'options_callback'=> ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
-                'buttons' => ['new' => false, 'copy' => false, 'delete' => false, 'up' => false, 'down' => false, 'move' => false],
-                'columnFields' => [
-                    'subpalette' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['subpalette'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:100%'
-                        ]
-                    ],
-                    'fields' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['fields'],
-                        'inputType' => 'comboWizard',
-                        'eval' => [
-                            'tl_class' => 'w50',
-                            'decodeEntities' => true
-                        ]
-                    ]
-                ]
-            ],
-            'sql' => 'blob NULL'
-        ],
-        */
     ]
 ];

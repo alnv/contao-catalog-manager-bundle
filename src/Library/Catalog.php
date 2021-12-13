@@ -159,8 +159,8 @@ class Catalog extends CatalogWizard {
             ],
             'published' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published')),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.published', '')
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published')),
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.published', '')
                 ],
                 'inputType' => 'checkbox',
                 'eval' => [
@@ -173,8 +173,8 @@ class Catalog extends CatalogWizard {
             ],
             'start' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.start', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('start')),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.start', '')
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.start', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('start')),
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.start', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -187,8 +187,8 @@ class Catalog extends CatalogWizard {
             ],
             'stop' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.stop', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('stop')),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.stop', '')
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.stop', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('stop')),
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.stop', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -201,8 +201,8 @@ class Catalog extends CatalogWizard {
             ],
             'alias' => [
                 'label' => [
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.title.alias', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('alias')),
-                    Translation::getInstance()->translate( $this->arrCatalog['table'] . '.field.description.alias', '')
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.alias', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('alias')),
+                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.alias', '')
                 ],
                 'eval' => [
                     'doNotCopy' => true,

@@ -44,27 +44,26 @@ class Catalog {
         return $GLOBALS['CM_DATA_CONTAINERS'];
     }
 
-    public function getModes( \DataContainer $objDataContainer ) {
+    public function getModes(\DataContainer $objDataContainer) {
 
-        $arrModes = array_keys( $GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'] );
+        $arrModes = array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['mode']);
 
-        if ( !$objDataContainer->activeRecord->pid ) {
+        if (!$objDataContainer->activeRecord->pid) {
 
-            if ( ( $intPos = array_search( 'parent', $arrModes ) ) !== false ) {
-
-                unset( $arrModes[ $intPos ] );
+            if (($intPos = array_search('parent', $arrModes)) !== false) {
+                unset($arrModes[$intPos]);
             }
         }
 
         else {
 
-            if ( ( $intPos = array_search( 'tree', $arrModes ) ) !== false ) {
+            if (($intPos = array_search( 'tree', $arrModes ) ) !== false) {
 
-                unset( $arrModes[ $intPos ] );
+                unset($arrModes[$intPos]);
             }
         }
 
-        return array_values( $arrModes );
+        return array_values($arrModes);
     }
 
     public function getFlags() {
@@ -72,14 +71,13 @@ class Catalog {
         return [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12' ];
     }
 
-    public function getParentFields( \DataContainer $objDataContainer ) {
+    public function getParentFields(\DataContainer $objDataContainer) {
 
-        if ( !$objDataContainer->activeRecord->pid ) {
-
+        if (!$objDataContainer->activeRecord->pid) {
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog( $objDataContainer->activeRecord->pid );
+        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->pid);
 
         return $objCatalog->getNaturalFields();
     }

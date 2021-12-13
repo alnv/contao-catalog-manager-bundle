@@ -215,13 +215,16 @@ class VirtualDataContainerArray extends \System {
                     $arrLegends[$strLegend] = [];
                 }
 
-                $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
-
-                if (!$objField) {
-                    continue;
+                $strField = $arrField['field'];
+                if (is_numeric($arrField['field'])) {
+                    $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
+                    if (!$objField) {
+                        continue;
+                    }
+                    $strField = $objField->fieldname;
                 }
 
-                $arrLegends[$strLegend][] = $objField->fieldname;
+                $arrLegends[$strLegend][] = $strField;
             }
 
             $strLegendFields = '';
@@ -293,15 +296,19 @@ class VirtualDataContainerArray extends \System {
 
         while ($objSubPalettes->next()) {
 
-            $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($objSubPalettes->selector);
-            if (!$objField) {
-                continue;
+            $strFieldname = $objSubPalettes->selector;
+            if (is_numeric($objSubPalettes->selector)) {
+                $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($objSubPalettes->selector);
+                if (!$objField) {
+                    continue;
+                }
+                $strFieldname = $objField->fieldname;
             }
 
             $arrFields = $this->getFieldsOnly(\StringUtil::deserialize($objSubPalettes->fields, true));
-            $strPalette = $objField->fieldname;
-            $this->addSubmitOnChange($objField->fieldname);
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'][] = $objField->fieldname;
+            $strPalette = $strFieldname;
+            $this->addSubmitOnChange($strFieldname);
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'][] = $strFieldname;
 
             if ($objSubPalettes->selector_option) {
                 $strPalette .= '_' . $objSubPalettes->selector_option;
@@ -317,11 +324,15 @@ class VirtualDataContainerArray extends \System {
 
         foreach ($arrFields as $arrField) {
 
-            $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
-            if (!$objField) {
-                continue;
+            $strField = $arrField['field'];
+            if (is_numeric($strField)) {
+                $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
+                if (!$objField) {
+                    continue;
+                }
+                $strField = $objField->fieldname;
             }
-            $arrReturn[] = $objField->fieldname;
+            $arrReturn[] = $strField;
         }
 
         return $arrReturn;

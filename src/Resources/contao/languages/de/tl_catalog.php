@@ -31,6 +31,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['validAliasCharacters'] = [ 'Gültige Alias-Ze
 $GLOBALS['TL_LANG']['tl_catalog']['order'] = [ 'Sortierfelder', 'Eines oder mehrere Felder, anhand derer die Tabelle sortiert wird.' ];
 $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = [ 'GeoCoding aktivieren', '' ];
 $GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint'] = 'Es können nur leere Tabellen verschoben werden.';
+$GLOBALS['TL_LANG']['tl_catalog']['palettes'] = ['Paletten', 'Paletten bearbeiten'];
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
     'none' => 'Keine Sortierung',

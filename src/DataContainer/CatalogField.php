@@ -7,7 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 
 class CatalogField {
 
-    public function checkExtensions( $varValue, \DataContainer $dc ) {
+    public function checkExtensions($varValue, \DataContainer $dc) {
 
         $varValue = strtolower($varValue);
         $arrExtensions = \StringUtil::trimsplit(',', $varValue);
@@ -35,12 +35,11 @@ class CatalogField {
         return $arrReturn;
     }
 
-    public function getRoles( \DataContainer $dc ) {
+    public function getRoles(\DataContainer $dc) {
 
         $arrRoles = array_keys($GLOBALS['CM_ROLES']);
 
         if (!$dc->activeRecord->type) {
-
             return $arrRoles;
         }
 
@@ -73,7 +72,7 @@ class CatalogField {
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
 
         if (!$strFieldname || $objCatalog == null) {
-            throw new \Exception(sprintf('somethin went wrong'));
+            throw new \Exception(sprintf('something went wrong'));
         }
 
         if (in_array($strFieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
@@ -92,14 +91,6 @@ class CatalogField {
             }
             return $strFieldname;
         }
-
-        /*
-        $objCatalogField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findBy(
-            ['tl_catalog_field.pid=?', 'tl_catalog_field.id!=?', 'tl_catalog_field.fieldname=?'],
-            [$arrActiveRecord['pid'], $arrActiveRecord['id'], $strFieldname]
-        );
-        */
-        // if ($objCatalogField !== null && !$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $strTable, $strSql) && !$objDataContainer->activeRecord->fieldname) {
 
         if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $strTable, $strSql) && !$objDataContainer->activeRecord->fieldname) {
             throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
