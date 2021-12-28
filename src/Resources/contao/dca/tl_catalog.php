@@ -45,7 +45,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'palettes' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['palettes'],
                 'href' => 'table=tl_catalog_palette',
-                'icon' => 'cssimport.svg'
+                'icon' => '/bundles/alnvcontaoassetsmanager/icons/palettes-icon.svg'
             ],
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',
