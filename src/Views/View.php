@@ -26,15 +26,12 @@ abstract class View extends \Controller {
                 case 'id':
                     $this->arrOptions['id'] = (int) $varValue;
                     break;
-
                 case 'alias':
                     $this->arrOptions['alias'] = $varValue;
                     break;
-
                 case 'isForm':
                     $this->arrOptions['isForm'] = (bool) $varValue;
                     break;
-
                 case 'masterPage':
                     $objPage = \PageModel::findByPk($varValue);
                     if ($objPage !== null) {
@@ -42,74 +39,59 @@ abstract class View extends \Controller {
                         $this->arrOptions['masterPage'] = true;
                     }
                     break;
-
                 case 'formPage':
                     $objPage = \PageModel::findByPk($varValue);
-                    if ( $objPage !== null ) {
+                    if ($objPage !== null) {
                         $this->arrFormPage = $objPage->row();
                         $this->arrOptions['formPage'] = true;
                     }
                     break;
-
                 case 'limit':
                     $this->arrOptions['limit'] = (int) $varValue;
                     break;
-
                 case 'fastMode':
                     $this->arrOptions['fastMode'] = $varValue ? true : false;
                     break;
-
                 case 'offset':
                     $this->arrOptions['offset'] = (int) $varValue;
                     break;
-
                 case 'pagination':
                     $this->arrOptions['pagination'] = $varValue;
                     break;
-
                 case 'distance':
                     $this->arrOptions['distance'] = $varValue;
                     break;
-
                 case 'having':
                     $this->arrOptions['having'] = $varValue;
                     break;
-
                 case 'ignoreVisibility':
                     $this->arrOptions['ignoreVisibility'] = $varValue;
                     break;
-
                 case 'order':
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
                     if (!$this->arrOptions['order']) {
                         unset($this->arrOptions['order']);
                     }
                     break;
-
                 case 'column':
                     if (is_array($varValue) && !empty($varValue)) {
                         $this->arrOptions['column'] = $varValue;
                     }
                     break;
-
                 case 'value':
                     if (is_array($varValue) && !empty($varValue)) {
                         $this->arrOptions['value'] = $varValue;
                     }
                     break;
-
                 case 'groupBy':
                     $this->arrOptions['groupBy'] = $varValue;
                     break;
-
                 case 'groupByHl':
                     $this->arrOptions['groupByHl'] = $varValue;
                     break;
-
                 case 'template':
                     $this->arrOptions['template'] = $varValue;
                     break;
-
                 case 'language':
                     $this->arrOptions['language'] = $varValue;
                     break;
@@ -341,6 +323,14 @@ abstract class View extends \Controller {
                 $strReturn .= $this->getContentElement($objContent->current());
             }
             return $strReturn;
+        };
+
+        $arrRow['parseImage'] = function($varValue) {
+            return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue);
+        };
+
+        $arrRow['parseArray'] = function($varValue, $strDelimiter=', ', $strField='label') {
+            return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue, $strDelimiter, $strField);
         };
 
         if (isset($GLOBALS['TL_HOOKS']['parseEntity']) && is_array($GLOBALS['TL_HOOKS']['parseEntity'])) {
