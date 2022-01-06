@@ -173,7 +173,7 @@ class Options {
                 $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
                 $arrQueries = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'],$strTable);
                 $arrOptions['column'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
-                $arrOptions['value'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
+                $arrOptions['value'] = isset($arrQueries['value']) ? $arrQueries['value'] : [];
                 break;
             case 'expert':
                 self::$arrField['dbFilterValue'] = \Controller::replaceInsertTags(self::$arrField['dbFilterValue']);
