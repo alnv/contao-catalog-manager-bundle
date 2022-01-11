@@ -18,8 +18,16 @@ class WatchlistModel extends \Model {
 
         $strTable = static::$strTable;
 
-        $arrOptions['column'] = ["$strTable.sent!=? AND $strTable.session=?"];;
+        $arrIdentifiers = ["$strTable.session=?"];
+        $arrOptions['column'] = ["$strTable.sent!=?"];
         $arrOptions['value'] = ['1', \Alnv\ContaoCatalogManagerBundle\Library\Watchlist::getSessionId()];
+
+        if (FE_USER_LOGGED_IN) {
+            $arrIdentifiers[] = "$strTable.member=?";
+            $arrOptions['value'][] = \FrontendUser::getInstance()->id;
+        }
+
+        $arrOptions['column'][] = '('.implode(' OR ', $arrIdentifiers).')';
         $arrOptions['order'] = "$strTable.created_at DESC";
 
         return static::findAll($arrOptions);

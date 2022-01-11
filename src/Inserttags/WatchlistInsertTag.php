@@ -50,6 +50,13 @@ class WatchlistInsertTag {
             }
 
             while ($objWatchlist->next()) {
+                if (!\Database::getInstance()->tableExists($objWatchlist->table)) {
+                    continue;
+                }
+                $objEntity = \Database::getInstance()->prepare('SELECT * FROM '. $objWatchlist->table . ' WHERE id=?')->limit(1)->execute($objWatchlist->identifier);
+                if (!$objEntity->numRows) {
+                    continue;
+                }
                 if ($arrOptions['total']) {
                     $intCount += (int) $objWatchlist->units;
                 } else {
@@ -172,6 +179,8 @@ class WatchlistInsertTag {
                 $arrIds[] = $objWatchlist->identifier;
             }
         }
+
+        $arrIds = array_filter($arrIds);
 
         return empty($arrIds) ? '0' : serialize($arrIds);
     }
