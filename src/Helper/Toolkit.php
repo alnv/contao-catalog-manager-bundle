@@ -267,7 +267,7 @@ class Toolkit {
         $strImage = 'articles';
 
         foreach ($arrLabelFields as $strField) {
-            $arrColumns[$strField] = static::parseCatalogValue( $arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true );
+            $arrColumns[$strField] = static::parseCatalogValue($arrRow[ $strField ], \Widget::getAttributesFromDca( $arrFields[ $strField ], $strField, $arrRow[ $strField ], $strField, $arrCatalog['table'] ), $arrRow, true);
         }
 
         if (count($arrColumns) < 2) {
@@ -275,7 +275,7 @@ class Toolkit {
         }
 
         foreach ($arrColumns as $strField => $strValue) {
-            $strTemplate .= !$intIndex ? $strValue :  ( ' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>' );
+            $strTemplate .= !$intIndex ? $strValue :  (' <span class="'. $strField .'" style="color:#999;padding-left:3px">' . ( $intIndex === 1 ? '[' : '' ) . $strValue . ( $intIndex === count( $arrColumns ) - 1 ? ']' : '' ) . '</span>');
             $intIndex += 1;
         }
 
@@ -301,7 +301,7 @@ class Toolkit {
                     $arrField['value'] = explode($arrField['csv'], $arrField['value']);
                 }
                 $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
-                $arrOptionValues =  static::getSelectedOptions($varValue, $arrField['options']);
+                $arrOptionValues = static::getSelectedOptions($varValue, $arrField['options']);
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
                 }

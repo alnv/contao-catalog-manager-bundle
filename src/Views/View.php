@@ -370,6 +370,17 @@ abstract class View extends \Controller {
 
     protected function parseField($varValue, $strField, $arrValues, $blnFastMode) {
 
+        if (isset($GLOBALS['TL_HOOKS']['parseFieldValue']) && is_array($GLOBALS['TL_HOOKS']['parseFieldValue'])) {
+            $strCallback = null;
+            foreach ($GLOBALS['TL_HOOKS']['parseFieldValue'] as $arrCallback) {
+                $this->import($arrCallback[0]);
+                $strCallback = $this->{$arrCallback[0]}->{$arrCallback[1]}($varValue, $strField, $arrValues, $this->strTable, $blnFastMode, $this);
+            }
+            if ($strCallback !== null) {
+                return $strCallback;
+            }
+        }
+
         $strHash = md5($strField.$varValue);
         if (\Cache::has($strHash)) {
             $arrAttribute = \Cache::get($strHash);
