@@ -4,7 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 class File {
 
-    public static function sendFileToBrowser($arrFiles) {
+    public static function sendFileToBrowser($arrFiles, $blnInline=false) {
 
         $strFile = \Input::get('file');
         if (!$strFile) {
@@ -20,7 +20,7 @@ class File {
                         (new $arrCallback[0])->{$arrCallback[1]}($strFile);
                     }
                 }
-                \Controller::sendFileToBrowser($strFile);
+                \Controller::sendFileToBrowser($strFile, $blnInline);
             }
         }
     }
