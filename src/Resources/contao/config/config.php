@@ -66,12 +66,6 @@ $GLOBALS['TL_HOOKS']['compileFormFields'][] = ['catalogmanager.hooks.formfields'
 $GLOBALS['TL_HOOKS']['loadFormField'][] = ['catalogmanager.hooks.formfields', 'loadFormField'];
 $GLOBALS['TL_HOOKS']['sqlCompileCommands'][] = ['catalogmanager.hooks.sqlcompilecommands', 'execute'];
 
-$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
-$GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
-$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
-$GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
-$GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';
-
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
@@ -437,3 +431,10 @@ $GLOBALS['CM_ROLES'] = [
         'sql' => "int(10) unsigned NOT NULL default '0'"
     ]
 ];
+
+$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
+$GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
+$GLOBALS['TL_MODELS']['tl_catalog_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel';
+$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
+$GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
+$GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';

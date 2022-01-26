@@ -6,6 +6,54 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
 class Toolkit {
 
+    public static function addToCatalogData($strType, $strTable, $strIdentifier) {
+
+        $objCatalogData = \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableAndIdentifier($strType, $strTable, $strIdentifier);
+
+        if (!$objCatalogData) {
+            $objCatalogData = new \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel();
+            $objCatalogData->created_at = time();
+            $objCatalogData->type = $strType;
+            $objCatalogData->table = $strTable;
+            $objCatalogData->identifier = $strIdentifier;
+            $objCatalogData->session = self::getSessionId();
+            $objCatalogData->member = (\FrontendUser::getInstance()->id ?: 0);
+        }
+
+        $objCatalogData->tstamp = time();
+
+        return $objCatalogData->save()->row();
+    }
+
+    public static function getLastAddedByTypeAndTable($strType, $strTable) {
+
+        $arrIds = [];
+        $objData = \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getLastAddedByType('view-master');
+        if (!$objData) {
+            return $arrIds;
+        }
+        while ($objData->next()) {
+            if ($objData->table != $strTable) {
+                continue;
+            }
+            $arrIds[] = $objData->identifier;
+        }
+        return array_filter($arrIds);
+    }
+
+    public static function getSessionId() {
+
+        $objSession = \System::getContainer()->get('session');
+        $strSessionId = $objSession->get('catalog-session-id');
+
+        if (!$strSessionId) {
+            $strSessionId = substr(md5(uniqid() . '.' . time()), 0, 64);
+            $objSession->set('catalog-session-id', $strSessionId);
+        }
+
+        return $strSessionId;
+    }
+
     public static function getLabel($strItem) {
 
         if (!isset($GLOBALS['TL_LANG']['MSC'][$strItem])) {

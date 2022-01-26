@@ -13,7 +13,9 @@ class Master extends View {
         $objEntity = $objModel->findByIdOrAlias($this->arrOptions['alias'], $this->getModelOptions());
 
         if ($objEntity !== null) {
-            $this->parseEntity($objEntity->row());
+            $arrEntity = $objEntity->row();
+            $this->parseEntity($arrEntity);
+            \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::addToCatalogData('view-master', $this->strTable, $arrEntity['id']);
         }
 
         return $this->getEntities();

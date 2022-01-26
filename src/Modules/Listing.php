@@ -178,6 +178,19 @@ class Listing extends \Hybrid {
             }
         }
 
+        if ($this->cmFilter && ($this->cmWizardFilterSettings || $this->cmValue)) {
+            $strFilterValues = $this->cmWizardFilterSettings ?: $this->cmValue;
+            if (strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
+                $arrIds = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
+                if (!$this->arrOptions['order']) {
+                    $this->arrOptions['order'] = '';
+                }
+                if (!empty($arrIds)) {
+                    $this->arrOptions['order'] .= ($this->arrOptions['order'] ?',': '') . ('FIELD('.$this->cmTable.'.id,'. implode(',', $arrIds) .')');
+                }
+            }
+        }
+
         if (is_array(\Input::get('order')) && !empty(\Input::get('order'))) {
             $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray(\Input::get('order'));
         }

@@ -87,9 +87,8 @@ $GLOBALS['TL_DCA']['tl_watchlist'] = [
         'sent' => [
             'inputType' => 'checkbox',
             'eval' => [
-                'chosen' => true,
                 'multiple' => false,
-                'tl_class' => 'long clr'
+                'tl_class' => 'clr'
             ],
             'filter' => true,
             'sql' => ['type' => 'string', 'fixed' => true, 'length' => 1, 'default' => '']

@@ -23,6 +23,7 @@ class Inserttags {
                     return '';
                 }
                 return $objDbUser->{$strField};
+            case 'TIMESTAMP':
             case 'timestamp':
                 $strMethod = $arrFragments[1] ?: 'tstamp';
                 $strStrToTimeParameter = $arrFragments[2] ?: '';
@@ -31,6 +32,17 @@ class Inserttags {
                 } else {
                     return (new \Date())->{$strMethod};
                 }
+            case 'LAST-ADDED-MASTER-VIEW-IDS':
+                $strTable = $arrFragments[1] ?: '';
+                if (!$strTable) {
+                    return '0';
+                }
+                $arrIds = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLastAddedByTypeAndTable('view-master', $strTable);
+                if (empty($arrIds)) {
+                    return '0';
+                }
+                return serialize($arrIds);
+
         }
 
         return false;

@@ -12,8 +12,8 @@ class Watchlist {
         $objTemplate->setData([
             'data' => base64_encode($strIdentifier.':'.$strTable),
             'units' => $arrData['units'],
-            'useUnits' => (bool) $arrOptions['useUnits'],
             'added' => isset($arrData['id']),
+            'useUnits' => (bool) $arrOptions['useUnits'],
             'buttonAddLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListAddButtonLabel'],
             'buttonRemoveLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListRemoveButtonLabel'],
             'buttonUnitsLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListUnitsButtonLabel'],
@@ -71,6 +71,8 @@ class Watchlist {
 
     public static function getSessionId() {
 
+        return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getSessionId();
+        /*
         $objSession = \System::getContainer()->get('session');
         $strSessionId = $objSession->get('watchlist-session');
 
@@ -80,5 +82,6 @@ class Watchlist {
         }
 
         return $strSessionId;
+        */
     }
 }
