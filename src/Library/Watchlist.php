@@ -47,7 +47,6 @@ class Watchlist {
         $objItem = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getByIdentifierAndTable($strIdentifier, $strTable);
 
         if (!$objItem) {
-
             $objItem = new \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel();
             $objItem->table = $strTable;
             $objItem->created_at = time();

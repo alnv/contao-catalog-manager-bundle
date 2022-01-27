@@ -9,9 +9,19 @@ class WatchlistModel extends \Model {
     public static function getByIdentifierAndTable($strIdentifier, $strTablename, array $arrOptions=[]) {
 
         $strTable = static::$strTable;
-        $arrColumns = ["$strTable.identifier=? AND $strTable.table=? AND $strTable.sent!=? AND $strTable.session=?"];
+        $arrIdentifiers = ["$strTable.session=?"];
 
-        return static::findOneBy($arrColumns, [$strIdentifier, $strTablename, '1', \Alnv\ContaoCatalogManagerBundle\Library\Watchlist::getSessionId()], $arrOptions);
+        $arrColumns = ["$strTable.identifier=? AND $strTable.table=? AND $strTable.sent!=?"];
+        $arrValues = [$strIdentifier, $strTablename, '1', \Alnv\ContaoCatalogManagerBundle\Library\Watchlist::getSessionId()];
+
+        if (FE_USER_LOGGED_IN) {
+            $arrIdentifiers[] = "$strTable.member=?";
+            $arrValues[] = \FrontendUser::getInstance()->id;
+        }
+
+        $arrColumns[] = '('.implode(' OR ', $arrIdentifiers).')';
+
+        return static::findOneBy($arrColumns, $arrValues, $arrOptions);
     }
 
     public static function getBySession($arrOptions=[]) {
