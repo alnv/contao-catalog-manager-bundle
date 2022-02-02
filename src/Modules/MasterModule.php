@@ -34,6 +34,7 @@ class MasterModule extends \Module {
         $objMaster = new Master($this->cmTable, [
             'alias' => \Input::get('auto_item'),
             'template' => $this->cmTemplate,
+            'ignoreVisibility' => (bool) $this->cmIgnoreVisibility,
             'id' => $this->id
         ]);
 

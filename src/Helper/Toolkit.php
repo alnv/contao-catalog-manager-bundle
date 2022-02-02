@@ -25,6 +25,47 @@ class Toolkit {
         return $objCatalogData->save()->row();
     }
 
+    public static function addCount($strType, $strTable, $strIdentifier) {
+
+        $intDay = (new \Date())->dayBegin;
+        $intMonth = (new \Date())->monthBegin;
+        $intYear = (new \Date())->yearBegin;
+
+        $arrAssigns = [
+            'day' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndDayPeriod($strType, $strTable, $strIdentifier, $intDay),
+            'month' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndMonthPeriod($strType, $strTable, $strIdentifier, $intMonth),
+            'year' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndYearPeriod($strType, $strTable, $strIdentifier, $intYear)
+        ];
+
+        foreach ($arrAssigns as $strPeriod => $objEntity) {
+
+            if (!$objEntity) {
+                $objEntity = new \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel();
+                $objEntity->created_at = time();
+                $objEntity->type = $strType;
+                $objEntity->table = $strTable;
+                $objEntity->identifier = $strIdentifier;
+                $objEntity->count = 1;
+                switch ($strPeriod) {
+                    case 'day':
+                        $objEntity->day = $intDay;
+                        break;
+                    case 'month':
+                        $objEntity->month = $intMonth;
+                        break;
+                    case 'year':
+                        $objEntity->year = $intYear;
+                        break;
+                }
+            } else {
+                $objEntity->count++;
+            }
+
+            $objEntity->tstamp = time();
+            $objEntity->save();
+        }
+    }
+
     public static function getLastAddedByTypeAndTable($strType, $strTable) {
 
         $arrIds = [];

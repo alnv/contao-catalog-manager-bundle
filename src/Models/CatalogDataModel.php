@@ -27,4 +27,31 @@ class CatalogDataModel extends \Model {
 
         return static::findAll($arrOptions);
     }
+
+    public static function getByTypeAndTableIdentifierAndDayPeriod($strType, $strTable, $strIdentifier, $intDayPeriod, $arrOptions=[]) {
+
+        $strT= static::$strTable;
+        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.day=?"];
+        $arrOptions['limit'] = 1;
+
+        return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intDayPeriod], $arrOptions);
+    }
+
+    public static function getByTypeAndTableIdentifierAndMonthPeriod($strType, $strTable, $strIdentifier, $intMonthPeriod, $arrOptions=[]) {
+
+        $strT= static::$strTable;
+        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.month=?"];
+        $arrOptions['limit'] = 1;
+
+        return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intMonthPeriod], $arrOptions);
+    }
+
+    public static function getByTypeAndTableIdentifierAndYearPeriod($strType, $strTable, $strIdentifier, $intYearPeriod, $arrOptions=[]) {
+
+        $strT= static::$strTable;
+        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.year=?"];
+        $arrOptions['limit'] = 1;
+
+        return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intYearPeriod], $arrOptions);
+    }
 }

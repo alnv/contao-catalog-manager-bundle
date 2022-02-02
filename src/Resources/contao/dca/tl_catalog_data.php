@@ -6,7 +6,10 @@ $GLOBALS['TL_DCA']['tl_catalog_data'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
-                'type,table,session,member,identifier' => 'index'
+                'type,table,session,member,identifier' => 'index',
+                'type,table,session,day' => 'index',
+                'type,table,session,year' => 'index',
+                'type,table,session,month' => 'index'
             ]
         ]
     ],
@@ -33,6 +36,18 @@ $GLOBALS['TL_DCA']['tl_catalog_data'] = [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'identifier' => [
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+        ],
+        'day' => [
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+        ],
+        'month' => [
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+        ],
+        'year' => [
+            'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
+        ],
+        'count' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ]
     ]
