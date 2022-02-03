@@ -7,9 +7,9 @@ $GLOBALS['TL_DCA']['tl_catalog_data'] = [
             'keys' => [
                 'id' => 'primary',
                 'type,table,session,member,identifier' => 'index',
-                'type,table,session,day' => 'index',
-                'type,table,session,year' => 'index',
-                'type,table,session,month' => 'index'
+                'type,table,identifier,day' => 'index',
+                'type,table,identifier,year' => 'index',
+                'type,table,identifier,month' => 'index'
             ]
         ]
     ],
