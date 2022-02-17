@@ -17,6 +17,11 @@ class Search {
             return $arrPages;
         }
 
+        $strDNS = '';
+        if ($objRoot = \PageModel::findByPk($intRoot)) {
+            $strDNS = $objRoot->dns?:'';
+        }
+
         while ($objCatalogFields->next()) {
             $strFieldname = $objCatalogFields->fieldname;
             if (!$strFieldname) {
@@ -33,12 +38,19 @@ class Search {
             $objListing = new Listing($strTable, []);
             foreach ($objListing->parse() as $arrEntity) {
                 if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
-                    foreach ($arrEntity[$strFieldname] as $arrUrls) {
-                        $arrPages[] = $arrUrls['absolute'];
+                    foreach ($arrEntity[$strFieldname] as $arrUrl) {
+                        if ($strDNS) {
+                            if (strpos($arrUrl['absolute'], $strDNS) !== false) {
+                                $arrPages[] = $arrUrl['absolute'];
+                            }
+                        } else {
+                            $arrPages[] = $arrUrl['absolute'];
+                        }
                     }
                 }
             }
         }
+
         return $arrPages;
     }
 
@@ -49,6 +61,11 @@ class Search {
 
         if (!$objModules->numRows) {
             return $arrPages;
+        }
+
+        $strDNS = '';
+        if ($objRoot = \PageModel::findByPk($intRoot)) {
+            $strDNS = $objRoot->dns?:'';
         }
 
         while ($objModules->next()) {
@@ -81,7 +98,14 @@ class Search {
                 if (!$strAlias) {
                     continue;
                 }
-                $arrPages[] = $objPage->getAbsoluteUrl('/'.$strAlias);
+                $strUrl = $objPage->getAbsoluteUrl('/'.$strAlias);
+                if ($strDNS) {
+                    if (strpos($strUrl, $strDNS) !== false) {
+                        $arrPages[] = $strUrl;
+                    }
+                } else {
+                    $arrPages[] = $strUrl;
+                }
             }
         }
 
