@@ -14,6 +14,7 @@ class ActiveInsertTag extends \System {
 
             global $objPage;
 
+            $strMode = null;
             $strDefault = null;
             $blnUseDefault = false;
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
@@ -26,6 +27,9 @@ class ActiveInsertTag extends \System {
                         case 'default':
                             $blnUseDefault = true;
                             $strDefault = $strOption;
+                            break;
+                        case 'mode':
+                            $strMode = $strOption; // BE || FE
                             break;
                         case 'csv':
                             if ($varValue !== '') {
@@ -52,6 +56,15 @@ class ActiveInsertTag extends \System {
                 foreach ($GLOBALS['TL_HOOKS']['replaceActiveInserttag'] as $arrCallback) {
                     $this->import($arrCallback[0]);
                     $varValue = $this->{$arrCallback[0]}->{$arrCallback[1]}($varValue, $arrFragments);
+                }
+            }
+
+            if ($strMode) {
+                if ($strMode == 'FE' && TL_MODE != $strMode) {
+                    return '';
+                }
+                if ($strMode == 'BE' && TL_MODE != $strMode) {
+                    return '';
                 }
             }
 
