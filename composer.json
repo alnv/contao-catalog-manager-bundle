@@ -35,7 +35,16 @@
     "contao/core-bundle":"~4.9",
     "terminal42/dcawizard": "^2.4",
     "sensio/framework-extra-bundle": "^5.2",
-    "menatwork/contao-multicolumnwizard-bundle": "^3.5"
+    "menatwork/contao-multicolumnwizard-bundle": "^3.5",
+    "alnv/assets-manager-bundle": "self.version",
+    "alnv/form-manager-bundle": "self.version",
+    "alnv/translation-manager-bundle": "self.version",
+    "alnv/widget-collection-bundle": "self.version",
+    "alnv/catalog-manager-multilingual-adapter-bundle": "self.version",
+    "alnv/contao-geocoding": "^2.1"
+  },
+  "conflict": {
+    "alnv/catalogmanager": "*"
   },
   "config": {
     "preferred-install": "dist"
