@@ -11,7 +11,7 @@
                 objInfoBox.open(map, this);
             };
         };
-        let initMap = function () {
+        var initMap = function () {
             let arrLocations = <?= $this->varLocations ?>;
             let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
             let objBounds = new google.maps.LatLngBounds();
