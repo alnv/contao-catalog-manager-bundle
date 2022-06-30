@@ -23,7 +23,7 @@
                     continue;
                 }
                 let strTemplate = arrLocations[i]['map']['infoContent'];
-                let objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'],arrLocations[i]['map']['longitude']);
+                let objPosition = new google.maps.LatLng(arrLocations[i]['map']['latitude'], arrLocations[i]['map']['longitude']);
                 let objMarker = new google.maps.Marker({
                     title: arrLocations[i]['map']['title'],
                     position: objPosition,

@@ -15,9 +15,12 @@ class GMap extends MapView {
         }
         
         $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
+        $arrJson = array_map(function($arrLocation) {
+            return ['map' => $arrLocation['map']];
+        }, $arrLocations);
         $objTemplate->setData([
             'locations' => $arrLocations,
-            'varLocations' => json_encode($arrLocations, 512)
+            'varLocations' => json_encode($arrJson, 512)
         ]);
 
         return $objTemplate->parse();
