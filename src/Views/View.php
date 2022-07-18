@@ -99,6 +99,14 @@ abstract class View extends \Controller {
         }
 
         $this->paginate();
+
+        if (isset($GLOBALS['TL_HOOKS']['initializeView']) && is_array($GLOBALS['TL_HOOKS']['initializeView'])) {
+            foreach ($GLOBALS['TL_HOOKS']['initializeView'] as $arrCallback) {
+                $this->import( $arrCallback[0] );
+                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->strTable, $this->arrOptions, $this);
+            }
+        }
+
         parent::__construct();
     }
 
