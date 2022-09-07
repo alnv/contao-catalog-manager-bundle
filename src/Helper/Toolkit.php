@@ -130,7 +130,7 @@ class Toolkit {
 
     public static function getFilterValue($strField) {
 
-        $arrActiveRecord = \Cache::get('activeRecord');
+        $arrActiveRecord = \Cache::get('activeRecord') ?: [];
         $varValue = \Input::get($strField) ?: \Input::post($strField);
 
         if (!$varValue && !empty($arrActiveRecord)) {
@@ -251,7 +251,7 @@ class Toolkit {
             return '';
         }
 
-        if (is_array( $arrValue)) {
+        if (is_array($arrValue)) {
             return serialize($arrValue);
         }
 
