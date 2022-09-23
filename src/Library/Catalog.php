@@ -96,19 +96,22 @@ class Catalog extends CatalogWizard {
                 continue;
             }
 
+            $strTable = $this->arrCatalog['table'] ?? '';
+            $arrLangSets = $GLOBALS['TL_LANG']['MSC'][$strFieldname] ?? [];
+
             unset($arrField['index']);
 
             if (!isset($arrField['label'])) {
                 $arrField['label'] = [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][0]),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.' . $strFieldname, $GLOBALS['TL_LANG']['MSC'][$strFieldname][1])
+                    Translation::getInstance()->translate(($strTable?$strTable.'.':'') . 'field.title.' . $strFieldname, $arrLangSets[0] ?? ''),
+                    Translation::getInstance()->translate(($strTable?$strTable.'.':'') . 'field.description.' . $strFieldname, $arrLangSets[1] ?? '')
                 ];
             }
 
             $arrFields[ $strFieldname ] = $arrField;
         }
 
-        array_insert( $this->arrFields, 0, $arrFields );
+        array_insert($this->arrFields, 0, $arrFields);
     }
 
     public function getDefaultFieldnames() {

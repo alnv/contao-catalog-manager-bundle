@@ -75,6 +75,6 @@ class DcaExtractor extends \DcaExtractor {
 
     public function getField($strFieldname) {
 
-        return $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldname];
+        return $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldname] ?? [];
     }
 }

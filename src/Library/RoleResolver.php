@@ -8,6 +8,7 @@ class RoleResolver extends \System {
     public static $arrRoles = null;
     public static $arrEntity = null;
     protected static $arrInstances = [];
+    protected static $objCache;
 
     public static function getInstance($strTable, $arrEntity=[]) {
 
@@ -15,6 +16,7 @@ class RoleResolver extends \System {
             return new self;
         }
 
+        self::$objCache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('cm.roleresolver.cache', 60, TL_ROOT . '/var/cache');
         $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
@@ -23,10 +25,14 @@ class RoleResolver extends \System {
             self::$arrInstances[$strInstanceKey] = new self;
         }
 
-        if (!\Cache::has($strInstanceKey)) {
-            \Cache::set($strInstanceKey, static::setRoles());
+        $objCacheResult = self::$objCache->getItem($strInstanceKey);
+
+        if (!$objCacheResult->isHit()) {
+            $objCacheResult->set(static::setRoles());
+            self::$objCache->save($objCacheResult);
         }
-        self::$arrRoles = \Cache::get($strInstanceKey);
+
+        self::$arrRoles = $objCacheResult->get($strInstanceKey);
 
         return self::$arrInstances[$strInstanceKey];
     }
@@ -49,7 +55,7 @@ class RoleResolver extends \System {
                 continue;
             }
 
-            if (!$arrField['eval']['role']) {
+            if (!isset($arrField['eval']['role'])) {
                 continue;
             }
 

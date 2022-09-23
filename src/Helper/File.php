@@ -50,7 +50,7 @@ class File {
                 }
 
                 $arrMeta = \Frontend::getMetaData($objFiles->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale());
-                if ($arrMeta['title'] == '') {
+                if (!isset($arrMeta['title']) || $arrMeta['title'] == '') {
                     $arrMeta['title'] = \StringUtil::specialchars($objFiles->basename);
                 }
 
@@ -69,7 +69,7 @@ class File {
                     'name' => $objFile->basename,
                     'title' => \StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                     'link' => $arrMeta['title'],
-                    'caption' => $arrMeta['caption'],
+                    'caption' => $arrMeta['caption'] ?? '',
                     'href' => $strHref,
                     'icon' => \Image::getPath($objFile->icon),
                     'mime' => $objFile->mime,

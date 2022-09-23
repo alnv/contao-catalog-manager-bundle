@@ -112,6 +112,10 @@ abstract class View extends \Controller {
 
     protected function paginate() {
 
+        if (!isset($this->arrOptions['pagination'])) {
+            return null;
+        }
+
         if (!$this->arrOptions['pagination'] && !\Input::post('reload')) {
             return null;
         }
@@ -207,16 +211,19 @@ abstract class View extends \Controller {
     }
 
     protected function validOrigin($strValue, $strField) {
-        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
+
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
             foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'] as $arrField) {
                 if ($arrField['inputType'] == 'fileTree') {
                     return false;
                 }
             }
         }
-        if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
+
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
             return false;
         }
+
         return true;
     }
 
@@ -226,12 +233,12 @@ abstract class View extends \Controller {
         $arrRow['origin'] = [];
         $arrRow['_table'] = $this->strTable;
 
-        if ($this->arrOptions['masterPage']) {
+        if (isset($this->arrOptions['masterPage']) && $this->arrOptions['masterPage']) {
             $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias']);
         }
 
         foreach ($arrEntity as $strField => $varValue) {
-            $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, $this->arrOptions['fastMode']);
+            $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, ($this->arrOptions['fastMode']??false));
             if ($strParsedValue !== $varValue) {
                 if ($this->validOrigin($varValue, $strField)) {
                     if (\Validator::isBinaryUuid($varValue)) {
@@ -353,13 +360,13 @@ abstract class View extends \Controller {
             }
         }
 
-        if ($this->arrOptions['template']) {
+        if (isset($this->arrOptions['template']) && $this->arrOptions['template']) {
             $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
             $objTemplate->setData($arrRow);
             $arrRow['template'] =  $objTemplate->parse();
         }
 
-        if ($this->arrOptions['groupBy']) {
+        if (isset($this->arrOptions['groupBy']) && $this->arrOptions['groupBy']) {
             $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
             if (!isset( $this->arrEntities[$strGroup])) {
                 $this->arrEntities[$strGroup] = [
@@ -396,7 +403,7 @@ abstract class View extends \Controller {
             $arrAttribute = \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
             \Cache::set($strHash, $arrAttribute);
         }
-        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, $this->arrOptions['isForm']);
+        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm']??false));
     }
 
     protected function getPageNumber() {

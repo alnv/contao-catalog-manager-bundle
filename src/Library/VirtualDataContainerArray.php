@@ -264,7 +264,9 @@ class VirtualDataContainerArray extends \System {
         $arrReturn = [];
         foreach ($this->arrFields as $strFieldname => $arrField) {
 
-            if (in_array($this->arrFields['type'], ['empty'])) {
+            $strType = $this->arrFields['type'] ?? '';
+
+            if ($strType == 'empty') {
                 continue;
             }
 

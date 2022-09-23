@@ -401,7 +401,7 @@ class Toolkit {
             case 'fileTree':
                 $strSizeId = null;
                 $arrOrderField = [];
-                if ($arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
+                if (isset($arrField['orderField']) && $arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
                     $arrOrderField = Image::getUuids($arrCatalog[$arrField['orderField']]);
                 }
                 if (isset($arrField['imageSize']) && $arrField['imageSize']) {
@@ -641,7 +641,7 @@ class Toolkit {
 
             if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
 
-                if ($arrQuery['group'] || $blnInitialGroup) {
+                if ((isset($arrQuery['group']) && $arrQuery['group']) || $blnInitialGroup) {
                     $strName = 'group' . $intIndex;
                 }
 
@@ -674,7 +674,7 @@ class Toolkit {
                         ]);
                     }
 
-                    if (is_bool($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] == true) {
+                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && is_bool($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] == true) {
                         continue;
                     }
 
@@ -690,7 +690,7 @@ class Toolkit {
                     $arrQueries[$strName][] = $strColumn;
                 }
 
-                if ($arrQuery['group']) {
+                if (isset($arrQuery['group']) && $arrQuery['group']) {
                     $blnInitialGroup = false;
                 }
             }

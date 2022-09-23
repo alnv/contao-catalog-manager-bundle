@@ -25,10 +25,10 @@ class DynModel extends \Model {
     public static function findByIdOrAlias($varId, array $arrOptions=[]) {
 
         $t = static::$strTable;
-        if (!isset($arrOptions['column']) && !is_array($arrOptions['column'])) {
+        if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
             $arrOptions['column'] = [];
         }
-        if (!isset($arrOptions['value']) && !is_array($arrOptions['value'])) {
+        if (!isset($arrOptions['value']) || !is_array($arrOptions['value'])) {
             $arrOptions['value'] = [];
         }
         $arrOptions['column'][] = !preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
@@ -70,9 +70,9 @@ class DynModel extends \Model {
             $arrFields = [ $arrOptions['table'] . ".*" ];
             $intCount = 0;
 
-            foreach ( $objBase->getRelations() as $strKey => $arrConfig ) {
+            foreach ($objBase->getRelations() as $strKey => $arrConfig) {
 
-                if ($arrConfig['load'] == 'eager' || $arrOptions['eager']) {
+                if ((isset($arrConfig['load']) && $arrConfig['load'] == 'eager') || (isset($arrOptions['eager']) && $arrOptions['eager'])) {
 
                     if ($arrConfig['type'] == 'hasOne' || $arrConfig['type'] == 'belongsTo') {
 
