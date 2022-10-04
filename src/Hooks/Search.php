@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 
@@ -23,28 +24,45 @@ class Search {
         }
 
         while ($objCatalogFields->next()) {
+
             $strFieldname = $objCatalogFields->fieldname;
+
             if (!$strFieldname) {
                 continue;
             }
+
             $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findAll(['tl_catalog.id=?'], [$objCatalogFields->pid]);
+
             if ($objCatalog === null) {
                 continue;
             }
+
             $strTable = $objCatalog->table;
+
             if (!$strTable) {
                 continue;
             }
-            $objListing = new Listing($strTable, []);
-            foreach ($objListing->parse() as $arrEntity) {
-                if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
-                    foreach ($arrEntity[$strFieldname] as $arrUrl) {
-                        if ($strDNS) {
-                            if (strpos($arrUrl['absolute'], $strDNS) !== false) {
+
+            $objModel = new ModelWizard($strTable);
+            $objModel = $objModel->getModel();
+            $objEntities = $objModel->findAll();
+
+            if ($objEntities) {
+
+                while ($objEntities->next()) {
+
+                    $arrEntity = $objEntities->row();
+
+                    if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
+
+                        foreach ($arrEntity[$strFieldname] as $arrUrl) {
+                            if ($strDNS) {
+                                if (strpos($arrUrl['absolute'], $strDNS) !== false) {
+                                    $arrPages[] = $arrUrl['absolute'];
+                                }
+                            } else {
                                 $arrPages[] = $arrUrl['absolute'];
                             }
-                        } else {
-                            $arrPages[] = $arrUrl['absolute'];
                         }
                     }
                 }
@@ -87,24 +105,35 @@ class Search {
             }
 
             $arrFilter = $this->parseFilter($objModules);
-            $objListing = new Listing($strTable, [
+
+            $objModel = new ModelWizard($strTable);
+            $objModel = $objModel->getModel();
+            $objEntities = $objModel->findAll([
                 'language' => $objPage->language,
                 'column' => isset($arrFilter['column']) ? $arrFilter['column'] : null,
                 'value' => isset($arrFilter['value']) ? $arrFilter['value'] : null
             ]);
 
-            foreach ($objListing->parse() as $arrEntity) {
-                $strAlias = $arrEntity['alias'];
-                if (!$strAlias) {
-                    continue;
-                }
-                $strUrl = $objPage->getAbsoluteUrl('/'.$strAlias);
-                if ($strDNS) {
-                    if (strpos($strUrl, $strDNS) !== false) {
+
+            if ($objEntities) {
+
+                while ($objEntities->next()) {
+
+                    $strAlias = $objEntities->alias;
+
+                    if (!$strAlias) {
+                        continue;
+                    }
+
+                    $strUrl = $objPage->getAbsoluteUrl('/'.$strAlias);
+
+                    if ($strDNS) {
+                        if (strpos($strUrl, $strDNS) !== false) {
+                            $arrPages[] = $strUrl;
+                        }
+                    } else {
                         $arrPages[] = $strUrl;
                     }
-                } else {
-                    $arrPages[] = $strUrl;
                 }
             }
         }
