@@ -101,8 +101,12 @@ class VirtualDataContainerArray extends \System {
 
             if (in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable']) && !$this->arrCatalog['showColumns']) {
                 $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, \DataContainer $dc) {
-                    $varReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
-                    return $varReturn ?: '-';
+                    try {
+                        $varReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
+                    } catch (\Exception $objError) {
+                        $varReturn = '';
+                    }
+                    return $varReturn ?: '';
                 };
             }
         }
