@@ -96,7 +96,7 @@ class Listing extends \Hybrid {
         $arrAddress = [
             'street' => Toolkit::getValueFromUrl(\Input::get('street')),
             'streetNumber' => Toolkit::getValueFromUrl(\Input::get('streetNumber')),
-            'zip' => Toolkit::getValueFromUrl(\Input::get('zip')),
+            'zip' => Toolkit::getValueFromUrl(\Input::get('zip')?:\Input::get('postal')),
             'city' => Toolkit::getValueFromUrl(\Input::get('city')),
         ];
 

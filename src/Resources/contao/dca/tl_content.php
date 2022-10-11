@@ -1,7 +1,7 @@
 <?php
 
 $GLOBALS['TL_DCA']['tl_content']['palettes']['component'] = '{type_legend},type;{include_legend},module;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
-$GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 if (\Input::get('do')) {
     $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule((\Input::get('sourceTable')?:\Input::get('do')), [
@@ -172,4 +172,13 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cmOffset'] = [
     ],
     'exclude' => true,
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
+];
+$GLOBALS['TL_DCA']['tl_content']['fields']['cmRadiusSearch'] = [
+    'inputType' => 'checkbox',
+    'eval' => [
+        'multiple' => false,
+        'tl_class' => 'clr'
+    ],
+    'exclude' => true,
+    'sql' => "char(1) NOT NULL default ''"
 ];
