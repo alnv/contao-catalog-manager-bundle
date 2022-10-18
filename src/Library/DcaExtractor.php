@@ -61,8 +61,10 @@ class DcaExtractor extends \DcaExtractor {
     public function hasVisibility() {
 
         $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($this->strTable);
+
         if ($objCatalog !== null) {
-            return $objCatalog->enableVisibility ? true : false;
+
+            return (bool) $objCatalog->enableVisibility;
         }
 
         return isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['start']) && isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['stop']) && isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['published']);

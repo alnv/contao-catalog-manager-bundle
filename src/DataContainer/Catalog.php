@@ -224,7 +224,7 @@ class Catalog {
             $objDataContainer->id = $intId;
         }
 
-        if (is_array($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'])) {
+        if (isset($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback']) && is_array($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'])) {
             foreach ($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'] as $callback) {
                 if (is_array($callback)) {
                     $this->import($callback[0]);
@@ -249,7 +249,7 @@ class Catalog {
         $objVersions = new \Versions( $strTable, $intId );
         $objVersions->initialize();
 
-        if (is_array($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'])) {
+        if (isset($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback']) && is_array($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'])) {
             foreach ($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'] as $callback) {
                 if (is_array($callback)) {
                     $this->import($callback[0]);

@@ -545,11 +545,12 @@ class Toolkit {
         $objDatabase = \Database::getInstance();
 
         foreach ($arrFields as $strFieldname => $arrField) {
-            if (!isset( $arrField['eval'])) {
+
+            if (!isset($arrField['eval'])) {
                 continue;
             }
 
-            if (!$arrField['eval']['useAsAlias']) {
+            if (!isset($arrField['eval']['useAsAlias']) || !$arrField['eval']['useAsAlias']) {
                 continue;
             }
 

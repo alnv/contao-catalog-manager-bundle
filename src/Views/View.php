@@ -195,11 +195,14 @@ abstract class View extends \Controller {
             }
         }
 
-        if ($this->dcaExtractor->hasVisibility() == true && !$this->arrOptions['ignoreVisibility']) {
+        if ($this->dcaExtractor->hasVisibility() && (!isset($this->arrOptions['ignoreVisibility']) || !$this->arrOptions['ignoreVisibility'])) {
+
             if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
                 $arrReturn['column'] = [];
             }
+
             $blnIsPreview = defined('BE_USER_LOGGED_IN') && BE_USER_LOGGED_IN === true;
+
             if (!$blnIsPreview) {
                 $intTime = \Date::floorToMinute();
                 $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
