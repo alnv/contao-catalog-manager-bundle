@@ -2,7 +2,8 @@
   "name": "alnv/catalog-manager-bundle",
   "type": "contao-bundle",
   "license": "proprietary",
-  "description": "",
+  "description": "Catalog Manager v2 for Contao CMS",
+  "keywords": ["contao", "catalog", "filter", "taxonomy", "frontend editing", "radius search"],
   "homepage": "https://catalog-manager.org",
   "authors": [
     {
