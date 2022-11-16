@@ -44,7 +44,7 @@
     "alnv/contao-geocoding": "^2.1"
   },
   "conflict": {
-    "alnv/catalogmanager": "*"
+    "alnv/catalog-manager": "*"
   },
   "config": {
     "preferred-install": "dist"
