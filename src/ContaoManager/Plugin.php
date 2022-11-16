@@ -11,7 +11,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
 class Plugin implements BundlePluginInterface, RoutingPluginInterface {
 
-    public function getBundles( ParserInterface $parser ) {
+    public function getBundles(ParserInterface $parser) {
 
         return [
             BundleConfig::create('Alnv\ContaoCatalogManagerBundle\AlnvContaoCatalogManagerBundle')
@@ -24,7 +24,7 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface {
         ];
     }
 
-    public function getRouteCollection( LoaderResolverInterface $resolver, KernelInterface $kernel ) {
+    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel) {
 
         return $resolver
             ->resolve( __DIR__ . '/../Resources/config/routing.yml' )
