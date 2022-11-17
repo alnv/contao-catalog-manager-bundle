@@ -6,9 +6,9 @@ class DynModel extends \Model {
 
     public static $strTable = '';
 
-    public function __construct( $objResult = null ) {
+    public function __construct($objResult = null) {
 
-        if ( !static::$strTable ) {
+        if (!static::$strTable) {
             return null;
         }
 
@@ -39,12 +39,12 @@ class DynModel extends \Model {
         return static::find($arrOptions);
     }
 
-    protected static function buildFindQuery( array $arrOptions ) {
+    protected static function buildFindQuery(array $arrOptions) {
 
-        $objBase = \DcaExtractor::getInstance( $arrOptions['table'] );
+        $objBase = \DcaExtractor::getInstance($arrOptions['table']);
         $strDistanceSelection = '';
 
-        if ( isset( $arrOptions['distance'] ) ) {
+        if (isset($arrOptions['distance'])) {
 
             $strDistanceSelection = sprintf(
                 ",3956 * 1.6 * 2 * ASIN(SQRT(POWER(SIN((%s-abs(%s.`%s`)) * pi()/180 / 2),2) + COS(%s * pi()/180) * COS(abs(%s.`%s`) *  pi()/180) * POWER( SIN( (%s-%s.`%s`) *  pi()/180 / 2 ), 2 ))) AS _distance ",
@@ -60,11 +60,9 @@ class DynModel extends \Model {
             );
         }
 
-        if ( !$objBase->hasRelations() ) {
-
+        if (!$objBase->hasRelations()) {
             $strQuery = "SELECT *$strDistanceSelection FROM " . $arrOptions['table'];
-        }
-        else {
+        } else {
 
             $arrJoins = [];
             $arrFields = [ $arrOptions['table'] . ".*" ];
@@ -91,19 +89,19 @@ class DynModel extends \Model {
             $strQuery = "SELECT " . implode(', ', $arrFields ) . $strDistanceSelection . " FROM " . $arrOptions['table'] . implode( "", $arrJoins );
         }
 
-        if ( isset( $arrOptions['column'] ) ) {
-            $strQuery .= " WHERE " . ( is_array($arrOptions['column'] ) ? implode(" AND ", $arrOptions['column'] ) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column'] ) . "=?");
+        if (isset($arrOptions['column'])) {
+            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column']) . "=?");
         }
 
-        if ( isset( $arrOptions['group'] ) ) {
+        if (isset($arrOptions['group'])) {
             $strQuery .= " GROUP BY " . $arrOptions['group'];
         }
 
-        if ( isset( $arrOptions['having'] ) ) {
+        if (isset($arrOptions['having'])) {
             $strQuery .= " HAVING " . $arrOptions['having'];
         }
 
-        if ( isset( $arrOptions['order'] ) ) {
+        if (isset($arrOptions['order'])) {
             $strQuery .= " ORDER BY " . $arrOptions['order'];
         }
 
