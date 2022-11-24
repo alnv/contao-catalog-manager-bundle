@@ -1,6 +1,6 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.0.13");
+define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.0");
 
 array_insert( $GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -13,17 +13,23 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_palette'
             ]
         ],
-        'catalog-element' => [
-            'name' => 'catalog-element-bundle',
+        'reactions' => [
+            'name' => 'reactions',
             'tables' => [
-                'tl_catalog_element',
-                'tl_content'
+                'tl_catalog_reactions'
             ]
         ],
         'watchlist' => [
             'name' => 'watchlist',
             'tables' => [
                 'tl_watchlist'
+            ]
+        ],
+        'catalog-element' => [
+            'name' => 'catalog-element-bundle',
+            'tables' => [
+                'tl_catalog_element',
+                'tl_content'
             ]
         ]
     ]
@@ -433,6 +439,8 @@ $GLOBALS['TL_MODELS']['tl_catalog_data'] = 'Alnv\ContaoCatalogManagerBundle\Mode
 $GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
 $GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
 $GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';
+$GLOBALS['TL_MODELS']['tl_catalog_reactions'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel';
+$GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel';
 
 if (class_exists('Alnv\ContaoAssetsManagerBundle\Library\AssetsManager')) {
     $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();

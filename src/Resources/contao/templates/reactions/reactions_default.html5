@@ -1,0 +1,30 @@
+<?php if (!empty($this->reaction)): ?>
+<div class="ce_reactions">
+    <div class="reaction">
+        <a href="<?= $this->reaction['href'] ?>" id="reid_<?= $this->reaction['key'] ?>">
+            <?php if ($this->reaction['icon']): ?>
+                <img src="<?= $this->reaction['icon'] ?>" alt="<?= $this->reaction['name'] ?>">
+            <?php endif; ?>
+            <?php if ($this->reaction['name']): ?>
+                <span class="name"><?= $this->reaction['name'] ?></span>
+            <?php endif; ?>
+        </a>
+        <?php if (!empty($this->reactions)): ?>
+            <ul class="list">
+                <?php foreach ($this->reactions as $arrReaction): ?>
+                    <li class="item">
+                        <a href="<?= $arrReaction['href'] ?>" id="reid_<?= $arrReaction['key'] ?>">
+                            <?php if ($arrReaction['icon']): ?>
+                                <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
+                            <?php endif; ?>
+                            <?php if ($arrReaction['name']): ?>
+                                <span class="name"><?= $arrReaction['name'] ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
