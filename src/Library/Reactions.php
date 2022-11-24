@@ -9,6 +9,11 @@ class Reactions {
 
     public function __construct($strTable, $strCatalogReactionsId) {
 
+        $objCombiner = new \Combiner();
+        $objCombiner->add('bundles/alnvcontaocatalogmanager/css/reactions.scss');
+
+        $GLOBALS['TL_CSS']['reactions'] = $objCombiner->getCombinedFile();
+
         $this->strTable = $strTable;
         $this->strCatalogReactionId = $strCatalogReactionsId;
 
@@ -56,8 +61,9 @@ class Reactions {
             return '';
         }
 
-        $objTemplate = new \FrontendTemplate($objReaction->template);
+        $strId = uniqid();
         $arrReactions = [];
+        $objTemplate = new \FrontendTemplate($objReaction->template);
         $arrActiveReaction = $this->getActiveReaction($strIdentifier);
 
         foreach (\StringUtil::deserialize($objReaction->reactions, true) as $arrReaction) {
@@ -70,6 +76,7 @@ class Reactions {
                 'key' => $arrReaction['key'],
                 'name' => $arrReaction['name'] ?? '',
                 'data' => $arrActiveReaction,
+                'id' => 'reid_' . $arrReaction['key'] . '_' . $strId,
                 'active' => !empty($arrActiveReaction) && ($arrActiveReaction['reaction_key'] == $arrReaction['key']),
                 'href' => $this->getHrefByIdentifier($strIdentifier, $arrReaction),
                 'icon' => $this->getIcon($arrReaction['icon']),
@@ -90,6 +97,7 @@ class Reactions {
         }
 
         $objTemplate->setData([
+            'id' => 'reaction-' . $this->strCatalogReactionId,
             'reaction' => $arrFirstReaction,
             'reactions' => $arrReactions
         ]);
