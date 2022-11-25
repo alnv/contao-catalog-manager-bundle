@@ -121,11 +121,13 @@ class Toolkit {
         $strTemplate = str_replace(["\r\n", "\r"], "\n", $strTemplate);
         $arrLines = explode("\n", $strTemplate);
         $arrNewLines = [];
+
         foreach ($arrLines as $strLine) {
             if(!empty($strLine))
                 $arrNewLines[] = trim($strLine);
         }
-        return implode($arrNewLines);
+
+        return implode('', $arrNewLines);
     }
 
     public static function getFilterValue($strField) {
@@ -341,8 +343,8 @@ class Toolkit {
             $arrLabels[] = $strValue;
         }
 
-        if (!empty($arrLabels)) {
-            $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode( $arrLabels, ' - ' ) .')</span>' . '</div>';
+        if (is_array($arrLabels) && !empty($arrLabels)) {
+            $strTemplate .= '<span style="color:#999;padding-left:3px">('. implode(' - ', $arrLabels) .')</span>' . '</div>';
         }
 
         return $strTemplate;
