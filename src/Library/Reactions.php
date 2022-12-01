@@ -53,6 +53,13 @@ class Reactions {
         }
     }
 
+    public function count($strIdentifier, $strKey) {
+
+        $objCount = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_reactions_data WHERE `table`=? AND identifier=? AND reaction_key=?')->execute($this->strTable, $strIdentifier, $strKey);
+
+        return $objCount->numRows;
+    }
+
     public function getReactions($strIdentifier) {
 
         $objReaction = \Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel::findByPk($this->strCatalogReactionId);
@@ -76,6 +83,7 @@ class Reactions {
                 'key' => $arrReaction['key'],
                 'name' => $arrReaction['name'] ?? '',
                 'data' => $arrActiveReaction,
+                'count' => $this->count($strIdentifier, $arrReaction['key']),
                 'id' => 'reid_' . $arrReaction['key'] . '_' . $strId,
                 'active' => !empty($arrActiveReaction) && ($arrActiveReaction['reaction_key'] == $arrReaction['key']),
                 'href' => $this->getHrefByIdentifier($strIdentifier, $arrReaction),

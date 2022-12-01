@@ -6,7 +6,7 @@
                 <img src="<?= $this->reaction['icon'] ?>" alt="<?= $this->reaction['name'] ?>">
             <?php endif; ?>
             <?php if ($this->reaction['name']): ?>
-                <span class="name"><?= $this->reaction['name'] ?></span>
+                <span class="name"><?= $this->reaction['name'] ?></span><span class="count"><?= $this->reaction['count'] ?></span>
             <?php endif; ?>
         </a>
         <?php if (!empty($this->reactions)): ?>
@@ -18,7 +18,7 @@
                                 <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
                             <?php endif; ?>
                             <?php if ($arrReaction['name']): ?>
-                                <span class="name"><?= $arrReaction['name'] ?></span>
+                                <span class="name"><?= $arrReaction['name'] ?></span><span class="count"><?= $arrReaction['count'] ?></span>
                             <?php endif; ?>
                         </a>
                     </li>
