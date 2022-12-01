@@ -71,16 +71,5 @@ class Watchlist {
     public static function getSessionId() {
 
         return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getSessionId();
-        /*
-        $objSession = \System::getContainer()->get('session');
-        $strSessionId = $objSession->get('watchlist-session');
-
-        if (!$strSessionId) {
-            $strSessionId = substr(md5(uniqid() . '.' . time()), 0, 64);
-            $objSession->set('watchlist-session', $strSessionId);
-        }
-
-        return $strSessionId;
-        */
     }
 }

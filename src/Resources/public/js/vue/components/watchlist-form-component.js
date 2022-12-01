@@ -1,9 +1,11 @@
+'use strict';
+
 const WatchlistFormComponent = Vue.component('watchlist-form', {
     data: function () {
         return {
             items: 1,
             hasItems: false
-        }
+        };
     },
     methods: {
         getButtonLabel: function () {
