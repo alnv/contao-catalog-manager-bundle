@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => ['type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter'],
+        '__selector__' => ['type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter', 'rte'],
         'default' => '{general_settings},name,type',
         'explanation' => '{general_settings},name,type,fieldname,text;{published_legend},published',
         'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',
@@ -79,6 +79,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'listWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory;{published_legend},published',
     ],
     'subpalettes' => [
+        'rte' => 'rteType',
         'dbFilter' => 'dbFilterType',
         'dbFilterType_expert' => 'dbFilterColumn,dbFilterValue',
         'dbFilterType_wizard' => 'dbWizardFilterSettings',
@@ -249,9 +250,20 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'inputType' => 'checkbox',
             'eval' => [
                 'tl_class' => 'clr',
-                'multiple' => false
+                'multiple' => false,
+                'submitOnChange' => true
             ],
             'sql' => "char(1) NOT NULL default ''"
+        ],
+        'rteType' => [
+            'inputType' => 'select',
+            'default' => 'tinyMCE',
+            'eval' => [
+                'tl_class' => 'w50',
+                'decodeEntities' => true
+            ],
+            'options' => ['tinyMCE', 'ace|html'],
+            'sql' => "varchar(16) NOT NULL default ''"
         ],
         'published' => [
             'inputType' => 'checkbox',

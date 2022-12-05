@@ -22,7 +22,7 @@ class Catalog extends CatalogWizard {
         $this->strIdentifier = $strIdentifier;
         $objCatalog = CatalogModel::findByTableOrModule( $this->strIdentifier );
 
-        if ( $objCatalog === null ) {
+        if ($objCatalog === null) {
             return null;
         }
 
@@ -34,14 +34,15 @@ class Catalog extends CatalogWizard {
             'order' => 'sorting ASC'
         ]);
 
-        if ( $objFields === null ) {
+        if ($objFields === null) {
             return null;
         }
 
-        while ( $objFields->next() ) {
+        while ($objFields->next()) {
 
             $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
-            if ( $arrField === null ) {
+
+            if ($arrField === null) {
                 continue;
             }
 
