@@ -1,7 +1,5 @@
 .ce_reactions {
-  .primary-reaction {
-    position: relative;
-  }
+  display: inline-block;
   .reaction {
     display: flex;
     &:active,
@@ -37,7 +35,8 @@
     }
   }
   &.loading {
-    .primary-reaction {
+    .reaction {
+      position: relative;
       &:after {
         content: '';
         display: block;
@@ -48,9 +47,9 @@
         top: 0;
         background-image: url('/system/themes/flexible/icons/loading.svg');
         background-repeat: no-repeat;
-        background-position: top center;
-        background-size: 50% 50%;
-        background-color: rgba(255, 255, 255, .7);
+        background-position: center center;
+        background-size: 45% 45%;
+        background-color: rgba(255, 255, 255, .8);
       }
     }
   }

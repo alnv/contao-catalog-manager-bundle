@@ -1,23 +1,21 @@
 <?php if (!empty($this->reaction)): ?>
 <div class="ce_reactions" id="<?= $this->id ?>">
     <div class="reaction">
-        <a href="<?= $this->reaction['href'] ?>" id="<?= $this->reaction['id'] ?>" class="primary-reaction<?= $this->reaction['active']?' active':'' ?>">
+        <a href="<?= $this->reaction['href'] ?>" id="<?= $this->reaction['id'] ?>" class="primary-reaction reaction-link<?= $this->reaction['active']?' active':'' ?>">
             <?php if ($this->reaction['icon']): ?>
                 <img src="<?= $this->reaction['icon'] ?>" alt="<?= $this->reaction['name'] ?>">
             <?php endif; ?>
-            <?php if ($this->reaction['name']): ?>
-                <span class="name"><?= $this->reaction['name'] ?></span><span class="count"><?= $this->reaction['count'] ?></span>
-            <?php endif; ?>
+            <span class="count"><?= $this->reaction['count'] ?></span>
         </a>
         <?php if (!empty($this->reactions)): ?>
             <ul class="list">
                 <?php foreach ($this->reactions as $arrReaction): ?>
                     <li>
-                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>" title="<?= $arrReaction['name'] ?>">
+                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>" title="<?= $arrReaction['name'] ?>" class="reaction-link">
                             <?php if ($arrReaction['icon']): ?>
                                 <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
                             <?php endif; ?>
-                                <span class="count"><?= $arrReaction['count'] ?></span>
+                            <span class="count"><?= $arrReaction['count'] ?></span>
                         </a>
                     </li>
                 <?php endforeach; ?>
