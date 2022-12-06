@@ -13,13 +13,11 @@
             <ul class="list">
                 <?php foreach ($this->reactions as $arrReaction): ?>
                     <li>
-                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>">
+                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>" title="<?= $arrReaction['name'] ?>">
                             <?php if ($arrReaction['icon']): ?>
                                 <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
                             <?php endif; ?>
-                            <?php if ($arrReaction['name']): ?>
-                                <span class="name"><?= $arrReaction['name'] ?></span><span class="count"><?= $arrReaction['count'] ?></span>
-                            <?php endif; ?>
+                                <span class="count"><?= $arrReaction['count'] ?></span>
                         </a>
                     </li>
                 <?php endforeach; ?>
