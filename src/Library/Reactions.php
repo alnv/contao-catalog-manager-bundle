@@ -105,7 +105,7 @@ class Reactions {
         }
 
         $objTemplate->setData([
-            'id' => 'reaction-' . $this->strCatalogReactionId,
+            'id' => 'reaction-' . $this->strCatalogReactionId . '-' . $strIdentifier,
             'reaction' => $arrFirstReaction,
             'reactions' => $arrReactions
         ]);
