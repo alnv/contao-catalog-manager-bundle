@@ -412,10 +412,12 @@ class Toolkit {
                 if ($blnFastMode) {
                     return Image::getUuids($varValue);
                 }
-                if ($arrField['isImage'] || $arrField['isGallery']) {
+                if ((isset($arrField['isImage']) && $arrField['isImage']) || (isset($arrField['isGallery']) && $arrField['isGallery'])) {
+
                     $arrImages = [];
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
+
                 if ($arrField['isFile']) {
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
