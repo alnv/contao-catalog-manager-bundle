@@ -35,7 +35,7 @@ class DcaExtractor extends \DcaExtractor {
                     foreach ($GLOBALS['TL_DCA'][$this->strTable]['list']['sorting']['fields'] as $strField) {
                         $strTable = $this->strTable;
                         if ($this->getDataContainer() == 'Multilingual') {
-                            $strTable = 'translation';
+                            // $strTable = 'translation';
                         }
                         $arrOrder = explode(' ', $strField);
                         $arrOrderBy[] = $strTable . '.' . $arrOrder[0] . ' ' . strtoupper($arrOrder[1] ?: $strFlag);
