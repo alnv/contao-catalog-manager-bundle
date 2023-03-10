@@ -2,12 +2,14 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
-class CatalogField {
+class CatalogField
+{
 
-    public function checkExtensions($varValue, \DataContainer $dc) {
+    public function checkExtensions($varValue, \DataContainer $dc)
+    {
 
         $varValue = strtolower($varValue);
         $arrExtensions = \StringUtil::trimsplit(',', $varValue);
@@ -21,12 +23,14 @@ class CatalogField {
         return $varValue;
     }
 
-    public function listFields( $arrRow ) {
+    public function listFields($arrRow)
+    {
 
-        return $arrRow['name'] . '<span style="color:#999;padding-left:3px">['. $arrRow['fieldname'] .']</span>';
+        return $arrRow['name'] . '<span style="color:#999;padding-left:3px">[' . $arrRow['fieldname'] . ']</span>';
     }
 
-    public function getFieldTypes() {
+    public function getFieldTypes()
+    {
 
         $arrReturn = [];
         foreach ($GLOBALS['CM_FIELDS'] as $strType) {
@@ -35,7 +39,8 @@ class CatalogField {
         return $arrReturn;
     }
 
-    public function getRoles(\DataContainer $dc) {
+    public function getRoles(\DataContainer $dc)
+    {
 
         $arrRoles = array_keys($GLOBALS['CM_ROLES']);
 
@@ -59,7 +64,8 @@ class CatalogField {
         return $arrRoles;
     }
 
-    public function watchFieldname($strFieldname, \DataContainer $objDataContainer) {
+    public function watchFieldname($strFieldname, \DataContainer $objDataContainer)
+    {
 
         $objDatabase = \Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
@@ -86,7 +92,7 @@ class CatalogField {
         }
 
         if ($objDataContainer->activeRecord->fieldname && $strFieldname != $objDataContainer->activeRecord->fieldname) {
-            if (!$objDatabaseBuilder->renameFieldname( $objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql)) {
+            if (!$objDatabaseBuilder->renameFieldname($objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql)) {
                 throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
             }
             return $strFieldname;
@@ -99,7 +105,8 @@ class CatalogField {
         return $strFieldname;
     }
 
-    public function changeFieldType($strValue, \DataContainer $objDataContainer) {
+    public function changeFieldType($strValue, \DataContainer $objDataContainer)
+    {
 
         if (!$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname) {
             return $strValue;
@@ -120,17 +127,18 @@ class CatalogField {
         return $strValue;
     }
 
-    public function getImageSizes() {
+    public function getImageSizes()
+    {
 
         $arrReturn = [];
         $objDatabase = \Database::getInstance();
         $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
 
-        if ( !$objImagesSize->numRows ) {
+        if (!$objImagesSize->numRows) {
             return $arrReturn;
         }
 
-        while ( $objImagesSize->next() ) {
+        while ($objImagesSize->next()) {
             $arrReturn[$objImagesSize->id] = $objImagesSize->name;
         }
 

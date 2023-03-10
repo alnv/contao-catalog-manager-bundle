@@ -15,20 +15,25 @@ class Element {
         }
 
         if ($objRequest->get('_scope') == 'frontend') {
-            if ($objElement->cmHideOnDetailPage && $_GET['auto_item']) { // backwards
+
+            $strAutoItem = $_GET['auto_item'] ?? '';
+
+            if ($objElement->cmHideOnDetailPage && $strAutoItem) { // backwards
                 return false;
             }
+
             if (!$objElement->cmHide) {
                 return $blnIsVisible;
             }
+
             switch ($objElement->cmHide) {
                 case 'autoitem':
-                    if ($_GET['auto_item']) {
+                    if ($strAutoItem) {
                         return false;
                     }
                     break;
                 case 'default':
-                    if (!$_GET['auto_item']) {
+                    if (!$strAutoItem) {
                         return false;
                     }
                     break;
