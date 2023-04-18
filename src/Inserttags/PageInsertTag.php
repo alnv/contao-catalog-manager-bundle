@@ -40,8 +40,9 @@ class PageInsertTag {
             }
 
             if ($blnTranslate) {
-                $objTransPage = \PageModel::findByPk($strPageId);
-                $strPageId = $objTransPage ? $objTransPage->languageMain : $objPage->languageMain;
+                if ($objPage->rootFallbackLanguage != $GLOBALS['TL_LANGUAGE']) {
+                    $strPageId = $objPage->languageMain;
+                }
             }
 
             return serialize($this->getCurrentAndAllSubPages($strPageId, $blnReverse));
