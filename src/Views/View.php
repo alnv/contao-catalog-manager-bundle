@@ -430,7 +430,7 @@ abstract class View extends \Controller {
 
     public function getPagination() {
 
-        if (!$this->arrOptions['pagination']) {
+        if (!($this->arrOptions['pagination']??'')) {
             return '';
         }
 

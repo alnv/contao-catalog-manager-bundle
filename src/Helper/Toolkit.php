@@ -141,7 +141,10 @@ class Toolkit
     public static function getFilterValue($strField)
     {
 
-        $arrActiveRecord = \Cache::get('activeRecord') ?: [];
+        $arrActiveRecord = [];
+        if (\Cache::has('activeRecord')) {
+            $arrActiveRecord = \Cache::get('activeRecord') ?: [];
+        }
         $varValue = \Input::get($strField) ?: \Input::post($strField);
 
         if (!$varValue && !empty($arrActiveRecord)) {
@@ -287,9 +290,7 @@ class Toolkit
             if (!isset($arrOrder['field']) || !$arrOrder['field']) {
                 return '';
             }
-            if (!$arrOrder['order']) {
-                $arrOrder['order'] = 'ASC';
-            }
+            $arrOrder['order'] = $arrOrder['order'] ?? 'ASC';
             return $arrOrder['field'] . ' ' . $arrOrder['order'];
         }, $arrOrders)));
     }
@@ -412,7 +413,7 @@ class Toolkit
                     $arrField['value'] = explode($arrField['csv'], $arrField['value']);
                 }
                 $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
-                $arrOptionValues = static::getSelectedOptions($varValue, $arrField['options']);
+                $arrOptionValues = static::getSelectedOptions($varValue, ($arrField['options']??[]));
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
                 }
@@ -468,8 +469,12 @@ class Toolkit
                     if ($blnStringFormat) {
                         $arrValues[] = $objPage->pageTitle ?: $objPage->title;
                     } else {
+                        $strUrl = '';
+                        try {
+                            $strUrl = $objPage->getFrontendUrl();
+                        } catch (\Exception $objException) {}
                         $arrValues[$strPageId] = [
-                            'url' => $objPage->getFrontendUrl(),
+                            'url' => $strUrl,
                             'master' => $objPage->getFrontendUrl('/' . $arrCatalog['alias']),
                             'absolute' => $objPage->getAbsoluteUrl('/' . $arrCatalog['alias'])
                         ];
