@@ -2,7 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class ShareButtons {
+class ShareButtons
+{
 
     protected $arrShareButtons = [
 
@@ -15,24 +16,26 @@ class ShareButtons {
 
     protected $arrEntity = [];
 
-    public function __construct( $arrEntity ) {
+    public function __construct($arrEntity)
+    {
 
         $this->arrEntity = $arrEntity;
     }
 
-    public function getShareButtons($arrButtons=[]) {
+    public function getShareButtons($arrButtons = [])
+    {
 
         $strTemplate = '';
 
-        if ( !empty( $arrButtons ) && is_array( $arrButtons ) ) {
+        if (!empty($arrButtons) && is_array($arrButtons)) {
 
             $this->arrShareButtons = $arrButtons;
         }
 
-        foreach ( $this->arrShareButtons as $strButton ) {
+        foreach ($this->arrShareButtons as $strButton) {
 
-            $objTemplate = new \FrontendTemplate( 'cm_share_button_' . $strButton );
-            $objTemplate->setData( $this->arrEntity );
+            $objTemplate = new \FrontendTemplate('cm_share_button_' . $strButton);
+            $objTemplate->setData($this->arrEntity);
             $strTemplate .= $objTemplate->parse();
         }
 
