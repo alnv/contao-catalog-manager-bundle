@@ -335,7 +335,7 @@ class Toolkit
             }
         }
 
-        if (count($arrColumns) < 2) {
+        if (count($arrColumns) < 2 && $arrCatalog['showColumns']) {
             return array_values($arrColumns)[0];
         }
 

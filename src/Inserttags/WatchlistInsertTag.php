@@ -11,8 +11,8 @@ class WatchlistInsertTag {
         $arrFragments = explode('::', $strFragment);
 
         $arrOptions = [];
-        $strType = $arrFragments[0] ?: '';
-        $strParams = $arrFragments[1] ?: '';
+        $strType = $arrFragments[0] ?? '';
+        $strParams = $arrFragments[1] ?? '';
 
         if (!in_array($strType, ['WATCHLIST', 'WATCHLIST-TABLE', 'WATCHLIST-RESET', 'WATCHLIST-COUNT'])) {
             return false;
