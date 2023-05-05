@@ -41,7 +41,7 @@
     "alnv/form-manager-bundle": "^2.0",
     "alnv/translation-manager-bundle": "^2.0",
     "alnv/widget-collection-bundle": "^2.0",
-    "alnv/catalog-manager-multilingual-adapter-bundle": "^2.0",
+    "alnv/catalog-manager-multilingual-adapter-bundle": "^2.1",
     "alnv/contao-geocoding": "^2.1"
   },
   "conflict": {

@@ -28,6 +28,9 @@ class Options {
 
     protected static function getGetterId() {
 
+        self::$arrField['id'] = self::$arrField['id'] ?? '';
+        self::$arrField['fieldname'] = self::$arrField['fieldname'] ?? '';
+
         return (self::$arrField['fieldname']?self::$arrField['fieldname'] . '.':'') . (self::$arrField['id']?:static::$strInstanceId);
     }
 

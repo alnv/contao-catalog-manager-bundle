@@ -1,0 +1,60 @@
+<?php if (!empty($this->reaction)): ?>
+<div class="ce_reactions" id="<?= $this->id ?>">
+    <div class="reaction">
+        <a href="<?= $this->reaction['href'] ?>" id="<?= $this->reaction['id'] ?>" class="primary-reaction reaction-link<?= $this->reaction['active']?' active':'' ?>">
+            <?php if ($this->reaction['icon']): ?>
+                <img src="<?= $this->reaction['icon'] ?>" alt="<?= $this->reaction['name'] ?>">
+            <?php endif; ?>
+            <span class="count"><?= $this->reaction['count'] ?></span>
+        </a>
+        <?php if (!empty($this->reactions)): ?>
+            <ul class="list">
+                <?php foreach ($this->reactions as $arrReaction): ?>
+                    <li>
+                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>" title="<?= $arrReaction['name'] ?>" class="reaction-link">
+                            <?php if ($arrReaction['icon']): ?>
+                                <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
+                            <?php endif; ?>
+                            <span class="count"><?= $arrReaction['count'] ?></span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+    (function () {
+        function setReactions() {
+            let objReaction = document.querySelector('#<?= $this->id ?>');
+            if (objReaction) {
+                let arrLinks = objReaction.querySelectorAll('a');
+                for (let i=0;i<arrLinks.length;i++) {
+                    let objLink = arrLinks[i];
+                    if (!objLink) {
+                        continue;
+                    }
+                    objLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        objReaction.classList.add('loading');
+                        let strUrl = this.href;
+                        let objXHttp = new XMLHttpRequest();
+                        objXHttp.onreadystatechange = function() {
+                            if (this.readyState === 4 && this.status === 200) {
+                                let objEmpty = document.createElement('div');
+                                objEmpty.innerHTML = objXHttp.responseText;
+                                objReaction.innerHTML = objEmpty.querySelector('#<?= $this->id ?>').innerHTML;
+                                objReaction.classList.remove('loading');
+                                setReactions();
+                            }
+                        };
+                        objXHttp.open("GET", strUrl, true);
+                        objXHttp.send();
+                    });
+                }
+            }
+        }
+        setReactions();
+    })();
+</script>
+<?php endif; ?>

@@ -3,6 +3,7 @@
 $GLOBALS['TL_LANG']['tl_module']['master_settings'] = 'Detail-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['listing_settings'] = 'Listen-Einstellungen';
 $GLOBALS['TL_LANG']['tl_module']['radius_search_settings'] = 'Umkreissuche-Einstellungen';
+$GLOBALS['TL_LANG']['tl_module']['performance_settings'] = 'Performance-Einstellungen';
 
 $GLOBALS['TL_LANG']['tl_module']['cmTable'] = [ 'Tabelle', '' ];
 $GLOBALS['TL_LANG']['tl_module']['cmTemplate'] = [ 'Template', '' ];
@@ -23,6 +24,7 @@ $GLOBALS['TL_LANG']['tl_module']['cmWizardFilterSettings'] = [ 'Filtereinstellun
 $GLOBALS['TL_LANG']['tl_module']['cmInfoContent'] = ['Info-Fenster Inhalt', ''];
 $GLOBALS['TL_LANG']['tl_module']['cmOrder'] = ['Sortierung', ''];
 $GLOBALS['TL_LANG']['tl_module']['cmIgnoreVisibility'] = ['Elemente immer anzeigen', 'Auch unveröffentlichte Daten werden angezeigt'];
+$GLOBALS['TL_LANG']['tl_module']['cmIgnoreFieldsFromParsing'] = ['Felder nicht parsen', ''];
 
 $GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'] = [
     'expert' => 'Experte',

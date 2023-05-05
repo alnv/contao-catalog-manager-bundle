@@ -103,7 +103,7 @@ abstract class CatalogWizard extends \System {
             return null;
         }
 
-        $blnMultiple = $arrField['multiple'] ? true : false;
+        $blnMultiple = (bool) $arrField['multiple'];
         $arrField['description'] = trim(strip_tags($arrField['description']));
         $arrReturn = [
             'sorting' => !$blnMultiple,
@@ -119,7 +119,7 @@ abstract class CatalogWizard extends \System {
                 'multiple' => $blnMultiple,
                 'role' => $arrField['role'] ?: '',
                 'useAsAlias' => $arrField['useAsAlias'] ?: '',
-                'mandatory' => $arrField['mandatory'] ? true : false,
+                'mandatory' => (bool) $arrField['mandatory'],
                 'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
@@ -225,8 +225,8 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['search'] = true;
                 $arrReturn['inputType'] = 'textarea';
                 $arrReturn['eval']['tl_class'] = 'clr';
-                if ( $arrField['rte'] ) {
-                    $arrReturn['eval']['rte'] = 'tinyMCE';
+                if (isset($arrField['rte']) && $arrField['rte']) {
+                    $arrReturn['eval']['rte'] = $arrField['rteType'] ?: 'tinyMCE';
                 }
                 break;
             case 'empty':

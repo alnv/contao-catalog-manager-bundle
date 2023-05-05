@@ -13,39 +13,63 @@ class PageInsertTag {
             global $objPage;
 
             $strPageId = $objPage->id;
+            $blnUseParent = false;
+            $blnTranslate = false;
+            $blnReverse = false;
+
             if (isset($arrFragments[1]) && strpos($arrFragments[1], '?') !== false) {
                 $arrParams = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseParametersFromString($arrFragments[1]);
                 foreach ($arrParams as $strParam) {
                     list($strKey, $strOption) = explode('=', $strParam);
                     switch ($strKey) {
                         case 'useParent':
-                            $strPageId = $objPage->pid;
+                            $blnUseParent = true;
                             break;
                         case 'translate':
-                            if ($objPage->languageMain) {
-                                $strPageId = $objPage->languageMain;
-                            }
+                            $blnTranslate = true;
+                            break;
+                        case 'reverse':
+                            $blnReverse = true;
                             break;
                     }
                 }
             }
 
-            return serialize($this->getCurrentAndAllSubPages($strPageId));
+            if ($blnUseParent) {
+                $strPageId = $objPage->pid;
+            }
+
+            if ($blnTranslate) {
+                if ($objPage->rootFallbackLanguage != $GLOBALS['TL_LANGUAGE']) {
+                    $strPageId = $objPage->languageMain;
+                }
+            }
+
+            return serialize($this->getCurrentAndAllSubPages($strPageId, $blnReverse));
         }
 
         return false;
     }
 
-    protected function getCurrentAndAllSubPages($strId, &$arrReturn=[]) {
+    protected function getCurrentAndAllSubPages($strId, $blnReverse, &$arrReturn=[]) {
 
         $objPage = \PageModel::findByPk($strId);
+
         if ($objPage === null) {
             return $arrReturn;
         }
-        $arrReturn[] = $strId;
-        if ($objNext = \PageModel::findPublishedByPid($objPage->id)) {
-            while ($objNext->next()) {
-                $this->getCurrentAndAllSubPages($objNext->id, $arrReturn);
+
+        if (!$blnReverse) {
+            $arrReturn[] = $strId;
+            if ($objNext = \PageModel::findPublishedByPid($objPage->id)) {
+                while ($objNext->next()) {
+                    $this->getCurrentAndAllSubPages($objNext->id, $blnReverse, $arrReturn);
+                }
+            }
+        } else {
+            $arrReturn[] = $strId;
+            if ($objPrev = \PageModel::findPublishedById($objPage->pid)) {
+                $this->getCurrentAndAllSubPages($objPrev->id, $blnReverse, $arrReturn);
             }
         }
 

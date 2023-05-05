@@ -13,6 +13,11 @@ class Breadcrumb {
         $intLastItemId = count($arrItems) -1;
         $arrItems[$intLastItemId]['isActive'] = false;
 
+        $strPageId = $arrItems[$intLastItemId]['data']['id'] ?? '';
+        if ($objPage = \PageModel::findByPk($strPageId)) {
+            $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
+        }
+
         $arrItem = [];
         $arrItem['isActive'] = true;
         $arrItem['href'] = $GLOBALS['CM_MASTER']['masterUrl'];

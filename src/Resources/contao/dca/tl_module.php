@@ -1,5 +1,7 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilter';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilterType';
@@ -9,9 +11,11 @@ $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmMaster'] = 'cmMasterPage,cmMas
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilterType_expert'] = 'cmColumn,cmValue';
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilterType_wizard'] = 'cmWizardFilterSettings';
 
-$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmIgnoreVisibility,cmTemplate;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmIgnoreVisibility,cmPagination,cmLimit,cmOffset,cmOrder,cmInfoContent;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['listing'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl,cmOrder;{radius_search_settings},cmRadiusSearch;{performance_settings:hide},cmIgnoreFieldsFromParsing;{template_legend:hide},cmTemplate,customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmIgnoreVisibility;{template_legend:hide},cmTemplate,customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmIgnoreVisibility,cmPagination,cmLimit,cmOffset,cmOrder,cmInfoContent;{radius_search_settings},cmRadiusSearch;{performance_settings:hide},cmIgnoreFieldsFromParsing;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'inputType' => 'select',
@@ -21,10 +25,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
         'tl_class' => 'w50',
         'mandatory' => true,
         'submitOnChange' => true,
-        'includeBlankOption'=> true,
+        'includeBlankOption' => true,
     ],
-    'options_callback' => [ 'catalogmanager.datacontainer.module', 'getTables' ],
-    'exclude' => true,
+    'options_callback' => ['catalogmanager.datacontainer.module', 'getTables'],
     'sql' => "varchar(128) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
@@ -36,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
         'mandatory' => true
     ],
     'options_callback' => ['catalogmanager.datacontainer.module', 'getListTemplates'],
-    'exclude' => true,
     'sql' => "varchar(255) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
@@ -45,7 +47,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
         'multiple' => false,
         'tl_class' => 'clr'
     ],
-    'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreVisibility'] = [
@@ -54,7 +55,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreVisibility'] = [
         'multiple' => false,
         'tl_class' => 'w50 m12'
     ],
-    'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
@@ -62,7 +62,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     'eval' => [
         'tl_class' => 'w50 clr'
     ],
-    'exclude' => true,
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
@@ -70,7 +69,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     'eval' => [
         'tl_class' => 'w50'
     ],
-    'exclude' => true,
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
@@ -79,10 +77,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
         'chosen' => true,
         'maxlength' => 64,
         'tl_class' => 'w50',
-        'includeBlankOption'=> true
+        'includeBlankOption' => true
     ],
-    'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
-    'exclude' => true,
+    'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => "varchar(64) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
@@ -91,10 +88,9 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
         'chosen' => true,
         'maxlength' => 2,
         'tl_class' => 'w50',
-        'includeBlankOption'=> true
+        'includeBlankOption' => true
     ],
-    'options' => [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
-    'exclude' => true,
+    'options' => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     'sql' => "varchar(2) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
@@ -105,8 +101,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
         'decodeEntities' => true,
         'options2_callback' => ['catalogmanager.datacontainer.module', 'getOrderByStatements']
     ],
-    'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
-    'sql' => ['type' => 'blob', 'notnull' => false ]
+    'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
+    'sql' => ['type' => 'blob', 'notnull' => false]
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     'inputType' => 'checkbox',
@@ -115,7 +111,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
         'tl_class' => 'clr',
         'submitOnChange' => true
     ],
-    'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilterType'] = [
@@ -125,9 +120,8 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilterType'] = [
         'tl_class' => 'clr',
         'submitOnChange' => true
     ],
-    'options' => [ 'wizard', 'expert' ],
+    'options' => ['wizard', 'expert'],
     'reference' => &$GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'],
-    'exclude' => true,
     'sql' => "varchar(12) NOT NULL default 'wizard'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
@@ -140,15 +134,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
         'enableField' => true,
         'enableGroup' => true
     ],
-    'options_callback' => [ 'catalogmanager.datacontainer.module', 'getFields' ],
-    'sql' => ['type' => 'blob', 'notnull' => false ]
+    'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
+    'sql' => ['type' => 'blob', 'notnull' => false]
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     'inputType' => 'textarea',
     'eval' => [
         'tl_class' => 'clr'
     ],
-    'exclude' => true,
     'sql' => "mediumtext NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
@@ -156,7 +149,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     'eval' => [
         'tl_class' => 'clr'
     ],
-    'exclude' => true,
     'sql' => "mediumtext NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmInfoContent'] = [
@@ -165,7 +157,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmInfoContent'] = [
         'tl_class' => 'clr',
         'allowHtml' => true
     ],
-    'exclude' => true,
     'sql' => "mediumtext NULL"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
@@ -175,7 +166,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
         'tl_class' => 'clr',
         'submitOnChange' => true
     ],
-    'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
@@ -183,14 +173,13 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     'eval' => [
         'chosen' => true,
         'tl_class' => 'w50',
-        'includeBlankOption'=> true
+        'includeBlankOption' => true
     ],
     'foreignKey' => 'tl_module.name',
     'relation' => [
         'load' => 'lazy',
         'type' => 'hasOne'
     ],
-    'exclude' => true,
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
@@ -203,7 +192,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
         'load' => 'lazy',
         'type' => 'hasOne'
     ],
-    'exclude' => true,
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
@@ -212,6 +200,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
         'multiple' => false,
         'tl_class' => 'clr'
     ],
-    'exclude' => true,
     'sql' => "char(1) NOT NULL default ''"
+];
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreFieldsFromParsing'] = [
+    'inputType' => 'checkbox',
+    'eval' => [
+        'multiple' => true,
+        'tl_class' => 'clr'
+    ],
+    'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
+    'sql' => "blob NULL"
 ];

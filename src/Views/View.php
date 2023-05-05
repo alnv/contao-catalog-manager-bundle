@@ -67,6 +67,9 @@ abstract class View extends \Controller {
                 case 'ignoreVisibility':
                     $this->arrOptions['ignoreVisibility'] = $varValue;
                     break;
+                case 'ignoreFieldsFromParsing':
+                    $this->arrOptions['ignoreFieldsFromParsing'] = $varValue;
+                    break;
                 case 'order':
                     $this->arrOptions['order'] = $varValue ?: $this->dcaExtractor->getOrderBy();
                     if (!$this->arrOptions['order']) {
@@ -241,7 +244,10 @@ abstract class View extends \Controller {
         }
 
         foreach ($arrEntity as $strField => $varValue) {
-            $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, ($this->arrOptions['fastMode']??false));
+            $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, [
+                'fastMode' => $this->arrOptions['fastMode']??false,
+                'ignoreFieldsFromParsing' => $this->arrOptions['ignoreFieldsFromParsing']??[]
+            ]);
             if ($strParsedValue !== $varValue) {
                 if ($this->validOrigin($varValue, $strField)) {
                     if (\Validator::isBinaryUuid($varValue)) {
@@ -386,7 +392,10 @@ abstract class View extends \Controller {
         return $arrEntity;
     }
 
-    protected function parseField($varValue, $strField, $arrValues, $blnFastMode) {
+    protected function parseField($varValue, $strField, $arrValues, $arrOptions = []) {
+
+        $blnFastMode = $arrOptions['fastMode'] ?? false;
+        $arrIgnoreFieldsFromParsing = $arrOptions['ignoreFieldsFromParsing'] ?? [];
 
         if (isset($GLOBALS['TL_HOOKS']['parseFieldValue']) && is_array($GLOBALS['TL_HOOKS']['parseFieldValue'])) {
             $strCallback = null;
@@ -399,6 +408,10 @@ abstract class View extends \Controller {
             }
         }
 
+        if (!empty($arrIgnoreFieldsFromParsing) && in_array($strField, $arrIgnoreFieldsFromParsing)) {
+            return $varValue;
+        }
+
         $strHash = md5($strField.$varValue);
         if (\Cache::has($strHash)) {
             $arrAttribute = \Cache::get($strHash);
@@ -406,6 +419,7 @@ abstract class View extends \Controller {
             $arrAttribute = \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
             \Cache::set($strHash, $arrAttribute);
         }
+
         return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm']??false));
     }
 
@@ -416,7 +430,7 @@ abstract class View extends \Controller {
 
     public function getPagination() {
 
-        if (!$this->arrOptions['pagination']) {
+        if (!($this->arrOptions['pagination']??'')) {
             return '';
         }
 

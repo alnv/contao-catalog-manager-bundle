@@ -5,11 +5,13 @@ namespace Alnv\ContaoCatalogManagerBundle\Modules;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 
-class Listing extends \Hybrid {
+class Listing extends \Hybrid
+{
 
     protected $objModel = null;
 
-    public function generate() {
+    public function generate()
+    {
 
         if (\System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
             $objTemplate = new \BackendTemplate('be_wildcard');
@@ -38,7 +40,8 @@ class Listing extends \Hybrid {
         return parent::generate();
     }
 
-    public function setOptions() {
+    public function setOptions()
+    {
 
         $this->setOrder();
         $this->setGroup();
@@ -48,19 +51,23 @@ class Listing extends \Hybrid {
         $this->setMasterPage();
         $this->setPagination();
         $this->setIgnoreVisibility();
+        $this->setIgnoreFieldsFromParsing();
     }
 
-    public function getOptions() {
+    public function getOptions()
+    {
 
         return $this->arrOptions;
     }
 
-    public function getTable() {
+    public function getTable()
+    {
 
         return $this->cmTable;
     }
 
-    protected function compile() {
+    protected function compile()
+    {
 
         $this->arrOptions = [
             'template' => $this->cmTemplate,
@@ -75,12 +82,20 @@ class Listing extends \Hybrid {
         $this->Template->pagination = $objListing->getPagination();
     }
 
-    protected function setIgnoreVisibility() {
+    protected function setIgnoreVisibility()
+    {
 
-        $this->arrOptions['ignoreVisibility'] = $this->cmIgnoreVisibility ? true : false;
+        $this->arrOptions['ignoreVisibility'] = (bool)$this->cmIgnoreVisibility;
     }
 
-    protected function setDistance() {
+    protected function setIgnoreFieldsFromParsing()
+    {
+
+        $this->arrOptions['ignoreFieldsFromParsing'] = \StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
+    }
+
+    protected function setDistance()
+    {
 
         if (!$this->cmRadiusSearch) {
             return false;
@@ -96,7 +111,7 @@ class Listing extends \Hybrid {
         $arrAddress = [
             'street' => Toolkit::getValueFromUrl(\Input::get('street')),
             'streetNumber' => Toolkit::getValueFromUrl(\Input::get('streetNumber')),
-            'zip' => Toolkit::getValueFromUrl(\Input::get('zip')?:\Input::get('postal')),
+            'zip' => Toolkit::getValueFromUrl(\Input::get('zip') ?: \Input::get('postal')),
             'city' => Toolkit::getValueFromUrl(\Input::get('city')),
         ];
 
@@ -121,7 +136,7 @@ class Listing extends \Hybrid {
                 'lngField' => $arrGeoCodingFields['longitude']
             ];
 
-            $this->arrOptions['having'] = '_distance < ' . (int) $strRadius;
+            $this->arrOptions['having'] = '_distance < ' . (int)$strRadius;
             $this->arrOptions['order'] = '_distance ASC';
 
             return true;
@@ -130,7 +145,8 @@ class Listing extends \Hybrid {
         return false;
     }
 
-    protected function setFilter() {
+    protected function setFilter()
+    {
 
         if (!$this->cmFilter) {
             return null;
@@ -144,15 +160,15 @@ class Listing extends \Hybrid {
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-                $this->cmValue =  \Controller::replaceInsertTags($this->cmValue);
+                $this->cmValue = \Controller::replaceInsertTags($this->cmValue);
                 $this->arrOptions['column'] = explode(';', \StringUtil::decodeEntities($this->cmColumn));
                 $this->arrOptions['value'] = explode(';', \StringUtil::decodeEntities($this->cmValue));
-                if ((is_array($this->arrOptions['value']) && !empty( $this->arrOptions['value']))) {
+                if ((is_array($this->arrOptions['value']) && !empty($this->arrOptions['value']))) {
                     $intIndex = -1;
                     $this->arrOptions['value'] = array_filter($this->arrOptions['value'], function ($strValue) use (&$intIndex) {
                         $intIndex = $intIndex + 1;
                         if ($strValue === '' || $strValue === null) {
-                            unset($this->arrOptions['column'][ $intIndex ]);
+                            unset($this->arrOptions['column'][$intIndex]);
                             return false;
                         }
                         return true;
@@ -166,7 +182,8 @@ class Listing extends \Hybrid {
         }
     }
 
-    protected function setOrder() {
+    protected function setOrder()
+    {
 
         if ($this->cmOrder) {
             $strOrder = Toolkit::getOrderByStatementFromArray(\Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($this->cmOrder, [
@@ -186,7 +203,7 @@ class Listing extends \Hybrid {
                     $this->arrOptions['order'] = '';
                 }
                 if (!empty($arrIds)) {
-                    $this->arrOptions['order'] .= ($this->arrOptions['order'] ?',': '') . ('FIELD('.$this->cmTable.'.id,'. implode(',', $arrIds) .')');
+                    $this->arrOptions['order'] .= ($this->arrOptions['order'] ? ',' : '') . ('FIELD(' . $this->cmTable . '.id,' . implode(',', $arrIds) . ')');
                 }
             }
         }
@@ -196,33 +213,36 @@ class Listing extends \Hybrid {
         }
     }
 
-    protected function setPagination() {
+    protected function setPagination()
+    {
 
-        if ( $this->cmPagination ) {
-            $this->arrOptions['pagination'] = $this->cmPagination ? true: false;
+        if ($this->cmPagination) {
+            $this->arrOptions['pagination'] = $this->cmPagination ? true : false;
         }
 
-        if ( $this->cmLimit ) {
+        if ($this->cmLimit) {
             $this->arrOptions['limit'] = $this->cmLimit;
         }
 
-        if ( $this->cmOffset ) {
+        if ($this->cmOffset) {
             $this->arrOptions['offset'] = $this->cmOffset;
         }
     }
 
-    protected function setGroup() {
+    protected function setGroup()
+    {
 
-        if ( $this->cmGroupBy ) {
+        if ($this->cmGroupBy) {
             $this->arrOptions['groupBy'] = $this->cmGroupBy;
         }
 
-        if ( $this->cmGroupByHl ) {
+        if ($this->cmGroupByHl) {
             $this->arrOptions['groupByHl'] = $this->cmGroupByHl;
         }
     }
 
-    protected function setMasterPage() {
+    protected function setMasterPage()
+    {
 
         if (!$this->cmMaster) {
             return null;
@@ -235,7 +255,8 @@ class Listing extends \Hybrid {
         $this->arrOptions['masterPage'] = $this->cmMasterPage;
     }
 
-    protected function setFormPage() {
+    protected function setFormPage()
+    {
 
         if (!$this->cmForm || !$this->cmFormPage) {
             return null;
