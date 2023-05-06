@@ -6,6 +6,9 @@ use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\ArrayUtil;
+use Contao\StringUtil;
+use Contao\System;
 
 class Catalog extends CatalogWizard
 {
@@ -52,7 +55,6 @@ class Catalog extends CatalogWizard
         }
 
         $this->setDefaultFields();
-        return parent::__construct();
     }
 
     public function getCatalog()
@@ -73,7 +75,7 @@ class Catalog extends CatalogWizard
         $arrReturn = [];
 
         foreach ($this->arrFields as $strFieldname => $arrField) {
-            $arrReturn[$strFieldname] = $blnLabelOnly ? \StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
+            $arrReturn[$strFieldname] = $blnLabelOnly ? StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
         }
 
         return $arrReturn;
@@ -119,7 +121,7 @@ class Catalog extends CatalogWizard
             $arrFields[$strFieldname] = $arrField;
         }
 
-        array_insert($this->arrFields, 0, $arrFields);
+        ArrayUtil::arrayInsert($this->arrFields, 0, $arrFields);
     }
 
     public function getDefaultFieldnames()
@@ -131,7 +133,7 @@ class Catalog extends CatalogWizard
     public function getDefaultFields()
     {
 
-        \System::loadLanguageFile('default');
+        System::loadLanguageFile('default');
 
         $arrReturn = [
             'id' => [

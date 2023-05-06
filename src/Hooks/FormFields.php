@@ -2,9 +2,16 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class FormFields {
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\ArrayUtil;
+use Contao\Input;
+use Contao\Widget;
 
-    public function compileFormFields($arrFields, $strFormId, $objForm) {
+class FormFields
+{
+
+    public function compileFormFields($arrFields, $strFormId, $objForm)
+    {
 
         foreach ($arrFields as $objField) {
 
@@ -14,27 +21,29 @@ class FormFields {
                 continue;
             }
 
-            $objField->value = \Input::get($objField->name);
+            $objField->value = Input::get($objField->name);
             $objField->options = serialize($arrOptions);
         }
 
         return $arrFields;
     }
 
-    public function loadFormField(\Widget $objWidget) {
+    public function loadFormField(Widget $objWidget)
+    {
 
-        if (in_array($objWidget->type, ['select','checkbox','radio']) && $objWidget->type) { // @todo
+        if (in_array($objWidget->type, ['select', 'checkbox', 'radio']) && $objWidget->type) { // @todo
 
-            if (\Input::get($objWidget->name) !== null) {
-                $objWidget->value = \Input::get($objWidget->name);
+            if (Input::get($objWidget->name) !== null) {
+                $objWidget->value = Input::get($objWidget->name);
             }
         }
         return $objWidget;
     }
 
-    protected function getOptions($strType, $objField) {
+    protected function getOptions($strType, $objField)
+    {
 
-        if (in_array($strType, ['select','checkbox','radio']) && $objField->optionsSource) {
+        if (in_array($strType, ['select', 'checkbox', 'radio']) && $objField->optionsSource) {
             switch ($objField->optionsSource) {
                 case 'dbActiveOptions':
                 case 'dbOptions':
@@ -42,10 +51,10 @@ class FormFields {
                     $objOptions::setParameter($objField->row(), null);
                     $arrOptions = $objOptions::getOptions(true);
                     if ($objField->includeBlankOption) {
-                        array_insert($arrOptions, 0, [
+                        ArrayUtil::arrayInsert($arrOptions, 0, [
                             [
                                 'value' => null,
-                                'label' => \Controller::replaceInsertTags($objField->blankOptionLabel) ?: '-'
+                                'label' => Toolkit::replaceInsertTags($objField->blankOptionLabel) ?: '-'
                             ]
                         ]);
                     }

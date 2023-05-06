@@ -1,8 +1,10 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.16");
+use Contao\ArrayUtil;
 
-array_insert( $GLOBALS['BE_MOD'], 2, [
+define("CATALOG_MANAGER_BUNDLE_VERSION", "2.2.0");
+
+ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
         'catalog-manager' => [
             'name' => 'catalog-manager-bundle',
@@ -35,7 +37,7 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
     ]
 ]);
 
-array_insert( $GLOBALS['FE_MOD'], 2, [
+ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
         'listing-map' => 'Alnv\ContaoCatalogManagerBundle\Modules\MapModule',
         'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
@@ -50,7 +52,7 @@ $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = 'Alnv\ContaoCatalogMa
 $GLOBALS['TL_HOOKS']['compileArticle'][] = ['catalogmanager.hooks.article', 'compileArticle'];
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'generateMaster'];
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = ['catalogmanager.hooks.element', 'isVisibleElement'];
-$GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget','getAttributesFromDca'];
+$GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget', 'getAttributesFromDca'];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePages'];
 $GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePagesByPagesRoles'];
 $GLOBALS['TL_HOOKS']['generateBreadcrumb'][] = ['catalogmanager.hooks.breadcrumb', 'generateDetailPage'];
@@ -410,7 +412,7 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'geo',
         'sql' => "decimal(10,8) NOT NULL default '0.000000'"
     ],
-    'longitude'=> [
+    'longitude' => [
         'group' => 'geo',
         'sql' => "decimal(10,8) NOT NULL default '0.000000'"
     ],

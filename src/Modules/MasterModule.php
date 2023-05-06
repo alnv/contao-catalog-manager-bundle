@@ -3,16 +3,24 @@
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
+use Contao\BackendTemplate;
+use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Module;
+use Contao\System;
 
-class MasterModule extends \Module {
+class MasterModule extends Module
+{
 
     protected $strTemplate = 'mod_master';
 
-    public function generate() {
+    public function generate()
+    {
 
-        if (\System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
+        if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
 
-            $objTemplate = new \BackendTemplate('be_wildcard');
+            $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
@@ -29,18 +37,19 @@ class MasterModule extends \Module {
         return parent::generate();
     }
 
-    protected function compile() {
+    protected function compile()
+    {
 
         $objMaster = new Master($this->cmTable, [
-            'alias' => \Input::get('auto_item'),
+            'alias' => Input::get('auto_item'),
             'template' => $this->cmTemplate,
-            'ignoreVisibility' => (bool) $this->cmIgnoreVisibility,
+            'ignoreVisibility' => (bool)$this->cmIgnoreVisibility,
             'id' => $this->id
         ]);
 
         $arrMaster = $objMaster->parse();
         if (empty($arrMaster)) {
-            throw new \CoreBundle\Exception\PageNotFoundException('Page not found: ' . \Environment::get('uri'));
+            throw new PageNotFoundException('Page not found: ' . Environment::get('uri'));
         }
 
         $this->Template->entities = $arrMaster;

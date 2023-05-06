@@ -2,21 +2,27 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Maps;
 
-abstract class MapView {
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+
+abstract class MapView
+{
 
     protected $strTable = null;
     protected $arrOptions = [];
 
-    public function __construct($strTable, $arrOptions = []) {
+    public function __construct($strTable, $arrOptions = [])
+    {
 
         $this->strTable = $strTable;
         $this->arrOptions = $arrOptions;
         $this->arrOptions['isForm'] = true;
     }
 
-    protected function getLocations() {
+    protected function getLocations()
+    {
 
-        return array_map(function ($arrLocation){
+        return array_map(function ($arrLocation) {
             $arrLocation['map'] = [];
             $arrLocation['map']['street'] = $arrLocation['roleResolver']()->getValueByRole('street');
             $arrLocation['map']['streetNumber'] = $arrLocation['roleResolver']()->getValueByRole('streetNumber');
@@ -28,12 +34,13 @@ abstract class MapView {
             $arrLocation['map']['text'] = $arrLocation['roleResolver']()->getValueByRole('teaser');
             $arrLocation['map']['latitude'] = $arrLocation['roleResolver']()->getValueByRole('latitude');
             $arrLocation['map']['longitude'] = $arrLocation['roleResolver']()->getValueByRole('longitude');
-            $arrLocation['map']['infoContent'] = \Controller::replaceInsertTags(\StringUtil::parseSimpleTokens($this->arrOptions['infoContent'], $this->parseTokens($arrLocation)));
+            $arrLocation['map']['infoContent'] = Toolkit::replaceInsertTags(Toolkit::parseSimpleTokens($this->arrOptions['infoContent'], $this->parseTokens($arrLocation)));
             return $arrLocation;
-        }, (new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->strTable, $this->arrOptions))->parse());
+        }, (new Listing($this->strTable, $this->arrOptions))->parse());
     }
 
-    protected function parseTokens($arrLocation) {
+    protected function parseTokens($arrLocation)
+    {
         $arrTokens = [];
         foreach ($arrLocation as $strField => $varValue) {
             if (is_callable($varValue)) {
@@ -46,10 +53,10 @@ abstract class MapView {
                 continue;
             }
             if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree') {
-                $varValue = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue);
+                $varValue = Toolkit::parseImage($varValue);
             }
             if (is_array($varValue)) {
-                $varValue = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue);
+                $varValue = Toolkit::parse($varValue);
             }
             $arrTokens[$strField] = $varValue;
         }

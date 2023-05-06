@@ -2,28 +2,36 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
-class Image {
+use Contao\FilesModel;
+use Contao\Frontend;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Validator;
 
-    public static function getImage($strUuid, $intSize = null, &$arrImages=[], $arrOrderField=[]) {
+class Image
+{
 
-        $objContainer = \System::getContainer();
-        $arrUuids = \StringUtil::deserialize($strUuid, true);
+    public static function getImage($strUuid, $intSize = null, &$arrImages = [], $arrOrderField = [])
+    {
+
+        $objContainer = System::getContainer();
+        $arrUuids = StringUtil::deserialize($strUuid, true);
         foreach ($arrUuids as $strUuid) {
 
-            if (!\Validator::isUuid($strUuid)) {
+            if (!Validator::isUuid($strUuid)) {
                 continue;
             }
 
-            $objFile = \FilesModel::findByUuid($strUuid);
+            $objFile = FilesModel::findByUuid($strUuid);
             if ($objFile == null) {
                 continue;
             }
 
             if ($objFile->type == 'folder') {
-                $objFiles = \FilesModel::findByPid($objFile->uuid);
+                $objFiles = FilesModel::findByPid($objFile->uuid);
                 if ($objFiles !== null) {
                     while ($objFiles->next()) {
-                        self::getImage(\StringUtil::binToUuid($objFiles->uuid),$intSize,$arrImages);
+                        self::getImage(StringUtil::binToUuid($objFiles->uuid), $intSize, $arrImages);
                     }
                 }
                 continue;
@@ -40,14 +48,14 @@ class Image {
                 if (is_callable([$objRequest, 'getLocale'])) {
                     $strLanguage = $objContainer->get('request_stack')->getCurrentRequest()->getLocale();
                 }
-                $arrMeta = \Frontend::getMetaData($objFile->meta, $strLanguage);
+                $arrMeta = Frontend::getMetaData($objFile->meta, $strLanguage);
             }
 
             $strStaticUrl = $objContainer->get('contao.assets.files_context')->getStaticUrl();
-            $objPicture = $objContainer->get('contao.image.picture_factory')->create($objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ($intSize ? (int) $intSize : null));
+            $objPicture = $objContainer->get('contao.image.picture_factory')->create($objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ($intSize ? (int)$intSize : null));
             $arrPicture = [
                 'path' => $objFile->path,
-                'uuid' => \StringUtil::binToUuid($objFile->uuid),
+                'uuid' => StringUtil::binToUuid($objFile->uuid),
                 'img' => $objPicture->getImg($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
                 'sources' => $objPicture->getSources($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
             ];
@@ -55,7 +63,7 @@ class Image {
             if (!empty($arrMeta)) {
                 foreach ($arrMeta as $strField => $strLabel) {
                     if ($strField === 'link') {
-                        $strLabel = \Controller::replaceInsertTags($strLabel);
+                        $strLabel = Toolkit::replaceInsertTags($strLabel);
                     }
                     $arrPicture[$strField] = $strLabel;
                 }
@@ -64,33 +72,37 @@ class Image {
         }
 
         if (!empty($arrOrderField)) {
-            $arrOrder = array_map( function () {}, array_flip($arrOrderField));
+            $arrOrder = \array_map(function () {
+            }, \array_flip($arrOrderField));
             foreach ($arrImages as $strKey => $arrValue) {
-                if (array_key_exists($arrValue['uuid'], $arrOrder)) {
+                if (\array_key_exists($arrValue['uuid'], $arrOrder)) {
                     $arrOrder[$arrValue['uuid']] = $arrValue;
                     unset($arrImages[$strKey]);
                 }
             }
-            if (!empty( $arrImages)) {
-                $arrOrder = array_merge($arrOrder, array_values($arrImages));
+            if (!empty($arrImages)) {
+                $arrOrder = \array_merge($arrOrder, array_values($arrImages));
             }
-            $arrImages = array_values(array_filter($arrOrder));
+            $arrImages = \array_values(array_filter($arrOrder));
             unset($arrOrder);
         }
 
         return $arrImages;
     }
 
-    public static function getUuids($strUuid) {
+    public static function getUuids($strUuid): array
+    {
 
         $arrReturn = [];
-        $arrUuids = \StringUtil::deserialize($strUuid, true);
-        foreach ( $arrUuids as $strUuid ) {
-            if (\Validator::isBinaryUuid($strUuid)) {
-                $strUuid = \StringUtil::binToUuid($strUuid);
+        $arrUuids = StringUtil::deserialize($strUuid, true);
+
+        foreach ($arrUuids as $strUuid) {
+            if (Validator::isBinaryUuid($strUuid)) {
+                $strUuid = StringUtil::binToUuid($strUuid);
             }
             $arrReturn[] = $strUuid;
         }
+
         return $arrReturn;
     }
 }

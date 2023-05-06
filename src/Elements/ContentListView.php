@@ -2,23 +2,29 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Elements;
 
-class ContentListView extends \Alnv\ContaoCatalogManagerBundle\Modules\Listing {
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
+use Alnv\ContaoCatalogManagerBundle\Modules\Listing;
+use Contao\BackendTemplate;
+
+class ContentListView extends Listing
+{
 
     protected $strKey = 'id';
     protected $arrOptions = [];
     protected $strTable = 'tl_content';
     protected $strTemplate = 'ce_listview';
 
-    public function generate() {
+    public function generate()
+    {
 
-        if (TL_MODE == 'BE') {
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        if (Mode::get() == 'BE') {
+            $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['CTE']['listview'][0]) . ' ###';
             $objTemplate->id = $this->id;
             return $objTemplate->parse();
         }
 
-        if ($this->customTpl != '' && TL_MODE == 'FE') {
+        if ($this->customTpl != '' && Mode::get() == 'FE') {
             $this->strTemplate = $this->customTpl;
         }
 

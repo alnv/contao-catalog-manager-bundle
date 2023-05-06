@@ -2,12 +2,16 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-class CatalogElement {
+use Contao\Database;
 
-    public function getArticleElements() {
+class CatalogElement
+{
+
+    public function getArticleElements(): array
+    {
 
         $arrReturn = [];
-        $objElements = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_element WHERE `type`=?')->execute('article');
+        $objElements = Database::getInstance()->prepare('SELECT * FROM tl_catalog_element WHERE `type`=?')->execute('article');
         if (!$objElements->numRows) {
             return $arrReturn;
         }

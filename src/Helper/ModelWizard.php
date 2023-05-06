@@ -3,16 +3,19 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
+use Contao\Model;
 
-class ModelWizard {
+class ModelWizard
+{
 
     protected $objModel = null;
 
-    public function __construct($strTable) {
+    public function __construct($strTable)
+    {
 
-        $strModel = \Model::getClassFromTable($strTable);
+        $strModel = Model::getClassFromTable($strTable);
 
-        if (strpos($strModel,'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
+        if (strpos($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
             $strModel = '';
         }
 
@@ -22,8 +25,8 @@ class ModelWizard {
         }
 
         if (isset($GLOBALS['CM_MODELS'][$strTable]) && $this->modelExist($GLOBALS['CM_MODELS'][$strTable])) {
-            $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][ $strTable ]();
-            $objMultilingualDynModel->createDynTable( $strTable );
+            $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][$strTable]();
+            $objMultilingualDynModel->createDynTable($strTable);
             $this->objModel = $objMultilingualDynModel;
             return null;
         }
@@ -33,14 +36,16 @@ class ModelWizard {
         $this->objModel = $objDynModel;
     }
 
-    public function getModel() {
+    public function getModel()
+    {
 
         return $this->objModel;
     }
 
-    protected function modelExist($strModel) {
+    protected function modelExist($strModel): bool
+    {
 
-        if (strpos($strModel,'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
+        if (strpos($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
             return false;
         }
 

@@ -1,8 +1,10 @@
 <?php
 
-\Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-    ->addField('cmHide', 'author', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_AFTER)
-    ->applyToPalette('default','tl_article');
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+
+PaletteManipulator::create()
+    ->addField('cmHide', 'author', PaletteManipulator::POSITION_AFTER)
+    ->applyToPalette('default', 'tl_article');
 
 $GLOBALS['TL_DCA']['tl_article']['palettes']['default'] = str_replace('cmHide;', 'cmHide;{catalog_legend:hide},cmContentElement,cmContentElementPosition;', $GLOBALS['TL_DCA']['tl_article']['palettes']['default']);
 

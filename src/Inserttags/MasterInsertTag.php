@@ -2,9 +2,14 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
-class MasterInsertTag {
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\StringUtil;
 
-    public function replace($strFragment) {
+class MasterInsertTag
+{
+
+    public function replace($strFragment)
+    {
 
         $arrFragments = explode('::', $strFragment);
 
@@ -17,7 +22,7 @@ class MasterInsertTag {
             }
 
             $varValue = '';
-            $strFieldname = explode('>', \StringUtil::decodeEntities(($arrFragments[1]?:'')));
+            $strFieldname = explode('>', StringUtil::decodeEntities(($arrFragments[1] ?: '')));
 
             switch ($strFieldname[0]) {
                 case 'getParent':
@@ -36,7 +41,7 @@ class MasterInsertTag {
                     if (is_array($arrArray) && isset($strFieldname[2])) {
                         $arrValues = [];
                         foreach ($arrArray as $arrEntity) {
-                            $arrValues[] = $arrEntity[$strFieldname[2]] ? \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($arrEntity[$strFieldname[2]]) : '';
+                            $arrValues[] = $arrEntity[$strFieldname[2]] ? Toolkit::parse($arrEntity[$strFieldname[2]]) : '';
                         }
                         $varValue = implode(',', $arrValues);
                     }
@@ -51,15 +56,15 @@ class MasterInsertTag {
             }
 
             if (is_array($varValue)) {
-                if ($strValue = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue)) {
+                if ($strValue = Toolkit::parse($varValue)) {
                     return $strValue ?: $strDefault;
                 }
-                if ($strImage = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue)) {
+                if ($strImage = Toolkit::parseImage($varValue)) {
                     return $strImage ?: $strDefault;
                 }
             }
 
-            return $varValue ? (string) $varValue : $strDefault;
+            return $varValue ? (string)$varValue : $strDefault;
         }
 
         return false;

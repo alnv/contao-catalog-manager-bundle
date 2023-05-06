@@ -1,7 +1,5 @@
 <?php
 
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilter';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilterType';

@@ -2,16 +2,22 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class Article {
+use Contao\ArrayUtil;
+use Contao\ContentModel;
+use Contao\ModuleArticle;
 
-    public function compileArticle($objTemplate, $arrData, \ModuleArticle $objArticle) {
+class Article
+{
+
+    public function compileArticle($objTemplate, $arrData, ModuleArticle $objArticle)
+    {
 
         if (!$objArticle->cmContentElement) {
             return null;
         }
 
         $arrElements = [];
-        $objCte = \ContentModel::findPublishedByPidAndTable($objArticle->cmContentElement, 'tl_catalog_element');
+        $objCte = ContentModel::findPublishedByPidAndTable($objArticle->cmContentElement, 'tl_catalog_element');
         if ($objCte !== null) {
             while ($objCte->next()) {
                 $arrCss = [];
@@ -22,7 +28,7 @@ class Article {
         }
 
         $arrTemplateElements = is_array($objTemplate->elements) ? $objTemplate->elements : [];
-        array_insert($arrTemplateElements, ($objArticle->cmContentElementPosition=='before'?0:count($arrTemplateElements)), $arrElements);
+        ArrayUtil::arrayInsert($arrTemplateElements, ($objArticle->cmContentElementPosition == 'before' ? 0 : count($arrTemplateElements)), $arrElements);
         $objTemplate->elements = $arrTemplateElements;
     }
 }

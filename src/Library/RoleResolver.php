@@ -2,21 +2,33 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class RoleResolver extends \System {
+use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
+use Contao\Controller;
+use Contao\System;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+
+class RoleResolver
+{
 
     public static $strTable = null;
+
     public static $arrRoles = null;
+
     public static $arrEntity = null;
+
     protected static $arrInstances = [];
+
     protected static $objCache;
 
-    public static function getInstance($strTable, $arrEntity=[]) {
+    public static function getInstance($strTable, $arrEntity = [])
+    {
 
         if ($strTable === null) {
             return new self;
         }
 
-        self::$objCache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('cm.roleresolver.cache', 60, TL_ROOT . '/var/cache');
+        $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
+        self::$objCache = new FilesystemAdapter('cm.roleresolver.cache', 60, $strRootDir . '/var/cache');
         $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
@@ -32,15 +44,16 @@ class RoleResolver extends \System {
             self::$objCache->save($objCacheResult);
         }
 
-        self::$arrRoles = $objCacheResult->get($strInstanceKey);
+        self::$arrRoles = $objCacheResult->get();
 
         return self::$arrInstances[$strInstanceKey];
     }
 
-    protected static function setRoles() {
+    protected static function setRoles()
+    {
 
-        \Controller::loadDataContainer(self::$strTable);
-        \System::loadLanguageFile(self::$strTable);
+        Controller::loadDataContainer(self::$strTable);
+        System::loadLanguageFile(self::$strTable);
 
         $arrRoles = [];
         $arrFields = $GLOBALS['TL_DCA'][self::$strTable]['fields'] ?: [];
@@ -80,19 +93,21 @@ class RoleResolver extends \System {
 
         if (isset($GLOBALS['TL_HOOKS']['roleResolverSetRoles']) && is_array($GLOBALS['TL_HOOKS']['roleResolverSetRoles'])) {
             foreach ($GLOBALS['TL_HOOKS']['roleResolverSetRoles'] as $arrCallback) {
-                $arrRoles = static::importStatic($arrCallback[0])->{$arrCallback[1]}($arrRoles, self::$arrEntity, self::$strTable);
+                $arrRoles = System::importStatic($arrCallback[0])->{$arrCallback[1]}($arrRoles, self::$arrEntity, self::$strTable);
             }
         }
 
         return $arrRoles;
     }
 
-    public function getRole($strRolename) {
+    public function getRole($strRolename)
+    {
 
         return $GLOBALS['CM_ROLES'][$strRolename];
     }
 
-    public function getValueByRole($strRolename) {
+    public function getValueByRole($strRolename)
+    {
 
         if (!isset(self::$arrRoles[$strRolename])) {
             return '';
@@ -101,7 +116,8 @@ class RoleResolver extends \System {
         return self::$arrRoles[$strRolename]['value'];
     }
 
-    public function getFieldByRole($strRolename) {
+    public function getFieldByRole($strRolename)
+    {
 
         if (!isset(self::$arrRoles[$strRolename])) {
             return '';
@@ -110,7 +126,8 @@ class RoleResolver extends \System {
         return self::$arrRoles[$strRolename]['name'];
     }
 
-    public function getFieldsByRoles($arrRoles) {
+    public function getFieldsByRoles($arrRoles)
+    {
 
         $arrReturn = [];
         foreach ($arrRoles as $strRole) {
@@ -123,7 +140,8 @@ class RoleResolver extends \System {
         return empty($arrReturn) ? null : $arrReturn;
     }
 
-    public function getGeoCodingAddress($strDelimiter=', ') {
+    public function getGeoCodingAddress($strDelimiter = ', ')
+    {
 
         $arrAddress = [];
         $arrAddressRoles = ['street', 'streetNumber', 'zip', 'city', 'state', 'country'];
@@ -134,11 +152,12 @@ class RoleResolver extends \System {
             }
         }
 
-        $objAddress = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
+        $objAddress = new AddressBuilder($arrAddress);
         return $objAddress->getAddress($strDelimiter);
     }
 
-    public function getGeoCodingFields() {
+    public function getGeoCodingFields()
+    {
 
         $arrReturn = [];
         $arrGeoRoles = ['latitude', 'longitude'];
@@ -150,7 +169,8 @@ class RoleResolver extends \System {
         return $arrReturn;
     }
 
-    protected function getKeyValueByRoles($arrRoles) {
+    protected function getKeyValueByRoles($arrRoles)
+    {
 
         $arrReturn = [];
 
@@ -160,12 +180,17 @@ class RoleResolver extends \System {
                 continue;
             }
 
-            $arrReturn[self::$arrRoles[ $strRole ]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
+            $arrReturn[self::$arrRoles[$strRole]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
         }
 
         return $arrReturn;
     }
 
-    private function __clone(){}
-    public function __wakeup(){}
+    private function __clone()
+    {
+    }
+
+    public function __wakeup()
+    {
+    }
 }

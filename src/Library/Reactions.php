@@ -2,14 +2,28 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class Reactions {
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel;
+use Contao\Combiner;
+use Contao\Controller;
+use Contao\Database;
+use Contao\FilesModel;
+use Contao\FrontendTemplate;
+use Contao\FrontendUser;
+use Contao\Input;
+use Contao\StringUtil;
+
+class Reactions
+{
 
     protected string $strTable;
     protected string $strCatalogReactionId;
 
-    public function __construct($strTable, $strCatalogReactionsId) {
+    public function __construct($strTable, $strCatalogReactionsId)
+    {
 
-        $objCombiner = new \Combiner();
+        $objCombiner = new Combiner();
         $objCombiner->add('bundles/alnvcontaocatalogmanager/css/reactions.scss');
 
         $GLOBALS['TL_CSS']['reactions'] = $objCombiner->getCombinedFile();
@@ -17,10 +31,10 @@ class Reactions {
         $this->strTable = $strTable;
         $this->strCatalogReactionId = $strCatalogReactionsId;
 
-        if ($strRequest = \Input::get('_req')) {
+        if ($strRequest = Input::get('_req')) {
 
-            $arrRequest = \StringUtil::deserialize(base64_decode($strRequest));
-            if (!is_array($arrRequest) || empty($arrRequest)) {
+            $arrRequest = StringUtil::deserialize(base64_decode($strRequest));
+            if (!\is_array($arrRequest) || empty($arrRequest)) {
                 $this->reload();
             }
 
@@ -28,13 +42,13 @@ class Reactions {
                 $this->reload();
             }
 
-            $objCurrentReaction = \Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel::getReaction($this->strTable, $arrRequest['id']);
+            $objCurrentReaction = CatalogReactionsDataModel::getReaction($this->strTable, $arrRequest['id']);
 
             if (!$objCurrentReaction) {
-                $objCurrentReaction = new \Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel();
+                $objCurrentReaction = new CatalogReactionsDataModel();
                 $objCurrentReaction->created_at = time();
-                $objCurrentReaction->session = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getSessionId();
-                $objCurrentReaction->member = \FrontendUser::getInstance()->id ?: 0;
+                $objCurrentReaction->session = Toolkit::getSessionId();
+                $objCurrentReaction->member = FrontendUser::getInstance()->id ?: 0;
                 $objCurrentReaction->table = $this->strTable;
                 $objCurrentReaction->reaction = $this->strCatalogReactionId;
                 $objCurrentReaction->identifier = $arrRequest['id'];
@@ -53,16 +67,18 @@ class Reactions {
         }
     }
 
-    public function count($strIdentifier, $strKey) {
+    public function count($strIdentifier, $strKey)
+    {
 
-        $objCount = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_reactions_data WHERE `table`=? AND identifier=? AND reaction_key=?')->execute($this->strTable, $strIdentifier, $strKey);
+        $objCount = Database::getInstance()->prepare('SELECT * FROM tl_catalog_reactions_data WHERE `table`=? AND identifier=? AND reaction_key=?')->execute($this->strTable, $strIdentifier, $strKey);
 
         return $objCount->numRows;
     }
 
-    public function getReactions($strIdentifier) {
+    public function getReactions($strIdentifier)
+    {
 
-        $objReaction = \Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel::findByPk($this->strCatalogReactionId);
+        $objReaction = CatalogReactionsModel::findByPk($this->strCatalogReactionId);
 
         if (!$objReaction) {
             return '';
@@ -70,10 +86,10 @@ class Reactions {
 
         $strId = uniqid();
         $arrReactions = [];
-        $objTemplate = new \FrontendTemplate($objReaction->template);
+        $objTemplate = new FrontendTemplate($objReaction->template);
         $arrActiveReaction = $this->getActiveReaction($strIdentifier);
 
-        foreach (\StringUtil::deserialize($objReaction->reactions, true) as $arrReaction) {
+        foreach (StringUtil::deserialize($objReaction->reactions, true) as $arrReaction) {
 
             if (!$arrReaction['key']) {
                 continue;
@@ -113,12 +129,14 @@ class Reactions {
         return $objTemplate->parse();
     }
 
-    protected function getAlias () : string {
+    protected function getAlias(): string
+    {
 
-        return $_GET['auto_item'] ? '/' . \Input::get('auto_item') : '';
+        return $_GET['auto_item'] ? '/' . Input::get('auto_item') : '';
     }
 
-    protected function reload() {
+    protected function reload()
+    {
 
         global $objPage;
 
@@ -126,10 +144,11 @@ class Reactions {
             return null;
         }
 
-        \Controller::redirect($objPage->getFrontendUrl($this->getAlias()));
+        Controller::redirect($objPage->getFrontendUrl($this->getAlias()));
     }
 
-    protected function getHrefByIdentifier($strIdentifier, $arrReaction) : string {
+    protected function getHrefByIdentifier($strIdentifier, $arrReaction): string
+    {
 
         global $objPage;
 
@@ -145,9 +164,10 @@ class Reactions {
         return $objPage->getFrontendUrl($this->getAlias()) . '?_req=' . base64_encode(serialize($arrOptions));
     }
 
-    protected function getActiveReaction($strIdentifier) : array {
+    protected function getActiveReaction($strIdentifier): array
+    {
 
-        $objReactionData = \Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel::getReaction($this->strTable, $strIdentifier);
+        $objReactionData = CatalogReactionsDataModel::getReaction($this->strTable, $strIdentifier);
 
         if (!$objReactionData) {
             return [];
@@ -156,9 +176,10 @@ class Reactions {
         return $objReactionData->row();
     }
 
-    protected function getIcon($strUuid) : string {
+    protected function getIcon($strUuid): string
+    {
 
-        $objFile = \FilesModel::findByUuid($strUuid);
+        $objFile = FilesModel::findByUuid($strUuid);
 
         if (!$objFile) {
             return '';

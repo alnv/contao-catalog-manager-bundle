@@ -2,10 +2,21 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoCatalogManagerBundle\Views\Listing as ViewListing;
+use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
+use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
+use Contao\BackendTemplate;
+use Contao\Controller;
+use Contao\Hybrid;
+use Contao\Input;
+use Contao\StringUtil;
+use Contao\System;
 
-class Listing extends \Hybrid
+
+class Listing extends Hybrid
 {
 
     protected $objModel = null;
@@ -13,8 +24,8 @@ class Listing extends \Hybrid
     public function generate()
     {
 
-        if (\System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
+            $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
@@ -27,13 +38,13 @@ class Listing extends \Hybrid
             return null;
         }
 
-        if (\Input::get('auto_item') && $this->cmMasterModule) {
-            return \Controller::getFrontendModule($this->cmMasterModule);
+        if (Input::get('auto_item') && $this->cmMasterModule) {
+            return Controller::getFrontendModule($this->cmMasterModule);
         }
 
         $this->strKey = $this->type;
         $this->typePrefix = $this->strTable == 'tl_module' ? 'mod_' : 'ce_';
-        if ($this->customTpl && TL_MODE == 'FE') {
+        if ($this->customTpl && Mode::get() == 'FE') {
             $this->strTemplate = $this->customTpl;
         }
 
@@ -75,7 +86,7 @@ class Listing extends \Hybrid
         ];
 
         $this->setOptions();
-        $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->cmTable, $this->arrOptions);
+        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
 
         $this->Template->rows = $objListing->countRows();
         $this->Template->entities = $objListing->parse();
@@ -91,7 +102,7 @@ class Listing extends \Hybrid
     protected function setIgnoreFieldsFromParsing()
     {
 
-        $this->arrOptions['ignoreFieldsFromParsing'] = \StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
+        $this->arrOptions['ignoreFieldsFromParsing'] = StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
     }
 
     protected function setDistance()
@@ -109,22 +120,22 @@ class Listing extends \Hybrid
         }
 
         $arrAddress = [
-            'street' => Toolkit::getValueFromUrl(\Input::get('street')),
-            'streetNumber' => Toolkit::getValueFromUrl(\Input::get('streetNumber')),
-            'zip' => Toolkit::getValueFromUrl(\Input::get('zip') ?: \Input::get('postal')),
-            'city' => Toolkit::getValueFromUrl(\Input::get('city')),
+            'street' => Toolkit::getValueFromUrl(Input::get('street')),
+            'streetNumber' => Toolkit::getValueFromUrl(Input::get('streetNumber')),
+            'zip' => Toolkit::getValueFromUrl(Input::get('zip') ?: Input::get('postal')),
+            'city' => Toolkit::getValueFromUrl(Input::get('city')),
         ];
 
         if (empty(array_filter($arrAddress))) {
             return false;
         }
 
-        $arrAddress['state'] = Toolkit::getValueFromUrl(\Input::get('state'));
-        $arrAddress['country'] = Toolkit::getValueFromUrl(\Input::get('country'));
-        $objAddressBuilder = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
+        $arrAddress['state'] = Toolkit::getValueFromUrl(Input::get('state'));
+        $arrAddress['country'] = Toolkit::getValueFromUrl(Input::get('country'));
+        $objAddressBuilder = new AddressBuilder($arrAddress);
         $strAddress = $objAddressBuilder->getAddress();
-        $strRadius = Toolkit::getValueFromUrl(\Input::get('radius')) ?: 15;
-        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+        $strRadius = Toolkit::getValueFromUrl(Input::get('radius')) ?: 15;
+        $objGeoCoding = new GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
         if ($arrGeoCoding !== null) {
@@ -154,15 +165,15 @@ class Listing extends \Hybrid
 
         switch ($this->cmFilterType) {
             case 'wizard':
-                \Controller::loadDataContainer($this->cmTable);
+                Controller::loadDataContainer($this->cmTable);
                 $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-                $this->cmValue = \Controller::replaceInsertTags($this->cmValue);
-                $this->arrOptions['column'] = explode(';', \StringUtil::decodeEntities($this->cmColumn));
-                $this->arrOptions['value'] = explode(';', \StringUtil::decodeEntities($this->cmValue));
+                $this->cmValue = Toolkit::replaceInsertTags($this->cmValue);
+                $this->arrOptions['column'] = explode(';', StringUtil::decodeEntities($this->cmColumn));
+                $this->arrOptions['value'] = explode(';', StringUtil::decodeEntities($this->cmValue));
                 if ((is_array($this->arrOptions['value']) && !empty($this->arrOptions['value']))) {
                     $intIndex = -1;
                     $this->arrOptions['value'] = array_filter($this->arrOptions['value'], function ($strValue) use (&$intIndex) {
@@ -186,7 +197,7 @@ class Listing extends \Hybrid
     {
 
         if ($this->cmOrder) {
-            $strOrder = Toolkit::getOrderByStatementFromArray(\Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($this->cmOrder, [
+            $strOrder = Toolkit::getOrderByStatementFromArray(Toolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'
             ]));
@@ -198,7 +209,7 @@ class Listing extends \Hybrid
         if ($this->cmFilter && ($this->cmWizardFilterSettings || $this->cmValue)) {
             $strFilterValues = $this->cmWizardFilterSettings ?: $this->cmValue;
             if (strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
-                $arrIds = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
+                $arrIds = Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
                 if (!$this->arrOptions['order']) {
                     $this->arrOptions['order'] = '';
                 }
@@ -208,8 +219,8 @@ class Listing extends \Hybrid
             }
         }
 
-        if (is_array(\Input::get('order')) && !empty(\Input::get('order'))) {
-            $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray(\Input::get('order'));
+        if (is_array(Input::get('order')) && !empty(Input::get('order'))) {
+            $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray(Input::get('order'));
         }
     }
 

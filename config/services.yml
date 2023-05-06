@@ -51,17 +51,17 @@ services:
     public: true
 
   catalogmanager.hooks.datacontainer:
-      class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
-      public: true
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
+    public: true
 
   catalogmanager.hooks.element:
-      class: Alnv\ContaoCatalogManagerBundle\Hooks\Element
-      public: true
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\Element
+    public: true
 
   catalogmanager.hooks.search:
-      class: Alnv\ContaoCatalogManagerBundle\Hooks\Search
-      public: true
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\Search
+    public: true
 
   catalogmanager.hooks.formfields:
-      class: Alnv\ContaoCatalogManagerBundle\Hooks\FormFields
-      public: true
+    class: Alnv\ContaoCatalogManagerBundle\Hooks\FormFields
+    public: true

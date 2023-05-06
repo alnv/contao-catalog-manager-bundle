@@ -2,14 +2,27 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class PageLayout extends \System {
+use Alnv\ContaoCatalogManagerBundle\Views\Master;
+use Contao\ArticleModel;
+use Contao\ContentModel;
+use Contao\Database;
+use Contao\Input;
+use Contao\LayoutModel;
+use Contao\PageModel;
+use Contao\PageRegular;
+use Contao\System;
 
-    public function __construct() {
+class PageLayout extends System
+{
+
+    public function __construct()
+    {
 
         parent::__construct();
     }
 
-    public function generateMaster(\PageModel $objPage, \LayoutModel $objLayout, \PageRegular $objPageRegular) {
+    public function generateMaster(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
+    {
 
         if (!isset($_GET['auto_item'])) {
             return null;
@@ -17,15 +30,16 @@ class PageLayout extends \System {
 
         $this->getMasterByPageId($objPage->id);
     }
-    
-    public function getMasterByPageId($strPageId,$strAlias=null) {
+
+    public function getMasterByPageId($strPageId, $strAlias = null)
+    {
 
         if (!$strAlias) {
-            $strAlias = \Input::get('auto_item');
+            $strAlias = Input::get('auto_item');
         }
-        $strTable = null;
+
         $strMasterPageId = $strPageId;
-        $objModule = \Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
+        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing', '1', $strPageId);
         if (!$objModule->numRows) {
             $strTable = $this->searchTableAndReturnTable($strPageId);
             if (!$strTable) {
@@ -36,7 +50,7 @@ class PageLayout extends \System {
             $strMasterPageId = $objModule->cmMasterPage;
         }
 
-        $GLOBALS['CM_MASTER'] = (new \Alnv\ContaoCatalogManagerBundle\Views\Master($strTable, [
+        $GLOBALS['CM_MASTER'] = (new Master($strTable, [
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
         ]))->parse()[0];
@@ -44,7 +58,8 @@ class PageLayout extends \System {
         $this->setMetaInformation($strTable);
     }
 
-    protected function setMetaInformation($strTable=null) {
+    protected function setMetaInformation($strTable = null)
+    {
 
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return null;
@@ -56,29 +71,29 @@ class PageLayout extends \System {
 
         if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
             foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {
-                $this->import( $arrCallback[0] );
-                $this->{$arrCallback[0]}->{$arrCallback[1]}($objPage, $strTable);
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($objPage, $strTable);
             }
         }
     }
 
-    protected function searchTableAndReturnTable($strPageId) {
+    protected function searchTableAndReturnTable($strPageId)
+    {
 
-        $objArticles = \ArticleModel::findByPid($strPageId);
+        $objArticles = ArticleModel::findByPid($strPageId);
         if ($objArticles == null) {
             return null;
         }
         while ($objArticles->next()) {
             if ($objArticles->cmContentElement) {
-                if ($strTable = $this->getDetailFrontendModule(\ContentModel::findPublishedByPidAndTable($objArticles->cmContentElement,'tl_catalog_element'))) {
+                if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->cmContentElement, 'tl_catalog_element'))) {
                     return $strTable;
                 }
             }
-            if ($strTable = $this->getDetailFrontendModule(\ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article'))) {
+            if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article'))) {
                 return $strTable;
             }
         }
-        $objContent = \ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article');
+        $objContent = ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article');
         if ($objContent == null) {
             return null;
         }
@@ -94,13 +109,14 @@ class PageLayout extends \System {
         return null;
     }
 
-    protected function getDetailFrontendModule($objContent) {
-        if ($objContent==null) {
+    protected function getDetailFrontendModule($objContent)
+    {
+        if ($objContent == null) {
             return null;
         }
         while ($objContent->next()) {
             if ($objContent->type == 'module' && $objContent->module) {
-                $objModule = \Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
+                $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
                 if ($objModule == null) {
                     continue;
                 }

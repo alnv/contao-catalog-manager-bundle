@@ -2,9 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Maps;
 
-class GMap extends MapView {
+use Contao\FrontendTemplate;
 
-    public function render() {
+class GMap extends MapView
+{
+
+    public function render()
+    {
 
         global $objPage;
 
@@ -13,9 +17,9 @@ class GMap extends MapView {
         if ($objPage->ajaxContext) {
             return json_encode($arrLocations, 512);
         }
-        
-        $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
-        $arrJson = array_map(function($arrLocation) {
+
+        $objTemplate = new FrontendTemplate($this->arrOptions['template']);
+        $arrJson = array_map(function ($arrLocation) {
             return ['map' => $arrLocation['map']];
         }, $arrLocations);
         $objTemplate->setData([

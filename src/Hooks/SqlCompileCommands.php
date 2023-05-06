@@ -2,11 +2,15 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class SqlCompileCommands {
+use Contao\Database;
 
-    public function execute($arrSQLCommands) {
+class SqlCompileCommands
+{
 
-        if (!\Database::getInstance()->tableExists('tl_catalog')) {
+    public function execute($arrSQLCommands)
+    {
+
+        if (!Database::getInstance()->tableExists('tl_catalog')) {
             return $arrSQLCommands;
         }
 
@@ -16,7 +20,7 @@ class SqlCompileCommands {
                     foreach ($arrSQLCommandGroup as $strHex => $strSqlCommand) {
                         $strTable = str_replace('DROP TABLE', '', $strSqlCommand);
                         $strTable = str_replace(' ', '', $strTable);
-                        $objCatalog = \Database::getInstance()->prepare('SELECT * FROM tl_catalog WHERE `table`=?')->limit(1)->execute($strTable);
+                        $objCatalog = Database::getInstance()->prepare('SELECT * FROM tl_catalog WHERE `table`=?')->limit(1)->execute($strTable);
                         if ($objCatalog->numRows) {
                             unset($arrSQLCommands[$strType][$strHex]);
                         }

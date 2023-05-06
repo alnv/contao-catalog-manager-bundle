@@ -3,12 +3,16 @@
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\DataContainer;
+use Contao\System;
 
-class Element {
+class Element
+{
 
-    public function isVisibleElement(&$objElement, $blnIsVisible) {
+    public function isVisibleElement(&$objElement, $blnIsVisible)
+    {
 
-        $objRequest = \System::getContainer()->get('request_stack')->getCurrentRequest();
+        $objRequest = System::getContainer()->get('request_stack')->getCurrentRequest();
 
         if ($objRequest === null) {
             return $blnIsVisible;
@@ -43,7 +47,8 @@ class Element {
         return $blnIsVisible;
     }
 
-    public function onloadCallback(\DataContainer $dc) {
+    public function onloadCallback(DataContainer $dc)
+    {
 
         foreach ($GLOBALS['TL_DCA'][$dc->table]['palettes'] as $strPalette => $strField) {
 

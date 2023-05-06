@@ -2,9 +2,15 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class Application {
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\ArrayUtil;
+use Contao\Input;
 
-    public function initializeBackendModules() {
+class Application
+{
+
+    public function initializeBackendModules()
+    {
 
         $objCatalogCollection = new CatalogCollection();
         $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
@@ -15,24 +21,25 @@ class Application {
             }
             $arrModule = [];
             $arrModule[$arrCatalog['module']] = $this->generateBeModConfig($arrCatalog);
-            array_insert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
+            ArrayUtil::arrayInsert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
         }
     }
 
-    public function generateBeModConfig( $arrCatalog ) {
+    public function generateBeModConfig($arrCatalog)
+    {
 
-        $arrTables = [ $arrCatalog['table'] ];
+        $arrTables = [$arrCatalog['table']];
 
-        if ( is_array( $arrCatalog['related'] ) && !empty( $arrCatalog['related'] ) ) {
-            foreach ( $arrCatalog['related'] as $strTable ) {
+        if (is_array($arrCatalog['related']) && !empty($arrCatalog['related'])) {
+            foreach ($arrCatalog['related'] as $strTable) {
                 $arrTables[] = $strTable;
             }
         }
 
-        if ( !isset( $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] ) ) {
-            $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'], $arrCatalog['name']),
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'] . '.' . 'description', $arrCatalog['description']),
+        if (!isset($GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']])) {
+            $GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']] = [
+                Translation::getInstance()->translate($arrCatalog['module'], $arrCatalog['name']),
+                Translation::getInstance()->translate($arrCatalog['module'] . '.' . 'description', $arrCatalog['description']),
             ];
         }
 
@@ -43,28 +50,30 @@ class Application {
         ];
     }
 
-    public function initializeDataContainerArrays() {
+    public function initializeDataContainerArrays()
+    {
 
-        $strModule = \Input::get('do');
+        $strModule = Input::get('do');
 
-        if ( !$strModule ) {
+        if (!$strModule) {
             return null;
         }
 
-        $this->initializeDataContainerArrayByTable( $strModule );
+        $this->initializeDataContainerArrayByTable($strModule);
     }
 
-    public function initializeDataContainerArrayByTable( $strTable ) {
+    public function initializeDataContainerArrayByTable($strTable)
+    {
 
-        $objVDataContainerArray = new VirtualDataContainerArray( $strTable );
+        $objVDataContainerArray = new VirtualDataContainerArray($strTable);
         $objVDataContainerArray->generate();
         $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
 
-        if ( is_array( $arrRelatedTables ) && !empty( $arrRelatedTables ) ) {
+        if (is_array($arrRelatedTables) && !empty($arrRelatedTables)) {
 
-            foreach ( $arrRelatedTables as $strTable ) {
+            foreach ($arrRelatedTables as $strTable) {
 
-                $this->initializeDataContainerArrayByTable( $strTable );
+                $this->initializeDataContainerArrayByTable($strTable);
             }
         }
     }

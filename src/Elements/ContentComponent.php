@@ -2,18 +2,24 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Elements;
 
-class ContentComponent extends \ContentElement {
+use Contao\ContentElement;
+use Contao\ModuleModel;
+
+class ContentComponent extends ContentElement
+{
 
     protected $strTemplate = 'ce_component';
 
-    public function generate() {
+    public function generate()
+    {
 
         return parent::generate();
     }
 
-    protected function compile() {
+    protected function compile()
+    {
 
-        $objModule = \ModuleModel::findByPk($this->module);
+        $objModule = ModuleModel::findByPk($this->module);
         if ($objModule == null) {
             return null;
         }

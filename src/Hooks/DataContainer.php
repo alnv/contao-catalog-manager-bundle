@@ -4,12 +4,15 @@ namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Contao\System;
 
-class DataContainer {
+class DataContainer
+{
 
-    public function generateDataContainerArray( $strTable ) {
+    public function generateDataContainerArray($strTable)
+    {
 
-        $objRequest = \System::getContainer()->get( 'request_stack' )->getCurrentRequest();
+        $objRequest = System::getContainer()->get('request_stack')->getCurrentRequest();
         if (!$objRequest) {
             return null;
         }
@@ -18,10 +21,10 @@ class DataContainer {
         }
 
         if ($strTable && !isset($GLOBALS['TL_DCA'][$strTable])) {
-            $objCatalog = CatalogModel::findByTableOrModule( $strTable );
-            if ( $objCatalog !== null ) {
+            $objCatalog = CatalogModel::findByTableOrModule($strTable);
+            if ($objCatalog !== null) {
                 $objVirtualDataContainerArray = new Application();
-                $objVirtualDataContainerArray->initializeDataContainerArrayByTable( $strTable );
+                $objVirtualDataContainerArray->initializeDataContainerArrayByTable($strTable);
             }
         }
     }

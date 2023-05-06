@@ -2,11 +2,17 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\Date;
+use Contao\System;
+use Contao\Validator;
 
-class ActiveInsertTag extends \System {
+class ActiveInsertTag extends System
+{
 
-    public function replace( $strFragment ) {
+    public function replace($strFragment)
+    {
 
         $arrFragments = explode('::', $strFragment);
 
@@ -44,26 +50,25 @@ class ActiveInsertTag extends \System {
                 $varValue = $strDefault;
             }
 
-            if (\Validator::isDate($varValue)) {
-                $varValue = (new \Date($varValue, $objPage->dateFormat))->dayBegin;
+            if (Validator::isDate($varValue)) {
+                $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
             }
 
-            if (\Validator::isDatim($varValue)) {
-                $varValue = (new \Date($varValue, $objPage->dateFormat))->dayBegin;
+            if (Validator::isDatim($varValue)) {
+                $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
             }
 
             if (isset($GLOBALS['TL_HOOKS']['replaceActiveInserttag']) && is_array($GLOBALS['TL_HOOKS']['replaceActiveInserttag'])) {
                 foreach ($GLOBALS['TL_HOOKS']['replaceActiveInserttag'] as $arrCallback) {
-                    $this->import($arrCallback[0]);
-                    $varValue = $this->{$arrCallback[0]}->{$arrCallback[1]}($varValue, $arrFragments);
+                    $varValue = System::importStatic($arrCallback[0])->{$arrCallback[1]}($varValue, $arrFragments);
                 }
             }
 
             if ($strMode) {
-                if ($strMode == 'FE' && TL_MODE != $strMode) {
+                if ($strMode == 'FE' && Mode::get() != $strMode) {
                     return '';
                 }
-                if ($strMode == 'BE' && TL_MODE != $strMode) {
+                if ($strMode == 'BE' && Mode::get() != $strMode) {
                     return '';
                 }
             }

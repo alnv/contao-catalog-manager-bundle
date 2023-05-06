@@ -2,26 +2,28 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
-class CatalogCollection extends CatalogWizard {
+class CatalogCollection extends CatalogWizard
+{
 
     protected $arrCatalogs = [];
     protected $arrTypes = [];
 
-    public function __construct() {
+    public function __construct()
+    {
 
         $objCatalogs = CatalogModel::findAll([
             'order' => 'sorting ASC'
         ]);
 
-        if ( $objCatalogs === null ) {
+        if ($objCatalogs === null) {
             return null;
         }
 
         while ($objCatalogs->next()) {
-            if ( !$objCatalogs->table ) {
+            if (!$objCatalogs->table) {
                 continue;
             }
             if (!isset($this->arrTypes[$objCatalogs->type])) {
@@ -30,12 +32,11 @@ class CatalogCollection extends CatalogWizard {
             $this->arrTypes[$objCatalogs->type][] = $objCatalogs->table;
             $this->arrCatalogs[$objCatalogs->table] = $this->parseCatalog($objCatalogs->row());
         }
-
-       parent::__construct();
     }
 
 
-    public function getCatalogs($strType = '') {
+    public function getCatalogs($strType = '')
+    {
 
         if (!$strType) {
             return $this->arrCatalogs;

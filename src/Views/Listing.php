@@ -4,9 +4,11 @@ namespace Alnv\ContaoCatalogManagerBundle\Views;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 
-class Listing extends View {
+class Listing extends View
+{
 
-    public function parse() {
+    public function parse()
+    {
 
         $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
@@ -20,7 +22,8 @@ class Listing extends View {
         return $this->getEntities();
     }
 
-    public function countRows() {
+    public function countRows()
+    {
 
         $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();

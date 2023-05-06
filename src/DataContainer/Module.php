@@ -2,41 +2,47 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-class Module {
+use Contao\Controller;
+use Contao\DataContainer;
+use Contao\Input;
+use Contao\StringUtil;
+use Contao\System;
 
-    public function getTables() {
+class Module
+{
 
-        return (new \Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog())->getTables();
+    public function getTables(): array
+    {
+
+        return (new Catalog())->getTables();
     }
 
-    public function getFields($dc = null) {
+    public function getFields($dc = null)
+    {
 
         $arrReturn = [];
 
-        if ( $dc === null ) {
+        if ($dc === null) {
             return $arrReturn;
         }
 
-        if ( $dc->activeRecord === null || !$dc->activeRecord->cmTable ) {
+        if ($dc->activeRecord === null || !$dc->activeRecord->cmTable) {
             return $arrReturn;
         }
 
-        \System::loadLanguageFile($dc->activeRecord->cmTable, \Input::post('language'));
-        \Controller::loadDataContainer($dc->activeRecord->cmTable);
+        System::loadLanguageFile($dc->activeRecord->cmTable, Input::post('language'));
+        Controller::loadDataContainer($dc->activeRecord->cmTable);
 
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
 
-            $strValue = is_array($arrField['label']) ? $arrField['label'][0] : $strField;
-            $arrReturn[$strField] = \StringUtil::decodeEntities($strValue);
+            $strValue = \is_array($arrField['label']) ? $arrField['label'][0] : $strField;
+            $arrReturn[$strField] = StringUtil::decodeEntities($strValue);
         }
         return $arrReturn;
     }
 
-    public function getListTemplates(\DataContainer $dc) {
-
-        if ($dc == null) {
-            return [];
-        }
+    public function getListTemplates(DataContainer $dc): array
+    {
 
         if (!$dc->activeRecord->type) {
             return [];
@@ -51,10 +57,11 @@ class Module {
                 break;
         }
 
-        return \Controller::getTemplateGroup('cm_' . $strType . '_');
+        return Controller::getTemplateGroup('cm_' . $strType . '_');
     }
 
-    public function getOrderByStatements() {
+    public function getOrderByStatements(): array
+    {
 
         return [
             'ASC',
@@ -62,8 +69,9 @@ class Module {
         ];
     }
 
-    public function getOperators() {
+    public function getOperators(): array
+    {
 
-        return array_keys( $GLOBALS['CM_OPERATORS'] );
+        return \array_keys($GLOBALS['CM_OPERATORS']);
     }
 }

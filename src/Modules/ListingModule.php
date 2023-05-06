@@ -2,7 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
-class ListingModule extends \Alnv\ContaoCatalogManagerBundle\Modules\Listing {
+class ListingModule extends Listing
+{
 
     protected $strKey = 'id';
     protected $arrOptions = [];

@@ -2,27 +2,35 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
-class DynModel extends \Model {
+use Contao\Database;
+use Contao\DcaExtractor;
+use Contao\Model;
+
+class DynModel extends Model
+{
 
     public static $strTable = '';
 
-    public function __construct($objResult = null) {
+    public function __construct($objResult = null)
+    {
 
         if (!static::$strTable) {
             return null;
         }
 
-        parent::__construct( $objResult );
+        parent::__construct($objResult);
     }
 
-    public function createDynTable($strTable, $objResult=null) {
+    public function createDynTable($strTable, $objResult = null)
+    {
 
         static::$strTable = $strTable;
         static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
         parent::__construct($objResult);
     }
 
-    public static function findByIdOrAlias($varId, array $arrOptions=[]) {
+    public static function findByIdOrAlias($varId, array $arrOptions = [])
+    {
 
         $t = static::$strTable;
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
@@ -39,9 +47,10 @@ class DynModel extends \Model {
         return static::find($arrOptions);
     }
 
-    protected static function buildFindQuery(array $arrOptions) {
+    protected static function buildFindQuery(array $arrOptions)
+    {
 
-        $objBase = \DcaExtractor::getInstance($arrOptions['table']);
+        $objBase = DcaExtractor::getInstance($arrOptions['table']);
         $strDistanceSelection = '';
 
         if (isset($arrOptions['distance'])) {
@@ -65,7 +74,7 @@ class DynModel extends \Model {
         } else {
 
             $arrJoins = [];
-            $arrFields = [ $arrOptions['table'] . ".*" ];
+            $arrFields = [$arrOptions['table'] . ".*"];
             $intCount = 0;
 
             foreach ($objBase->getRelations() as $strKey => $arrConfig) {
@@ -75,22 +84,22 @@ class DynModel extends \Model {
                     if ($arrConfig['type'] == 'hasOne' || $arrConfig['type'] == 'belongsTo') {
 
                         ++$intCount;
-                        $objRelated = \DcaExtractor::getInstance($arrConfig['table']);
+                        $objRelated = DcaExtractor::getInstance($arrConfig['table']);
                         foreach (array_keys($objRelated->getFields()) as $strField) {
 
-                            $arrFields[] = 'j' . $intCount . '.' . \Database::quoteIdentifier($strField) . ' AS ' . $strKey . '__' . $strField;
+                            $arrFields[] = 'j' . $intCount . '.' . Database::quoteIdentifier($strField) . ' AS ' . $strKey . '__' . $strField;
                         }
 
-                        $arrJoins[] = " LEFT JOIN " . $arrConfig['table'] . " j$intCount ON " . $arrOptions['table'] . "." . \Database::quoteIdentifier( $strKey ) . "=j$intCount." . $arrConfig['field'];
+                        $arrJoins[] = " LEFT JOIN " . $arrConfig['table'] . " j$intCount ON " . $arrOptions['table'] . "." . Database::quoteIdentifier($strKey) . "=j$intCount." . $arrConfig['field'];
                     }
                 }
             }
 
-            $strQuery = "SELECT " . implode(', ', $arrFields ) . $strDistanceSelection . " FROM " . $arrOptions['table'] . implode( "", $arrJoins );
+            $strQuery = "SELECT " . implode(', ', $arrFields) . $strDistanceSelection . " FROM " . $arrOptions['table'] . implode("", $arrJoins);
         }
 
         if (isset($arrOptions['column'])) {
-            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . \Database::quoteIdentifier($arrOptions['column']) . "=?");
+            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . Database::quoteIdentifier($arrOptions['column']) . "=?");
         }
 
         if (isset($arrOptions['group'])) {

@@ -2,17 +2,30 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\ArrayUtil;
+use Contao\Controller;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Widget;
 
-class Options {
+class Options
+{
 
     protected static $arrField = [];
+
     protected static $arrInstances = [];
+
     protected static $strInstanceId = null;
+
     protected static $arrDataContainer = null;
 
-    public static function getInstance($strInstanceId) {
+    public static function getInstance($strInstanceId)
+    {
 
         if (!$strInstanceId) {
             $strInstanceId = uniqid();
@@ -26,22 +39,24 @@ class Options {
         return static::$arrInstances[$strInstanceId];
     }
 
-    protected static function getGetterId() {
+    protected static function getGetterId()
+    {
 
         self::$arrField['id'] = self::$arrField['id'] ?? '';
         self::$arrField['fieldname'] = self::$arrField['fieldname'] ?? '';
 
-        return (self::$arrField['fieldname']?self::$arrField['fieldname'] . '.':'') . (self::$arrField['id']?:static::$strInstanceId);
+        return (self::$arrField['fieldname'] ? self::$arrField['fieldname'] . '.' : '') . (self::$arrField['id'] ?: static::$strInstanceId);
     }
 
-    public static function getOptions($blnAsAssoc=false) {
+    public static function getOptions($blnAsAssoc = false)
+    {
 
         $arrTemps = [];
         $arrReturn = [];
         $strGetter = static::getGetterId();
-        
-        if (\Cache::has($strGetter)) {
-            return \Cache::get($strGetter);
+
+        if (Cache::has($strGetter)) {
+            return Cache::get($strGetter);
         }
 
         switch (self::$arrField['optionsSource']) {
@@ -91,7 +106,7 @@ class Options {
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
-                \Cache::set($strGetter, $arrReturn);
+                Cache::set($strGetter, $arrReturn);
                 return $arrReturn;
 
             case 'dbActiveOptions':
@@ -122,16 +137,17 @@ class Options {
                     }
                 }
 
-                \Cache::set($strGetter, $arrReturn);
+                Cache::set($strGetter, $arrReturn);
                 return $arrReturn;
         }
 
-        \Cache::set($strGetter, $arrReturn);
+        Cache::set($strGetter, $arrReturn);
 
         return $arrReturn;
     }
 
-    protected static function getValue($strValue, $strField, $strTable) {
+    protected static function getValue($strValue, $strField, $strTable)
+    {
 
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
@@ -141,15 +157,16 @@ class Options {
             }
         }
 
-        return \StringUtil::deserialize($strValue, true);
+        return StringUtil::deserialize($strValue, true);
     }
 
-    protected static function getEntities() {
+    protected static function getEntities()
+    {
 
         $objModel = new ModelWizard(self::$arrField['dbTable']);
         $objModel = $objModel->getModel();
         $arrModelOptions = [];
-        array_insert($arrModelOptions, 0, self::setFilter());
+        ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
         if (self::$arrField['dbOrderField']) {
             $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
             $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
@@ -157,7 +174,8 @@ class Options {
         return $objModel->findAll($arrModelOptions);
     }
 
-    protected static function getCleanLabel($strValue, $strField, $strTable) {
+    protected static function getCleanLabel($strValue, $strField, $strTable)
+    {
 
         if (!$strTable || !$strField) {
             return $strValue;
@@ -165,29 +183,30 @@ class Options {
 
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
-        return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strValue, \Widget::getAttributesFromDca($arrField, $strField, $strValue, $strField, $strTable), [], true);
+        return Toolkit::parseCatalogValue($strValue, Widget::getAttributesFromDca($arrField, $strField, $strValue, $strField, $strTable), [], true);
     }
 
-    protected static function setFilter() {
+    protected static function setFilter()
+    {
 
         $arrOptions = [];
         switch (self::$arrField['dbFilterType']) {
             case 'wizard':
                 $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
-                $arrQueries = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'],$strTable);
+                $arrQueries = Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'], $strTable);
                 $arrOptions['column'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
                 $arrOptions['value'] = isset($arrQueries['value']) ? $arrQueries['value'] : [];
                 break;
             case 'expert':
-                self::$arrField['dbFilterValue'] = \Controller::replaceInsertTags(self::$arrField['dbFilterValue']);
-                $arrOptions['column'] = explode(';',\StringUtil::decodeEntities(self::$arrField['dbFilterColumn']));
-                $arrOptions['value'] = explode(';',\StringUtil::decodeEntities(self::$arrField['dbFilterValue']));
+                self::$arrField['dbFilterValue'] = Toolkit::replaceInsertTags(self::$arrField['dbFilterValue']);
+                $arrOptions['column'] = explode(';', StringUtil::decodeEntities(self::$arrField['dbFilterColumn']));
+                $arrOptions['value'] = explode(';', StringUtil::decodeEntities(self::$arrField['dbFilterValue']));
                 if ((is_array($arrOptions['value']) && !empty($arrOptions['value']))) {
                     $intIndex = -1;
                     $arrOptions['value'] = array_filter($arrOptions['value'], function ($strValue) use (&$intIndex, $arrOptions) {
                         $intIndex = $intIndex + 1;
                         if ($strValue === '' || $strValue === null) {
-                            unset($arrOptions['column'][ $intIndex ]);
+                            unset($arrOptions['column'][$intIndex]);
                             return false;
                         }
                         return true;
@@ -208,21 +227,23 @@ class Options {
         return $arrOptions;
     }
 
-    public static function setParameter($arrField, $objDataContainer=null) {
+    public static function setParameter($arrField, $objDataContainer = null)
+    {
 
         self::$arrField = $arrField;
         self::$arrDataContainer = $objDataContainer;
 
         if (self::$arrField['dbTable']) {
-            \System::loadLanguageFile(self::$arrField['dbTable']);
-            \Controller::loadDataContainer(self::$arrField['dbTable']);
+            System::loadLanguageFile(self::$arrField['dbTable']);
+            Controller::loadDataContainer(self::$arrField['dbTable']);
         }
     }
 
-    protected static function getLabel($strValue, $strFallbackLabel='') {
+    protected static function getLabel($strValue, $strFallbackLabel = '')
+    {
 
         $strTable = self::$arrField['dbTable'] ?: 'option';
-        $strFallbackLabel = \StringUtil::decodeEntities($strFallbackLabel);
-        return \Controller::replaceInsertTags(\Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate(($strTable?$strTable.'.':'') . (self::$arrField['fieldname']?:self::$arrField['dbKey']) . '.' . $strValue, $strFallbackLabel));
+        $strFallbackLabel = StringUtil::decodeEntities($strFallbackLabel);
+        return Toolkit::replaceInsertTags(Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . (self::$arrField['fieldname'] ?: self::$arrField['dbKey']) . '.' . $strValue, $strFallbackLabel));
     }
 }

@@ -2,26 +2,31 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-use Symfony\Component\HttpKernel\EventListener\ValidateRequestListener;
+use Contao\Date;
+use Contao\Environment;
 
-class ICalendar {
+class ICalendar
+{
 
     protected $arrEntity = [];
 
-    public function __construct( $arrEntity ) {
+    public function __construct($arrEntity)
+    {
 
         $this->arrEntity = $arrEntity;
     }
 
-    public function getICalendarUrl() {
+    public function getICalendarUrl()
+    {
 
         global $objPage;
 
-        return 'catalog-manager/icalendar/?t='. ( $this->arrEntity['_table'] ) .'&i='. ( $this->arrEntity['id'] ) .'&p=' . $objPage->id;
+        return 'catalog-manager/icalendar/?t=' . ($this->arrEntity['_table']) . '&i=' . ($this->arrEntity['id']) . '&p=' . $objPage->id;
     }
 
 
-    public function getICalFile() {
+    public function getICalFile()
+    {
 
         global $objPage;
 
@@ -33,30 +38,30 @@ class ICalendar {
         $strTeaser = $this->arrEntity['roleResolver']()->getValueByRole('teaser');
         $strTitle = $this->arrEntity['roleResolver']()->getValueByRole('title');
         $strCity = $this->arrEntity['roleResolver']()->getValueByRole('city');
-        $strStart = $this->setICalendarDate( $strStartDate . ( $strStartTime ? ' ' . $strStartTime : '' ), ( $strStartTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat ) );
-        $strEnd = $this->setICalendarDate( $strEndDate . ( $strEndTime ? ' ' . $strEndTime : '' ), ( $strEndTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat ) );
+        $strStart = $this->setICalendarDate($strStartDate . ($strStartTime ? ' ' . $strStartTime : ''), ($strStartTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat));
+        $strEnd = $this->setICalendarDate($strEndDate . ($strEndTime ? ' ' . $strEndTime : ''), ($strEndTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat));
 
         $arrICalFormat = [
             'BEGIN:' => 'VEVENT',
             'DTSTART:' => $strStart,
             'DTEND:' => $strEnd,
-            'LOCATION:' => $strCity . ( $strLocation ? ', ' . $strLocation : '' ),
-            'DTSTAMP:' => date( 'Ymd\THis', time() ),
+            'LOCATION:' => $strCity . ($strLocation ? ', ' . $strLocation : ''),
+            'DTSTAMP:' => date('Ymd\THis', time()),
             'SUMMARY:' => $strTitle,
-            'URL;VALUE=URI:' => \Environment::get('uri'),
+            'URL;VALUE=URI:' => Environment::get('uri'),
             'DESCRIPTION:' => $strTeaser,
-            'UID:' => md5( $this->arrEntity['id'] ),
+            'UID:' => md5($this->arrEntity['id']),
             'END:' => 'VEVENT'
         ];
 
         $strFile =
             "BEGIN:VCALENDAR" . "\r\n" .
-            "VERSION:2.0" . "\r\n".
+            "VERSION:2.0" . "\r\n" .
             "PRODID:https://catalog-manager.org" . "\r\n";
 
-        foreach ( $arrICalFormat as $strFieldname => $strValue ) {
+        foreach ($arrICalFormat as $strFieldname => $strValue) {
 
-            if ( !$strValue ) {
+            if (!$strValue) {
 
                 continue;
             }
@@ -70,13 +75,13 @@ class ICalendar {
     }
 
 
-    protected function setICalendarDate( $strDate, $strFormat ) {
+    protected function setICalendarDate($strDate, $strFormat)
+    {
 
-        if ( !$strDate ) {
-
+        if (!$strDate) {
             return '';
         }
 
-        return date( 'Ymd\THis', (new \Date( $strDate, $strFormat ))->tstamp );
+        return date('Ymd\THis', (new Date($strDate, $strFormat))->tstamp);
     }
 }

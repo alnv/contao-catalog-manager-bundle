@@ -2,18 +2,23 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Contao\Input;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Config;
+use Contao\StringUtil;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
 class CatalogField
 {
 
-    public function checkExtensions($varValue, \DataContainer $dc)
+    public function checkExtensions($varValue, DataContainer $dc)
     {
 
         $varValue = strtolower($varValue);
-        $arrExtensions = \StringUtil::trimsplit(',', $varValue);
-        $arrUploadTypes = \StringUtil::trimsplit(',', strtolower(\Config::get('uploadTypes')));
+        $arrExtensions = StringUtil::trimsplit(',', $varValue);
+        $arrUploadTypes = StringUtil::trimsplit(',', strtolower(Config::get('uploadTypes')));
         $arrNotAllowed = array_diff($arrExtensions, $arrUploadTypes);
 
         if (0 !== count($arrNotAllowed)) {
@@ -39,7 +44,7 @@ class CatalogField
         return $arrReturn;
     }
 
-    public function getRoles(\DataContainer $dc)
+    public function getRoles(DataContainer $dc)
     {
 
         $arrRoles = array_keys($GLOBALS['CM_ROLES']);
@@ -64,15 +69,17 @@ class CatalogField
         return $arrRoles;
     }
 
-    public function watchFieldname($strFieldname, \DataContainer $objDataContainer)
+    public function watchFieldname($strFieldname, DataContainer $objDataContainer)
     {
 
-        $objDatabase = \Database::getInstance();
+        $objDatabase = Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
         $arrActiveRecord = $objDataContainer->activeRecord->row();
-        if (\Input::post('role')) {
-            $arrActiveRecord['role'] = \Input::post('role');
+
+        if (Input::post('role')) {
+            $arrActiveRecord['role'] = Input::post('role');
         }
+
         $strSql = Toolkit::getSql($strType, $arrActiveRecord);
         $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
         $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
@@ -105,7 +112,7 @@ class CatalogField
         return $strFieldname;
     }
 
-    public function changeFieldType($strValue, \DataContainer $objDataContainer)
+    public function changeFieldType($strValue, DataContainer $objDataContainer)
     {
 
         if (!$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname) {
@@ -131,7 +138,7 @@ class CatalogField
     {
 
         $arrReturn = [];
-        $objDatabase = \Database::getInstance();
+        $objDatabase = Database::getInstance();
         $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
 
         if (!$objImagesSize->numRows) {

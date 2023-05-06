@@ -1,10 +1,13 @@
 <?php
 
+use Contao\Input;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+
 $GLOBALS['TL_DCA']['tl_content']['palettes']['component'] = '{type_legend},type;{include_legend},module;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
-if (\Input::get('do')) {
-    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule((\Input::get('sourceTable')?:\Input::get('do')), [
+if (Input::get('do')) {
+    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule((Input::get('sourceTable') ?: Input::get('do')), [
         'limit' => 1
     ]);
     if ($objCatalog !== null) {
@@ -13,16 +16,16 @@ if (\Input::get('do')) {
         }
     }
 }
-if (\Input::get('do') == 'catalog-element') {
+if (Input::get('do') == 'catalog-element') {
     $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_catalog_element';
 }
 
 foreach ($GLOBALS['TL_DCA']['tl_content']['palettes'] as $strPalette => $strFields) {
-    if ( in_array($strPalette, [ '__selector__', 'default' ])) {
+    if (in_array($strPalette, ['__selector__', 'default'])) {
         continue;
     }
-    \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-        ->addField('cmHide', 'type_legend', \Contao\CoreBundle\DataContainer\PaletteManipulator::POSITION_APPEND )
+    PaletteManipulator::create()
+        ->addField('cmHide', 'type_legend', PaletteManipulator::POSITION_APPEND)
         ->applyToPalette($strPalette, 'tl_content');
 }
 
@@ -59,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cmTable'] = [
         'tl_class' => 'w50',
         'mandatory' => true,
         'submitOnChange' => true,
-        'includeBlankOption'=> true,
+        'includeBlankOption' => true,
     ],
     'options_callback' => ['catalogmanager.datacontainer.module', 'getTables'],
     'exclude' => true,
@@ -96,7 +99,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cmOrder'] = [
         'options2_callback' => ['catalogmanager.datacontainer.module', 'getOrderByStatements']
     ],
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
-    'sql' => ['type' => 'blob', 'notnull' => false ]
+    'sql' => ['type' => 'blob', 'notnull' => false]
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['cmFilter'] = [
     'inputType' => 'checkbox',
@@ -130,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cmWizardFilterSettings'] = [
         'enableGroup' => true
     ],
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
-    'sql' => ['type' => 'blob', 'notnull' => false ]
+    'sql' => ['type' => 'blob', 'notnull' => false]
 ];
 $GLOBALS['TL_DCA']['tl_content']['fields']['cmColumn'] = [
     'inputType' => 'textarea',

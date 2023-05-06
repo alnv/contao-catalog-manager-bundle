@@ -2,15 +2,19 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
-class CatalogOptionModel extends \Model {
+use Contao\Model;
+
+class CatalogOptionModel extends Model
+{
 
     protected static $strTable = 'tl_catalog_option';
 
-    public static function findByValueAndPid( $strValue, $strPid, array $arrOptions=[] ) {
+    public static function findByValueAndPid($strValue, $strPid, array $arrOptions = [])
+    {
 
         $strT = static::$strTable;
-        $arrColumns = [ "$strT.value=? AND $strT.pid=?" ];
+        $arrColumns = ["$strT.value=? AND $strT.pid=?"];
 
-        return static::findOneBy( $arrColumns, [$strValue, $strPid], $arrOptions );
+        return static::findOneBy($arrColumns, [$strValue, $strPid], $arrOptions);
     }
 }

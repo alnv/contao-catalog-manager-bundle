@@ -3,10 +3,20 @@
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
+use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\FrontendTemplate;
+use Contao\System;
 
-class WatchlistInsertTag {
+class WatchlistInsertTag
+{
 
-    public function replace($strFragment) {
+    public function replace($strFragment)
+    {
 
         $arrFragments = explode('::', $strFragment);
 
@@ -27,7 +37,7 @@ class WatchlistInsertTag {
                         $arrOptions['tables'] = explode(',', $strOption);
                         break;
                     case 'total':
-                        $arrOptions['total'] = (bool) $strOption;
+                        $arrOptions['total'] = (bool)$strOption;
                         break;
                     case 'template':
                         $arrOptions['template'] = $strOption ?: '';
@@ -43,22 +53,22 @@ class WatchlistInsertTag {
         if ($strType == 'WATCHLIST-COUNT') {
 
             $intCount = 0;
-            $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
+            $objWatchlist = WatchlistModel::getBySession();
 
             if (!$objWatchlist) {
                 return $intCount;
             }
 
             while ($objWatchlist->next()) {
-                if (!\Database::getInstance()->tableExists($objWatchlist->table)) {
+                if (!Database::getInstance()->tableExists($objWatchlist->table)) {
                     continue;
                 }
-                $objEntity = \Database::getInstance()->prepare('SELECT * FROM '. $objWatchlist->table . ' WHERE id=?')->limit(1)->execute($objWatchlist->identifier);
+                $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $objWatchlist->table . ' WHERE id=?')->limit(1)->execute($objWatchlist->identifier);
                 if (!$objEntity->numRows) {
                     continue;
                 }
                 if ($arrOptions['total']) {
-                    $intCount += (int) $objWatchlist->units;
+                    $intCount += (int)$objWatchlist->units;
                 } else {
                     $intCount++;
                 }
@@ -71,8 +81,8 @@ class WatchlistInsertTag {
 
             $arrItems = [];
             $arrIdentifiers = [];
-            $objTemplate = new \FrontendTemplate(($arrOptions['template'] ?:'ce_watchlist_table'));
-            $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
+            $objTemplate = new FrontendTemplate(($arrOptions['template'] ?: 'ce_watchlist_table'));
+            $objWatchlist = WatchlistModel::getBySession();
 
             if ($objWatchlist) {
                 while ($objWatchlist->next()) {
@@ -95,8 +105,8 @@ class WatchlistInsertTag {
                     continue;
                 }
 
-                \DataContainer::loadDataContainer($strTable);
-                \System::loadLanguageFile($strTable);
+                DataContainer::loadDataContainer($strTable);
+                System::loadLanguageFile($strTable);
 
                 $strT = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?: $strTable;
 
@@ -110,15 +120,15 @@ class WatchlistInsertTag {
                 }
                 $arrColumn[] = implode(' OR ', $arrQuery);
 
-                $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($strTable, [
+                $objListing = new Listing($strTable, [
                     'value' => $arrValue,
                     'column' => $arrColumn,
-                    'order' => "FIELD($strT.id,".implode(',', $arrIds).")"
+                    'order' => "FIELD($strT.id," . implode(',', $arrIds) . ")"
                 ]);
 
                 if (!isset($arrItems[$strTable])) {
 
-                    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
+                    $objCatalog = CatalogModel::findByTableOrModule($strTable);
                     $arrItems[$strTable] = [
                         'entities' => [],
                         'catalog' => $objCatalog ? $objCatalog->row() : [],
@@ -128,7 +138,7 @@ class WatchlistInsertTag {
                 }
 
                 foreach ($objListing->parse() as $arrEntity) {
-                    $arrEntity['watchlistData'] = \Alnv\ContaoCatalogManagerBundle\Library\Watchlist::getData($arrEntity['id'], $strTable);
+                    $arrEntity['watchlistData'] = Watchlist::getData($arrEntity['id'], $strTable);
                     $arrItems[$strTable]['entities'][] = $arrEntity;
                 }
             }
@@ -143,7 +153,7 @@ class WatchlistInsertTag {
 
         if ($strType == 'WATCHLIST-RESET') {
 
-            $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
+            $objWatchlist = WatchlistModel::getBySession();
 
             if (!$objWatchlist) {
                 return '';
@@ -162,10 +172,11 @@ class WatchlistInsertTag {
         return false;
     }
 
-    protected function getWatchListIDs($arrOptions=[]) {
+    protected function getWatchListIDs($arrOptions = [])
+    {
 
         $arrIds = [];
-        $objWatchlist = \Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel::getBySession();
+        $objWatchlist = WatchlistModel::getBySession();
 
         if (!$objWatchlist) {
             return '0';

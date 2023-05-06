@@ -2,19 +2,23 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
-class OptionSourcePalette {
+class OptionSourcePalette
+{
 
-    public static function getPalette() {
+    public static function getPalette(): string
+    {
 
         return 'dbTable,dbKey,dbLabel,dbFilterType,dbOrderField,dbOrder';
     }
 
-    public static function getActivePalette() {
+    public static function getActivePalette(): string
+    {
 
         return 'dbTable,dbKey,dbFilterType,dbOrderField,dbOrder';
     }
 
-    public static function getFields() {
+    public static function getFields(): array
+    {
 
         return [
             'dbTable' => [
@@ -28,7 +32,7 @@ class OptionSourcePalette {
                     'submitOnChange' => true,
                     'includeBlankOption' => true
                 ],
-                'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getTables' ],
+                'options_callback' => ['catalogmanager.datacontainer.catalog', 'getTables'],
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbKey' => [
@@ -53,7 +57,7 @@ class OptionSourcePalette {
                     'tl_class' => 'w50',
                     'includeBlankOption' => true
                 ],
-                'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDbFields' ],
+                'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbFilterType' => [
@@ -98,7 +102,7 @@ class OptionSourcePalette {
                     'enableGroup' => true
                 ],
                 'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
-                'sql' => ['type' => 'blob', 'notnull' => false ]
+                'sql' => ['type' => 'blob', 'notnull' => false]
             ],
             'dbOrderField' => [
                 'label' => &$GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'],
@@ -111,7 +115,7 @@ class OptionSourcePalette {
                     'tl_class' => 'w50',
                     'includeBlankOption' => true
                 ],
-                'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDbFields' ],
+                'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
                 'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
             ],
             'dbOrder' => [

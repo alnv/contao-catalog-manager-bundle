@@ -2,7 +2,20 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class VirtualDataContainerArray extends \System
+use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\ArrayUtil;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Widget;
+
+class VirtualDataContainerArray
 {
 
     protected $arrCatalog = [];
@@ -15,8 +28,6 @@ class VirtualDataContainerArray extends \System
         $this->arrCatalog = $objCatalog->getCatalog();
         $this->arrFields = $objCatalog->getFields();
         $this->generateEmptyDataContainer();
-
-        return parent::__construct();
     }
 
     protected function setConfig()
@@ -31,9 +42,9 @@ class VirtualDataContainerArray extends \System
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
 
         if ($this->arrCatalog['enableGeocoding']) {
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (\DataContainer $objDataContainer) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
                 if ($objDataContainer->activeRecord) {
-                    \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
+                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
                 }
             };
         }
@@ -43,16 +54,16 @@ class VirtualDataContainerArray extends \System
                 return null;
             }
             if ($objDataContainer->id) {
-                $objActiveRecord = \Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
+                $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
                 if (!$objActiveRecord->numRows) {
                     return null;
                 }
-                \Cache::set('activeRecord', $objActiveRecord->row());
+                Cache::set('activeRecord', $objActiveRecord->row());
             }
         };
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = true;
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = $this->arrCatalog['enableVisibility'] ? true : false;
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = (bool)$this->arrCatalog['enableVisibility'];
     }
 
     protected function setList()
@@ -104,9 +115,9 @@ class VirtualDataContainerArray extends \System
             }
 
             if (in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable']) && !$this->arrCatalog['showColumns']) {
-                $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, \DataContainer $dc) {
+                $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, DataContainer $dc) {
                     try {
-                        $varReturn = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseCatalogValue($strGroupValue, \Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
+                        $varReturn = Toolkit::parseCatalogValue($strGroupValue, Widget::getAttributesFromDca($this->arrFields[$strField], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
                     } catch (\Exception $objError) {
                         $varReturn = '';
                     }
@@ -116,8 +127,8 @@ class VirtualDataContainerArray extends \System
         }
 
         if (count($arrList['labels']['fields']) > 0) {
-            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
-                return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
+            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
+                return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
         }
 
@@ -125,7 +136,7 @@ class VirtualDataContainerArray extends \System
             $arrList['sorting']['mode'] = 4;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] = function ($arrRow) use ($arrList) {
-                return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
+                return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
 
             $arrList['labels']['showColumns'] = false;
@@ -136,12 +147,12 @@ class VirtualDataContainerArray extends \System
             $arrList['sorting']['fields'] = ['sorting'];
             $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon
             $arrList['labels']['fields'] = $this->arrCatalog['columns'];
-            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, \DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
-                return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::renderTreeRow($arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
+            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
+                return Toolkit::renderTreeRow($arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
             $arrList['sorting']['fields'] = [];
             $arrList['labels']['showColumns'] = false;
-            array_insert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'cut' => [
                     'icon' => 'cut.svg',
                     'href' => 'act=paste&amp;mode=cut',
@@ -154,7 +165,7 @@ class VirtualDataContainerArray extends \System
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['sorting'] = $arrList['sorting'];
 
         if ($this->arrCatalog['enableCopy']) {
-            array_insert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'copy' => [
                     'href' => 'act=copy',
                     'icon' => 'copy.gif'
@@ -163,7 +174,7 @@ class VirtualDataContainerArray extends \System
         }
 
         if ($this->arrCatalog['enableVisibility']) {
-            array_insert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], count($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations']) - 1, [
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], count($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations']) - 1, [
                 'toggle' => [
                     'icon' => 'visible.gif',
                     'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s,\'' . $this->arrCatalog['table'] . '\')"',
@@ -183,7 +194,7 @@ class VirtualDataContainerArray extends \System
     protected function setPalettes()
     {
 
-        $objPalettes = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findAll([
+        $objPalettes = CatalogPaletteModel::findAll([
             'column' => ['type=? AND published=? AND pid=?'],
             'value' => ['palette', '1', $this->arrCatalog['id']],
             'sorting' => 'sorting ASC'
@@ -206,16 +217,16 @@ class VirtualDataContainerArray extends \System
 
             $arrLegends = [];
             $strLegend = '';
-            $strName = \StringUtil::generateAlias(strtolower($objPalettes->name));
-            $arrFields = \StringUtil::deserialize($objPalettes->fields, true);
-            $arrFieldsets = \StringUtil::deserialize($objPalettes->fieldsets, true);
+            $strName = StringUtil::generateAlias(strtolower($objPalettes->name));
+            $arrFields = StringUtil::deserialize($objPalettes->fields, true);
+            $arrFieldsets = StringUtil::deserialize($objPalettes->fieldsets, true);
 
             foreach ($arrFields as $arrField) {
 
                 if ($arrField['field'] == '__FIELDSET__') {
                     $arrFieldset = current($arrFieldsets);
-                    $strLegend = \StringUtil::generateAlias($arrFieldset['label']) . '_legend';
-                    $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strLegend] = \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . 'fieldset.' . $strLegend, $arrFieldset['label']);
+                    $strLegend = StringUtil::generateAlias($arrFieldset['label']) . '_legend';
+                    $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strLegend] = Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . 'fieldset.' . $strLegend, $arrFieldset['label']);
                     $strLegend .= ($arrFieldset['hide'] ? ':hide' : '');
                     next($arrFieldsets);
                     continue;
@@ -227,7 +238,7 @@ class VirtualDataContainerArray extends \System
 
                 $strField = $arrField['field'];
                 if (is_numeric($arrField['field'])) {
-                    $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
+                    $objField = CatalogFieldModel::findByPk($arrField['field']);
                     if (!$objField) {
                         continue;
                     }
@@ -295,7 +306,7 @@ class VirtualDataContainerArray extends \System
     protected function setSubPalettes()
     {
 
-        $objSubPalettes = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findAll([
+        $objSubPalettes = CatalogPaletteModel::findAll([
             'column' => ['type=? AND published=?'],
             'value' => ['subpalette', '1'],
             'sorting' => 'sorting ASC'
@@ -313,14 +324,14 @@ class VirtualDataContainerArray extends \System
 
             $strFieldname = $objSubPalettes->selector;
             if (is_numeric($objSubPalettes->selector)) {
-                $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($objSubPalettes->selector);
+                $objField = CatalogFieldModel::findByPk($objSubPalettes->selector);
                 if (!$objField) {
                     continue;
                 }
                 $strFieldname = $objField->fieldname;
             }
 
-            $arrFields = $this->getFieldsOnly(\StringUtil::deserialize($objSubPalettes->fields, true));
+            $arrFields = $this->getFieldsOnly(StringUtil::deserialize($objSubPalettes->fields, true));
             $strPalette = $strFieldname;
             $this->addSubmitOnChange($strFieldname);
             $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'][] = $strFieldname;
@@ -342,7 +353,7 @@ class VirtualDataContainerArray extends \System
 
             $strField = $arrField['field'];
             if (is_numeric($strField)) {
-                $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($arrField['field']);
+                $objField = CatalogFieldModel::findByPk($arrField['field']);
                 if (!$objField) {
                     continue;
                 }
@@ -365,8 +376,8 @@ class VirtualDataContainerArray extends \System
 
             $strName = isset($arrField['name']) && $arrField['name'] ? $arrField['name'] : '';
             $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $strName),
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $strName)
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $strName),
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $strName)
             ];
         }
     }
@@ -385,9 +396,9 @@ class VirtualDataContainerArray extends \System
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = [
             'config' => [
                 'onsubmit_callback' => [
-                    function (\DataContainer $objDataContainer) {
+                    function (DataContainer $objDataContainer) {
                         if ($objDataContainer->activeRecord) {
-                            \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::saveAlias($objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog);
+                            Toolkit::saveAlias($objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog);
                         }
                     }
                 ],
@@ -449,7 +460,7 @@ class VirtualDataContainerArray extends \System
         foreach ($this->arrCatalog['ctable'] as $strTable) {
             $strTitle = '';
             $strDescription = '';
-            $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
+            $objCatalog = CatalogModel::findByTableOrModule($strTable);
             if ($objCatalog !== null) {
                 $strTitle = $objCatalog->name;
                 $strDescription = $objCatalog->description;
@@ -457,13 +468,13 @@ class VirtualDataContainerArray extends \System
             $arrOperation = [];
             $arrOperation['child_' . $strTable] = [
                 'label' => [
-                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
-                    \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
+                    Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
+                    Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
                 'icon' => 'edit.gif'
             ];
-            array_insert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }
     }
 
@@ -484,8 +495,7 @@ class VirtualDataContainerArray extends \System
 
         if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
             foreach ($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback) {
-                $this->import($arrCallback[0]);
-                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrCatalog['table'], $this);
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($this->arrCatalog['table'], $this);
             }
         }
     }

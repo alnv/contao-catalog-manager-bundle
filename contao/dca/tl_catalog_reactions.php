@@ -1,5 +1,6 @@
 <?php
 
+use Contao\Config;
 
 $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
     'config' => [
@@ -93,7 +94,7 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
                         'eval' => [
                             'filesOnly' => true,
                             'fieldType' => 'radio',
-                            'extensions' => \Config::get('validImageTypes'),
+                            'extensions' => Config::get('validImageTypes'),
                             'tl_class' => 'clr'
                         ]
                     ]
@@ -107,7 +108,7 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
                 'mandatory' => true,
                 'tl_class' => 'w50 clr'
             ],
-            'options_callback' => function() {
+            'options_callback' => function () {
                 return $this->getTemplateGroup('reactions_');
             },
             'sql' => "varchar(64) NOT NULL default ''"

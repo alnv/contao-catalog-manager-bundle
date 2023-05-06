@@ -1,5 +1,7 @@
 <?php
 
+use Contao\System;
+
 $GLOBALS['TL_DCA']['tl_catalog'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -56,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -73,7 +75,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         ]
     ],
     'palettes' => [
-        '__selector__' => [ 'type', 'mode', 'sortingType' ],
+        '__selector__' => ['type', 'mode', 'sortingType'],
         'default' => '{type_settings},type;',
         'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
         'modifier' => '{type_settings},type;{general_settings},name;'
@@ -84,17 +86,17 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'sortingType_none' => '',
         'mode_list' => 'sortingType,columns,showColumns',
         'mode_parent' => 'headerFields,sortingType,columns',
-        'mode_tree'=> 'columns'
+        'mode_tree' => 'columns'
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'pid' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
@@ -136,7 +138,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getCatalogTypes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getCatalogTypes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['type'],
             'filter' => true,
             'sorting' => true,
@@ -168,7 +170,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'w50',
                 'mandatory' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getDataContainers' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDataContainers'],
             'sql' => ['type' => 'string', 'length' => 32, 'default' => 'Table']
         ],
         'validAliasCharacters' => [
@@ -180,8 +182,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'chosen' => true,
                 'tl_class' => 'w50'
             ],
-            'options_callback' => static function() {
-                return \System::getContainer()->get('contao.slug.valid_characters')->getOptions();
+            'options_callback' => static function () {
+                return System::getContainer()->get('contao.slug.valid_characters')->getOptions();
             },
             'sql' => "varchar(255) NOT NULL default '0-9a-zA-Z'"
         ],
@@ -195,7 +197,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'mandatory' => true,
                 'submitOnChange' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getModes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getModes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'],
             'sql' => ['type' => 'string', 'length' => 16, 'default' => 'list']
         ],
@@ -204,10 +206,10 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'eval' => [
                 'tl_class' => 'w50',
                 'mandatory' => true,
-                'options2_callback' => [ 'catalogmanager.datacontainer.catalog', 'getOrderByStatements' ]
+                'options2_callback' => ['catalogmanager.datacontainer.catalog', 'getOrderByStatements']
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
-            'sql' => ['type' => 'blob', 'notnull' => false ]
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getFields'],
+            'sql' => ['type' => 'blob', 'notnull' => false]
         ],
         'flag' => [
             'inputType' => 'select',
@@ -217,7 +219,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'maxlength' => 2,
                 'tl_class' => 'w50',
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFlags' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getFlags'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['flag'],
             'sql' => ['type' => 'string', 'length' => 2, 'default' => '1']
         ],
@@ -228,7 +230,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'maxlength' => 128,
                 'tl_class' => 'w50'
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getFields' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getFields'],
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'headerFields' => [
@@ -237,8 +239,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'tl_class' => 'clr',
                 'multiple' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getParentFields' ],
-            'sql' => ['type' => 'blob', 'notnull' => false ]
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getParentFields'],
+            'sql' => ['type' => 'blob', 'notnull' => false]
         ],
         'showColumns' => [
             'inputType' => 'checkbox',
@@ -258,7 +260,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'submitOnChange' => true
             ],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalog', 'getSortingTypes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalog', 'getSortingTypes'],
             'sql' => ['type' => 'string', 'length' => 16, 'fixed' => true, 'default' => 'fixed']
         ],
         'columns' => [

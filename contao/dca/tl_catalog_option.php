@@ -1,5 +1,10 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Input;
+
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
         'closed' => true,
@@ -7,24 +12,24 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
         'enableVersioning' => true,
         'ptable' => 'tl_catalog_field',
         'onsubmit_callback' => [
-            function(\DataContainer $objDataContainer) {
-                if (!$objDataContainer->activeRecord || !\Input::get('dcaWizard')) {
+            function (DataContainer $objDataContainer) {
+                if (!$objDataContainer->activeRecord || !Input::get('dcaWizard')) {
                     return null;
                 }
                 $arrSet = [];
                 $arrSet['tstamp'] = time();
-                $arrSet['pid'] = \Input::get('dcaWizard');
-                \Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                $arrSet['pid'] = Input::get('dcaWizard');
+                Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
             },
-            function(\DataContainer $objDataContainer) {
+            function (DataContainer $objDataContainer) {
                 if (!$objDataContainer->activeRecord) {
                     return null;
                 }
-                $objActive = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_option WHERE id=?')->limit(1)->execute($objDataContainer->activeRecord->id);
+                $objActive = Database::getInstance()->prepare('SELECT * FROM tl_catalog_option WHERE id=?')->limit(1)->execute($objDataContainer->activeRecord->id);
                 $arrSet = [];
                 $arrSet['tstamp'] = time();
-                $arrSet['value'] = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
-                \Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
+                $arrSet['value'] = Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
+                Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
             }
         ],
         'sql' => [
@@ -39,8 +44,8 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             'mode' => 4,
             'fields' => ['sorting'],
             'headerFields' => ['name', 'type', 'fieldname', 'role'],
-            'child_record_callback' => function($arrRow) {
-                return $arrRow['label'] . '<span style="color:#999;padding-left:3px">['. $arrRow['value'] .']</span>';
+            'child_record_callback' => function ($arrRow) {
+                return $arrRow['label'] . '<span style="color:#999;padding-left:3px">[' . $arrRow['value'] . ']</span>';
             }
         ],
         'operations' => [
@@ -53,7 +58,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 'href' => 'act=delete',
                 'icon' => 'delete.gif',
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog_option']['delete'],
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
                 'href' => 'act=show',
@@ -66,17 +71,17 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
             'options_callback' => ['catalogmanager.datacontainer.catalogoption', 'getFieldLabels'],
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'label' => [
             'inputType' => 'text',
@@ -104,7 +109,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     ]
 ];
 
-if (\Input::get('dcaWizard')) {
+if (Input::get('dcaWizard')) {
     $GLOBALS['TL_DCA']['tl_catalog_option']['config']['closed'] = false;
-    $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['filter'] = [['pid=?',\Input::get('id')]];
+    $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['filter'] = [['pid=?', Input::get('id')]];
 }

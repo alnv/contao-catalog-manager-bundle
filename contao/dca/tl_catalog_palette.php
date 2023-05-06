@@ -1,53 +1,60 @@
 <?php
 
+use Contao\StringUtil;
+use Contao\DataContainer;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+
 $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
     'config' => [
         'dataContainer' => 'Table',
         'enableVersioning' => true,
         'ptable' => 'tl_catalog',
         'onload_callback' => [
-            function (\DataContainer $objDataContainer) {
+            function (DataContainer $objDataContainer) {
 
-                $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
+                $objCurrent = CatalogPaletteModel::findByPk($objDataContainer->id);
                 if (!$objCurrent) {
                     return null;
                 }
 
                 if ($objCurrent->type == 'subpalette' && $objCurrent->selector) {
-                    $arrOptions = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objCurrent->selector);
+                    $arrOptions = (new CatalogPalette())->getFieldOptions($objCurrent->selector);
                     if (!empty($arrOptions)) {
-                        \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                        PaletteManipulator::create()
                             ->addField('selector_option', 'selector')
                             ->applyToPalette('subpalette', 'tl_catalog_palette');
                         $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_option']['options'] = $arrOptions;
                     }
                 }
 
-                if ($objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByFieldnameAndPid('type', $objCurrent->pid)) {
-                    \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                if ($objField = CatalogFieldModel::findByFieldnameAndPid('type', $objCurrent->pid)) {
+                    PaletteManipulator::create()
                         ->addField('selector_type', 'name')
                         ->applyToPalette('palette', 'tl_catalog_palette');
-                    $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objField->id);
+                    $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new CatalogPalette())->getFieldOptions($objField->id);
                 }
 
-                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
+                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
             }
         ],
         'onsubmit_callback' => [
-            function (\DataContainer $objDataContainer) {
+            function (DataContainer $objDataContainer) {
 
                 $arrFields = [];
                 $intPosition = 0;
-                $arrFieldsets = \StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
+                $arrFieldsets = StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
 
-                foreach (\StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
+                foreach (StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
                     if ($arrField['field'] === '__FIELDSET__') {
                         $intPosition++;
                         $arrFields[] = 'Fieldset ' . $intPosition;
                     }
                 }
 
-                $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
+                $objCurrent = CatalogPaletteModel::findByPk($objDataContainer->id);
                 if (count($arrFieldsets) != count($arrFields)) {
                     $arrNewSets = [];
                     foreach ($arrFields as $strIndex => $strField) {

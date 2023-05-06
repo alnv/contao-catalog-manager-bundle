@@ -2,19 +2,23 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Hooks;
 
-class Breadcrumb {
+use Contao\PageModel;
 
-    public function generateDetailPage($arrItems) {
+class Breadcrumb
+{
 
-        if (!is_array($GLOBALS['CM_MASTER']) ||  empty($GLOBALS['CM_MASTER'])) {
+    public function generateDetailPage($arrItems)
+    {
+
+        if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return $arrItems;
         }
 
-        $intLastItemId = count($arrItems) -1;
+        $intLastItemId = count($arrItems) - 1;
         $arrItems[$intLastItemId]['isActive'] = false;
 
         $strPageId = $arrItems[$intLastItemId]['data']['id'] ?? '';
-        if ($objPage = \PageModel::findByPk($strPageId)) {
+        if ($objPage = PageModel::findByPk($strPageId)) {
             $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
         }
 

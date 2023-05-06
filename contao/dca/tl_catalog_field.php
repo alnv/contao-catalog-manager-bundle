@@ -1,5 +1,11 @@
 <?php
 
+use Contao\Config;
+use Contao\ArrayUtil;
+use Contao\DataContainer;
+use Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette;
+use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField;
+
 $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'config' => [
         'dataContainer' => 'Table',
@@ -11,8 +17,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ]
         ],
         'onsubmit_callback' => [
-            function(\DataContainer $dataContainer) {
-                (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField())->changeFieldType($dataContainer->activeRecord->type, $dataContainer);
+            function (DataContainer $dataContainer) {
+                (new CatalogField())->changeFieldType($dataContainer->activeRecord->type, $dataContainer);
             }
         ]
     ],
@@ -22,7 +28,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'fields' => ['sorting'],
             'panelLayout' => 'filter;search,limit',
             'headerFields' => ['type', 'name', 'table'],
-            'child_record_callback'  => ['catalogmanager.datacontainer.catalogfield', 'listFields']
+            'child_record_callback' => ['catalogmanager.datacontainer.catalogfield', 'listFields']
         ],
         'label' => [
             'fields' => ['name', 'fieldname', 'type'],
@@ -34,13 +40,13 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'icon' => 'header.svg'
             ],
             'copy' => [
-               'href' => 'act=paste&amp;mode=copy',
+                'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg'
             ],
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
                 'icon' => 'visible.svg',
@@ -85,11 +91,11 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'dbFilterType_wizard' => 'dbWizardFilterSettings',
         'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => 'optionsDcaWizard',
-        'optionsSource_dbOptions' => \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getPalette()
+        'optionsSource_dbOptions' => OptionSourcePalette::getPalette()
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'pid' => [
             'foreignKey' => 'tl_catalog.id',
@@ -194,7 +200,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options' => [ 'options', 'dbOptions' ],
+            'options' => ['options', 'dbOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
@@ -203,13 +209,13 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'foreignTable' => 'tl_catalog_option',
             'foreignField' => 'pid',
             'params' => [
-                'dcaWizard'=> \Input::get('id')
+                'dcaWizard' => \Input::get('id')
             ],
             'eval' => [
                 'showOperations' => true,
                 'orderField' => 'sorting ASC',
-                'operations' => ['edit','delete'],
-                'fields' => ['id','label','value']
+                'operations' => ['edit', 'delete'],
+                'fields' => ['id', 'label', 'value']
             ]
         ],
         'multiple' => [
@@ -235,7 +241,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getImageSizes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getImageSizes'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'mandatory' => [
@@ -332,7 +338,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'nospace' => true,
                 'rgxp' => 'natural',
                 'tl_class' => 'w50',
-                'maxval' => \Config::get('imageWidth') > 0 ? \Config::get('imageWidth') : null
+                'maxval' => Config::get('imageWidth') > 0 ? Config::get('imageWidth') : null
             ],
             'sql' => "int(10) unsigned NULL"
         ],
@@ -342,7 +348,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'nospace' => true,
                 'rgxp' => 'natural',
                 'tl_class' => 'w50',
-                'maxval' => \Config::get('imageHeight') > 0 ? \Config::get('imageHeight') : null
+                'maxval' => Config::get('imageHeight') > 0 ? Config::get('imageHeight') : null
             ],
             'sql' => "int(10) unsigned NULL"
         ],
@@ -364,4 +370,4 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     ]
 ];
 
-array_insert($GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getFields());
+ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, OptionSourcePalette::getFields());
