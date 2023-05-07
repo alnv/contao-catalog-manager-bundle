@@ -4,11 +4,12 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Input;
+use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
         'closed' => true,
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'ptable' => 'tl_catalog_field',
         'onsubmit_callback' => [

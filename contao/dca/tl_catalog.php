@@ -1,10 +1,12 @@
 <?php
 
+use Contao\DataContainer;
+use Contao\DC_Table;
 use Contao\System;
 
 $GLOBALS['TL_DCA']['tl_catalog'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ctable' => [
             'tl_catalog_field',
             'tl_catalog_palette'
@@ -25,8 +27,10 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     ],
     'list' => [
         'sorting' => [
-            'mode' => 5,
-            'icon' => '/bundles/alnvcontaoassetsmanager/icons/model-icon.svg',
+            'mode' => DataContainer::MODE_TREE,
+            'rootPaste' => true,
+            'showRootTrails' => true,
+            'icon' => '/bundles/alnvcontaocatalogmanager/icons/model-icon.svg',
             'panelLayout' => 'filter;sort,search'
         ],
         'label' => [
@@ -42,12 +46,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'fields' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_field',
-                'icon' => '/bundles/alnvcontaoassetsmanager/icons/fields-icon.svg'
+                'icon' => '/bundles/alnvcontaocatalogmanager/icons/fields-icon.svg'
             ],
             'palettes' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['palettes'],
                 'href' => 'table=tl_catalog_palette',
-                'icon' => '/bundles/alnvcontaoassetsmanager/icons/palettes-icon.svg'
+                'icon' => '/bundles/alnvcontaocatalogmanager/icons/palettes-icon.svg'
             ],
             'cut' => [
                 'href' => 'act=paste&amp;mode=cut',

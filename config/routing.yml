@@ -1,3 +1,0 @@
-catalogmanager:
-  resource: "@AlnvContaoCatalogManagerBundle/Controller"
-  type: annotation

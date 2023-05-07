@@ -6,7 +6,6 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
-use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
@@ -20,18 +19,21 @@ use Contao\PageModel;
 use Contao\StringUtil;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-/**
- *
- * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
- */
+#[Route(
+    path: 'catalog-manager',
+    name: 'catalog-manager-frontend-controller',
+    defaults: ['_scope' => 'frontend']
+)]
 class FrontendController extends AbstractController
 {
 
-    /**
-     *
-     * @Route("/watchlist/update", methods={"POST"}, name="update-watchlist")
-     */
+    #[Route(
+        path: '/watchlist/update',
+        methods: ["POST"],
+        name: 'catalog-manager-update-watchlist'
+    )]
     public function updateWatchlist()
     {
 
@@ -43,10 +45,11 @@ class FrontendController extends AbstractController
         return new JsonResponse(Watchlist::updateWatchlist($strIdentifier, $strTable, Input::post('items')));
     }
 
-    /**
-     *
-     * @Route("/view-listing/{module}/{page}", methods={"POST"}, name="view-listing")
-     */
+    #[Route(
+        path: '/view-listing/{module}/{page}',
+        methods: ["POST"],
+        name: 'catalog-manager-view-listing'
+    )]
     public function getViewListing($module, $page)
     {
 
@@ -68,10 +71,11 @@ class FrontendController extends AbstractController
         return new JsonResponse(['template' => Toolkit::compress($strListing), 'limit' => Cache::get('limit_' . $module), 'max' => (Cache::get('max_' . $module) ? true : false)]);
     }
 
-    /**
-     *
-     * @Route("/json-listing/{module}/{page}", methods={"POST"}, name="json-listing")
-     */
+    #[Route(
+        path: '/json-listing/{module}/{page}',
+        methods: ["POST"],
+        name: 'catalog-manager-json-listing'
+    )]
     public function getJsonListing($module, $page)
     {
 
@@ -100,10 +104,11 @@ class FrontendController extends AbstractController
         return new JsonResponse(['results' => (new Listing($objModule->getTable(), $arrOptions))->parse()]);
     }
 
-    /**
-     *
-     * @Route("/view-map/{module}/{page}", methods={"GET"}, name="view-map")
-     */
+    #[Route(
+        path: '/view-map/{module}/{page}',
+        methods: ["GET"],
+        name: 'catalog-manager-view-map'
+    )]
     public function getViewMap($module, $page)
     {
 
@@ -115,35 +120,11 @@ class FrontendController extends AbstractController
         return new JsonResponse(['locations' => $strListing]);
     }
 
-    /**
-     *
-     * @Route("/async-image", methods={"POST"}, name="async-image")
-     */
-    public function getAsyncImage()
-    {
-
-        $this->container->get('contao.framework')->initialize();
-        $arrReturn = [
-            'src' => null,
-            'alt' => ''
-        ];
-        $objEntity = new Master(Input::post('table'), [
-            'alias' => Input::post('id'),
-            'id' => '1'
-        ]);
-        $objRoleResolver = RoleResolver::getInstance(Input::post('table'), $objEntity->parse()[0]);
-        $arrImage = $objRoleResolver->getValueByRole(Input::post('role'));
-        if (is_array($arrImage) && !empty($arrImage)) {
-            $arrReturn['src'] = $arrImage[0]['img']['srcset'];
-            $arrReturn['alt'] = $arrImage[0]['alt'];
-        }
-        return new JsonResponse($arrReturn);
-    }
-
-    /**
-     *
-     * @Route("/icalendar", methods={"GET"}, name="getICalendar")
-     */
+    #[Route(
+        path: '/icalendar',
+        methods: ["GET"],
+        name: 'catalog-manager-get-icalendar'
+    )]
     public function getICalendar()
     {
 

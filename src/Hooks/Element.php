@@ -22,10 +22,6 @@ class Element
 
             $strAutoItem = $_GET['auto_item'] ?? '';
 
-            if ($objElement->cmHideOnDetailPage && $strAutoItem) { // backwards
-                return false;
-            }
-
             if (!$objElement->cmHide) {
                 return $blnIsVisible;
             }

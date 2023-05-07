@@ -1,14 +1,16 @@
 <?php
 
-use Contao\Config;
-use Contao\ArrayUtil;
-use Contao\DataContainer;
-use Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette;
 use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField;
+use Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette;
+use Contao\ArrayUtil;
+use Contao\Config;
+use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\Input;
 
 $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_catalog',
         'sql' => [
             'keys' => [
@@ -49,9 +51,9 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
+                'href' => 'act=toggle&amp;field=published',
                 'icon' => 'visible.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
+                'showInHeader' => true
             ],
             'show' => [
                 'href' => 'act=show',
@@ -83,6 +85,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'pagepicker' => '{general_settings},name,type;fieldname,role,mandatory,multiple,{published_legend},published',
         'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published',
         'listWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory;{published_legend},published',
+        'customOptionWizard' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{options_legend},optionsSource;{published_legend},published'
     ],
     'subpalettes' => [
         'rte' => 'rteType',
@@ -122,7 +125,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getFieldTypes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
-            // 'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'changeFieldType']],
             'filter' => true,
             'sorting' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
@@ -209,7 +211,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'foreignTable' => 'tl_catalog_option',
             'foreignField' => 'pid',
             'params' => [
-                'dcaWizard' => \Input::get('id')
+                'dcaWizard' => Input::get('id')
             ],
             'eval' => [
                 'showOperations' => true,
@@ -278,6 +280,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'doNotCopy' => true
             ],
             'filter' => true,
+            'toggle' => true,
             'sql' => "char(1) NOT NULL default ''"
         ],
         'includeBlankOption' => [

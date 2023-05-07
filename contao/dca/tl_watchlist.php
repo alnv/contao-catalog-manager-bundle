@@ -1,8 +1,10 @@
 <?php
 
+use Contao\DC_Table;
+
 $GLOBALS['TL_DCA']['tl_watchlist'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'sql' => [
             'keys' => [
                 'id' => 'primary',

@@ -1,42 +1,41 @@
 .ce_reactions {
   display: inline-block;
+
   .reaction {
     display: flex;
-    &:active,
-    &:hover {
-      .list {
-        // max-width: 10000px;
-        // opacity: 1;
-      }
-    }
   }
+
   .list {
     transition: all 200ms ease-in;
-    // max-width: 0;
-    // opacity: 0;
     display: flex;
     list-style: none;
     padding-left: 0;
     margin-top: 0;
     margin-bottom: 0;
+
     li {
       margin: 0;
     }
   }
+
   a {
     font-size: 14px;
     text-decoration: none;
+
     img {
       width: auto;
       height: 50px;
     }
+
     span {
       display: block;
     }
   }
+
   &.loading {
     .reaction {
       position: relative;
+
       &:after {
         content: '';
         display: block;

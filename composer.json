@@ -3,7 +3,7 @@
   "type": "contao-bundle",
   "license": "proprietary",
   "description": "Catalog Manager v2 for Contao CMS",
-  "keywords": ["contao", "catalog", "filter", "taxonomy", "frontend editing", "radius search"],
+  "keywords": ["contao", "catalog", "filter", "frontend editing", "radius search"],
   "homepage": "https://catalog-manager.org",
   "authors": [
     {
@@ -20,16 +20,7 @@
   "autoload": {
     "psr-4": {
       "Alnv\\ContaoCatalogManagerBundle\\": "src/"
-    },
-    "classmap": [
-      "contao/"
-    ],
-    "exclude-from-classmap": [
-      "contao/dca/",
-      "contao/config/",
-      "contao/languages/",
-      "contao/templates/"
-    ]
+    }
   },
   "require": {
     "ext-json": "*",
@@ -37,12 +28,6 @@
     "contao/core-bundle":"~5.1",
     "terminal42/dcawizard": "^2.6",
     "menatwork/contao-multicolumnwizard-bundle": "^3.6"
-  },
-  "conflict": {
-    "alnv/catalog-manager": "*"
-  },
-  "config": {
-    "preferred-install": "dist"
   },
   "extra": {
     "contao-manager-plugin": "Alnv\\ContaoCatalogManagerBundle\\ContaoManager\\Plugin"

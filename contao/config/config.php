@@ -1,6 +1,14 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\Elements\ContentListView;
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
+use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
+use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
+use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
+use Alnv\ContaoFormManagerBundle\Widgets\CustomOptionWizard;
 use Contao\ArrayUtil;
+use Contao\Combiner;
+use Contao\DC_Table;
 
 define("CATALOG_MANAGER_BUNDLE_VERSION", "2.2.0");
 
@@ -26,30 +34,21 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
             'tables' => [
                 'tl_watchlist'
             ]
-        ],
-        'catalog-element' => [
-            'name' => 'catalog-element-bundle',
-            'tables' => [
-                'tl_catalog_element',
-                'tl_content'
-            ]
         ]
     ]
 ]);
 
 ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
-        'listing-map' => 'Alnv\ContaoCatalogManagerBundle\Modules\MapModule',
-        'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
-        'master' => 'Alnv\ContaoCatalogManagerBundle\Modules\MasterModule'
+        'listing-map' => MapModule::class,
+        'listing' => ListingModule::class,
+        'master' => MasterModule::class
     ]
 ]);
 
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
-$GLOBALS['TL_CTE']['catalog-manager-bundle']['component'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentComponent';
-$GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentListView';
+$GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
 
-$GLOBALS['TL_HOOKS']['compileArticle'][] = ['catalogmanager.hooks.article', 'compileArticle'];
 $GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'generateMaster'];
 $GLOBALS['TL_HOOKS']['isVisibleElement'][] = ['catalogmanager.hooks.element', 'isVisibleElement'];
 $GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget', 'getAttributesFromDca'];
@@ -73,7 +72,10 @@ $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];
 $GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
-$GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
+$GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'] = ['Table' => DC_Table::class];
+$GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'customOptionWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
+
+$GLOBALS['BE_FFL']['customOptionWizard'] = CustomOptionWizard::class;
 
 $GLOBALS['CM_OPERATORS'] = [
     'equal' => [
@@ -444,10 +446,8 @@ $GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\M
 $GLOBALS['TL_MODELS']['tl_catalog_reactions'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel';
 $GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel';
 
-if (class_exists('Alnv\ContaoAssetsManagerBundle\Library\AssetsManager')) {
-    $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/watchlist-form-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js');
+if (Mode::get() == 'BE') {
+    $objCombiner = new Combiner();
+    $objCombiner->add('/bundles/alnvcontaocatalogmanager/css/backend.scss');
+    $GLOBALS['TL_CSS']['catalog-manager-backend-css'] = $objCombiner->getCombinedFile();
 }

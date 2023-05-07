@@ -2,32 +2,36 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\ContaoManager;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
+use Alnv\ContaoCatalogManagerBundle\AlnvContaoCatalogManagerBundle;
+use Alnv\ContaoTranslationManagerBundle\AlnvContaoTranslationManagerBundle;
+use Alnv\ContaoWidgetCollectionBundle\AlnvContaoWidgetCollectionBundle;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
+use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class Plugin implements BundlePluginInterface, RoutingPluginInterface {
+class Plugin implements BundlePluginInterface, RoutingPluginInterface
+{
 
-    public function getBundles(ParserInterface $parser) {
+    public function getBundles(ParserInterface $parser)
+    {
 
         return [
-            BundleConfig::create('Alnv\ContaoCatalogManagerBundle\AlnvContaoCatalogManagerBundle')
+            BundleConfig::create(AlnvContaoCatalogManagerBundle::class)
+                ->setReplace(['contao-catalog-manager-bundle'])
                 ->setLoadAfter([
-                    'Contao\CoreBundle\ContaoCoreBundle',
-                    'Alnv\ContaoAssetsManagerBundle\AlnvContaoAssetsManagerBundle',
-                    'Alnv\ContaoTranslationManagerBundle\AlnvContaoTranslationManagerBundle'
+                    ContaoCoreBundle::class,
+                    AlnvContaoWidgetCollectionBundle::class,
+                    AlnvContaoTranslationManagerBundle::class
                 ])
-                ->setReplace(['contao-catalog-manager-bundle']),
         ];
     }
 
-    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel) {
-
-        return $resolver
-            ->resolve(__DIR__ . '/../Resources/config/routing.yml')
-            ->load(__DIR__ . '/../Resources/config/routing.yml');
+    public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
+    {
+        return $resolver->resolve('@AlnvContaoCatalogManagerBundle/src/Controller')->load('@AlnvContaoCatalogManagerBundle/src/Controller');
     }
 }

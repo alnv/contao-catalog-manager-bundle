@@ -52,7 +52,7 @@ abstract class CatalogWizard
             }
         }
 
-        \Cache::set($strIdentifier, $arrCatalog);
+        Cache::set($strIdentifier, $arrCatalog);
 
         return $arrCatalog;
     }
@@ -269,6 +269,22 @@ abstract class CatalogWizard
                     $arrReturn['eval']['tl_class'] = 'clr';
                 }
                 break;
+            case 'customOptionWizard':
+                $arrField['inputType'] = 'customOptionWizard';
+                $arrField['eval']['tl_class'] = 'clr';
+                $arrField['eval']['multiple'] = true;
+                $arrField['filter'] = true;
+                $arrField['eval']['csv'] = ',';
+                $arrField['eval']['addButtonLabel1'] = 'Tag hinzufügen';
+                $arrField['eval']['addButtonLabel2'] = 'Hinzufügen';
+                $arrField['options_callback'] = function ($objDataContainer = null) use ($arrField) {
+                    $objOptions = Options::getInstance($arrField['fieldname'] . '.' . $arrField['pid']);
+                    $objOptions::setParameter($arrField, $objDataContainer);
+                    return $objOptions::getOptions();
+                };
+                if (isset($arrField['eval']['size'])) {
+                    unset($arrField['eval']['size']);
+                }
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
                 $arrReturn['eval']['tl_class'] = 'clr';
@@ -280,10 +296,13 @@ abstract class CatalogWizard
                 $arrReturn['eval']['imageWidth'] = $arrField['imageWidth'];
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
-                $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid($arrField['uploadFolder']);
+                try {
+                    $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid($arrField['uploadFolder']);
+                } catch (\Exception $objError) {}
+
                 if ($arrReturn['eval']['role']) {
                     $objRoleResolver = RoleResolver::getInstance(null);
-                    switch ($objRoleResolver->getRole($arrReturn['eval']['role'])['type']) {
+                    switch ($objRoleResolver->getRole(($arrReturn['eval']['role'])['type']??'')) {
                         case 'image':
                             $arrReturn['eval']['isImage'] = true;
                             if ($arrField['imageSize']) {

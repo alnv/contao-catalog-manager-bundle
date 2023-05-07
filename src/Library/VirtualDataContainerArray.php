@@ -39,12 +39,12 @@ class VirtualDataContainerArray
         }
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] = $this->arrCatalog['ctable'];
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $this->arrCatalog['dataContainer'];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $this->getDataContainerNamespace($this->arrCatalog['dataContainer']);
 
         if ($this->arrCatalog['enableGeocoding']) {
             $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
                 if ($objDataContainer->activeRecord) {
-                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->activeRecord->row());
+                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->getCurrentRecord());
                 }
             };
         }
@@ -64,6 +64,12 @@ class VirtualDataContainerArray
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = true;
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = (bool)$this->arrCatalog['enableVisibility'];
+    }
+
+    protected function getDataContainerNamespace($strDataContainer)
+    {
+
+        return $GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'][$strDataContainer] ?? $strDataContainer;
     }
 
     protected function setList()
@@ -168,7 +174,7 @@ class VirtualDataContainerArray
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'copy' => [
                     'href' => 'act=copy',
-                    'icon' => 'copy.gif'
+                    'icon' => 'copy.svg'
                 ]
             ]);
         }
@@ -176,9 +182,8 @@ class VirtualDataContainerArray
         if ($this->arrCatalog['enableVisibility']) {
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], count($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations']) - 1, [
                 'toggle' => [
-                    'icon' => 'visible.gif',
-                    'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s,\'' . $this->arrCatalog['table'] . '\')"',
-                    'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon'],
+                    'href' => 'act=toggle&amp;field=published',
+                    'icon' => 'visible.svg',
                     'showInHeader' => true
                 ]
             ]);
@@ -398,7 +403,7 @@ class VirtualDataContainerArray
                 'onsubmit_callback' => [
                     function (DataContainer $objDataContainer) {
                         if ($objDataContainer->activeRecord) {
-                            Toolkit::saveAlias($objDataContainer->activeRecord->row(), $this->arrFields, $this->arrCatalog);
+                            Toolkit::saveAlias($objDataContainer->getCurrentRecord(), $this->arrFields, $this->arrCatalog);
                         }
                     }
                 ],
@@ -414,16 +419,16 @@ class VirtualDataContainerArray
                 'operations' => [
                     'edit' => [
                         'href' => 'act=edit',
-                        'icon' => 'header.gif'
+                        'icon' => 'header.svg'
                     ],
                     'delete' => [
                         'href' => 'act=delete',
-                        'icon' => 'delete.gif',
+                        'icon' => 'delete.svg',
                         'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
                     ],
                     'show' => [
                         'href' => 'act=show',
-                        'icon' => 'show.gif'
+                        'icon' => 'show.svg'
                     ]
                 ],
                 'global_operations' => [
@@ -472,7 +477,7 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => 'edit.gif'
+                'icon' => 'edit.svg'
             ];
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }

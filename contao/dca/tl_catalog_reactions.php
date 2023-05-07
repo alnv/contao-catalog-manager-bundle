@@ -1,10 +1,11 @@
 <?php
 
 use Contao\Config;
+use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'sql' => [
             'keys' => [

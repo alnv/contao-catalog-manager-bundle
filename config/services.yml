@@ -46,10 +46,6 @@ services:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout
     public: true
 
-  catalogmanager.hooks.article:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Article
-    public: true
-
   catalogmanager.hooks.datacontainer:
     class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
     public: true

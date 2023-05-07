@@ -103,7 +103,7 @@ class RoleResolver
     public function getRole($strRolename)
     {
 
-        return $GLOBALS['CM_ROLES'][$strRolename];
+        return $GLOBALS['CM_ROLES'][$strRolename] ?? [];
     }
 
     public function getValueByRole($strRolename)

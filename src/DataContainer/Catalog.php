@@ -2,16 +2,15 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
+use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
 use Contao\Backend;
 use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
-use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Versions;
 
 class Catalog
 {
@@ -19,7 +18,7 @@ class Catalog
     public function addIcon($arrRow, $strLabel, DataContainer $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false)
     {
 
-        $strIcon = 'bundles/alnvcontaoassetsmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
+        $strIcon = 'bundles/alnvcontaocatalogmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
         $strAttributes .= 'class="resize-image"';
         return Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
     }
@@ -93,7 +92,7 @@ class Catalog
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->pid);
+        $objCatalog = new LibraryCatalog($objDataContainer->activeRecord->pid);
 
         return $objCatalog->getNaturalFields();
     }
@@ -109,7 +108,7 @@ class Catalog
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->table);
+        $objCatalog = new LibraryCatalog($objDataContainer->activeRecord->table);
 
         return $objCatalog->getNaturalFields();
     }
@@ -149,7 +148,7 @@ class Catalog
     public function watchTable($strTable, DataContainer $objDataContainer)
     {
 
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new CatalogDatabase();
         $objDatabase = Database::getInstance();
 
         if (!$strTable) {
@@ -186,7 +185,7 @@ class Catalog
             return null;
         }
 
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new CatalogDatabase();
         $objDatabaseBuilder->createCustomFieldsIfNotExists($objDataContainer->activeRecord->table);
     }
 
@@ -198,107 +197,20 @@ class Catalog
             return null;
         }
 
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new CatalogDatabase();
         $objDatabaseBuilder->deleteTable($objDataContainer->activeRecord->table);
     }
 
     public function getOrderByStatements(): array
     {
-
         return [
             'ASC',
             'DESC'
         ];
     }
 
-    public function toggleIcon($arrRow, $strHref, $strLabel, $strTitle, $strIcon, $strAttributes)
-    {
-
-        if (Input::get('tid')) {
-
-            $this->toggleVisibility(Input::get('tid'), (Input::get('state') == 1), (@func_get_arg(12) ?: null));
-
-            Controller::redirect(Controller::getReferer());
-        }
-
-        $strHref .= '&amp;tid=' . $arrRow['id'] . '&amp;state=' . ($arrRow['published'] ? '' : 1);
-
-        if (!$arrRow['published']) {
-
-            $strIcon = 'invisible.svg';
-        }
-
-        return '<a href="' . Backend::addToUrl($strHref) . '" title="' . StringUtil::specialchars($strTitle) . '"' . $strAttributes . '>' . Image::getHtml($strIcon, $strLabel, 'data-state="' . ($arrRow['published'] ? 1 : 0) . '"') . '</a> ';
-    }
-
-    protected function toggleVisibility($intId, $blnVisible, DataContainer $objDataContainer = null)
-    {
-
-        Input::setGet('id', $intId);
-        Input::setGet('act', 'toggle');
-
-        $strTable = Toolkit::getTableByDo();
-
-        if (!$strTable) {
-
-            return null;
-        }
-
-        if ($objDataContainer) {
-
-            $objDataContainer->id = $intId;
-        }
-
-        if (isset($GLOBALS['TL_DCA'][$strTable]['config']['onload_callback']) && is_array($GLOBALS['TL_DCA'][$strTable]['config']['onload_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$strTable]['config']['onload_callback'] as $callback) {
-                System::importStatic($callback[0])->{$callback[1]}($objDataContainer);
-            }
-        }
-
-        if ($objDataContainer) {
-
-            $objRow = Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE id=?')->limit(1)->execute($intId);
-
-            if ($objRow->numRows) {
-
-                $objDataContainer->activeRecord = $objRow;
-            }
-        }
-
-        $objVersions = new Versions($strTable, $intId);
-        $objVersions->initialize();
-
-        if (isset($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback']) && is_array($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'] as $callback) {
-                System::importStatic($callback[0])->{$callback[1]}($blnVisible, $objDataContainer);
-            }
-        }
-
-        $intTime = time();
-
-        Database::getInstance()->prepare('UPDATE ' . $strTable . ' %s WHERE id=?')->set([
-            'tstamp' => time(),
-            'published' => ($blnVisible ? '1' : '')
-        ])->execute($intId);
-
-        if ($objDataContainer) {
-
-            $objDataContainer->activeRecord->tstamp = $intTime;
-            $objDataContainer->activeRecord->published = ($blnVisible ? '1' : '');
-        }
-
-        if (is_array($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'] as $callback) {
-                System::importStatic($callback[0])->{$callback[1]}($objDataContainer);
-            }
-        }
-
-        $objVersions->create();
-    }
-
     public function getTables(): array
     {
-
         return Database::getInstance()->listTables();
     }
 
@@ -325,7 +237,6 @@ class Catalog
 
     public function getOperators(): array
     {
-
         return array_keys($GLOBALS['CM_OPERATORS']);
     }
 }

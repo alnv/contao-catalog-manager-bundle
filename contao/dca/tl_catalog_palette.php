@@ -1,15 +1,16 @@
 <?php
 
-use Contao\StringUtil;
-use Contao\DataContainer;
-use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\StringUtil;
 
 $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'ptable' => 'tl_catalog',
         'onload_callback' => [
@@ -85,10 +86,10 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'mode' => 4,
             'fields' => ['sorting'],
             'headerFields' => ['name', 'table'],
-            'child_record_callback' => function($arrRow) {
+            'child_record_callback' => function ($arrRow) {
                 $arrTypes = $GLOBALS['TL_LANG']['tl_catalog_palette']['reference']['type'] ?: [];
                 return $arrRow['name'] .
-                    (isset($arrTypes[$arrRow['type']]) ? ' <span style="background:#f0c674;color:#fff;border-radius:5px;padding:3px;font-size:12px;">'.$arrTypes[$arrRow['type']].'</span>' : '');
+                    (isset($arrTypes[$arrRow['type']]) ? ' <span style="background:#f0c674;color:#fff;border-radius:5px;padding:3px;font-size:12px;">' . $arrTypes[$arrRow['type']] . '</span>' : '');
             }
         ],
         'operations' => [
@@ -103,12 +104,12 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
+                'href' => 'act=toggle&amp;field=published',
                 'icon' => 'visible.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
+                'showInHeader' => true
             ],
             'show' => [
                 'href' => 'act=show',
@@ -136,13 +137,13 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'type' => [
             'inputType' => 'select',
@@ -189,7 +190,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options_callback'=> ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
+            'options_callback' => ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
             'filter' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
@@ -258,6 +259,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'doNotCopy' => true
             ],
             'filter' => true,
+            'toggle' => true,
             'sql' => "char(1) NOT NULL default ''"
         ]
     ]

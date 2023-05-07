@@ -183,6 +183,7 @@ class Catalog extends CatalogWizard
                     'doNotCopy' => true,
                     'tl_class' => 'clr'
                 ],
+                'toggle' => true,
                 'filter' => true,
                 'sql' => "char(1) NOT NULL default ''"
             ],

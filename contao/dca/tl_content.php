@@ -2,12 +2,12 @@
 
 use Contao\Input;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
-$GLOBALS['TL_DCA']['tl_content']['palettes']['component'] = '{type_legend},type;{include_legend},module;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 if (Input::get('do')) {
-    $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule((Input::get('sourceTable') ?: Input::get('do')), [
+    $objCatalog = CatalogModel::findByTableOrModule((Input::get('sourceTable') ?: Input::get('do')), [
         'limit' => 1
     ]);
     if ($objCatalog !== null) {
@@ -15,9 +15,6 @@ if (Input::get('do')) {
             $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = $objCatalog->table;
         }
     }
-}
-if (Input::get('do') == 'catalog-element') {
-    $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = 'tl_catalog_element';
 }
 
 foreach ($GLOBALS['TL_DCA']['tl_content']['palettes'] as $strPalette => $strFields) {
@@ -40,7 +37,6 @@ $GLOBALS['TL_DCA']['tl_content']['subpalettes']['cmMaster'] = 'cmMasterPage';
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['cmFilterType_expert'] = 'cmColumn,cmValue';
 $GLOBALS['TL_DCA']['tl_content']['subpalettes']['cmFilterType_wizard'] = 'cmWizardFilterSettings';
 
-$GLOBALS['TL_DCA']['tl_content']['fields']['cmHideOnDetailPage'] = ['sql' => "char(1) NOT NULL default ''"]; // can be delete
 $GLOBALS['TL_DCA']['tl_content']['fields']['cmHide'] = [
     'inputType' => 'select',
     'eval' => [

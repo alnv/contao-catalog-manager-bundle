@@ -636,7 +636,7 @@ class Toolkit
         $arrSet = [];
         $arrSet['tstamp'] = time();
         $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], $arrActiveRecord['pid']);
-        $objDatabase->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
+        $objDatabase->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id=?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
     public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9')
@@ -672,11 +672,10 @@ class Toolkit
         }
 
         if ($blnAliasFieldExist && $strId) {
-            $arrValues = [$strValue, $strId];
-            if ($strPid !== null) {
-                $arrValues[] = $strPid;
-            }
-            if (Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!=?' . ($strPid ? ' AND `pid`=?' : ''))->limit(1)->execute($arrValues)->numRows) {
+            if (Database::getInstance()
+                ->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!="'.$strId.'"' . ($strPid !== null ? ' AND `pid`="'.$strPid.'"' : ''))
+                ->limit(1)->execute($strValue)
+                ->numRows) {
                 $strValue = $strValue . '-' . $strId;
             }
         }

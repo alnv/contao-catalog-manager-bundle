@@ -2,13 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-use Contao\Input;
-use Contao\Database;
-use Contao\DataContainer;
-use Contao\Config;
-use Contao\StringUtil;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Contao\Config;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Input;
+use Contao\StringUtil;
 
 class CatalogField
 {
@@ -74,7 +74,8 @@ class CatalogField
 
         $objDatabase = Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
-        $arrActiveRecord = $objDataContainer->activeRecord->row();
+        $arrActiveRecord = $objDataContainer->getCurrentRecord();
+
 
         if (Input::post('role')) {
             $arrActiveRecord['role'] = Input::post('role');
@@ -128,7 +129,7 @@ class CatalogField
             return $strValue;
         }
 
-        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, $objDataContainer->activeRecord->row());
+        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, $objDataContainer->getCurrentRecord());
         (new \Alnv\ContaoCatalogManagerBundle\Library\Database())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;

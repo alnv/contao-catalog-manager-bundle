@@ -1,4 +1,4 @@
-const ViewGmapComponent = Vue.component( 'view-gmap', {
+const ViewGmapComponent = Vue.component('view-gmap', {
     data: function () {
         return {
             map: null,
@@ -13,38 +13,38 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
             this.removeMarkers();
             this.$http.get('/catalog-manager/view-map/' + this.module + '/' + this.page, {
                 params: this.parameters
-            }).then(function ( objResponse ) {
+            }).then(function (objResponse) {
                 if (objResponse.body && objResponse.ok) {
                     this.locations = JSON.parse(objResponse.body.locations);
                     this.initMap();
                     this.$parent.clearAlert();
                 }
-                if ( !objResponse.ok ) {
-                    this.$parent.setErrorAlert( '', this );
+                if (!objResponse.ok) {
+                    this.$parent.setErrorAlert('', this);
                 }
             });
         },
         onChange: function (shared) {
             this.parameters = shared;
-            if ( this.view ) {
-                this.$parent.setLoadingAlert( '', this );
+            if (this.view) {
+                this.$parent.setLoadingAlert('', this);
             }
             this.fetch();
         },
-        addSharedParameters: function(shared) {
-            for (var name in shared) {
+        addSharedParameters: function (shared) {
+            for (let name in shared) {
                 if (shared.hasOwnProperty(name)) {
                     this.parameters[name] = shared[name];
                 }
             }
         },
-        setMarkers: function() {
+        setMarkers: function () {
             this.bounds = new google.maps.LatLngBounds();
 
-            for (var i=0;i<this.locations.length;i++) {
-                var strTemplate = this.locations[i]['map']['infoContent'];
-                var objPosition = new google.maps.LatLng(this.locations[i]['map']['latitude'],this.locations[i]['map']['longitude']);
-                var objMarker = new google.maps.Marker({
+            for (let i = 0; i < this.locations.length; i++) {
+                let strTemplate = this.locations[i]['map']['infoContent'];
+                let objPosition = new google.maps.LatLng(this.locations[i]['map']['latitude'], this.locations[i]['map']['longitude']);
+                let objMarker = new google.maps.Marker({
                     title: this.locations[i]['map']['title'],
                     position: objPosition,
                     map: this.map
@@ -56,8 +56,8 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
                 this.markers.push(objMarker);
             }
         },
-        removeMarkers: function() {
-            for (var i=0;i<this.markers.length;i++) {
+        removeMarkers: function () {
+            for (let i = 0; i < this.markers.length; i++) {
                 this.markers[i].setMap(null);
             }
         },
@@ -71,25 +71,25 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
             this.map.fitBounds(this.bounds);
         },
         getInfoContent: function (content) {
-            var objInfoBox = new google.maps.InfoWindow({content: content});
-            return function() {
+            let objInfoBox = new google.maps.InfoWindow({content: content});
+            return function () {
                 objInfoBox.setContent(content);
                 objInfoBox.open(this.map, this);
             };
         },
         loadGMap: function () {
-            if ( typeof google === 'undefined' ) {
-                var objScript = document.createElement('script');
-                objScript.src = 'https://maps.googleapis.com/maps/api/js?key='+ this.mapApiKey +'&callback=';
+            if (typeof google === 'undefined') {
+                let objScript = document.createElement('script');
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=' + this.mapApiKey + '&callback=';
                 objScript.defer = true;
                 objScript.async = true;
-                objScript.onload = function() {
+                objScript.onload = function () {
                     if (!this.awaitOnChange) {
                         this.fetch();
                     }
                 }.bind(this);
                 document.body.appendChild(objScript);
-                localStorage.setItem('data-protection-gmap-accepted','1');
+                localStorage.setItem('data-protection-gmap-accepted', '1');
                 return null;
             }
             if (!this.awaitOnChange) {
@@ -97,7 +97,7 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
             }
         }
     },
-    created: function() {
+    created: function () {
         if (localStorage.getItem('data-protection-gmap-accepted')) {
             this.useDataPrivacyMode = false;
         }
@@ -157,12 +157,12 @@ const ViewGmapComponent = Vue.component( 'view-gmap', {
     },
     template:
         '<div class="view-gmap-component">' +
-            '<transition name="fade">' +
-                '<div class="view-gmap-component-container" v-show="locations.length">' +
-                    '<div class="gmap" v-bind:style="style"></div>' +
-                '</div>' +
-            '</transition>' +
-            '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
-            '<loading v-if="!locations.length && !useDataPrivacyMode && loader"></loading>' +
+        '<transition name="fade">' +
+        '<div class="view-gmap-component-container" v-show="locations.length">' +
+        '<div class="gmap" v-bind:style="style"></div>' +
+        '</div>' +
+        '</transition>' +
+        '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
+        '<loading v-if="!locations.length && !useDataPrivacyMode && loader"></loading>' +
         '</div>'
 });
