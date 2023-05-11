@@ -409,7 +409,7 @@ class Toolkit
             case 'checkbox':
             case 'select':
             case 'radio':
-                if (isset($arrField['csv']) && $arrField['csv']) {
+                if (isset($arrField['csv']) && $arrField['csv'] && is_string($arrField['value'])) {
                     $arrField['value'] = explode($arrField['csv'], $arrField['value']);
                 }
                 $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
