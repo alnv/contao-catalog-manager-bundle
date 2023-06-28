@@ -18,12 +18,8 @@ class PageLayout extends \System {
         $this->getMasterByPageId($objPage->id);
     }
     
-    public function getMasterByPageId($strPageId,$strAlias=null) {
+    public function getMasterByPageId($strPageId, $strAlias=null) {
 
-        if (!$strAlias) {
-            $strAlias = \Input::get('auto_item');
-        }
-        $strTable = null;
         $strMasterPageId = $strPageId;
         $objModule = \Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
         if (!$objModule->numRows) {
@@ -34,6 +30,10 @@ class PageLayout extends \System {
         } else {
             $strTable = $objModule->cmTable;
             $strMasterPageId = $objModule->cmMasterPage;
+        }
+
+        if (!$strAlias) {
+            $strAlias = \Input::get('auto_item');
         }
 
         $GLOBALS['CM_MASTER'] = (new \Alnv\ContaoCatalogManagerBundle\Views\Master($strTable, [
