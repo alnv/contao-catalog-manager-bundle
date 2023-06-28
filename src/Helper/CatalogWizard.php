@@ -252,7 +252,7 @@ abstract class CatalogWizard extends \System {
                     'type' => $blnMultiple ? 'hasMany' : 'hasOne',
                     'load' => 'lazy'
                 ];
-                if ($arrReturn['eval']['rgxp'] == 'url') {
+                if (isset($arrReturn['eval']['rgxp']) && $arrReturn['eval']['rgxp'] == 'url') {
                     $arrReturn['inputType'] = 'text';
                     $arrReturn['eval']['dcaPicker'] = true;
                     unset($arrReturn['relation']);
