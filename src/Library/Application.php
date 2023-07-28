@@ -2,9 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class Application {
+use Contao\CoreBundle\Controller\BackendCsvImportController;
 
-    public function initializeBackendModules() {
+class Application
+{
+
+    public function initializeBackendModules()
+    {
 
         $objCatalogCollection = new CatalogCollection();
         $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
@@ -19,52 +23,63 @@ class Application {
         }
     }
 
-    public function generateBeModConfig( $arrCatalog ) {
+    public function generateBeModConfig($arrCatalog)
+    {
 
-        $arrTables = [ $arrCatalog['table'] ];
+        $arrTables = [$arrCatalog['table']];
 
-        if ( is_array( $arrCatalog['related'] ) && !empty( $arrCatalog['related'] ) ) {
-            foreach ( $arrCatalog['related'] as $strTable ) {
+        if (is_array($arrCatalog['related']) && !empty($arrCatalog['related'])) {
+            foreach ($arrCatalog['related'] as $strTable) {
                 $arrTables[] = $strTable;
             }
         }
 
-        if ( !isset( $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] ) ) {
-            $GLOBALS['TL_LANG']['MOD'][ $arrCatalog['module'] ] = [
+        if (!isset($GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']])) {
+            $GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']] = [
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'], $arrCatalog['name']),
                 \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'] . '.' . 'description', $arrCatalog['description']),
             ];
         }
 
-        return [
+        $arrBEModule = [
 
             'name' => $arrCatalog['module'],
             'tables' => $arrTables
         ];
+
+        if (in_array('tl_content', $arrTables)) {
+
+            $arrBEModule['table'] = [BackendCsvImportController::class, 'importTableWizardAction'];
+            $arrBEModule['list'] = [BackendCsvImportController::class, 'importListWizardAction'];
+        }
+
+        return $arrBEModule;
     }
 
-    public function initializeDataContainerArrays() {
+    public function initializeDataContainerArrays()
+    {
 
         $strModule = \Input::get('do');
 
-        if ( !$strModule ) {
+        if (!$strModule) {
             return null;
         }
 
-        $this->initializeDataContainerArrayByTable( $strModule );
+        $this->initializeDataContainerArrayByTable($strModule);
     }
 
-    public function initializeDataContainerArrayByTable( $strTable ) {
+    public function initializeDataContainerArrayByTable($strTable)
+    {
 
-        $objVDataContainerArray = new VirtualDataContainerArray( $strTable );
+        $objVDataContainerArray = new VirtualDataContainerArray($strTable);
         $objVDataContainerArray->generate();
         $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
 
-        if ( is_array( $arrRelatedTables ) && !empty( $arrRelatedTables ) ) {
+        if (is_array($arrRelatedTables) && !empty($arrRelatedTables)) {
 
-            foreach ( $arrRelatedTables as $strTable ) {
+            foreach ($arrRelatedTables as $strTable) {
 
-                $this->initializeDataContainerArrayByTable( $strTable );
+                $this->initializeDataContainerArrayByTable($strTable);
             }
         }
     }
