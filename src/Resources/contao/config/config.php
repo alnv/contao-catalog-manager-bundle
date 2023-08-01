@@ -1,6 +1,6 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.18");
+define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.20");
 
 array_insert( $GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -99,7 +99,7 @@ $GLOBALS['CM_OPERATORS'] = [
         'token' => 'LOWER(CAST(##field## AS CHAR)) NOT REGEXP LOWER(CAST(##value## AS CHAR))'
     ],
     'between' => [
-        'token' => '##field## BETWEEN ##value## AND ##value##',
+        'token' => '##field## BETWEEN CAST(##value##  AS DECIMAL(5,2)) AND CAST(##value##  AS DECIMAL(5,2))',
         'valueNumber' => 2
     ],
     'greater' => [
