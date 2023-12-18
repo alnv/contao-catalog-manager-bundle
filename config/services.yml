@@ -3,20 +3,8 @@ services:
     autowire: true
     autoconfigure: true
 
-  contao.listener.doctrine_schema:
-    class: Alnv\ContaoCatalogManagerBundle\EventListener\DoctrineSchemaListener
-    arguments:
-      - '@contao.doctrine.dca_schema_provider'
-      - '@messenger.receiver_locator'
-    tags:
-      - { name: doctrine.event_listener, event: postGenerateSchema }
-
   Alnv\ContaoCatalogManagerBundle\Controller\FrontendController:
     public: true
-
-  Alnv\ContaoCatalogManagerBundle\EventListener\SqlCompileCommandsListener:
-    tags:
-      - { name: contao.hook, hook: sqlCompileCommands }
 
   Alnv\ContaoCatalogManagerBundle\EventListener\InitializeSystemListener:
     tags:
