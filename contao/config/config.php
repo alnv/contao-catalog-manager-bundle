@@ -1,5 +1,13 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel;
 use Alnv\ContaoCatalogManagerBundle\Elements\ContentListView;
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
@@ -10,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.2.0");
+const CATALOG_MANAGER_BUNDLE_VERSION =  "3.0.0";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -48,25 +56,6 @@ ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
 
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
-
-$GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'generateMaster'];
-$GLOBALS['TL_HOOKS']['isVisibleElement'][] = ['catalogmanager.hooks.element', 'isVisibleElement'];
-$GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget', 'getAttributesFromDca'];
-$GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePages'];
-$GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePagesByPagesRoles'];
-$GLOBALS['TL_HOOKS']['generateBreadcrumb'][] = ['catalogmanager.hooks.breadcrumb', 'generateDetailPage'];
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'initializeBackendModules'];
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'generateDataContainerArray'];
-$GLOBALS['TL_HOOKS']['loadDataContainer'][] = ['catalogmanager.hooks.datacontainer', 'generateDataContainerArray'];
-$GLOBALS['TL_HOOKS']['compileFormFields'][] = ['catalogmanager.hooks.formfields', 'compileFormFields'];
-$GLOBALS['TL_HOOKS']['loadFormField'][] = ['catalogmanager.hooks.formfields', 'loadFormField'];
-$GLOBALS['TL_HOOKS']['sqlCompileCommands'][] = ['catalogmanager.hooks.sqlcompilecommands', 'execute'];
-
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags', 'replace'];
 
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
@@ -437,14 +426,14 @@ $GLOBALS['CM_ROLES'] = [
     ]
 ];
 
-$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
-$GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
-$GLOBALS['TL_MODELS']['tl_catalog_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel';
-$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
-$GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
-$GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';
-$GLOBALS['TL_MODELS']['tl_catalog_reactions'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel';
-$GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel';
+$GLOBALS['TL_MODELS']['tl_catalog'] = CatalogModel::class;
+$GLOBALS['TL_MODELS']['tl_watchlist'] = WatchlistModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_data'] = CatalogDataModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_field'] = CatalogFieldModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_option'] = CatalogOptionModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_palette'] = CatalogPaletteModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_reactions'] = CatalogReactionsModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = CatalogReactionsDataModel::class;
 
 if (Mode::get() == 'BE') {
     $objCombiner = new Combiner();

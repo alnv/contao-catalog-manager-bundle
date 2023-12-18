@@ -1,18 +1,18 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
+use Alnv\ContaoCatalogManagerBundle\Library\Options;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\ArrayUtil;
+use Contao\Form;
 use Contao\Input;
-use Contao\Widget;
 
-class FormFields
+class CompileFormFieldsListener
 {
 
-    public function compileFormFields($arrFields, $strFormId, $objForm)
+    public function __invoke(array $arrFields, string $strFormId, Form $objForm): array
     {
-
         foreach ($arrFields as $objField) {
 
             $arrOptions = $this->getOptions($objField->type, $objField);
@@ -28,18 +28,6 @@ class FormFields
         return $arrFields;
     }
 
-    public function loadFormField(Widget $objWidget)
-    {
-
-        if (in_array($objWidget->type, ['select', 'checkbox', 'radio']) && $objWidget->type) { // @todo
-
-            if (Input::get($objWidget->name) !== null) {
-                $objWidget->value = Input::get($objWidget->name);
-            }
-        }
-        return $objWidget;
-    }
-
     protected function getOptions($strType, $objField)
     {
 
@@ -47,7 +35,7 @@ class FormFields
             switch ($objField->optionsSource) {
                 case 'dbActiveOptions':
                 case 'dbOptions':
-                    $objOptions = \Alnv\ContaoCatalogManagerBundle\Library\Options::getInstance($objField->name . '.' . $objField->pid);
+                    $objOptions = Options::getInstance($objField->name . '.' . $objField->pid);
                     $objOptions::setParameter($objField->row(), null);
                     $arrOptions = $objOptions::getOptions(true);
                     if ($objField->includeBlankOption) {

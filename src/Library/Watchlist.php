@@ -10,7 +10,7 @@ use Contao\FrontendUser;
 class Watchlist
 {
 
-    public static function getForm($strIdentifier, $strTable, $arrOptions = [])
+    public static function getForm($strIdentifier, $strTable, $arrOptions = []): string
     {
 
         $objTemplate = new FrontendTemplate('ce_watchlist_form');
@@ -29,7 +29,7 @@ class Watchlist
         return $objTemplate->parse();
     }
 
-    public static function getData($strIdentifier, $strTable)
+    public static function getData($strIdentifier, $strTable): array
     {
 
         $arrData = self::getWatchlistData($strIdentifier, $strTable);
@@ -37,7 +37,7 @@ class Watchlist
         return isset($arrData['id']) ? $arrData : [];
     }
 
-    public static function getWatchlistData($strIdentifier, $strTable)
+    public static function getWatchlistData($strIdentifier, $strTable): array
     {
 
         $objWatchlist = WatchlistModel::getByIdentifierAndTable($strIdentifier, $strTable);
@@ -51,7 +51,7 @@ class Watchlist
         return $objWatchlist->row();
     }
 
-    public static function updateWatchlist($strIdentifier, $strTable, $strUnits)
+    public static function updateWatchlist($strIdentifier, $strTable, $strUnits): array
     {
 
         $objItem = WatchlistModel::getByIdentifierAndTable($strIdentifier, $strTable);

@@ -9,23 +9,25 @@ use Contao\Input;
 class Application
 {
 
-    public function initializeBackendModules()
+    public function initializeBackendModules(): void
     {
 
         $objCatalogCollection = new CatalogCollection();
         $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
 
         foreach ($arrCatalogs as $arrCatalog) {
+
             if (!$arrCatalog['navigation']) {
                 continue;
             }
+
             $arrModule = [];
             $arrModule[$arrCatalog['module']] = $this->generateBeModConfig($arrCatalog);
             ArrayUtil::arrayInsert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
         }
     }
 
-    public function generateBeModConfig($arrCatalog)
+    public function generateBeModConfig($arrCatalog): array
     {
 
         $arrTables = [$arrCatalog['table']];
@@ -44,25 +46,24 @@ class Application
         }
 
         return [
-
             'name' => $arrCatalog['module'],
             'tables' => $arrTables
         ];
     }
 
-    public function initializeDataContainerArrays()
+    public function initializeDataContainerArrays(): void
     {
 
         $strModule = Input::get('do');
 
         if (!$strModule) {
-            return null;
+            return;
         }
 
         $this->initializeDataContainerArrayByTable($strModule);
     }
 
-    public function initializeDataContainerArrayByTable($strTable)
+    public function initializeDataContainerArrayByTable($strTable): void
     {
 
         $objVDataContainerArray = new VirtualDataContainerArray($strTable);

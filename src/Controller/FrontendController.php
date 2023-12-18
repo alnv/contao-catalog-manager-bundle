@@ -4,7 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Controller;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout;
+use Alnv\ContaoCatalogManagerBundle\EventListener\GetPageLayoutListener;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
 use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
@@ -21,20 +21,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(
-    path: 'catalog-manager',
-    name: 'catalog-manager-frontend-controller',
-    defaults: ['_scope' => 'frontend']
-)]
+#[Route(path: 'catalog-manager', name: 'catalog-manager-frontend-controller', defaults: ['_scope' => 'frontend'])]
 class FrontendController extends AbstractController
 {
 
-    #[Route(
-        path: '/watchlist/update',
-        methods: ["POST"],
-        name: 'catalog-manager-update-watchlist'
-    )]
-    public function updateWatchlist()
+    #[Route(path: '/watchlist/update', methods: ["POST"])]
+    public function updateWatchlist(): JsonResponse
     {
 
         $this->container->get('contao.framework')->initialize();
@@ -45,15 +37,12 @@ class FrontendController extends AbstractController
         return new JsonResponse(Watchlist::updateWatchlist($strIdentifier, $strTable, Input::post('items')));
     }
 
-    #[Route(
-        path: '/view-listing/{module}/{page}',
-        methods: ["POST"],
-        name: 'catalog-manager-view-listing'
-    )]
-    public function getViewListing($module, $page)
+    #[Route(path: '/view-listing/{module}/{page}', methods: ["POST"])]
+    public function getViewListing($module, $page): JsonResponse
     {
 
         global $objPage;
+
         $objPage = PageModel::findByPK($page)->loadDetails();
         $GLOBALS['TL_LANGUAGE'] = $objPage->language;
 
@@ -61,7 +50,7 @@ class FrontendController extends AbstractController
             Environment::set('request', (Input::post('requestUrl') ?: ''));
         }
 
-        (new PageLayout())->getMasterByPageId($page, Input::get('item'));
+        (new GetPageLayoutListener())->getMasterByPageId($page, Input::get('item'));
 
         $objPage->ajaxContext = true;
 
@@ -71,19 +60,16 @@ class FrontendController extends AbstractController
         return new JsonResponse(['template' => Toolkit::compress($strListing), 'limit' => Cache::get('limit_' . $module), 'max' => (Cache::get('max_' . $module) ? true : false)]);
     }
 
-    #[Route(
-        path: '/json-listing/{module}/{page}',
-        methods: ["POST"],
-        name: 'catalog-manager-json-listing'
-    )]
-    public function getJsonListing($module, $page)
+    #[Route(path: '/json-listing/{module}/{page}', methods: ["POST"])]
+    public function getJsonListing($module, $page): JsonResponse
     {
 
         global $objPage;
+
         $objPage = PageModel::findByPK($page)->loadDetails();
         $GLOBALS['TL_LANGUAGE'] = $objPage->language;
 
-        (new PageLayout())->getMasterByPageId($page, Input::get('item'));
+        (new GetPageLayoutListener())->getMasterByPageId($page, Input::get('item'));
         $objPage->ajaxContext = true;
         $objModule = ModuleModel::findByPk($module);
 
@@ -104,28 +90,23 @@ class FrontendController extends AbstractController
         return new JsonResponse(['results' => (new Listing($objModule->getTable(), $arrOptions))->parse()]);
     }
 
-    #[Route(
-        path: '/view-map/{module}/{page}',
-        methods: ["GET"],
-        name: 'catalog-manager-view-map'
-    )]
-    public function getViewMap($module, $page)
+    #[Route(path: '/view-map/{module}/{page}', methods: ["GET"])]
+    public function getViewMap($module, $page): JsonResponse
     {
 
         global $objPage;
+
         $objPage = PageModel::findByPK($page)->loadDetails();
-        (new PageLayout())->getMasterByPageId($page, Input::get('item'));
+        (new GetPageLayoutListener())->getMasterByPageId($page, Input::get('item'));
+
         $objPage->ajaxContext = true;
         $strListing = Controller::getFrontendModule($module);
+
         return new JsonResponse(['locations' => $strListing]);
     }
 
-    #[Route(
-        path: '/icalendar',
-        methods: ["GET"],
-        name: 'catalog-manager-get-icalendar'
-    )]
-    public function getICalendar()
+    #[Route(path: '/icalendar', methods: ["GET"])]
+    public function getICalendar(): Response
     {
 
         $this->container->get('contao.framework')->initialize();
@@ -137,8 +118,10 @@ class FrontendController extends AbstractController
             'alias' => Input::get('i'),
             'id' => '1'
         ]);
+
         $arrMaster = $objEntity->parse()[0] ?: [];
         $objICalendar = new ICalendar($arrMaster);
+
         return new Response(
             $objICalendar->getICalFile(),
             200,

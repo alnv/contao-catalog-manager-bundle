@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
@@ -13,9 +14,9 @@ use Contao\System;
 class Catalog extends CatalogWizard
 {
 
-    protected $arrFields = [];
-    protected $arrCatalog = [];
-    protected $strIdentifier = null;
+    protected array $arrFields = [];
+    protected array $arrCatalog = [];
+    protected string|null $strIdentifier = null;
 
     public function __construct($strIdentifier)
     {
@@ -124,44 +125,47 @@ class Catalog extends CatalogWizard
         ArrayUtil::arrayInsert($this->arrFields, 0, $arrFields);
     }
 
-    public function getDefaultFieldnames()
+    public function getDefaultFieldnames(): array
     {
 
         return array_keys($this->getDefaultFields());
     }
 
-    public function getDefaultFields()
+    public function getDefaultFields(): array
     {
 
         System::loadLanguageFile('default');
 
+        $strTable = $this->arrCatalog['table'] ?? '';
+        $strKeyName = ($strTable?$strTable.'.':'');
+
         $arrReturn = [
             'id' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.id', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('id')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.id', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.id', Toolkit::getLabel('id')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.id', '')
                 ],
                 'search' => true,
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.pid', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('pid')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.pid', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.pid', Toolkit::getLabel('pid')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.pid', '')
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'sorting' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.sorting', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('sorting')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.sorting', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.sorting', Toolkit::getLabel('sorting')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.sorting', '')
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.tstamp', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('tstamp')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.tstamp', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.tstamp', Toolkit::getLabel('tstamp')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.tstamp', '')
                 ],
                 'eval' => [
                     'rgxp' => 'datim',
@@ -174,8 +178,8 @@ class Catalog extends CatalogWizard
             ],
             'published' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.published', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.published', Toolkit::getLabel('published')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.published', '')
                 ],
                 'inputType' => 'checkbox',
                 'eval' => [
@@ -189,8 +193,8 @@ class Catalog extends CatalogWizard
             ],
             'start' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.start', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('start')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.start', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.start', Toolkit::getLabel('start')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.start', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -203,8 +207,8 @@ class Catalog extends CatalogWizard
             ],
             'stop' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.stop', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('stop')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.stop', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.stop', Toolkit::getLabel('stop')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.stop', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -217,8 +221,8 @@ class Catalog extends CatalogWizard
             ],
             'alias' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.alias', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('alias')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.alias', '')
+                    Translation::getInstance()->translate($strKeyName . 'field.title.alias', Toolkit::getLabel('alias')),
+                    Translation::getInstance()->translate($strKeyName . 'field.description.alias', '')
                 ],
                 'eval' => [
                     'doNotCopy' => true,
@@ -229,11 +233,12 @@ class Catalog extends CatalogWizard
                 'sql' => "varchar(128) NOT NULL default ''"
             ]
         ];
-        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) && $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) {
+
+        if ($strTable && isset($GLOBALS['TL_DCA'][$strTable]['config']['ptable']) && $GLOBALS['TL_DCA'][$strTable]['config']['ptable']) {
             $arrReturn['pid']['relation'] = [
                 'load' => 'lazy',
                 'field' => 'id',
-                'table' => $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable'],
+                'table' => $GLOBALS['TL_DCA'][$strTable]['config']['ptable'],
                 'type' => 'belongsTo'
             ];
         }

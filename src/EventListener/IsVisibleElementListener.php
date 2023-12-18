@@ -1,13 +1,19 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
+use Contao\Model;
 use Contao\System;
 
-class Element
+class IsVisibleElementListener
 {
+
+    public function __invoke(Model $objElement, bool $blnIsVisible): bool
+    {
+        return $this->isVisibleElement($objElement, $blnIsVisible);
+    }
 
     public function isVisibleElement(&$objElement, $blnIsVisible)
     {
@@ -43,7 +49,7 @@ class Element
         return $blnIsVisible;
     }
 
-    public function onloadCallback(DataContainer $dc)
+    public function onloadCallback(DataContainer $dc): void
     {
 
         foreach ($GLOBALS['TL_DCA'][$dc->table]['palettes'] as $strPalette => $strField) {

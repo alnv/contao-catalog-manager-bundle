@@ -87,7 +87,7 @@ class RoleResolver
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
                 'role' => $GLOBALS['CM_ROLES'][$strRole],
-                'value' => isset(self::$arrEntity[$strFieldname]) ? self::$arrEntity[$strFieldname] : ''
+                'value' => isset(self::$arrEntity[$strFieldname]) ?? ''
             ];
         }
 
@@ -100,33 +100,33 @@ class RoleResolver
         return $arrRoles;
     }
 
-    public function getRole($strRolename)
+    public function getRole($strRoleName)
     {
 
-        return $GLOBALS['CM_ROLES'][$strRolename] ?? [];
+        return $GLOBALS['CM_ROLES'][$strRoleName] ?? [];
     }
 
-    public function getValueByRole($strRolename)
+    public function getValueByRole($strRoleName)
     {
 
-        if (!isset(self::$arrRoles[$strRolename])) {
+        if (!isset(self::$arrRoles[$strRoleName])) {
             return '';
         }
 
-        return self::$arrRoles[$strRolename]['value'];
+        return self::$arrRoles[$strRoleName]['value'];
     }
 
-    public function getFieldByRole($strRolename)
+    public function getFieldByRole($strRoleName)
     {
 
-        if (!isset(self::$arrRoles[$strRolename])) {
+        if (!isset(self::$arrRoles[$strRoleName])) {
             return '';
         }
 
-        return self::$arrRoles[$strRolename]['name'];
+        return self::$arrRoles[$strRoleName]['name'];
     }
 
-    public function getFieldsByRoles($arrRoles)
+    public function getFieldsByRoles($arrRoles): null|array
     {
 
         $arrReturn = [];
@@ -140,7 +140,7 @@ class RoleResolver
         return empty($arrReturn) ? null : $arrReturn;
     }
 
-    public function getGeoCodingAddress($strDelimiter = ', ')
+    public function getGeoCodingAddress($strDelimiter = ', '): string
     {
 
         $arrAddress = [];
@@ -152,11 +152,10 @@ class RoleResolver
             }
         }
 
-        $objAddress = new AddressBuilder($arrAddress);
-        return $objAddress->getAddress($strDelimiter);
+        return (new AddressBuilder($arrAddress))->getAddress($strDelimiter);
     }
 
-    public function getGeoCodingFields()
+    public function getGeoCodingFields(): array
     {
 
         $arrReturn = [];
@@ -169,7 +168,7 @@ class RoleResolver
         return $arrReturn;
     }
 
-    protected function getKeyValueByRoles($arrRoles)
+    protected function getKeyValueByRoles($arrRoles): array
     {
 
         $arrReturn = [];

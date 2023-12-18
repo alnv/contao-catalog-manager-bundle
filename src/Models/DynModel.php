@@ -11,6 +11,8 @@ class DynModel extends Model
 
     public static $strTable = '';
 
+    public static array $arrClassNames = [];
+
     public function __construct($objResult = null)
     {
 
@@ -26,6 +28,7 @@ class DynModel extends Model
 
         static::$strTable = $strTable;
         static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
+
         parent::__construct($objResult);
     }
 
@@ -33,12 +36,15 @@ class DynModel extends Model
     {
 
         $t = static::$strTable;
+
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
             $arrOptions['column'] = [];
         }
+
         if (!isset($arrOptions['value']) || !is_array($arrOptions['value'])) {
             $arrOptions['value'] = [];
         }
+
         $arrOptions['column'][] = !preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
         $arrOptions['value'][] = $varId;
         $arrOptions['limit'] = 1;
@@ -85,8 +91,8 @@ class DynModel extends Model
 
                         ++$intCount;
                         $objRelated = DcaExtractor::getInstance($arrConfig['table']);
-                        foreach (array_keys($objRelated->getFields()) as $strField) {
 
+                        foreach (array_keys($objRelated->getFields()) as $strField) {
                             $arrFields[] = 'j' . $intCount . '.' . Database::quoteIdentifier($strField) . ' AS ' . $strKey . '__' . $strField;
                         }
 

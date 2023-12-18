@@ -9,6 +9,7 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
 use Contao\Controller;
+use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
@@ -16,13 +17,13 @@ use Contao\Widget;
 class Options
 {
 
-    protected static $arrField = [];
+    protected static array $arrField = [];
 
-    protected static $arrInstances = [];
+    protected static array $arrInstances = [];
 
-    protected static $strInstanceId = null;
+    protected static null|string $strInstanceId = null;
 
-    protected static $arrDataContainer = null;
+    protected static null|array|DataContainer $arrDataContainer = null;
 
     public static function getInstance($strInstanceId)
     {
@@ -39,7 +40,7 @@ class Options
         return static::$arrInstances[$strInstanceId];
     }
 
-    protected static function getGetterId()
+    protected static function getGetterId(): string
     {
 
         self::$arrField['id'] = self::$arrField['id'] ?? '';
@@ -48,7 +49,7 @@ class Options
         return (self::$arrField['fieldname'] ? self::$arrField['fieldname'] . '.' : '') . (self::$arrField['id'] ?: static::$strInstanceId);
     }
 
-    public static function getOptions($blnAsAssoc = false)
+    public static function getOptions($blnAsAssoc = false): array
     {
 
         $arrTemps = [];
@@ -186,7 +187,7 @@ class Options
         return Toolkit::parseCatalogValue($strValue, Widget::getAttributesFromDca($arrField, $strField, $strValue, $strField, $strTable), [], true);
     }
 
-    protected static function setFilter()
+    protected static function setFilter(): array
     {
 
         $arrOptions = [];
@@ -227,7 +228,7 @@ class Options
         return $arrOptions;
     }
 
-    public static function setParameter($arrField, $objDataContainer = null)
+    public static function setParameter($arrField, $objDataContainer = null): void
     {
 
         self::$arrField = $arrField;
@@ -239,11 +240,12 @@ class Options
         }
     }
 
-    protected static function getLabel($strValue, $strFallbackLabel = '')
+    protected static function getLabel($strValue, $strFallbackLabel = ''): string
     {
 
         $strTable = self::$arrField['dbTable'] ?: 'option';
         $strFallbackLabel = StringUtil::decodeEntities($strFallbackLabel);
+
         return Toolkit::replaceInsertTags(Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . (self::$arrField['fieldname'] ?: self::$arrField['dbKey']) . '.' . $strValue, $strFallbackLabel));
     }
 }

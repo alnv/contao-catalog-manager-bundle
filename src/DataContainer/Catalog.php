@@ -15,11 +15,12 @@ use Contao\System;
 class Catalog
 {
 
-    public function addIcon($arrRow, $strLabel, DataContainer $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false)
+    public function addIcon($arrRow, $strLabel, DataContainer $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false): string
     {
 
         $strIcon = 'bundles/alnvcontaocatalogmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
         $strAttributes .= 'class="resize-image"';
+
         return Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
     }
 
@@ -125,7 +126,7 @@ class Catalog
         $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
     }
 
-    public function getNavigation()
+    public function getNavigation(): array
     {
 
         $arrReturn = [];

@@ -1,15 +1,15 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
+use Contao\Module;
 use Contao\PageModel;
 
-class Breadcrumb
+class GenerateBreadcrumbListener
 {
 
-    public function generateDetailPage($arrItems)
+    public function __invoke(array $arrItems, Module $module): array
     {
-
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return $arrItems;
         }

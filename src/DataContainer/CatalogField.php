@@ -2,6 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
+use Alnv\ContaoCatalogManagerBundle\Library\Database as LDatabase;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Contao\Config;
@@ -13,7 +15,7 @@ use Contao\StringUtil;
 class CatalogField
 {
 
-    public function checkExtensions($varValue, DataContainer $dc)
+    public function checkExtensions($varValue, DataContainer $dc): string
     {
 
         $varValue = strtolower($varValue);
@@ -28,23 +30,25 @@ class CatalogField
         return $varValue;
     }
 
-    public function listFields($arrRow)
+    public function listFields($arrRow): string
     {
 
         return $arrRow['name'] . '<span style="color:#999;padding-left:3px">[' . $arrRow['fieldname'] . ']</span>';
     }
 
-    public function getFieldTypes()
+    public function getFieldTypes(): array
     {
 
         $arrReturn = [];
+
         foreach ($GLOBALS['CM_FIELDS'] as $strType) {
             $arrReturn[$strType] = $strType;
         }
+
         return $arrReturn;
     }
 
-    public function getRoles(DataContainer $dc)
+    public function getRoles(DataContainer $dc): array
     {
 
         $arrRoles = array_keys($GLOBALS['CM_ROLES']);
@@ -76,20 +80,19 @@ class CatalogField
         $strType = $objDataContainer->activeRecord->type;
         $arrActiveRecord = $objDataContainer->getCurrentRecord();
 
-
         if (Input::post('role')) {
             $arrActiveRecord['role'] = Input::post('role');
         }
 
         $strSql = Toolkit::getSql($strType, $arrActiveRecord);
         $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new LDatabase();
 
         if (!$strFieldname || $objCatalog == null) {
             throw new \Exception(sprintf('something went wrong'));
         }
 
-        if (in_array($strFieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
+        if (in_array($strFieldname, (new Catalog(null))->getDefaultFieldnames())) {
             return $strFieldname;
         }
 
@@ -125,17 +128,17 @@ class CatalogField
             return $strValue;
         }
 
-        if (in_array($objDataContainer->activeRecord->fieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
+        if (in_array($objDataContainer->activeRecord->fieldname, (new Catalog(null))->getDefaultFieldnames())) {
             return $strValue;
         }
 
         $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, $objDataContainer->getCurrentRecord());
-        (new \Alnv\ContaoCatalogManagerBundle\Library\Database())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
+        (new LDatabase())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;
     }
 
-    public function getImageSizes()
+    public function getImageSizes(): array
     {
 
         $arrReturn = [];

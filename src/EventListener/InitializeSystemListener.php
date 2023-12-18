@@ -1,12 +1,17 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Contao\System;
 
-class Initialize
+class InitializeSystemListener
 {
+    public function __invoke(): void
+    {
+        $this->initializeBackendModules();
+        $this->generateDataContainerArray();
+    }
 
     public function initializeBackendModules()
     {

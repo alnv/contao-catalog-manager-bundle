@@ -38,6 +38,7 @@ class Module
             $strValue = \is_array($arrField['label']) ? $arrField['label'][0] : $strField;
             $arrReturn[$strField] = StringUtil::decodeEntities($strValue);
         }
+
         return $arrReturn;
     }
 

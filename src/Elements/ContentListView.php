@@ -10,8 +10,11 @@ class ContentListView extends Listing
 {
 
     protected $strKey = 'id';
-    protected $arrOptions = [];
+
+    protected array $arrOptions = [];
+
     protected $strTable = 'tl_content';
+
     protected $strTemplate = 'ce_listview';
 
     public function generate()
@@ -21,6 +24,7 @@ class ContentListView extends Listing
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['CTE']['listview'][0]) . ' ###';
             $objTemplate->id = $this->id;
+
             return $objTemplate->parse();
         }
 

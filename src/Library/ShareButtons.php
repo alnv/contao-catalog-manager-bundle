@@ -7,8 +7,7 @@ use Contao\FrontendTemplate;
 class ShareButtons
 {
 
-    protected $arrShareButtons = [
-
+    protected array $arrShareButtons = [
         'twitter',
         'facebook',
         'linkedin',
@@ -16,7 +15,7 @@ class ShareButtons
         'email',
     ];
 
-    protected $arrEntity = [];
+    protected array $arrEntity = [];
 
     public function __construct($arrEntity)
     {
@@ -24,7 +23,7 @@ class ShareButtons
         $this->arrEntity = $arrEntity;
     }
 
-    public function getShareButtons($arrButtons = [])
+    public function getShareButtons($arrButtons = []): string
     {
 
         $strTemplate = '';

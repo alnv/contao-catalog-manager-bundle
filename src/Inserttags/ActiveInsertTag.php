@@ -8,7 +8,7 @@ use Contao\Date;
 use Contao\System;
 use Contao\Validator;
 
-class ActiveInsertTag extends System
+class ActiveInsertTag
 {
 
     public function replace($strFragment)

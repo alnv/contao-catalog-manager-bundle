@@ -13,9 +13,15 @@ class ModelWizard
     public function __construct($strTable)
     {
 
-        $strModel = Model::getClassFromTable($strTable);
+        $strModel = '';
 
-        if (strpos($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
+        try {
+            $strModel = Model::getClassFromTable($strTable);
+        } catch (\Exception $objError) {
+            //
+        }
+
+        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
             $strModel = '';
         }
 
@@ -34,6 +40,8 @@ class ModelWizard
         $objDynModel = new DynModel();
         $objDynModel->createDynTable($strTable);
         $this->objModel = $objDynModel;
+
+        $GLOBALS['TL_MODELS'][$strTable] = DynModel::class;
     }
 
     public function getModel()
@@ -45,7 +53,7 @@ class ModelWizard
     protected function modelExist($strModel): bool
     {
 
-        if (strpos($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
+        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
             return false;
         }
 

@@ -1,15 +1,15 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
 use Contao\ArrayUtil;
 
-class Widget
+class GetAttributesFromDcaListener
 {
 
-    public function getAttributesFromDca($arrAttributes, $objDataContainer = null)
+    public function __invoke(array $arrAttributes, $objDataContainer = null): array
     {
 
         if (isset($arrAttributes['optionsSource']) && $arrAttributes['optionsSource']) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
 use Contao\ArticleModel;
@@ -12,23 +12,15 @@ use Contao\PageModel;
 use Contao\PageRegular;
 use Contao\System;
 
-class PageLayout extends System
+class GetPageLayoutListener
 {
-
-    public function __construct()
+    public function __invoke(PageModel $pageModel, LayoutModel $layout, PageRegular $pageRegular): void
     {
-
-        parent::__construct();
-    }
-
-    public function generateMaster(PageModel $objPage, LayoutModel $objLayout, PageRegular $objPageRegular)
-    {
-
         if (!isset($_GET['auto_item'])) {
-            return null;
+            return;
         }
 
-        $this->getMasterByPageId($objPage->id);
+        $this->getMasterByPageId($pageModel->id);
     }
 
     public function getMasterByPageId($strPageId, $strAlias = null)
@@ -80,9 +72,11 @@ class PageLayout extends System
     {
 
         $objArticles = ArticleModel::findByPid($strPageId);
+
         if ($objArticles == null) {
             return null;
         }
+
         while ($objArticles->next()) {
             if ($objArticles->cmContentElement) {
                 if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->cmContentElement, 'tl_catalog_element'))) {
@@ -93,10 +87,12 @@ class PageLayout extends System
                 return $strTable;
             }
         }
+
         $objContent = ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article');
         if ($objContent == null) {
             return null;
         }
+
         while ($objContent->next()) {
             if (!in_array($objContent->type, ['listview'])) {
                 continue;
@@ -114,6 +110,7 @@ class PageLayout extends System
         if ($objContent == null) {
             return null;
         }
+
         while ($objContent->next()) {
             if ($objContent->type == 'module' && $objContent->module) {
                 $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
@@ -125,6 +122,7 @@ class PageLayout extends System
                 }
             }
         }
+
         return null;
     }
 }

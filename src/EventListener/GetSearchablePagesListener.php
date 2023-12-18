@@ -1,20 +1,27 @@
 <?php
 
-namespace Alnv\ContaoCatalogManagerBundle\Hooks;
+namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-use Contao\PageModel;
-use Contao\Database;
 use Contao\Controller;
+use Contao\Database;
+use Contao\PageModel;
 use Contao\StringUtil;
 
+class GetSearchablePagesListener
+{
+    public function __invoke(array $arrPages, $intRoot = 0, bool $blnIsSitemap = false, string $language = null): array
+    {
 
-class Search {
+        $arrPages = $this->getSearchablePages($arrPages, $intRoot, $blnIsSitemap, $language);
+        return $this->getSearchablePagesByPagesRoles($arrPages, $intRoot, $blnIsSitemap, $language);
+    }
 
-    public function getSearchablePagesByPagesRoles($arrPages, $intRoot=0, $blnIsSitemap=false) {
+    public function getSearchablePagesByPagesRoles($arrPages, $intRoot = 0, $blnIsSitemap = false, $language = null)
+    {
 
         $objCatalogFields = CatalogFieldModel::findAll([
             'column' => ['tl_catalog_field.role=?'],
@@ -24,9 +31,9 @@ class Search {
             return $arrPages;
         }
 
-        $strDNS = '';
+        $strDns = '';
         if ($objRoot = PageModel::findByPk($intRoot)) {
-            $strDNS = $objRoot->dns?:'';
+            $strDns = $objRoot->dns ?: '';
         }
 
         while ($objCatalogFields->next()) {
@@ -37,7 +44,10 @@ class Search {
                 continue;
             }
 
-            $objCatalog = CatalogModel::findAll(['tl_catalog.id=?'], [$objCatalogFields->pid]);
+            $objCatalog = CatalogModel::findAll([
+                'column' => ['tl_catalog.id=?'],
+                'value' => [$objCatalogFields->pid]
+            ]);
 
             if ($objCatalog === null) {
                 continue;
@@ -62,8 +72,8 @@ class Search {
                     if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
 
                         foreach ($arrEntity[$strFieldname] as $arrUrl) {
-                            if ($strDNS) {
-                                if (strpos($arrUrl['absolute'], $strDNS) !== false) {
+                            if ($strDns) {
+                                if (str_contains($arrUrl['absolute'], $strDns)) {
                                     $arrPages[] = $arrUrl['absolute'];
                                 }
                             } else {
@@ -78,10 +88,11 @@ class Search {
         return $arrPages;
     }
 
-    public function getSearchablePages($arrPages, $intRoot=0, $blnIsSitemap=false, $strLanguage='') {
+    public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false, $strLanguage = '')
+    {
 
         $objDatabase = Database::getInstance();
-        $objModules = $objDatabase->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing','1');
+        $objModules = $objDatabase->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing', '1');
 
         if (!$objModules->numRows) {
             return $arrPages;
@@ -89,7 +100,7 @@ class Search {
 
         $strDNS = '';
         if ($objRoot = PageModel::findByPk($intRoot)) {
-            $strDNS = $objRoot->dns?:'';
+            $strDNS = $objRoot->dns ?: '';
         }
 
         while ($objModules->next()) {
@@ -131,7 +142,7 @@ class Search {
                         continue;
                     }
 
-                    $strUrl = $objPage->getAbsoluteUrl('/'.$strAlias);
+                    $strUrl = $objPage->getAbsoluteUrl('/' . $strAlias);
 
                     if ($strDNS) {
                         if (strpos($strUrl, $strDNS) !== false) {
@@ -147,7 +158,8 @@ class Search {
         return $arrPages;
     }
 
-    protected function parseFilter($objModules) {
+    protected function parseFilter($objModules)
+    {
 
         $arrReturn = [
             'column' => [],

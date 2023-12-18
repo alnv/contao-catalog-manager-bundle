@@ -19,7 +19,7 @@ class Inserttags
         }
 
         switch ($arrFragments[0]) {
-            case 'cmUser':
+            case 'CM-USER':
                 if (!FrontendUser::getInstance()->id) {
                     return '';
                 }
@@ -31,7 +31,6 @@ class Inserttags
                 }
                 return $objDbUser->{$strField};
             case 'TIMESTAMP':
-            case 'timestamp':
                 $strMethod = $arrFragments[1] ?: 'tstamp';
                 $strStrToTimeParameter = $arrFragments[2] ?: '';
                 if ($strStrToTimeParameter) {

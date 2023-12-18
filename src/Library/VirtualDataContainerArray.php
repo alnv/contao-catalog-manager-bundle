@@ -18,8 +18,9 @@ use Contao\Widget;
 class VirtualDataContainerArray
 {
 
-    protected $arrCatalog = [];
-    protected $arrFields = [];
+    protected array $arrCatalog = [];
+
+    protected array $arrFields = [];
 
     public function __construct($strModule)
     {
@@ -30,7 +31,7 @@ class VirtualDataContainerArray
         $this->generateEmptyDataContainer();
     }
 
-    protected function setConfig()
+    protected function setConfig(): void
     {
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_table'] = $this->arrCatalog['table'];
@@ -50,14 +51,18 @@ class VirtualDataContainerArray
         }
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onload_callback'][] = function ($objDataContainer = null) {
+
             if (!$objDataContainer) {
-                return null;
+                return;
             }
+
             if ($objDataContainer->id) {
                 $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
+
                 if (!$objActiveRecord->numRows) {
-                    return null;
+                    return;
                 }
+
                 Cache::set('activeRecord', $objActiveRecord->row());
             }
         };
@@ -190,7 +195,7 @@ class VirtualDataContainerArray
         }
     }
 
-    protected function setFields()
+    protected function setFields(): void
     {
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] = $this->arrFields;
@@ -278,7 +283,7 @@ class VirtualDataContainerArray
         }
     }
 
-    protected function addSubmitOnChange($strField)
+    protected function addSubmitOnChange($strField): void
     {
 
         if (isset($this->arrFields[$strField]) && isset($this->arrFields[$strField]['eval'])) {
@@ -286,7 +291,7 @@ class VirtualDataContainerArray
         }
     }
 
-    protected function getDefaultPalettes()
+    protected function getDefaultPalettes(): array
     {
 
         $arrReturn = [];
@@ -349,7 +354,7 @@ class VirtualDataContainerArray
         }
     }
 
-    protected function getFieldsOnly($arrFields)
+    protected function getFieldsOnly($arrFields): array
     {
 
         $arrReturn = [];
@@ -357,6 +362,7 @@ class VirtualDataContainerArray
         foreach ($arrFields as $arrField) {
 
             $strField = $arrField['field'];
+
             if (is_numeric($strField)) {
                 $objField = CatalogFieldModel::findByPk($arrField['field']);
                 if (!$objField) {
@@ -364,13 +370,14 @@ class VirtualDataContainerArray
                 }
                 $strField = $objField->fieldname;
             }
+
             $arrReturn[] = $strField;
         }
 
         return $arrReturn;
     }
 
-    protected function setLabels()
+    protected function setLabels(): void
     {
 
         foreach ($this->arrFields as $strFieldname => $arrField) {

@@ -3,12 +3,60 @@ services:
     autowire: true
     autoconfigure: true
 
+  contao.listener.doctrine_schema:
+    class: Alnv\ContaoCatalogManagerBundle\EventListener\DoctrineSchemaListener
+    arguments:
+      - '@contao.doctrine.dca_schema_provider'
+      - '@messenger.receiver_locator'
+    tags:
+      - { name: doctrine.event_listener, event: postGenerateSchema }
+
   Alnv\ContaoCatalogManagerBundle\Controller\FrontendController:
     public: true
 
-  catalogmanager.hooks.widget:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Widget
-    public: true
+  Alnv\ContaoCatalogManagerBundle\EventListener\SqlCompileCommandsListener:
+    tags:
+      - { name: contao.hook, hook: sqlCompileCommands }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\InitializeSystemListener:
+    tags:
+      - { name: contao.hook, hook: initializeSystem }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\GenerateBreadcrumbListener:
+    tags:
+      - { name: contao.hook, hook: generateBreadcrumb }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\GetSearchablePagesListener:
+    tags:
+      - { name: contao.hook, hook: getSearchablePages }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\ReplaceInsertTagsListener:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\LoadDataContainerListener:
+    tags:
+      - { name: contao.hook, hook: loadDataContainer }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\GetPageLayoutListener:
+    tags:
+      - { name: contao.hook, hook: getPageLayout }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\IsVisibleElementListener:
+    tags:
+      - { name: contao.hook, hook: isVisibleElement }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\CompileFormFieldsListener:
+    tags:
+      - { name: contao.hook, hook: compileFormFields }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\GetAttributesFromDcaListener:
+    tags:
+      - { name: contao.hook, hook: getAttributesFromDca }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\LoadFormFieldListener:
+    tags:
+      - { name: contao.hook, hook: loadFormField }
 
   catalogmanager.datacontainer.catalog:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog
@@ -22,42 +70,10 @@ services:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogOption
     public: true
 
-  catalogmanager.hooks.sqlcompilecommands:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\SqlCompileCommands
-    public: true
-
-  catalogmanager.datacontainer.module:
-    class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
-    public: true
-
   catalogmanager.datacontainer.catalogpalette:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette
     public: true
 
-  catalogmanager.hooks.initialize:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Initialize
-    public: true
-
-  catalogmanager.hooks.breadcrumb:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Breadcrumb
-    public: true
-
-  catalogmanager.hooks.pageLayout:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\PageLayout
-    public: true
-
-  catalogmanager.hooks.datacontainer:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\DataContainer
-    public: true
-
-  catalogmanager.hooks.element:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Element
-    public: true
-
-  catalogmanager.hooks.search:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\Search
-    public: true
-
-  catalogmanager.hooks.formfields:
-    class: Alnv\ContaoCatalogManagerBundle\Hooks\FormFields
+  catalogmanager.datacontainer.module:
+    class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
     public: true

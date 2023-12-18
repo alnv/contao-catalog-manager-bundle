@@ -19,6 +19,7 @@ abstract class CatalogWizard
     {
 
         $strIdentifier = 'catalog_' . $arrCatalog['table'];
+
         if (Cache::has($strIdentifier)) {
             return Cache::get($strIdentifier);
         }
