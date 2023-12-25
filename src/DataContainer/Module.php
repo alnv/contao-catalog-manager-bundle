@@ -53,6 +53,9 @@ class Module
             case 'listing-map':
                 $strType = 'map_view';
                 break;
+            case 'listing-table':
+                $strType = 'listing';
+                break;
             default:
                 $strType = $dc->activeRecord->type;
                 break;

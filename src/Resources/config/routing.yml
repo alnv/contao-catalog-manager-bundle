@@ -1,0 +1,5 @@
+controllers:
+  resource:
+    path: ../../Controller/
+    namespace: Alnv\ContaoCatalogManagerBundle\Controller
+  type: attribute

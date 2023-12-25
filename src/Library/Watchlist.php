@@ -20,7 +20,7 @@ class Watchlist
             'data' => base64_encode($strIdentifier . ':' . $strTable),
             'units' => $arrData['units'],
             'added' => isset($arrData['id']),
-            'useUnits' => (bool)$arrOptions['useUnits'],
+            'useUnits' => (bool)($arrOptions['useUnits']??false),
             'buttonAddLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListAddButtonLabel'],
             'buttonRemoveLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListRemoveButtonLabel'],
             'buttonUnitsLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListUnitsButtonLabel'],

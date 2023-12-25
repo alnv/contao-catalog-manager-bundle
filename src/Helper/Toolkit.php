@@ -107,7 +107,7 @@ class Toolkit
     public static function getSessionId()
     {
 
-        $objSession = System::getContainer()->get('session');
+        $objSession = System::getContainer()->get('request_stack')->getSession();
         $strSessionId = $objSession->get('catalog-session-id');
 
         if (!$strSessionId) {
@@ -457,22 +457,26 @@ class Toolkit
             case 'fileTree':
                 $strSizeId = null;
                 $arrOrderField = [];
+
                 if (isset($arrField['orderField']) && $arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
                     $arrOrderField = CatalogImage::getUuids($arrCatalog[$arrField['orderField']]);
                 }
+
                 if (isset($arrField['imageSize']) && $arrField['imageSize']) {
                     $strSizeId = $arrField['imageSize'];
                 }
+
                 if ($blnFastMode) {
                     return CatalogImage::getUuids($varValue);
                 }
+
                 if ((isset($arrField['isImage']) && $arrField['isImage']) || (isset($arrField['isGallery']) && $arrField['isGallery'])) {
 
                     $arrImages = [];
                     return CatalogImage::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
 
-                if ($arrField['isFile']) {
+                if (isset($arrField['isFile']) && $arrField['isFile']) {
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }

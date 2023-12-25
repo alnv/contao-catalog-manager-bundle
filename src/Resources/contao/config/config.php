@@ -49,7 +49,7 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
 ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
         'listing-map' => MapModule::class,
-        'listing' => ListingModule::class,
+        'listing-table' => ListingModule::class,
         'master' => MasterModule::class
     ]
 ]);
@@ -202,7 +202,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'content' => [
         'group' => 'article',
-        'sql' => "longtext NULL"
+        'sql' => "text NULL"
     ],
     'description' => [
         'group' => 'article',

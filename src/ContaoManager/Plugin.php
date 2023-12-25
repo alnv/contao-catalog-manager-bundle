@@ -32,6 +32,9 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
 
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
-        return $resolver->resolve('@AlnvContaoCatalogManagerBundle/src/Controller')->load('@AlnvContaoCatalogManagerBundle/src/Controller');
+
+        return $resolver
+            ->resolve(__DIR__ . '/../Resources/config/routing.yml')
+            ->load(__DIR__ . '/../Resources/config/routing.yml');
     }
 }
