@@ -2,11 +2,29 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Views;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
+use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
+use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
+use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoCatalogManagerBundle\Library\ShareButtons;
+use Cache;
+use Config;
+use ContentModel;
+use Controller;
+use Date;
+use FrontendTemplate;
+use Input;
+use PageModel;
+use Pagination;
+use StringUtil;
+use Validator;
+use Widget;
+use function is_callable;
 
-abstract class View extends \Controller {
+abstract class View extends Controller
+{
 
     public $arrFormPage = [];
     public $arrMasterPage = [];
@@ -15,45 +33,46 @@ abstract class View extends \Controller {
     protected $arrEntities = [];
     protected $dcaExtractor = null;
 
-    public function __construct($strTable, $arrOptions = []) {
+    public function __construct($strTable, $arrOptions = [])
+    {
 
         $this->strTable = $strTable;
         $this->initializeDataContainer();
-        $this->dcaExtractor = new \Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor($strTable);
+        $this->dcaExtractor = new DcaExtractor($strTable);
 
         foreach ($arrOptions as $strName => $varValue) {
             switch ($strName) {
                 case 'id':
-                    $this->arrOptions['id'] = (int) $varValue;
+                    $this->arrOptions['id'] = (int)$varValue;
                     break;
                 case 'alias':
                     $this->arrOptions['alias'] = $varValue;
                     break;
                 case 'isForm':
-                    $this->arrOptions['isForm'] = (bool) $varValue;
+                    $this->arrOptions['isForm'] = (bool)$varValue;
                     break;
                 case 'masterPage':
-                    $objPage = \PageModel::findByPk($varValue);
+                    $objPage = PageModel::findByPk($varValue);
                     if ($objPage !== null) {
                         $this->arrMasterPage = $objPage->row();
                         $this->arrOptions['masterPage'] = true;
                     }
                     break;
                 case 'formPage':
-                    $objPage = \PageModel::findByPk($varValue);
+                    $objPage = PageModel::findByPk($varValue);
                     if ($objPage !== null) {
                         $this->arrFormPage = $objPage->row();
                         $this->arrOptions['formPage'] = true;
                     }
                     break;
                 case 'limit':
-                    $this->arrOptions['limit'] = (int) $varValue;
+                    $this->arrOptions['limit'] = (int)$varValue;
                     break;
                 case 'fastMode':
                     $this->arrOptions['fastMode'] = $varValue ? true : false;
                     break;
                 case 'offset':
-                    $this->arrOptions['offset'] = (int) $varValue;
+                    $this->arrOptions['offset'] = (int)$varValue;
                     break;
                 case 'pagination':
                     $this->arrOptions['pagination'] = $varValue;
@@ -105,7 +124,7 @@ abstract class View extends \Controller {
 
         if (isset($GLOBALS['TL_HOOKS']['initializeView']) && is_array($GLOBALS['TL_HOOKS']['initializeView'])) {
             foreach ($GLOBALS['TL_HOOKS']['initializeView'] as $arrCallback) {
-                $this->import( $arrCallback[0] );
+                $this->import($arrCallback[0]);
                 $this->{$arrCallback[0]}->{$arrCallback[1]}($this->strTable, $this->arrOptions, $this);
             }
         }
@@ -113,13 +132,26 @@ abstract class View extends \Controller {
         parent::__construct();
     }
 
-    protected function paginate() {
+    protected function initializeDataContainer()
+    {
+
+        $objApplication = new Application();
+        $objApplication->initializeDataContainerArrayByTable($this->strTable);
+
+        if (!isset($GLOBALS['TL_DCA'][$this->strTable])) {
+
+            Controller::loadDataContainer($this->strTable);
+        }
+    }
+
+    protected function paginate()
+    {
 
         if (!isset($this->arrOptions['pagination'])) {
             return null;
         }
 
-        if (!$this->arrOptions['pagination'] && !\Input::post('reload')) {
+        if (!$this->arrOptions['pagination'] && !Input::post('reload')) {
             return null;
         }
 
@@ -134,15 +166,15 @@ abstract class View extends \Controller {
 
         if ($objTotal !== null) {
             $numTotal = $objTotal->count();
-            \Cache::set('limit_' . $this->arrOptions['id'], $numTotal);
+            Cache::set('limit_' . $this->arrOptions['id'], $numTotal);
         }
 
-        if (\Input::post('reload')) {
-            $intOffset = (int) \Input::post('reload') + 1;
+        if (Input::post('reload')) {
+            $intOffset = (int)Input::post('reload') + 1;
             $intLimit = $this->arrOptions['limit'] * $intOffset;
             if ($intLimit > $numTotal) {
                 $intLimit = $numTotal;
-                \Cache::set('max_' . $this->arrOptions['id'], true);
+                Cache::set('max_' . $this->arrOptions['id'], true);
             }
             $this->arrOptions['offset'] = 0;
             $this->arrOptions['limit'] = $intLimit;
@@ -162,38 +194,28 @@ abstract class View extends \Controller {
         $numOffset = $this->getPageNumber();
 
         if ($this->arrOptions['limit'] > 0 && $this->arrOptions['offset']) {
-            $numOffset += round( $this->arrOptions['offset'] / $this->arrOptions['limit'] );
+            $numOffset += round($this->arrOptions['offset'] / $this->arrOptions['limit']);
         }
 
         $this->arrOptions['offset'] = ($numOffset - 1) * $this->arrOptions['limit'];
         $this->arrOptions['total'] = $numTotal;
     }
 
-    protected function initializeDataContainer() {
-
-        $objApplication = new Application();
-        $objApplication->initializeDataContainerArrayByTable($this->strTable);
-
-        if (!isset($GLOBALS['TL_DCA'][ $this->strTable])) {
-
-            \Controller::loadDataContainer($this->strTable);
-        }
-    }
-
-    protected function getModelOptions() {
+    protected function getModelOptions()
+    {
 
         $arrReturn = [];
         $arrOptions = ['limit', 'offset', 'pagination', 'order', 'column', 'value', 'distance', 'having', 'language'];
 
         foreach ($arrOptions as $strOption) {
-            if (isset($this->arrOptions[ $strOption ])) {
+            if (isset($this->arrOptions[$strOption])) {
                 $arrReturn[$strOption] = $this->arrOptions[$strOption];
             }
         }
 
         if (isset($GLOBALS['TL_HOOKS']['getModelOptions']) && is_array($GLOBALS['TL_HOOKS']['getModelOptions'])) {
             foreach ($GLOBALS['TL_HOOKS']['getModelOptions'] as $arrCallback) {
-                $this->import( $arrCallback[0] );
+                $this->import($arrCallback[0]);
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $this->strTable, $this->arrOptions);
             }
         }
@@ -207,7 +229,7 @@ abstract class View extends \Controller {
             $blnIsPreview = defined('BE_USER_LOGGED_IN') && BE_USER_LOGGED_IN === true;
 
             if (!$blnIsPreview) {
-                $intTime = \Date::floorToMinute();
+                $intTime = Date::floorToMinute();
                 $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
             }
@@ -216,24 +238,57 @@ abstract class View extends \Controller {
         return $arrReturn;
     }
 
-    protected function validOrigin($strValue, $strField) {
+    protected function getPageNumber()
+    {
 
-        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
-            foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'] as $arrField) {
-                if ($arrField['inputType'] == 'fileTree') {
-                    return false;
-                }
+        return (int)Input::get('page_e' . $this->arrOptions['id']);
+    }
+
+    public function getPagination()
+    {
+
+        if (!($this->arrOptions['pagination'] ?? '')) {
+            return '';
+        }
+
+        $objPagination = new Pagination($this->arrOptions['total'], $this->arrOptions['limit'], Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
+
+        return $objPagination->generate("\n  ");
+    }
+
+    public function getAddUrl()
+    {
+
+        return Toolkit::parseDetailLink($this->arrFormPage, '');
+    }
+
+    public function getEntities()
+    {
+
+        if (isset($GLOBALS['TL_HOOKS']['parseViewEntities']) && is_array($GLOBALS['TL_HOOKS']['parseViewEntities'])) {
+            foreach ($GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback) {
+                $this->import($arrCallback[0]);
+                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrEntities, $this);
             }
         }
 
-        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
-            return false;
-        }
-
-        return true;
+        return $this->arrEntities;
     }
 
-    protected function parseEntity($arrEntity) {
+    public function getTable()
+    {
+
+        return $this->strTable;
+    }
+
+    public function getModuleId()
+    {
+
+        return $this->arrOptions['id'];
+    }
+
+    protected function parseEntity($arrEntity)
+    {
 
         $arrRow = [];
         $arrRow['origin'] = [];
@@ -245,13 +300,13 @@ abstract class View extends \Controller {
 
         foreach ($arrEntity as $strField => $varValue) {
             $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, [
-                'fastMode' => $this->arrOptions['fastMode']??false,
-                'ignoreFieldsFromParsing' => $this->arrOptions['ignoreFieldsFromParsing']??[]
+                'fastMode' => $this->arrOptions['fastMode'] ?? false,
+                'ignoreFieldsFromParsing' => $this->arrOptions['ignoreFieldsFromParsing'] ?? []
             ]);
             if ($strParsedValue !== $varValue) {
                 if ($this->validOrigin($varValue, $strField)) {
-                    if (\Validator::isBinaryUuid($varValue)) {
-                        $varValue = \StringUtil::binToUuid($varValue);
+                    if (Validator::isBinaryUuid($varValue)) {
+                        $varValue = StringUtil::binToUuid($varValue);
                     }
                     $arrRow['origin'][$strField] = $varValue;
                 }
@@ -260,15 +315,15 @@ abstract class View extends \Controller {
         }
 
         $arrRow['roleResolver'] = function () use ($arrRow) {
-            return \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance($this->strTable, $arrRow);
+            return RoleResolver::getInstance($this->strTable, $arrRow);
         };
 
         $arrRow['shareButtons'] = function () use ($arrRow) {
-            return (new \Alnv\ContaoCatalogManagerBundle\Library\ShareButtons($arrRow))->getShareButtons();
+            return (new ShareButtons($arrRow))->getShareButtons();
         };
 
         $arrRow['iCalendarUrl'] = function () use ($arrRow) {
-            return (new \Alnv\ContaoCatalogManagerBundle\Library\ICalendar($arrRow))->getICalendarUrl();
+            return (new ICalendar($arrRow))->getICalendarUrl();
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
@@ -301,14 +356,14 @@ abstract class View extends \Controller {
                 }
             }
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
-            \Controller::loadDataContainer($arrRelation['table']);
+            Controller::loadDataContainer($arrRelation['table']);
             $strTable = isset($GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table']) ? $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] : $arrRelation['table'];
-            $strField = $strTable .'.'. $arrRelation['field'];
+            $strField = $strTable . '.' . $arrRelation['field'];
             foreach ($arrValues as $strValue) {
                 if ($strValue == '' || $strValue == null) {
                     continue;
                 }
-                $arrColumns[] = 'FIND_IN_SET(?,'. $strField .')';
+                $arrColumns[] = 'FIND_IN_SET(?,' . $strField . ')';
             }
 
             if (empty($arrValues)) {
@@ -318,7 +373,7 @@ abstract class View extends \Controller {
             $objList = new Listing($arrRelation['table'], [
                 'column' => [implode('OR ', $arrColumns)],
                 'value' => $arrValues,
-                'order' => 'FIELD('. $strField .', '. implode(',', $arrValues) .')' // @exp.
+                'order' => 'FIELD(' . $strField . ', ' . implode(',', $arrValues) . ')' // @exp.
             ]);
 
             return $objList->parse();
@@ -339,8 +394,8 @@ abstract class View extends \Controller {
 
         $arrRow['getContentElements'] = function () use ($arrRow) {
             $strReturn = '';
-            $objContent = \ContentModel::findPublishedByPidAndTable($arrRow['id'], $this->strTable);
-            if ( $objContent === null ) {
+            $objContent = ContentModel::findPublishedByPidAndTable($arrRow['id'], $this->strTable);
+            if ($objContent === null) {
                 return $strReturn;
             }
             while ($objContent->next()) {
@@ -349,12 +404,12 @@ abstract class View extends \Controller {
             return $strReturn;
         };
 
-        $arrRow['parseImage'] = function($varValue) {
-            return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parseImage($varValue);
+        $arrRow['parseImage'] = function ($varValue) {
+            return Toolkit::parseImage($varValue);
         };
 
-        $arrRow['parseArray'] = function($varValue, $strDelimiter=', ', $strField='label') {
-            return \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($varValue, $strDelimiter, $strField);
+        $arrRow['parseArray'] = function ($varValue, $strDelimiter = ', ', $strField = 'label') {
+            return Toolkit::parse($varValue, $strDelimiter, $strField);
         };
 
         if (isset($GLOBALS['TL_HOOKS']['parseEntity']) && is_array($GLOBALS['TL_HOOKS']['parseEntity'])) {
@@ -362,24 +417,23 @@ abstract class View extends \Controller {
                 if (is_array($arrCallback)) {
                     $this->import($arrCallback[0]);
                     $this->{$arrCallback[0]}->{$arrCallback[1]}($arrRow, $this->strTable, $this->arrOptions, $this);
-                }
-                elseif (\is_callable($arrCallback)) {
+                } elseif (is_callable($arrCallback)) {
                     $arrCallback($arrRow, $this->strTable, $this->arrOptions, $this);
                 }
             }
         }
 
         if (isset($this->arrOptions['template']) && $this->arrOptions['template']) {
-            $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
+            $objTemplate = new FrontendTemplate($this->arrOptions['template']);
             $objTemplate->setData($arrRow);
-            $arrRow['template'] =  $objTemplate->parse();
+            $arrRow['template'] = $objTemplate->parse();
         }
 
         if (isset($this->arrOptions['groupBy']) && $this->arrOptions['groupBy']) {
-            $strGroup = $arrEntity[ $this->arrOptions['groupBy'] ];
-            if (!isset( $this->arrEntities[$strGroup])) {
+            $strGroup = $arrEntity[$this->arrOptions['groupBy']];
+            if (!isset($this->arrEntities[$strGroup])) {
                 $this->arrEntities[$strGroup] = [
-                    'headline' => \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::parse($arrRow[$this->arrOptions['groupBy']]),
+                    'headline' => Toolkit::parse($arrRow[$this->arrOptions['groupBy']]),
                     'hl' => $this->arrOptions['groupByHl'],
                     'entities' => []
                 ];
@@ -392,7 +446,8 @@ abstract class View extends \Controller {
         return $arrEntity;
     }
 
-    protected function parseField($varValue, $strField, $arrValues, $arrOptions = []) {
+    protected function parseField($varValue, $strField, $arrValues, $arrOptions = [])
+    {
 
         $blnFastMode = $arrOptions['fastMode'] ?? false;
         $arrIgnoreFieldsFromParsing = $arrOptions['ignoreFieldsFromParsing'] ?? [];
@@ -412,58 +467,33 @@ abstract class View extends \Controller {
             return $varValue;
         }
 
-        $strHash = md5($strField.$varValue);
-        if (\Cache::has($strHash)) {
-            $arrAttribute = \Cache::get($strHash);
+        $strHash = md5($strField . $varValue);
+        if (Cache::has($strHash)) {
+            $arrAttribute = Cache::get($strHash);
         } else {
-            $arrAttribute = \Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
-            \Cache::set($strHash, $arrAttribute);
+            $arrAttribute = Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
+            Cache::set($strHash, $arrAttribute);
         }
 
-        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm']??false));
+        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm'] ?? false));
     }
 
-    protected function getPageNumber() {
+    protected function validOrigin($strValue, $strField)
+    {
 
-        return (int) \Input::get('page_e' . $this->arrOptions['id']);
-    }
-
-    public function getPagination() {
-
-        if (!($this->arrOptions['pagination']??'')) {
-            return '';
-        }
-
-        $objPagination = new \Pagination($this->arrOptions['total'], $this->arrOptions['limit'], \Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
-
-        return $objPagination->generate("\n  ");
-    }
-
-    public function getAddUrl() {
-
-        return Toolkit::parseDetailLink($this->arrFormPage, '');
-    }
-
-    public function getEntities() {
-
-        if (isset($GLOBALS['TL_HOOKS']['parseViewEntities']) && is_array($GLOBALS['TL_HOOKS']['parseViewEntities'])) {
-            foreach ($GLOBALS['TL_HOOKS']['parseViewEntities'] as $arrCallback) {
-                $this->import( $arrCallback[0] );
-                $this->{$arrCallback[0]}->{$arrCallback[1]}($this->arrEntities, $this);
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
+            foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'] as $arrField) {
+                if ($arrField['inputType'] == 'fileTree') {
+                    return false;
+                }
             }
         }
 
-        return $this->arrEntities;
-    }
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
+            return false;
+        }
 
-    public function getTable() {
-
-        return $this->strTable;
-    }
-
-    public function getModuleId() {
-
-        return $this->arrOptions['id'];
+        return true;
     }
 
     abstract public function parse();

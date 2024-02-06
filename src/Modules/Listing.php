@@ -208,8 +208,11 @@ class Listing extends \Hybrid
             }
         }
 
-        if (is_array(\Input::get('order')) && !empty(\Input::get('order'))) {
-            $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray(\Input::get('order'));
+        $arrInputOrder = \Input::get('order') ?? [];
+        if (is_array($arrInputOrder) && !empty($arrInputOrder)) {
+            if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
+                $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
+            }
         }
     }
 

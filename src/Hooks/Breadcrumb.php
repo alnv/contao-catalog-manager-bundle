@@ -14,7 +14,9 @@ class Breadcrumb {
         $arrItems[$intLastItemId]['isActive'] = false;
 
         $strPageId = $arrItems[$intLastItemId]['data']['id'] ?? '';
-        if ($objPage = \PageModel::findByPk($strPageId)) {
+        $blnRequireItem = $arrItems[$intLastItemId]['data']['requireItem'] ?? false;
+
+        if (($objPage = \PageModel::findByPk($strPageId)) && !$blnRequireItem) {
             $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
         }
 
@@ -26,7 +28,7 @@ class Breadcrumb {
         $arrItems[$intLastItemId]['data']['title'] = $arrItem['title'];
         $arrItem['data'] = $arrItems[$intLastItemId]['data'];
 
-        if ($arrItems[$intLastItemId]['data']['requireItem']) {
+        if ($blnRequireItem) {
             $arrItems[$intLastItemId] = $arrItem;
         } else {
             $arrItems[] = $arrItem;
