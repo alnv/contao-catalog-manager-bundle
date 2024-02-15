@@ -594,28 +594,36 @@ class Toolkit
         }
 
         if (empty($arrValues)) {
-            $strAlias = md5(time() . '/' . ($arrActiveRecord['id'] ?: ''));
+            $strAlias = md5(time() . '/' . $arrActiveRecord['id']);
         } else {
             $strAlias = implode('-', $arrValues);
         }
 
         $arrSet = [];
         $arrSet['tstamp'] = time();
-        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], $arrActiveRecord['pid']);
+        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), 'a-zA-Z0-9', ($arrActiveRecord['lid'] ?: null));
         $objDatabase->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
-    public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9')
+    public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9', $strLid = null)
     {
+
+        $strLanguage = '';
+        $strLanguageColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langColumnName'] ?? '';
+        $strLangPidColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langPid'] ?? '';
 
         $blnAliasFieldExist = $strTable && \Database::getInstance()->fieldExists($strAliasField, $strTable);
 
         if ($strId && $blnAliasFieldExist) {
             $objEntity = \Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `id`=?')->limit(1)->execute($strId);
             if ($objEntity->numRows) {
+                if ($strLanguageColumn) {
+                    $strLanguage = $objEntity->{$strLanguageColumn} ?: '';
+                }
                 $strValue = $objEntity->{$strAliasField} ?: $strValue;
             }
         }
+
         if (!$strValue) {
             return md5(time());
         }
@@ -638,11 +646,22 @@ class Toolkit
         }
 
         if ($blnAliasFieldExist && $strId) {
+
+            $arrQueries = [];
             $arrValues = [$strValue, $strId];
+
             if ($strPid !== null) {
+                $arrQueries[] = ' AND `pid`=?';
                 $arrValues[] = $strPid;
             }
-            if (\Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!=?' . ($strPid ? ' AND `pid`=?' : ''))->limit(1)->execute($arrValues)->numRows) {
+
+            if ($strLanguageColumn && $strLangPidColumn) {
+                $arrQueries[] = ' AND `'.$strLangPidColumn.'`!=? AND id!=?';
+                $arrValues[] = ($strLid?:$strId);
+                $arrValues[] = $strLid;
+            }
+
+            if (\Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!=?' . implode('', $arrQueries))->limit(1)->execute($arrValues)->numRows) {
                 $strValue = $strValue . '-' . $strId;
             }
         }

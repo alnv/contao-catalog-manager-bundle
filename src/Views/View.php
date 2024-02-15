@@ -222,13 +222,14 @@ abstract class View extends Controller
 
         if ($this->dcaExtractor->hasVisibility() && (!isset($this->arrOptions['ignoreVisibility']) || !$this->arrOptions['ignoreVisibility'])) {
 
-            if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
-                $arrReturn['column'] = [];
-            }
-
             $blnIsPreview = defined('BE_USER_LOGGED_IN') && BE_USER_LOGGED_IN === true;
 
             if (!$blnIsPreview) {
+
+                if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
+                    $arrReturn['column'] = [];
+                }
+
                 $intTime = Date::floorToMinute();
                 $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";

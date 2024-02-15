@@ -150,10 +150,16 @@ class Options {
         $objModel = $objModel->getModel();
         $arrModelOptions = [];
         array_insert($arrModelOptions, 0, self::setFilter());
+
         if (self::$arrField['dbOrderField']) {
             $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
             $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
+
+        if (isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['fallbackLang']) && $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['fallbackLang']) {
+            $arrModelOptions['language'] = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['fallbackLang'];
+        }
+
         return $objModel->findAll($arrModelOptions);
     }
 

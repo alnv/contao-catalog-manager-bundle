@@ -17,6 +17,7 @@ class ActiveInsertTag extends \System {
             $strMode = null;
             $strDefault = null;
             $blnUseDefault = false;
+            $blnUseCsv = false;
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
 
             if (isset($arrFragments[2]) && strpos($arrFragments[2], '?') !== false) {
@@ -33,7 +34,7 @@ class ActiveInsertTag extends \System {
                             break;
                         case 'csv':
                             if ($varValue !== '') {
-                                $varValue = serialize(explode(',', $varValue));
+                                $blnUseCsv = true;
                             }
                             break;
                     }
@@ -50,6 +51,10 @@ class ActiveInsertTag extends \System {
 
             if (\Validator::isDatim($varValue)) {
                 $varValue = (new \Date($varValue, $objPage->dateFormat))->dayBegin;
+            }
+
+            if ($blnUseCsv) {
+                $varValue = serialize(explode(',', $varValue));
             }
 
             if (isset($GLOBALS['TL_HOOKS']['replaceActiveInserttag']) && is_array($GLOBALS['TL_HOOKS']['replaceActiveInserttag'])) {
