@@ -1,24 +1,30 @@
-<?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
+<?php
+
+use Contao\Config;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+
+?>
+<?php if (is_array($this->locations) && !empty($this->locations)): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
     <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:100%">
-        <button><?= \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('map.button.dsgvo', 'Datenschutzbestimmungen zustimmen') ?></button>
+        <button><?= Translation::getInstance()->translate('map.button.dsgvo', 'Datenschutzbestimmungen zustimmen') ?></button>
     </div>
     <script defer>
         let getInfoCallback = function (map, content) {
-            var objInfoBox = new google.maps.InfoWindow({content: content});
-            return function() {
+            let objInfoBox = new google.maps.InfoWindow({content: content});
+            return function () {
                 objInfoBox.setContent(content);
                 objInfoBox.open(map, this);
             };
         };
-        var initMap = function () {
+        let initMap = function () {
             let arrLocations = <?= $this->varLocations ?>;
             let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
             let objBounds = new google.maps.LatLngBounds();
             if (typeof arrLocations === 'undefined' || !arrLocations.length) {
                 return null;
             }
-            for (let i=0;i<arrLocations.length;i++) {
+            for (let i = 0; i < arrLocations.length; i++) {
                 if (!arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude']) {
                     continue;
                 }
@@ -42,7 +48,7 @@
                     return null;
                 }
                 let objScript = document.createElement('script');
-                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= \Config::get('googleMapsApiKey') ?>&callback=initMap';
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= Config::get('googleMapsApiKey') ?>&callback=initMap';
                 objScript.id = "script_<?= $strUniqueId ?>";
                 objScript.defer = true;
                 document.body.appendChild(objScript);
@@ -52,7 +58,7 @@
                 objDataProtectionButton.addEventListener('click', function () {
                     loadGMap();
                     localStorage.setItem('data-protection-gmap-accepted', '1')
-                },false);
+                }, false);
             } else {
                 loadGMap();
             }

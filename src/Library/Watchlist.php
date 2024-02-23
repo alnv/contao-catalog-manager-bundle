@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
@@ -13,6 +14,8 @@ class Watchlist
     public static function getForm($strIdentifier, $strTable, $arrOptions = []): string
     {
 
+        WidgetToolkit::addVueJsScript();
+
         $objTemplate = new FrontendTemplate('ce_watchlist_form');
         $arrData = self::getWatchlistData($strIdentifier, $strTable);
 
@@ -20,6 +23,7 @@ class Watchlist
             'data' => base64_encode($strIdentifier . ':' . $strTable),
             'units' => $arrData['units'],
             'added' => isset($arrData['id']),
+            'id' => 'id_' . md5($strIdentifier . ':' . $strTable),
             'useUnits' => (bool)($arrOptions['useUnits']??false),
             'buttonAddLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListAddButtonLabel'],
             'buttonRemoveLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListRemoveButtonLabel'],

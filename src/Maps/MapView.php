@@ -8,8 +8,8 @@ use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 abstract class MapView
 {
 
-    protected $strTable = null;
-    protected $arrOptions = [];
+    protected null|string $strTable = null;
+    protected array $arrOptions = [];
 
     public function __construct($strTable, $arrOptions = [])
     {
@@ -39,7 +39,7 @@ abstract class MapView
         }, (new Listing($this->strTable, $this->arrOptions))->parse());
     }
 
-    protected function parseTokens($arrLocation)
+    protected function parseTokens($arrLocation): array
     {
         $arrTokens = [];
         foreach ($arrLocation as $strField => $varValue) {

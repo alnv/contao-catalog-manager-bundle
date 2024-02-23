@@ -1,4 +1,4 @@
-<div class="v-component">
+<div id="wishlist-<?= $this->id ?>" class="ce_watchlist-component">
     <watchlist-form
             data="<?= $this->data ?>"
             units="<?= $this->units ?>"
@@ -9,3 +9,11 @@
             :use-units="<?= $this->useUnits ? 'true' : 'false' ?>"
     ></watchlist-form>
 </div>
+<script>
+    (function () {
+        new Vue({
+            el: '#wishlist-<?= $this->id ?>',
+            data: {}
+        });
+    })();
+</script>
