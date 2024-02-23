@@ -7,7 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 class Listing extends View
 {
 
-    public function parse()
+    public function parse(): array
     {
 
         $objModel = new ModelWizard($this->strTable);
@@ -23,7 +23,7 @@ class Listing extends View
         return $this->getEntities();
     }
 
-    public function countRows()
+    public function countRows(): int
     {
 
         $objModel = new ModelWizard($this->strTable);

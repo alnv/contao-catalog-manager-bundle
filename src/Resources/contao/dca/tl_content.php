@@ -3,6 +3,7 @@
 use Contao\Input;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\EventListener\IsVisibleElementListener;
 
 $GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
@@ -26,7 +27,7 @@ foreach ($GLOBALS['TL_DCA']['tl_content']['palettes'] as $strPalette => $strFiel
         ->applyToPalette($strPalette, 'tl_content');
 }
 
-$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = ['catalogmanager.hooks.element', 'onloadCallback'];
+$GLOBALS['TL_DCA']['tl_content']['config']['onload_callback'][] = [IsVisibleElementListener::class, 'onloadCallback'];
 
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'cmFilter';
 $GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'cmMaster';

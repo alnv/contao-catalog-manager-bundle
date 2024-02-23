@@ -14,7 +14,7 @@ class DcaExtractor extends ContaoDcaExtractor
         parent::__construct($strTable);
     }
 
-    public function getOrderBy()
+    public function getOrderBy(): string
     {
 
         if (!isset($GLOBALS['TL_DCA'][$this->strTable]['list'])) {
@@ -57,7 +57,7 @@ class DcaExtractor extends ContaoDcaExtractor
         return '';
     }
 
-    public function hasVisibility()
+    public function hasVisibility(): bool
     {
 
         $objCatalog = CatalogModel::findByTableOrModule($this->strTable);

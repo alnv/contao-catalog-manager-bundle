@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\CoreBundle\Controller\BackendCsvImportController;
 use Contao\ArrayUtil;
 use Contao\Input;
 
@@ -32,7 +33,7 @@ class Application
 
         $arrTables = [$arrCatalog['table']];
 
-        if (is_array($arrCatalog['related']) && !empty($arrCatalog['related'])) {
+        if (\is_array($arrCatalog['related']) && !empty($arrCatalog['related'])) {
             foreach ($arrCatalog['related'] as $strTable) {
                 $arrTables[] = $strTable;
             }
@@ -45,10 +46,18 @@ class Application
             ];
         }
 
-        return [
+        $arrBEModule = [
             'name' => $arrCatalog['module'],
             'tables' => $arrTables
         ];
+
+        if (\in_array('tl_content', $arrTables)) {
+
+            $arrBEModule['table'] = [BackendCsvImportController::class, 'importTableWizardAction'];
+            $arrBEModule['list'] = [BackendCsvImportController::class, 'importListWizardAction'];
+        }
+
+        return $arrBEModule;
     }
 
     public function initializeDataContainerArrays(): void

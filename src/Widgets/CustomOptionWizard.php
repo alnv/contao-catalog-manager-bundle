@@ -2,7 +2,10 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Widgets;
 
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit;
+use Contao\Combiner;
 use Contao\DataContainer;
+use Contao\FrontendTemplate;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
@@ -14,6 +17,7 @@ class CustomOptionWizard extends Widget
 
     public function __construct($arrAttributes = null)
     {
+
         parent::__construct($arrAttributes);
 
         $this->preserveTags = true;
@@ -34,8 +38,21 @@ class CustomOptionWizard extends Widget
         parent::validate();
     }
 
-    public function generate()
+    protected function setResources()
     {
+
+        $objCombiner = new Combiner();
+        $objCombiner->add('bundles/alnvcontaocatalogmanager/js/vue/components/custom-option-wizard-field-component.js');
+        $GLOBALS['TL_JAVASCRIPT']['custom_options'] = $objCombiner->getCombinedFile();
+    }
+
+
+    public function generate(): string
+    {
+
+        Toolkit::addVueJsScript('TL_JAVASCRIPT');
+
+        $this->setResources();
 
         DataContainer::loadDataContainer($this->strTable);
         System::loadLanguageFile($this->strTable);
@@ -57,6 +74,14 @@ class CustomOptionWizard extends Widget
         \asort($arrOptions);
         $arrAttributes['options'] = array_values($arrOptions);
 
-        return '<div class="v-component"><custom-option-wizard-field :no-label="true" :value="' . $strValue . '" :eval="' . htmlspecialchars(\json_encode($arrAttributes), ENT_QUOTES, 'UTF-8') . '" name="' . $this->strName . '"></custom-option-wizard-field></div>';
+        $objTemplate = new FrontendTemplate('be_widget_custom_options');
+        $objTemplate->setData([
+            'value' => $strValue,
+            'id' => $this->id,
+            'name' => $this->name,
+            'attributes' => $arrAttributes
+        ]);
+
+        return $objTemplate->parse();
     }
 }

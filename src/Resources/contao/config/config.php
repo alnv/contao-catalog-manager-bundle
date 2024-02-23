@@ -13,7 +13,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
-use Alnv\ContaoFormManagerBundle\Widgets\CustomOptionWizard;
+use Alnv\ContaoCatalogManagerBundle\Widgets\CustomOptionWizard;
 use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
@@ -92,7 +92,7 @@ $GLOBALS['CM_OPERATORS'] = [
         'token' => 'LOWER(CAST(##field## AS CHAR)) NOT REGEXP LOWER(CAST(##value## AS CHAR))'
     ],
     'between' => [
-        'token' => '##field## BETWEEN ##value## AND ##value##',
+        'token' => '##field## BETWEEN CAST(##value##  AS DECIMAL(5,2)) AND CAST(##value##  AS DECIMAL(5,2))',
         'valueNumber' => 2
     ],
     'greater' => [

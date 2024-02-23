@@ -37,7 +37,7 @@ class MasterModule extends Module
         return parent::generate();
     }
 
-    protected function compile()
+    protected function compile(): void
     {
 
         $objMaster = new Master($this->cmTable, [

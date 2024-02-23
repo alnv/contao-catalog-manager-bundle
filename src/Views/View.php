@@ -26,16 +26,12 @@ use Contao\Widget;
 abstract class View extends Controller
 {
 
-    public $arrFormPage = [];
-
-    public $arrMasterPage = [];
-
-    protected $strTable = null;
-
-    protected $arrOptions = [];
-    protected $arrEntities = [];
-
-    protected $dcaExtractor = null;
+    public array $arrFormPage = [];
+    public array $arrMasterPage = [];
+    protected null|string $strTable = null;
+    protected array $arrOptions = [];
+    protected array $arrEntities = [];
+    protected null|DcaExtractor $dcaExtractor = null;
 
     public function __construct($strTable, $arrOptions = [])
     {
@@ -192,7 +188,7 @@ abstract class View extends Controller
         $this->arrOptions['total'] = $numTotal;
     }
 
-    protected function initializeDataContainer()
+    protected function initializeDataContainer(): void
     {
 
         $objApplication = new Application();
@@ -225,15 +221,16 @@ abstract class View extends Controller
 
         if ($this->dcaExtractor->hasVisibility() && (!isset($this->arrOptions['ignoreVisibility']) || !$this->arrOptions['ignoreVisibility'])) {
 
-            if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
-                $arrReturn['column'] = [];
-            }
-
             $blnHasBackendUser = System::getContainer()->get('contao.security.token_checker')->hasBackendUser();
             $blnShowUnpublished = System::getContainer()->get('contao.security.token_checker')->isPreviewMode();
             $blnIsPreview = $blnShowUnpublished && $blnHasBackendUser === true;
 
             if (!$blnIsPreview) {
+
+                if (!isset($arrReturn['column']) || !is_array($arrReturn['column'])) {
+                    $arrReturn['column'] = [];
+                }
+
                 $intTime = Date::floorToMinute();
                 $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
@@ -243,7 +240,7 @@ abstract class View extends Controller
         return $arrReturn;
     }
 
-    protected function validOrigin($strValue, $strField)
+    protected function validOrigin($strValue, $strField): bool
     {
 
         if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
@@ -452,7 +449,7 @@ abstract class View extends Controller
         return (int)Input::get('page_e' . $this->arrOptions['id']);
     }
 
-    public function getPagination()
+    public function getPagination(): string
     {
 
         if (!($this->arrOptions['pagination'] ?? '')) {
@@ -464,13 +461,13 @@ abstract class View extends Controller
         return $objPagination->generate("\n  ");
     }
 
-    public function getAddUrl()
+    public function getAddUrl(): string
     {
 
         return Toolkit::parseDetailLink($this->arrFormPage, '');
     }
 
-    public function getEntities()
+    public function getEntities(): array
     {
 
         if (isset($GLOBALS['TL_HOOKS']['parseViewEntities']) && is_array($GLOBALS['TL_HOOKS']['parseViewEntities'])) {
@@ -482,7 +479,7 @@ abstract class View extends Controller
         return $this->arrEntities;
     }
 
-    public function getTable()
+    public function getTable(): string
     {
 
         return $this->strTable;

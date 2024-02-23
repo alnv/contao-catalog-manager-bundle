@@ -23,23 +23,26 @@ class GetPageLayoutListener
         $this->getMasterByPageId($pageModel->id);
     }
 
-    public function getMasterByPageId($strPageId, $strAlias = null)
-    {
-
-        if (!$strAlias) {
-            $strAlias = Input::get('auto_item');
-        }
+    public function getMasterByPageId($strPageId, $strAlias=null) {
 
         $strMasterPageId = $strPageId;
-        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing', '1', $strPageId);
+        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
+
         if (!$objModule->numRows) {
+
             $strTable = $this->searchTableAndReturnTable($strPageId);
+
             if (!$strTable) {
                 return null;
             }
+
         } else {
             $strTable = $objModule->cmTable;
             $strMasterPageId = $objModule->cmMasterPage;
+        }
+
+        if (!$strAlias) {
+            $strAlias = Input::get('auto_item');
         }
 
         $GLOBALS['CM_MASTER'] = (new Master($strTable, [

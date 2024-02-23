@@ -1,4 +1,4 @@
-Vue.component( 'custom-option-wizard-field', {
+Vue.component('custom-option-wizard-field', {
     data: function () {
         return {
             options: [],
@@ -13,7 +13,7 @@ Vue.component( 'custom-option-wizard-field', {
             }
             return strValue === this.value;
         },
-        setCssClass: function() {
+        setCssClass: function () {
             let objCssClass = {};
             if (this.eval['tl_class']) {
                 objCssClass[this.eval['tl_class']] = true;
@@ -31,11 +31,11 @@ Vue.component( 'custom-option-wizard-field', {
                 return null;
             }
             if (this.newValue && this.newFormVisible) {
-                this.$http.post('/form-manager/addOption', {
+                this.$http.post('/catalog-manager/addOption', {
                     table: this.eval['_table'],
                     option: this.newValue,
                     name: this.name
-                },{
+                }, {
                     emulateJSON: true,
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }).then(function (objResponse) {
@@ -53,21 +53,21 @@ Vue.component( 'custom-option-wizard-field', {
             this.newFormVisible = false;
         },
         deleteOption: function (option) {
-            for (let i = this.options.length-1; i > -1; i--) {
+            for (let i = this.options.length - 1; i > -1; i--) {
                 if (this.options[i] === option) {
-                    this.$http.post('/form-manager/deleteOption', {
+                    this.$http.post('/catalog-manager/deleteOption', {
                         table: this.eval['_table'],
                         option: this.options[i]['value'],
                         name: this.name,
                         index: i
-                    },{
+                    }, {
                         emulateJSON: true,
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }).then(function (objResponse) {
                         if (objResponse.body && objResponse.ok) {
                             for (let j = 0; j < this.value.length; j++) {
                                 if (this.value[j] === objResponse.body.value) {
-                                    this.value.splice(j,1);
+                                    this.value.splice(j, 1);
                                 }
                             }
                             this.options.splice(objResponse.body.index, 1);
@@ -79,11 +79,11 @@ Vue.component( 'custom-option-wizard-field', {
         }
     },
     watch: {
-        value: function() {
+        value: function () {
             this.$emit('input', this.value);
         }
     },
-    mounted: function() {
+    mounted: function () {
         this.options = this.eval.options || [];
     },
     props: {
@@ -102,7 +102,7 @@ Vue.component( 'custom-option-wizard-field', {
         },
         idPrefix: {
             default: '',
-            type: String ,
+            type: String,
             required: false
         },
         noLabel: {
@@ -113,24 +113,24 @@ Vue.component( 'custom-option-wizard-field', {
     },
     template:
         '<div class="field-component custom-option-wizard" v-bind:class="setCssClass()">' +
-            '<div class="field-component-container">' +
-                '<input type="hidden" :name="name" :value="this.value">' +
-                '<p v-if="!noLabel" class="label" v-html="eval.label"></p>' +
-                '<div v-for="(option, index) in options" class="checkbox-container" v-bind:class="{\'checked\': checked(option.value)}">' +
-                    '<input type="checkbox" v-model="value" :value="option.value" :id="idPrefix + \'id_\' + name + \'_\' + index">' +
-                    '<label :for="idPrefix + \'id_\' + name + \'_\' + index" v-html="option.label"></label>' +
-                    '<form class="form-delete">' +
-                        '<button class="delete button" v-if="option.delete" @click.prevent="deleteOption(option)"><i class="delete"></i></button>' +
-                    '</form>' +
-                '</div>' +
-                '<div class="option-wizard-controller">' +
-                   '<form class="form-add">'+
-                        '<input v-if="newFormVisible" type="text" class="text" :placeholder="eval.addButtonLabel1" v-model="newValue" @keyup.enter.prevent="addOption">' +
-                        '<button @click.prevent="addOption" class="add button"><span v-html="(newFormVisible ? eval.addButtonLabel2 : eval.addButtonLabel1)"></span></button>' +
-                    '</form>' +
-                '</div>' +
-                '<template v-if="!eval.validate"><p class="error" v-for="message in eval.messages">{{ message }}</p></template>' +
-                '<div v-if="eval.description" v-html="eval.description" class="info"></div>' +
-            '</div>' +
+        '<div class="field-component-container">' +
+        '<input type="hidden" :name="name" :value="this.value">' +
+        '<p v-if="!noLabel" class="label" v-html="eval.label"></p>' +
+        '<div v-for="(option, index) in options" class="checkbox-container" v-bind:class="{\'checked\': checked(option.value)}">' +
+        '<input type="checkbox" v-model="value" :value="option.value" :id="idPrefix + \'id_\' + name + \'_\' + index">' +
+        '<label :for="idPrefix + \'id_\' + name + \'_\' + index" v-html="option.label"></label>' +
+        '<form class="form-delete">' +
+        '<button class="delete button" v-if="option.delete" @click.prevent="deleteOption(option)"><i class="delete"></i></button>' +
+        '</form>' +
+        '</div>' +
+        '<div class="option-wizard-controller">' +
+        '<form class="form-add">' +
+        '<input v-if="newFormVisible" type="text" class="text" :placeholder="eval.addButtonLabel1" v-model="newValue" @keyup.enter.prevent="addOption">' +
+        '<button @click.prevent="addOption" class="add button"><span v-html="(newFormVisible ? eval.addButtonLabel2 : eval.addButtonLabel1)"></span></button>' +
+        '</form>' +
+        '</div>' +
+        '<template v-if="!eval.validate"><p class="error" v-for="message in eval.messages">{{ message }}</p></template>' +
+        '<div v-if="eval.description" v-html="eval.description" class="info"></div>' +
+        '</div>' +
         '</div>'
 });

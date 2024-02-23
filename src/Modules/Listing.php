@@ -8,6 +8,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing as ViewListing;
 use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Contao\BackendTemplate;
 use Contao\Controller;
 use Contao\Hybrid;
@@ -65,19 +66,19 @@ class Listing extends Hybrid
         $this->setIgnoreFieldsFromParsing();
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
 
         return $this->arrOptions;
     }
 
-    public function getTable()
+    public function getTable(): string
     {
 
         return $this->cmTable;
     }
 
-    protected function compile()
+    protected function compile(): void
     {
 
         $this->arrOptions = [
@@ -93,19 +94,19 @@ class Listing extends Hybrid
         $this->Template->pagination = $objListing->getPagination();
     }
 
-    protected function setIgnoreVisibility()
+    protected function setIgnoreVisibility(): void
     {
 
         $this->arrOptions['ignoreVisibility'] = (bool)$this->cmIgnoreVisibility;
     }
 
-    protected function setIgnoreFieldsFromParsing()
+    protected function setIgnoreFieldsFromParsing(): void
     {
 
         $this->arrOptions['ignoreFieldsFromParsing'] = StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
     }
 
-    protected function setDistance()
+    protected function setDistance(): bool
     {
 
         if (!$this->cmRadiusSearch) {
@@ -197,10 +198,12 @@ class Listing extends Hybrid
     {
 
         if ($this->cmOrder) {
-            $strOrder = Toolkit::getOrderByStatementFromArray(Toolkit::decodeJson($this->cmOrder, [
+
+            $strOrder = Toolkit::getOrderByStatementFromArray(WidgetToolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'
             ]));
+
             if ($strOrder) {
                 $this->arrOptions['order'] = $strOrder;
             }
@@ -219,8 +222,11 @@ class Listing extends Hybrid
             }
         }
 
-        if (is_array(Input::get('order')) && !empty(Input::get('order'))) {
-            $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray(Input::get('order'));
+        $arrInputOrder = Input::get('order') ?? [];
+        if (is_array($arrInputOrder) && !empty($arrInputOrder)) {
+            if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
+                $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
+            }
         }
     }
 

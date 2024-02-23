@@ -8,7 +8,7 @@ use Contao\Environment;
 class ICalendar
 {
 
-    protected $arrEntity = [];
+    protected array $arrEntity = [];
 
     public function __construct($arrEntity)
     {
@@ -16,7 +16,7 @@ class ICalendar
         $this->arrEntity = $arrEntity;
     }
 
-    public function getICalendarUrl()
+    public function getICalendarUrl(): string
     {
 
         global $objPage;
@@ -25,7 +25,7 @@ class ICalendar
     }
 
 
-    public function getICalFile()
+    public function getICalFile(): string
     {
 
         global $objPage;
@@ -38,6 +38,7 @@ class ICalendar
         $strTeaser = $this->arrEntity['roleResolver']()->getValueByRole('teaser');
         $strTitle = $this->arrEntity['roleResolver']()->getValueByRole('title');
         $strCity = $this->arrEntity['roleResolver']()->getValueByRole('city');
+
         $strStart = $this->setICalendarDate($strStartDate . ($strStartTime ? ' ' . $strStartTime : ''), ($strStartTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat));
         $strEnd = $this->setICalendarDate($strEndDate . ($strEndTime ? ' ' . $strEndTime : ''), ($strEndTime ? $objPage->dateFormat . ' ' . $objPage->timeFormat : $objPage->dateFormat));
 
@@ -75,7 +76,7 @@ class ICalendar
     }
 
 
-    protected function setICalendarDate($strDate, $strFormat)
+    protected function setICalendarDate($strDate, $strFormat): string
     {
 
         if (!$strDate) {

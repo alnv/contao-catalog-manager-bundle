@@ -169,6 +169,7 @@ abstract class CatalogWizard
             $arrReturn['eval']['rgxp'] = $strRgxp;
         }
 
+
         switch ($arrField['type']) {
             case 'explanation':
                 $arrReturn['inputType'] = 'explanation';
@@ -271,21 +272,22 @@ abstract class CatalogWizard
                 }
                 break;
             case 'customOptionWizard':
-                $arrField['inputType'] = 'customOptionWizard';
-                $arrField['eval']['tl_class'] = 'clr';
-                $arrField['eval']['multiple'] = true;
-                $arrField['filter'] = true;
-                $arrField['eval']['csv'] = ',';
-                $arrField['eval']['addButtonLabel1'] = 'Tag hinzufügen';
-                $arrField['eval']['addButtonLabel2'] = 'Hinzufügen';
-                $arrField['options_callback'] = function ($objDataContainer = null) use ($arrField) {
+                $arrReturn['inputType'] = 'customOptionWizard';
+                $arrReturn['eval']['tl_class'] = 'clr';
+                $arrReturn['eval']['multiple'] = true;
+                $arrReturn['filter'] = true;
+                $arrReturn['eval']['csv'] = ',';
+                $arrReturn['eval']['addButtonLabel1'] = 'Tag hinzufügen';
+                $arrReturn['eval']['addButtonLabel2'] = 'Hinzufügen';
+                $arrReturn['options_callback'] = function ($objDataContainer = null) use ($arrField) {
                     $objOptions = Options::getInstance($arrField['fieldname'] . '.' . $arrField['pid']);
                     $objOptions::setParameter($arrField, $objDataContainer);
                     return $objOptions::getOptions();
                 };
-                if (isset($arrField['eval']['size'])) {
-                    unset($arrField['eval']['size']);
+                if (isset($arrReturn['eval']['size'])) {
+                    unset($arrReturn['eval']['size']);
                 }
+                break;
             case 'upload':
                 $arrReturn['inputType'] = 'fileTree';
                 $arrReturn['eval']['tl_class'] = 'clr';
@@ -298,7 +300,7 @@ abstract class CatalogWizard
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
                 try {
-                    $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid($arrField['uploadFolder']);
+                    $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid(($arrField['uploadFolder']??''));
                 } catch (\Exception $objError) {}
 
                 if ($arrReturn['eval']['role']) {

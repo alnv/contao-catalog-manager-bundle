@@ -22,6 +22,7 @@ class ActiveInsertTag
 
             $strMode = null;
             $strDefault = null;
+            $blnUseCsv = false;
             $blnUseDefault = false;
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
 
@@ -39,7 +40,7 @@ class ActiveInsertTag
                             break;
                         case 'csv':
                             if ($varValue !== '') {
-                                $varValue = serialize(explode(',', $varValue));
+                                $blnUseCsv = true;
                             }
                             break;
                     }
@@ -56,6 +57,10 @@ class ActiveInsertTag
 
             if (Validator::isDatim($varValue)) {
                 $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
+            }
+
+            if ($blnUseCsv) {
+                $varValue = serialize(explode(',', $varValue));
             }
 
             if (isset($GLOBALS['TL_HOOKS']['replaceActiveInserttag']) && is_array($GLOBALS['TL_HOOKS']['replaceActiveInserttag'])) {

@@ -10,15 +10,17 @@ class GenerateBreadcrumbListener
 
     public function __invoke(array $arrItems, Module $module): array
     {
-        if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
+        if (!is_array($GLOBALS['CM_MASTER']) ||  empty($GLOBALS['CM_MASTER'])) {
             return $arrItems;
         }
 
-        $intLastItemId = count($arrItems) - 1;
+        $intLastItemId = count($arrItems) -1;
         $arrItems[$intLastItemId]['isActive'] = false;
 
         $strPageId = $arrItems[$intLastItemId]['data']['id'] ?? '';
-        if ($objPage = PageModel::findByPk($strPageId)) {
+        $blnRequireItem = $arrItems[$intLastItemId]['data']['requireItem'] ?? false;
+
+        if (($objPage = PageModel::findByPk($strPageId)) && !$blnRequireItem) {
             $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
         }
 
@@ -30,7 +32,7 @@ class GenerateBreadcrumbListener
         $arrItems[$intLastItemId]['data']['title'] = $arrItem['title'];
         $arrItem['data'] = $arrItems[$intLastItemId]['data'];
 
-        if ($arrItems[$intLastItemId]['data']['requireItem']) {
+        if ($blnRequireItem) {
             $arrItems[$intLastItemId] = $arrItem;
         } else {
             $arrItems[] = $arrItem;

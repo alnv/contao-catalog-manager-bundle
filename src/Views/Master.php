@@ -7,7 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 class Master extends View
 {
 
-    public function parse()
+    public function parse(): array
     {
 
         $objModel = new ModelWizard($this->strTable);

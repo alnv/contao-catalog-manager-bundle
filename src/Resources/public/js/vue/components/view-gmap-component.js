@@ -157,12 +157,12 @@ const ViewGmapComponent = Vue.component('view-gmap', {
     },
     template:
         '<div class="view-gmap-component">' +
-        '<transition name="fade">' +
-        '<div class="view-gmap-component-container" v-show="locations.length">' +
-        '<div class="gmap" v-bind:style="style"></div>' +
-        '</div>' +
-        '</transition>' +
-        '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
-        '<loading v-if="!locations.length && !useDataPrivacyMode && loader"></loading>' +
+            '<transition name="fade">' +
+            '<div class="view-gmap-component-container" v-show="locations.length">' +
+            '<div class="gmap" v-bind:style="style"></div>' +
+            '</div>' +
+            '</transition>' +
+            '<button v-if="!locations.length && useDataPrivacyMode" v-html="dataPrivacyText" v-on:click="loadGMap"></button>' +
+            '<loading v-if="!locations.length && !useDataPrivacyMode && loader"></loading>' +
         '</div>'
 });
