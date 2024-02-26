@@ -52,6 +52,22 @@ class Listing extends Hybrid
         return parent::generate();
     }
 
+    protected function compile(): void
+    {
+
+        $this->arrOptions = [
+            'template' => $this->cmTemplate,
+            'id' => $this->id
+        ];
+
+        $this->setOptions();
+        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
+
+        $this->Template->rows = $objListing->countRows();
+        $this->Template->entities = $objListing->parse();
+        $this->Template->pagination = $objListing->getPagination();
+    }
+
     public function setOptions()
     {
 
@@ -76,22 +92,6 @@ class Listing extends Hybrid
     {
 
         return $this->cmTable;
-    }
-
-    protected function compile(): void
-    {
-
-        $this->arrOptions = [
-            'template' => $this->cmTemplate,
-            'id' => $this->id
-        ];
-
-        $this->setOptions();
-        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
-
-        $this->Template->rows = $objListing->countRows();
-        $this->Template->entities = $objListing->parse();
-        $this->Template->pagination = $objListing->getPagination();
     }
 
     protected function setIgnoreVisibility(): void

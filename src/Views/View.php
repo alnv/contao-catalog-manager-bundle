@@ -298,7 +298,7 @@ abstract class View extends Controller
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
-            if (!isset($arrRow[$strField]) || empty($arrRow[$strField])) {
+            if (empty($arrRow[$strField])) {
                 return [];
             }
             if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField])) {
@@ -326,10 +326,12 @@ abstract class View extends Controller
                     $arrValues[] = $strValue;
                 }
             }
+
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
             Controller::loadDataContainer($arrRelation['table']);
-            $strTable = isset($GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table']) ? $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] : $arrRelation['table'];
+            $strTable = $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] ?? $arrRelation['table'];
             $strField = $strTable . '.' . $arrRelation['field'];
+
             foreach ($arrValues as $strValue) {
                 if ($strValue == '' || $strValue == null) {
                     continue;

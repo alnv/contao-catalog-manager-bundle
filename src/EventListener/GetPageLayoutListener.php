@@ -61,6 +61,7 @@ class GetPageLayoutListener
         }
 
         global $objPage;
+
         $objPage->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
         $objPage->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
 
@@ -81,11 +82,6 @@ class GetPageLayoutListener
         }
 
         while ($objArticles->next()) {
-            if ($objArticles->cmContentElement) {
-                if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->cmContentElement, 'tl_catalog_element'))) {
-                    return $strTable;
-                }
-            }
             if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article'))) {
                 return $strTable;
             }
@@ -97,12 +93,15 @@ class GetPageLayoutListener
         }
 
         while ($objContent->next()) {
+
             if (!in_array($objContent->type, ['listview'])) {
                 continue;
             }
+
             if (!$objContent->cmTable) {
                 continue;
             }
+
             return $objContent->cmTable;
         }
         return null;
@@ -115,11 +114,15 @@ class GetPageLayoutListener
         }
 
         while ($objContent->next()) {
+
             if ($objContent->type == 'module' && $objContent->module) {
+
                 $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
+
                 if ($objModule == null) {
                     continue;
                 }
+
                 if ($objModule->cmMaster || $objModule->type == 'master') {
                     return $objModule->cmTable;
                 }

@@ -6,19 +6,16 @@ use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 use Contao\Controller;
 use Contao\System;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class RoleResolver
 {
 
-    public static $strTable = null;
-
-    public static $arrRoles = null;
-
-    public static $arrEntity = null;
-
-    protected static $arrInstances = [];
-
-    protected static $objCache;
+    public static null|string $strTable = null;
+    public static null|array $arrRoles = null;
+    public static null|array $arrEntity = null;
+    protected static null|array $arrInstances = [];
+    protected static FilesystemAdapter $objCache;
 
     public static function getInstance($strTable, $arrEntity = [])
     {
@@ -28,28 +25,31 @@ class RoleResolver
         }
 
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
-        self::$objCache = new FilesystemAdapter('cm.roleresolver.cache', 60, $strRootDir . '/var/cache');
+        self::$objCache = new FilesystemAdapter('', 0, $strRootDir . '/var/cache');
+
         $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
+
             self::$strTable = $strTable;
             self::$arrEntity = $arrEntity;
             self::$arrInstances[$strInstanceKey] = new self;
         }
 
-        $objCacheResult = self::$objCache->getItem($strInstanceKey);
+        self::$arrRoles = self::$objCache->get($strInstanceKey, function (ItemInterface $item) {
 
-        if (!$objCacheResult->isHit()) {
-            $objCacheResult->set(static::setRoles());
-            self::$objCache->save($objCacheResult);
-        }
+            $arrReturn = static::setRoles();
 
-        self::$arrRoles = $objCacheResult->get();
+            $item->expiresAfter(60 * 60);
+            $item->set($arrReturn);
+
+            return $arrReturn;
+        });
 
         return self::$arrInstances[$strInstanceKey];
     }
 
-    protected static function setRoles()
+    protected static function setRoles(): array
     {
 
         Controller::loadDataContainer(self::$strTable);
@@ -87,7 +87,7 @@ class RoleResolver
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
                 'role' => $GLOBALS['CM_ROLES'][$strRole],
-                'value' => isset(self::$arrEntity[$strFieldname]) ?? ''
+                'value' => self::$arrEntity[$strFieldname] ?? ''
             ];
         }
 
@@ -100,13 +100,13 @@ class RoleResolver
         return $arrRoles;
     }
 
-    public function getRole($strRoleName)
+    public function getRole($strRoleName): array
     {
 
         return $GLOBALS['CM_ROLES'][$strRoleName] ?? [];
     }
 
-    public function getValueByRole($strRoleName)
+    public function getValueByRole($strRoleName): string
     {
 
         if (!isset(self::$arrRoles[$strRoleName])) {
@@ -116,7 +116,7 @@ class RoleResolver
         return self::$arrRoles[$strRoleName]['value'];
     }
 
-    public function getFieldByRole($strRoleName)
+    public function getFieldByRole($strRoleName): string
     {
 
         if (!isset(self::$arrRoles[$strRoleName])) {

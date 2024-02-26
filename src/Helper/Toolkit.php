@@ -494,6 +494,7 @@ class Toolkit
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }
+
                 return [];
 
             case 'multiColumnWizard':

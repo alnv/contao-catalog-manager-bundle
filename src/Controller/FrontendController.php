@@ -70,7 +70,7 @@ class FrontendController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/json-listing/{module}/{page}', methods: ["POST"])]
+    #[Route(path: '/json-listing/{module}/{page}', methods: ["POST", "GET"])]
     public function getJsonListing($module, $page): JsonResponse
     {
 

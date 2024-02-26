@@ -15,7 +15,7 @@ class MasterModule extends Module
 
     protected $strTemplate = 'mod_master';
 
-    public function generate()
+    public function generate(): string
     {
 
         if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
@@ -31,7 +31,7 @@ class MasterModule extends Module
         }
 
         if (!$this->cmTable) {
-            return null;
+            return '';
         }
 
         return parent::generate();

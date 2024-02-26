@@ -11,7 +11,7 @@ class DynModel extends Model
 
     public static $strTable = '';
 
-    public static array $arrClassNames = [];
+    // public static $arrClassNames = [];
 
     public function __construct($objResult = null)
     {
