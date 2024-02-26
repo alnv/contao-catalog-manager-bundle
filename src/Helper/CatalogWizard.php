@@ -299,13 +299,16 @@ abstract class CatalogWizard
                 $arrReturn['eval']['imageWidth'] = $arrField['imageWidth'];
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
+
                 try {
                     $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid(($arrField['uploadFolder']??''));
                 } catch (\Exception $objError) {}
 
-                if ($arrReturn['eval']['role']) {
+                if (isset($arrReturn['eval']['role']) && $arrReturn['eval']['role']) {
+
                     $objRoleResolver = RoleResolver::getInstance(null);
-                    switch ($objRoleResolver->getRole(($arrReturn['eval']['role'])['type']??'')) {
+
+                    switch (($objRoleResolver->getRole($arrReturn['eval']['role'])['type'] ?? '')) {
                         case 'image':
                             $arrReturn['eval']['isImage'] = true;
                             if ($arrField['imageSize']) {
