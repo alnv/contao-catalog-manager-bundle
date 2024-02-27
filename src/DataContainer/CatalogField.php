@@ -78,7 +78,7 @@ class CatalogField
 
         $objDatabase = Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
-        $arrActiveRecord = $objDataContainer->getCurrentRecord();
+        $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
 
         if (Input::post('role')) {
             $arrActiveRecord['role'] = Input::post('role');
@@ -132,7 +132,7 @@ class CatalogField
             return $strValue;
         }
 
-        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, $objDataContainer->getCurrentRecord());
+        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, Toolkit::getActiveRecordAsArrayFromDc($objDataContainer));
         (new LDatabase())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;

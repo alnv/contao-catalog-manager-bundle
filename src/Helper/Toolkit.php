@@ -11,6 +11,7 @@ use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Ausi\SlugGenerator\SlugGenerator;
 use Ausi\SlugGenerator\SlugOptions;
 use Contao\Database;
+use Contao\DataContainer;
 use Contao\Date;
 use Contao\FilesModel;
 use Contao\FrontendUser;
@@ -857,5 +858,14 @@ class Toolkit
     public static function parseSimpleTokens($strString, $arrData, $blnAllowHtml = true)
     {
         return System::getContainer()->get('contao.string.simple_token_parser')->parse($strString, $arrData, $blnAllowHtml);
+    }
+
+    public static function getActiveRecordAsArrayFromDc(DataContainer $objDataContainer): array
+    {
+        if (method_exists($objDataContainer, 'getCurrentRecord')) {
+           return $objDataContainer->getCurrentRecord();
+        } else {
+            return $objDataContainer->activeRecord->row();
+        }
     }
 }

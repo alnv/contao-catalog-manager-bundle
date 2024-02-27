@@ -45,7 +45,7 @@ class VirtualDataContainerArray
         if ($this->arrCatalog['enableGeocoding']) {
             $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
                 if ($objDataContainer->activeRecord) {
-                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], $objDataContainer->getCurrentRecord());
+                    Toolkit::saveGeoCoordinates($this->arrCatalog['table'], Toolkit::getActiveRecordAsArrayFromDc($objDataContainer));
                 }
             };
         }
@@ -410,7 +410,7 @@ class VirtualDataContainerArray
                 'onsubmit_callback' => [
                     function (DataContainer $objDataContainer) {
                         if ($objDataContainer->activeRecord) {
-                            Toolkit::saveAlias($objDataContainer->getCurrentRecord(), $this->arrFields, $this->arrCatalog);
+                            Toolkit::saveAlias(Toolkit::getActiveRecordAsArrayFromDc($objDataContainer), $this->arrFields, $this->arrCatalog);
                         }
                     }
                 ],
