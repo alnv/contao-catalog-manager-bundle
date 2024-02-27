@@ -11,8 +11,6 @@ class DynModel extends Model
 
     public static $strTable = '';
 
-    // public static $arrClassNames = [];
-
     public function __construct($objResult = null)
     {
 
@@ -27,7 +25,10 @@ class DynModel extends Model
     {
 
         static::$strTable = $strTable;
-        static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
+
+        if (isset(static::$arrClassNames)) {
+            static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
+        }
 
         parent::__construct($objResult);
     }
