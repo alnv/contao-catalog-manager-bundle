@@ -1,6 +1,6 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.22");
+define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.24");
 
 array_insert( $GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [

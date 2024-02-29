@@ -246,13 +246,16 @@ class Toolkit
                 return $objFile->path;
             }
         }
+
         if (!is_array($varImage) && empty($varImage)) {
             return '';
         }
+
         if (isset($varImage['img'])) {
-            return $varImage['img']['src'];
+            return $varImage['img']['src'] ?? '';
         }
-        return $varImage[0]['img']['src'];
+
+        return $varImage[0]['img']['src'] ?? '';
     }
 
     public static function parseParametersFromString($strParameter)
