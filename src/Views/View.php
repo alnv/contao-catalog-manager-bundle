@@ -147,6 +147,9 @@ abstract class View extends Controller
         $arrOptions['limit'] = 0;
         $arrOptions['offset'] = 0;
 
+        $this->arrOptions['offset'] = $this->arrOptions['offset'] ?? 0;
+        $this->arrOptions['limit'] = $this->arrOptions['limit'] ?? 0;
+
         $objModel = new ModelWizard($this->strTable);
         $objModel = $objModel->getModel();
         $objTotal = $objModel->findAll($arrOptions);
@@ -264,6 +267,7 @@ abstract class View extends Controller
         $arrRow = [];
         $arrRow['origin'] = [];
         $arrRow['_table'] = $this->strTable;
+        $arrRow['masterUrl'] = '';
 
         if (isset($this->arrOptions['masterPage']) && $this->arrOptions['masterPage']) {
             $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias']);

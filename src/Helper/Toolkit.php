@@ -285,10 +285,10 @@ class Toolkit
         }
 
         if (isset($varImage['img'])) {
-            return $varImage['img']['src'];
+            return $varImage['img']['src'] ?? '';
         }
 
-        return $varImage[0]['img']['src'];
+        return $varImage[0]['img']['src'] ?? '';
     }
 
     public static function parseParametersFromString($strParameter)
