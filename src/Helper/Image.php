@@ -2,11 +2,13 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\FilesModel;
 use Contao\Frontend;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
+use Psr\Log\LogLevel;
 
 class Image
 {
@@ -52,13 +54,25 @@ class Image
             }
 
             $strStaticUrl = $objContainer->get('contao.assets.files_context')->getStaticUrl();
-            $objPicture = $objContainer->get('contao.image.picture_factory')->create($objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ($intSize ? (int)$intSize : null));
-            $arrPicture = [
-                'path' => $objFile->path,
-                'uuid' => StringUtil::binToUuid($objFile->uuid),
-                'img' => $objPicture->getImg($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
-                'sources' => $objPicture->getSources($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
-            ];
+            $arrPicture = [];
+
+            try {
+                $objPicture = $objContainer->get('contao.image.picture_factory')->create($objContainer->getParameter('kernel.project_dir') . '/' . $objFile->path, ($intSize ? (int)$intSize : null));
+                $arrPicture = [
+                    'path' => $objFile->path,
+                    'uuid' => StringUtil::binToUuid($objFile->uuid),
+                    'img' => $objPicture->getImg($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
+                    'sources' => $objPicture->getSources($objContainer->getParameter('kernel.project_dir'), $strStaticUrl),
+                ];
+            } catch (\Exception $objError) {
+                System::getContainer()
+                    ->get('monolog.logger.contao')
+                    ->log(LogLevel::ERROR, $objError->getMessage(), ['contao' => new ContaoContext(__CLASS__ . '::' . __FUNCTION__)]);
+            }
+
+            if (empty($arrPicture)) {
+                continue;
+            }
 
             if (!empty($arrMeta)) {
                 foreach ($arrMeta as $strField => $strLabel) {
@@ -68,6 +82,7 @@ class Image
                     $arrPicture[$strField] = $strLabel;
                 }
             }
+
             $arrImages[] = $arrPicture;
         }
 

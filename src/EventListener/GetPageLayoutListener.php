@@ -48,7 +48,9 @@ class GetPageLayoutListener
         $GLOBALS['CM_MASTER'] = (new Master($strTable, [
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
-        ]))->parse()[0];
+        ]))->parse();
+
+        $GLOBALS['CM_MASTER'] = $GLOBALS['CM_MASTER'][0] ?? [];
 
         $this->setMetaInformation($strTable);
     }

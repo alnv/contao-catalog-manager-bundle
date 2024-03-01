@@ -6,7 +6,7 @@ class Cache
 {
     protected static $objInstance;
 
-    protected static $arrData = array();
+    protected static array $arrData = [];
 
     public static function has($strKey)
     {
@@ -15,15 +15,15 @@ class Cache
 
     public static function get($strKey)
     {
-        return static::$arrData[$strKey];
+        return (static::$arrData[$strKey] ?? null);
     }
 
-    public static function set($strKey, $varValue)
+    public static function set($strKey, $varValue): void
     {
         static::$arrData[$strKey] = $varValue;
     }
 
-    public static function remove($strKey)
+    public static function remove($strKey): void
     {
         unset(static::$arrData[$strKey]);
     }

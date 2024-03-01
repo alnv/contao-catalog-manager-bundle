@@ -769,7 +769,7 @@ class Toolkit
                     $arrQueries[$strName] = [];
                 }
 
-                $varValue = $arrQuery['value'];
+                $varValue = ($arrQuery['value']??null);
 
                 if ($varValue !== null) {
 
