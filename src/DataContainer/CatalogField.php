@@ -89,7 +89,12 @@ class CatalogField
         $objDatabaseBuilder = new LDatabase();
 
         if (!$strFieldname || $objCatalog == null) {
-            throw new \Exception(sprintf('something went wrong'));
+            throw new \Exception('Something went wrong');
+        }
+
+        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $strFieldname))
+        {
+            throw new \Exception('Special characters are not allowed');
         }
 
         if (in_array($strFieldname, (new Catalog(null))->getDefaultFieldnames())) {
