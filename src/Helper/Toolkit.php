@@ -7,6 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
 use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Ausi\SlugGenerator\SlugGenerator;
 use Ausi\SlugGenerator\SlugOptions;
@@ -605,8 +606,7 @@ class Toolkit
         $objRoleResolver = RoleResolver::getInstance($strTable, $arrEntity);
         $arrGeoFields = $objRoleResolver->getGeoCodingFields();
         $strAddress = $objRoleResolver->getGeoCodingAddress();
-        $objDatabase = Database::getInstance();
-        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+        $objGeoCoding = new GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
         if (static::isEmpty($arrEntity[$arrGeoFields['longitude']]) && $arrEntity[$arrGeoFields['latitude']]) {
@@ -618,7 +618,7 @@ class Toolkit
             $arrSet['tstamp'] = time();
             $arrSet[$arrGeoFields['longitude']] = $arrGeoCoding['longitude'];
             $arrSet[$arrGeoFields['latitude']] = $arrGeoCoding['latitude'];
-            $objDatabase->prepare('UPDATE ' . $strTable . ' %s WHERE id = ?')->set($arrSet)->execute($arrEntity['id']);
+            Database::getInstance()->prepare('UPDATE ' . $strTable . ' %s WHERE id = ?')->set($arrSet)->execute($arrEntity['id']);
         }
     }
 
@@ -641,7 +641,6 @@ class Toolkit
         }
 
         $arrValues = [];
-        $objDatabase = Database::getInstance();
 
         foreach ($arrFields as $strFieldname => $arrField) {
 
@@ -667,12 +666,11 @@ class Toolkit
         $arrSet = [];
         $arrSet['tstamp'] = time();
         $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), 'a-zA-Z0-9', ($arrActiveRecord['lid'] ?: null));
-        $objDatabase->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
+        Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
     public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9', $strLid = null): string
     {
-
 
         $strLanguageColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langColumnName'] ?? '';
         $strLangPidColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langPid'] ?? '';
@@ -710,7 +708,7 @@ class Toolkit
         if ($blnAliasFieldExist && $strId) {
 
             $arrQueries = [];
-            $arrValues = [$strValue];
+            $arrValues = [$strId, $strValue];
 
             if ($strPid !== null) {
                 $arrQueries[] = ' AND `pid`=?';
@@ -723,7 +721,7 @@ class Toolkit
                 $arrValues[] = $strLid;
             }
 
-            $objExists = Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!=' . $strId . implode('', $arrQueries))->limit(1)->execute($arrValues);
+            $objExists = Database::getInstance()->prepare("SELECT * FROM $strTable WHERE id!=? AND `$strAliasField`=?" . implode('', $arrQueries))->limit(1)->execute(...$arrValues);
 
             if ($objExists->numRows) {
                 $strValue = $strValue . '-' . $strId;

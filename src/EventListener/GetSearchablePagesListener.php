@@ -91,8 +91,7 @@ class GetSearchablePagesListener
     public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false, $strLanguage = '')
     {
 
-        $objDatabase = Database::getInstance();
-        $objModules = $objDatabase->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing', '1');
+        $objModules =  Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing', '1');
 
         if (!$objModules->numRows) {
             return $arrPages;

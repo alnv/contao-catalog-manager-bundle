@@ -121,9 +121,8 @@ class Catalog
             return null;
         }
 
-        $objDatabase = Database::getInstance();
         $strModulename = 'module_' . strtolower($objDataContainer->activeRecord->table);
-        $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
+        Database::getInstance()->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
     }
 
     public function getNavigation(): array
@@ -150,14 +149,12 @@ class Catalog
     {
 
         $objDatabaseBuilder = new CatalogDatabase();
-        $objDatabase = Database::getInstance();
 
         if (!$strTable) {
-
             return '';
         }
 
-        if ($strTable == $objDataContainer->activeRecord->table && $objDatabase->tableExists($strTable, true)) {
+        if ($strTable == $objDataContainer->activeRecord->table && Database::getInstance()->tableExists($strTable, true)) {
 
             return $strTable;
         }
