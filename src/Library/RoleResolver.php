@@ -85,7 +85,7 @@ class RoleResolver
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
-                'type' => $arrField['inputType'],
+                'type' => ($arrField['inputType']??''),
                 'role' => $GLOBALS['CM_ROLES'][$strRole],
                 'value' => self::$arrEntity[$strFieldname] ?? ''
             ];

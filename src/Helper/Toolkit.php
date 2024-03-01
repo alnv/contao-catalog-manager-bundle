@@ -569,7 +569,7 @@ class Toolkit
 
         foreach ($arrValues as $strValue) {
 
-            if (!isset($arrTemp[$strValue])) {
+            if (!(is_numeric($strValue) || is_string($strValue)) || !isset($arrTemp[$strValue])) {
                 continue;
             }
 
