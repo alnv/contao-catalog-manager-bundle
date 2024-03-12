@@ -106,7 +106,7 @@ class RoleResolver
         return $GLOBALS['CM_ROLES'][$strRoleName] ?? [];
     }
 
-    public function getValueByRole($strRoleName): string
+    public function getValueByRole($strRoleName): mixed
     {
 
         if (!isset(self::$arrRoles[$strRoleName])) {
