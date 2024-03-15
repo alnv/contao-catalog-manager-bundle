@@ -80,7 +80,7 @@ const WatchlistFormComponent = Vue.component('watchlist-form', {
         '<div class="ce_watchlist-form" v-bind:class="{added:hasItems}">' +
             '<div class="watchlist-form">' +
                 '<div class="watchlist-units" v-if="useUnits">' +
-                    '<input type="text"  v-model="items">' +
+                    '<input type="number"  v-model="items" min="0">' +
                     '<button v-if="hasItems" @click="updateWishlist" class="watchlist-update-button"><span v-html="buttonUnitsLabel"></span></button>' +
                 '</div>' +
                 '<button @click="deleteOrAdd" class="watchlist-button" v-bind:class="{\'remove-button\':hasItems, \'add-button\':!hasItems}"><span v-html="getButtonLabel()"></span></button>' +
