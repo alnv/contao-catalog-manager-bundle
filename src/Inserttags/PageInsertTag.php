@@ -8,12 +8,12 @@ use Contao\PageModel;
 class PageInsertTag
 {
 
-    public function replace($strFragment)
+    public function __invoke($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
 
-        if (is_array($arrFragments) && $arrFragments[0] == 'ACTIVE_PAGE') {
+        if (is_array($arrFragments) && strtoupper($arrFragments[0]) == 'ACTIVE_PAGE') {
 
             global $objPage;
 

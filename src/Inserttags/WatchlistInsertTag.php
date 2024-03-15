@@ -15,13 +15,14 @@ use Contao\System;
 class WatchlistInsertTag
 {
 
-    public function replace($strFragment)
+    public function __invoke($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
 
         $arrOptions = [];
         $strType = $arrFragments[0] ?? '';
+        $strType = strtoupper($strType);
         $strParams = $arrFragments[1] ?? '';
 
         if (!in_array($strType, ['WATCHLIST', 'WATCHLIST-TABLE', 'WATCHLIST-RESET', 'WATCHLIST-COUNT'])) {

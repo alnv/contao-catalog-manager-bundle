@@ -8,14 +8,14 @@ use Contao\StringUtil;
 class MasterInsertTag
 {
 
-    public function replace($strFragment)
+    public function __invoke($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
 
-        if (is_array($arrFragments) && $arrFragments[0] == 'MASTER' && isset($arrFragments[1])) {
+        if (is_array($arrFragments) && strtoupper($arrFragments[0]) == 'MASTER' && isset($arrFragments[1])) {
 
-            $strDefault = $arrFragments[2] ?: '';
+            $strDefault = $arrFragments[2] ?? '';
 
             if (empty($GLOBALS['CM_MASTER'])) {
                 return $strDefault;

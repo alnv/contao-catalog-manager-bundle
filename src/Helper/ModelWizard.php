@@ -34,6 +34,7 @@ class ModelWizard
             $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][$strTable]();
             $objMultilingualDynModel->createDynTable($strTable);
             $this->objModel = $objMultilingualDynModel;
+            $GLOBALS['TL_MODELS'][$strTable] = $objMultilingualDynModel::class;
             return null;
         }
 

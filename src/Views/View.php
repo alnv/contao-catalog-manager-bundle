@@ -69,7 +69,7 @@ abstract class View extends Controller
                     $this->arrOptions['limit'] = (int)$varValue;
                     break;
                 case 'fastMode':
-                    $this->arrOptions['fastMode'] = $varValue ? true : false;
+                    $this->arrOptions['fastMode'] = (bool)$varValue;
                     break;
                 case 'offset':
                     $this->arrOptions['offset'] = (int)$varValue;

@@ -1,5 +1,9 @@
 <?php
 
+use Contao\Controller;
+use Contao\DataContainer;
+use Contao\Database;
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilter';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilterType';
@@ -14,6 +18,23 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,hea
 $GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmIgnoreVisibility,cmPagination,cmLimit,cmOffset,cmOrder,cmInfoContent;{radius_search_settings},cmRadiusSearch;{performance_settings:hide},cmIgnoreFieldsFromParsing;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
+
+
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = function (DataContainer $objDataContainer) {
+    $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->limit(1)->execute($objDataContainer->id);
+    if ($objActiveRecord->type && in_array($objActiveRecord->type, ['listing-table', 'listing-map'])) {
+        $GLOBALS['TL_DCA']['tl_module']['fields']['customTpl']['options_callback'] = function (DataContainer $objDataContainer) {
+            $strSuffix = '';
+            if ($objDataContainer->activeRecord->type == 'listing-map') {
+                $strSuffix = 'map';
+            }
+            if ($objDataContainer->activeRecord->type == 'listing-table') {
+                $strSuffix = 'table';
+            }
+            return Controller::getTemplateGroup('mod_listing_' . $strSuffix);
+        };
+    }
+};
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'inputType' => 'select',

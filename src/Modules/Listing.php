@@ -68,7 +68,7 @@ class Listing extends Hybrid
         $this->Template->pagination = $objListing->getPagination();
     }
 
-    public function setOptions()
+    public function setOptions(): void
     {
 
         $this->setOrder();

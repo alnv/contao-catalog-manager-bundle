@@ -10,15 +10,18 @@ use Contao\FrontendUser;
 class Inserttags
 {
 
-    public function replace($strFragments)
+    public function __invoke($strFragments)
     {
 
         $arrFragments = explode('::', $strFragments);
+
         if (!isset($arrFragments[0])) {
             return false;
         }
 
-        switch ($arrFragments[0]) {
+        $strType = strtoupper($arrFragments[0]);
+
+        switch ($strType) {
             case 'CM-USER':
                 if (!FrontendUser::getInstance()->id) {
                     return '';
@@ -31,7 +34,7 @@ class Inserttags
                 }
                 return $objDbUser->{$strField};
             case 'TIMESTAMP':
-                $strMethod = $arrFragments[1] ?: 'tstamp';
+                $strMethod = $arrFragments[1] ?? 'tstamp';
                 $strStrToTimeParameter = $arrFragments[2] ?: '';
                 if ($strStrToTimeParameter) {
                     return strtotime($strStrToTimeParameter, (new Date())->{$strMethod});
@@ -39,7 +42,7 @@ class Inserttags
                     return (new Date())->{$strMethod};
                 }
             case 'LAST-ADDED-MASTER-VIEW-IDS':
-                $strTable = $arrFragments[1] ?: '';
+                $strTable = $arrFragments[1] ?? '';
                 if (!$strTable) {
                     return '0';
                 }

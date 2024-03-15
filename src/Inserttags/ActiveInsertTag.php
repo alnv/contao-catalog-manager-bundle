@@ -11,12 +11,12 @@ use Contao\Validator;
 class ActiveInsertTag
 {
 
-    public function replace($strFragment)
+    public function __invoke($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
 
-        if (is_array($arrFragments) && $arrFragments[0] == 'ACTIVE' && isset($arrFragments[1])) {
+        if (is_array($arrFragments) && strtoupper($arrFragments[0]) == 'ACTIVE' && isset($arrFragments[1])) {
 
             global $objPage;
 

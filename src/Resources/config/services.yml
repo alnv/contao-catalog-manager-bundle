@@ -6,6 +6,22 @@ services:
   Alnv\ContaoCatalogManagerBundle\Controller\FrontendController:
     public: true
 
+  Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+  Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+  Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+  Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+  Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag:
+    tags:
+      - { name: contao.hook, hook: replaceInsertTags }
+
   Alnv\ContaoCatalogManagerBundle\EventListener\InitializeSystemListener:
     tags:
       - { name: contao.hook, hook: initializeSystem }
