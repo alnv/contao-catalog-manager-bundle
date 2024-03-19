@@ -1,8 +1,6 @@
 <?php
-
 use Contao\Config;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
-
 ?>
 <?php if (is_array($this->locations) && !empty($this->locations)): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
@@ -17,9 +15,13 @@ use Alnv\ContaoTranslationManagerBundle\Library\Translation;
                 objInfoBox.open(map, this);
             };
         };
-        let initMap = function () {
+        var initMap = initMap || function () {
             let arrLocations = <?= $this->varLocations ?>;
-            let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
+            let objMapOptions = {};
+            if (arrLocations.length<2) {
+                objMapOptions.maxZoom = 13;
+            }
+            let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), objMapOptions);
             let objBounds = new google.maps.LatLngBounds();
             if (typeof arrLocations === 'undefined' || !arrLocations.length) {
                 return null;
@@ -50,7 +52,6 @@ use Alnv\ContaoTranslationManagerBundle\Library\Translation;
                 let objScript = document.createElement('script');
                 objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= Config::get('googleMapsApiKey') ?>&callback=initMap';
                 objScript.id = "script_<?= $strUniqueId ?>";
-                objScript.defer = true;
                 document.body.appendChild(objScript);
             };
             let objDataProtectionButton = objMapDocument.querySelector('button');
