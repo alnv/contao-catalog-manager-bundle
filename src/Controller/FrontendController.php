@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route(path: 'catalog-manager', name: 'catalog-manager-frontend-controller', defaults: ['_scope' => 'frontend'])]
+#[Route(path: 'catalog-manager', name: 'catalog-manager-frontend-controller', defaults: ['_scope' => 'frontend', '_token_check' => false])]
 class FrontendController extends AbstractController
 {
 
