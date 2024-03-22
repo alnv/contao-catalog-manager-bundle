@@ -21,7 +21,11 @@ class GenerateBreadcrumbListener
         $blnRequireItem = $arrItems[$intLastItemId]['data']['requireItem'] ?? false;
 
         if (($objPage = PageModel::findByPk($strPageId)) && !$blnRequireItem) {
-            $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
+            try {
+                $arrItems[$intLastItemId]['href'] = $objPage->getFrontendUrl();
+            } catch (\Exception $objError) {
+                //
+            }
         }
 
         $arrItem = [];
