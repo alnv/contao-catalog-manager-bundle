@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 use Contao\Controller;
 use Contao\System;
@@ -12,9 +13,13 @@ class RoleResolver
 {
 
     public static null|string $strTable = null;
+
     public static null|array $arrRoles = null;
+
     public static null|array $arrEntity = null;
+
     protected static null|array $arrInstances = [];
+
     protected static FilesystemAdapter $objCache;
 
     public static function getInstance($strTable, $arrEntity = [])
@@ -27,22 +32,18 @@ class RoleResolver
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
         self::$objCache = new FilesystemAdapter('', 0, $strRootDir . '/var/cache');
 
-        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
+        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '') . (md5($arrEntity['tstamp']??'0'));
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
-
             self::$strTable = $strTable;
             self::$arrEntity = $arrEntity;
             self::$arrInstances[$strInstanceKey] = new self;
         }
 
         self::$arrRoles = self::$objCache->get($strInstanceKey, function (ItemInterface $item) {
-
             $arrReturn = static::setRoles();
-
             $item->expiresAfter(60 * 60);
             $item->set($arrReturn);
-
             return $arrReturn;
         });
 
@@ -148,7 +149,7 @@ class RoleResolver
 
         foreach ($arrAddressRoles as $strRole) {
             if ($strValue = $this->getValueByRole($strRole)) {
-                $arrAddress[$strRole] = $strValue;
+                $arrAddress[$strRole] = Toolkit::parse($strValue, ' ');
             }
         }
 
@@ -172,13 +173,10 @@ class RoleResolver
     {
 
         $arrReturn = [];
-
         foreach ($arrRoles as $strRole) {
-
             if (!isset(self::$arrRoles[$strRole]['name'])) {
                 continue;
             }
-
             $arrReturn[self::$arrRoles[$strRole]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
         }
 
