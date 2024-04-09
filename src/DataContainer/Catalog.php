@@ -2,8 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
 use Contao\Backend;
 use Contao\Controller;
 use Contao\Database;
@@ -36,7 +36,7 @@ class Catalog
         return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType']);
     }
 
-    public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes)
+    public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes): string
     {
 
         if (!$arrRow['table']) {
@@ -131,14 +131,12 @@ class Catalog
         $arrReturn = [];
 
         if (!is_array($GLOBALS['BE_MOD']) || empty($GLOBALS['BE_MOD'])) {
-
             return $arrReturn;
         }
 
         foreach ($GLOBALS['BE_MOD'] as $strModulename => $arrModules) {
 
             $strModuleLabel = $GLOBALS['TL_LANG']['MOD'][$strModulename] ?: $strModulename;
-
             $arrReturn[$strModulename] = $strModuleLabel;
         }
 
@@ -155,20 +153,17 @@ class Catalog
         }
 
         if ($strTable == $objDataContainer->activeRecord->table && Database::getInstance()->tableExists($strTable, true)) {
-
             return $strTable;
         }
 
         if ($strTable != $objDataContainer->activeRecord->table && $objDataContainer->activeRecord->table) {
 
             if (!$objDatabaseBuilder->renameTable($objDataContainer->activeRecord->table, $strTable)) {
-
                 throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
             }
         }
 
         if (!$objDatabaseBuilder->createTableIfNotExist($strTable)) {
-
             throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
         }
 
@@ -179,7 +174,6 @@ class Catalog
     {
 
         if (!$objDataContainer->activeRecord->table) {
-
             return null;
         }
 
@@ -191,7 +185,6 @@ class Catalog
     {
 
         if (!$objDataContainer->activeRecord->table) {
-
             return null;
         }
 
@@ -218,7 +211,6 @@ class Catalog
         $arrReturn = [];
 
         if ($dc->activeRecord === null || !$dc->activeRecord->dbTable) {
-
             return $arrReturn;
         }
 
@@ -226,7 +218,6 @@ class Catalog
         Controller::loadDataContainer($dc->activeRecord->dbTable);
 
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['fields'] as $strField => $arrField) {
-
             $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
         }
 

@@ -38,15 +38,18 @@ $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
     'fixed' => 'Feste Sortierung',
     'switchable' => 'Variable Sortierung'
 ];
+
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] = [
     'catalog' => 'Katalog',
-    'modifier' => 'Modifizierer'
+    // 'modifier' => 'Modifizierer'
 ];
+
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'] = [
     'list' => 'List view',
     'parent' => 'Parent view',
     'tree' => 'Tree view'
 ];
+
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['flag'] = [
     '1' => 'Aufsteigende Sortierung nach Anfangsbuchstabe',
     '2' => 'Absteigende Sortierung nach Anfangsbuchstabe',

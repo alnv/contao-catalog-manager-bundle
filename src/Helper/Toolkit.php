@@ -292,7 +292,7 @@ class Toolkit
         return $varImage[0]['img']['src'] ?? '';
     }
 
-    public static function parseParametersFromString($strParameter)
+    public static function parseParametersFromString($strParameter): array
     {
 
         $arrChunks = explode('?', urldecode($strParameter), 2);
@@ -302,7 +302,7 @@ class Toolkit
         return explode('&', $strSource);
     }
 
-    public static function getValueFromUrl($arrValue)
+    public static function getValueFromUrl($arrValue): string
     {
 
         if ($arrValue === '' || $arrValue === null) {
@@ -524,17 +524,20 @@ class Toolkit
 
                 foreach ($varValue as $strPageId) {
                     $objPage = PageModel::findByPk($strPageId);
+
                     if ($objPage === null) {
                         continue;
                     }
+
                     if ($blnStringFormat) {
                         $arrValues[] = $objPage->pageTitle ?: $objPage->title;
                     } else {
                         $strUrl = '';
+
                         try {
                             $strUrl = $objPage->getFrontendUrl();
-                        } catch (\Exception $objException) {
-                        }
+                        } catch (\Exception $objException) {}
+
                         $arrValues[$strPageId] = [
                             'url' => $strUrl,
                             'master' => $objPage->getFrontendUrl('/' . $arrCatalog['alias']),
@@ -583,11 +586,13 @@ class Toolkit
     public function cmp($a, $b)
     {
         $strKey = 'value';
+
         if ($a[$strKey] < $b[$strKey]) {
             return 1;
         } else if ($a[$strKey] > $b[$strKey]) {
             return -1;
         }
+
         return 0;
     }
 
@@ -622,14 +627,16 @@ class Toolkit
         }
     }
 
-    public static function isEmpty($varValue)
+    public static function isEmpty($varValue): bool
     {
         if ($varValue === null) {
             return true;
         }
+
         if ($varValue === '') {
             return true;
         }
+
         return false;
     }
 
@@ -666,6 +673,7 @@ class Toolkit
         $arrSet = [];
         $arrSet['tstamp'] = time();
         $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), 'a-zA-Z0-9', ($arrActiveRecord['lid'] ?: null));
+
         Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
@@ -751,7 +759,7 @@ class Toolkit
             'option4' => 'group'
         ]);
 
-        if (!is_array($arrJson) || empty($arrJson)) {
+        if (empty($arrJson)) {
             return $arrReturn;
         }
 
