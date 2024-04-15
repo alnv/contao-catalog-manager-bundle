@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Date;
+use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 
@@ -21,8 +22,9 @@ class ActiveInsertTag
             global $objPage;
 
             $strMode = null;
-            $strDefault = null;
+            $blnTouch = false;
             $blnUseCsv = false;
+            $strDefault = null;
             $blnUseDefault = false;
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
 
@@ -37,6 +39,9 @@ class ActiveInsertTag
                             break;
                         case 'mode':
                             $strMode = $strOption; // BE || FE
+                            break;
+                        case 'touch':
+                            $blnTouch = (bool)$strOption;
                             break;
                         case 'csv':
                             if ($varValue !== '') {
@@ -57,6 +62,20 @@ class ActiveInsertTag
 
             if (Validator::isDatim($varValue)) {
                 $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
+            }
+
+            if ($blnTouch && $varValue) {
+                $_varValue = StringUtil::deserialize($varValue);
+                if (is_array($_varValue)) {
+                    $arrValues = [];
+                    foreach ($_varValue as $strKey => $strValue) {
+                        $arrValues[$strKey] = '"' . $strValue . '"';
+                    }
+                    $varValue = serialize($arrValues);
+                }
+                if (is_string($_varValue)) {
+                    $varValue = '"' . $_varValue . '"';
+                }
             }
 
             if ($blnUseCsv) {

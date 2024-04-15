@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION =  "3.0.12";
+const CATALOG_MANAGER_BUNDLE_VERSION =  "3.0.13";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
