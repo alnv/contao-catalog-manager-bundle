@@ -423,6 +423,11 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'number',
         'rgxp' => 'natural',
         'sql' => "int(10) unsigned NOT NULL default '0'"
+    ],
+    'signed' => [
+        'group' => 'number',
+        'rgxp' => 'natural',
+        'sql' => "int(11) signed NULL"
     ]
 ];
 
