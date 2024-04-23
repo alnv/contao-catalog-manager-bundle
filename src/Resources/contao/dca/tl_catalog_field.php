@@ -94,7 +94,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'dbFilterType_wizard' => 'dbWizardFilterSettings',
         'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => 'optionsDcaWizard',
-        'optionsSource_dbOptions' => OptionSourcePalette::getPalette()
+        'optionsSource_dbOptions' => OptionSourcePalette::getPalette(),
+        'optionsSource_dbActiveOptions' => OptionSourcePalette::getActivePalette()
     ],
     'fields' => [
         'id' => [
@@ -202,7 +203,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options' => ['options', 'dbOptions'],
+            'options' => ['options', 'dbOptions', 'dbActiveOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],

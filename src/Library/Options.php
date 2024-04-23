@@ -113,20 +113,27 @@ class Options
             case 'dbActiveOptions':
                 $arrField = self::$arrField;
                 $objEntities = self::getEntities();
+
                 if ($objEntities === null) {
                     return $arrReturn;
                 }
+
                 while ($objEntities->next()) {
                     $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
+
                     foreach ($varValues as $strValue) {
+
                         if (in_array($strValue, $arrTemps)) {
                             continue;
                         }
+
                         $arrTemps[] = $strValue;
                         $strLabel = self::getCleanLabel($strValue, $arrField['dbKey'], $arrField['dbTable']);
+
                         if (!$strLabel) {
                             continue;
                         }
+
                         if ($blnAsAssoc) {
                             $arrReturn[] = [
                                 'value' => $strValue,
@@ -134,6 +141,7 @@ class Options
                             ];
                             continue;
                         }
+
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
@@ -152,7 +160,7 @@ class Options
 
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
-        if (isset($arrField['eval']) && $arrField['eval'] && isset($arrField['eval']['multiple']) && $arrField['eval']['multiple'] === true) {
+        if (isset($arrField['eval']) && is_array($arrField['eval'])) {
             if (isset($arrField['eval']['csv']) && $arrField['eval']['csv']) {
                 return explode($arrField['eval']['csv'], $strValue);
             }
@@ -168,10 +176,12 @@ class Options
         $objModel = $objModel->getModel();
         $arrModelOptions = [];
         ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
+
         if (self::$arrField['dbOrderField']) {
             $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
             $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
+
         return $objModel->findAll($arrModelOptions);
     }
 

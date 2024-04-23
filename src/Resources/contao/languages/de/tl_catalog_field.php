@@ -51,5 +51,6 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
 ];
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'options' => 'Options',
-    'dbOptions' => 'Datenbank Tabelle'
+    'dbOptions' => 'Datenbank Tabelle',
+    'dbActiveOptions' => 'Datenbank Tabelle (zugewiesen)'
 ];

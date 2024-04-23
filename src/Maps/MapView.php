@@ -27,7 +27,7 @@ abstract class MapView
             $arrLocation['map']['street'] = $arrLocation['roleResolver']()->getValueByRole('street');
             $arrLocation['map']['streetNumber'] = $arrLocation['roleResolver']()->getValueByRole('streetNumber');
             $arrLocation['map']['city'] = $arrLocation['roleResolver']()->getValueByRole('city');
-            $arrLocation['map']['zip'] = $arrLocation['roleResolver']()->getValueByRole('zip');
+            $arrLocation['map']['zip'] = ($arrLocation['roleResolver']()->getValueByRole('zip') ?: $arrLocation['roleResolver']()->getValueByRole('postal'));
             $arrLocation['map']['country'] = $arrLocation['roleResolver']()->getValueByRole('country');
             $arrLocation['map']['location'] = $arrLocation['roleResolver']()->getValueByRole('location');
             $arrLocation['map']['title'] = $arrLocation['roleResolver']()->getValueByRole('title');

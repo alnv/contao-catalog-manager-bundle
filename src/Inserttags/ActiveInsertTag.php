@@ -52,7 +52,7 @@ class ActiveInsertTag
                 }
             }
 
-            if ($blnUseDefault && ($varValue === '' || $varValue === null)) {
+            if ($blnUseDefault && ($varValue == '' || $varValue == null)) {
                 $varValue = $strDefault;
             }
 
@@ -64,17 +64,16 @@ class ActiveInsertTag
                 $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
             }
 
-            if ($blnTouch && $varValue) {
+            if ($blnTouch && !empty($varValue)) {
                 $_varValue = StringUtil::deserialize($varValue);
                 if (is_array($_varValue)) {
                     $arrValues = [];
                     foreach ($_varValue as $strKey => $strValue) {
-                        $arrValues[$strKey] = '"' . $strValue . '"';
+                        $arrValues[$strKey] = '[[:<:]]' . $strValue . '[[:>:]]';
                     }
                     $varValue = serialize($arrValues);
-                }
-                if (is_string($_varValue)) {
-                    $varValue = '"' . $_varValue . '"';
+                } elseif (is_string($_varValue)) {
+                    $varValue = '[[:<:]]' . $_varValue . '[[:>:]]';
                 }
             }
 

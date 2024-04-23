@@ -128,19 +128,30 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'title' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'headline' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'textfield' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'page' => [
         'group' => 'article',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'pages' => [
@@ -153,7 +164,9 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'member' => [
         'group' => 'member',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NULL"
     ],
     'members' => [
@@ -165,7 +178,9 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'group' => [
         'group' => 'member',
-        'rgxp' => 'natural',
+        'eval' => [
+            'csv' => 'natural'
+        ],
         'sql' => "int(10) unsigned NULL"
     ],
     'groups' => [
@@ -174,15 +189,27 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'subtitle' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'tags' => [
         'group' => 'article',
-        'sql' => "blob NULL",
+        'sql' => "blob NULL"
+    ],
+    'comma-separated-list' => [
+        'group' => 'article',
+        'eval' => [
+            'csv' => ','
+        ],
+        'sql' => "text NULL"
     ],
     'alias' => [
-        'rgxp' => 'alias',
         'group' => 'article',
+        'eval' => [
+            'rgxp' => 'alias'
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'type' => [
@@ -239,112 +266,191 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'duration' => [
         'group' => 'article',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'price' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'vpe' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'ean' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'package' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'category' => [
         'group' => 'article',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'author' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'location' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'street' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'streetNumber' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 16
+        ],
         'sql' => "varchar(16) NOT NULL default '%s'"
     ],
     'city' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'zip' => [
         'group' => 'address',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 12
+        ],
+        'sql' => "varchar(12) NOT NULL default '%s'"
+    ],
+    'postal' => [
+        'group' => 'address',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 12
+        ],
         'sql' => "varchar(12) NOT NULL default '%s'"
     ],
     'state' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'country' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'fullname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'firstname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'lastname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'email' => [
         'group' => 'contact',
-        'rgxp' => 'email',
+        'eval' => [
+            'rgxp' => 'email',
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'emails' => [
         'group' => 'contact',
-        'rgxp' => 'emails',
+        'eval' => [
+            'rgxp' => 'emails'
+        ],
         'sql' => "text NULL"
     ],
     'url' => [
         'group' => 'contact',
-        'rgxp' => 'url',
+        'eval' => [
+            'rgxp' => 'url',
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'website' => [
         'group' => 'contact',
-        'rgxp' => 'url',
+        'eval' => [
+            'maxlength' => 255,
+            'rgxp' => 'url'
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'phone' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'fax' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'mobile' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'avatar' => [
@@ -354,41 +460,58 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'company' => [
         'group' => 'contact',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'startDate' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'startTime' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'endDate' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'endTime' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'date' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'datim' => [
         'group' => 'date',
-        'rgxp' => 'datim',
+        'eval' => [
+            'rgxp' => 'datim'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'time' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'hasone' => [
@@ -401,18 +524,30 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'latitude' => [
         'group' => 'geo',
+        'eval' => [
+            'maxlength' => 32
+        ],
         'sql' => "varchar(32) NOT NULL default '0.000000'"
     ],
     'longitude' => [
         'group' => 'geo',
+        'eval' => [
+            'maxlength' => 32
+        ],
         'sql' => "varchar(32) NOT NULL default '0.000000'"
     ],
     'gender' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'sku' => [
         'group' => 'product',
+        'eval' => [
+            'maxlength' => 32
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'decimal' => [
@@ -421,12 +556,16 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'integer' => [
         'group' => 'number',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'signed' => [
         'group' => 'number',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(11) signed NULL"
     ]
 ];
