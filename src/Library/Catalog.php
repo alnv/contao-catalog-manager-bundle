@@ -2,8 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
@@ -64,13 +64,13 @@ class Catalog extends CatalogWizard
         return $this->arrCatalog;
     }
 
-    public function getFields()
+    public function getFields(): array
     {
 
         return $this->arrFields;
     }
 
-    public function getNaturalFields($blnLabelOnly = true)
+    public function getNaturalFields($blnLabelOnly = true): array
     {
 
         $arrReturn = [];
@@ -82,7 +82,7 @@ class Catalog extends CatalogWizard
         return $arrReturn;
     }
 
-    protected function setDefaultFields()
+    protected function setDefaultFields(): void
     {
         foreach ($this->getDefaultFields() as $strAlias => $arrField) {
             if (isset($this->arrFields[$strAlias])) {
@@ -137,7 +137,7 @@ class Catalog extends CatalogWizard
         System::loadLanguageFile('default');
 
         $strTable = $this->arrCatalog['table'] ?? '';
-        $strKeyName = ($strTable?$strTable.'.':'');
+        $strKeyName = ($strTable ? $strTable . '.' : '');
 
         $arrReturn = [
             'id' => [

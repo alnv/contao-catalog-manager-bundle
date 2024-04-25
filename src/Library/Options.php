@@ -90,11 +90,16 @@ class Options
                     return $arrReturn;
                 }
                 while ($objEntities->next()) {
+
                     $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
+
                     foreach ($varValues as $strValue) {
+
                         if (in_array($strValue, $arrTemps)) {
                             continue;
                         }
+
+                        $strValue = trim($strValue);
                         $arrTemps[] = $strValue;
                         $strLabel = self::getCleanLabel($objEntities->{$arrField['dbLabel']}, $arrField['dbLabel'], $arrField['dbTable']);
                         if ($blnAsAssoc) {
@@ -104,6 +109,7 @@ class Options
                             ];
                             continue;
                         }
+
                         $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
                     }
                 }
@@ -127,6 +133,7 @@ class Options
                             continue;
                         }
 
+                        $strValue = trim($strValue);
                         $arrTemps[] = $strValue;
                         $strLabel = self::getCleanLabel($strValue, $arrField['dbKey'], $arrField['dbTable']);
 

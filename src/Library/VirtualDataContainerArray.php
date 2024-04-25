@@ -77,7 +77,7 @@ class VirtualDataContainerArray
         return $GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'][$strDataContainer] ?? $strDataContainer;
     }
 
-    protected function setList()
+    protected function setList(): void
     {
 
         $arrList = [

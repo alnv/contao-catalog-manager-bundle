@@ -169,7 +169,6 @@ abstract class CatalogWizard
             $arrReturn['eval']['rgxp'] = $strRgxp;
         }
 
-
         switch ($arrField['type']) {
             case 'explanation':
                 $arrReturn['inputType'] = 'explanation';
