@@ -185,7 +185,7 @@ class Options
         ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
 
         if (self::$arrField['dbOrderField']) {
-            $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
+            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable']; //isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
             $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
 
@@ -210,10 +210,10 @@ class Options
         $arrOptions = [];
         switch (self::$arrField['dbFilterType']) {
             case 'wizard':
-                $strTable = isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
+                $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable']; // isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
                 $arrQueries = Toolkit::convertComboWizardToModelValues(self::$arrField['dbWizardFilterSettings'], $strTable);
-                $arrOptions['column'] = isset($arrQueries['column']) ? $arrQueries['column'] : [];
-                $arrOptions['value'] = isset($arrQueries['value']) ? $arrQueries['value'] : [];
+                $arrOptions['column'] = $arrQueries['column'] ?? [];
+                $arrOptions['value'] = $arrQueries['value'] ?? [];
                 break;
             case 'expert':
                 self::$arrField['dbFilterValue'] = Toolkit::replaceInsertTags(self::$arrField['dbFilterValue']);

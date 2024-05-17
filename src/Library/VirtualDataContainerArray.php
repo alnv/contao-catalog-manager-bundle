@@ -73,7 +73,6 @@ class VirtualDataContainerArray
 
     protected function getDataContainerNamespace($strDataContainer)
     {
-
         return $GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'][$strDataContainer] ?? $strDataContainer;
     }
 
@@ -197,7 +196,6 @@ class VirtualDataContainerArray
 
     protected function setFields(): void
     {
-
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] = $this->arrFields;
     }
 

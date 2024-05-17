@@ -192,7 +192,7 @@ abstract class CatalogWizard
                 $arrReturn['sorting'] = true;
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['tl_class'] = 'w50 wizard';
-                if (in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
+                if (isset($arrReturn['eval']['rgxp']) && in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
                     $arrReturn['eval']['dateFormat'] = Date::getFormatFromRgxp($arrReturn['eval']['rgxp']);
                 }
                 $arrReturn['eval']['datepicker'] = true;

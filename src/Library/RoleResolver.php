@@ -42,7 +42,7 @@ class RoleResolver
 
         self::$arrRoles = self::$objCache->get($strInstanceKey, function (ItemInterface $item) {
             $arrReturn = static::setRoles();
-            $item->expiresAfter(60 * 60);
+            $item->expiresAfter(60);
             $item->set($arrReturn);
             return $arrReturn;
         });
@@ -87,7 +87,7 @@ class RoleResolver
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
                 'type' => ($arrField['inputType']??''),
-                'role' => $GLOBALS['CM_ROLES'][$strRole],
+                'role' => $GLOBALS['CM_ROLES'][$strRole] ?? '',
                 'value' => self::$arrEntity[$strFieldname] ?? ''
             ];
         }
@@ -103,7 +103,6 @@ class RoleResolver
 
     public function getRole($strRoleName): array
     {
-
         return $GLOBALS['CM_ROLES'][$strRoleName] ?? [];
     }
 

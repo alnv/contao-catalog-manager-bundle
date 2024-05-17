@@ -60,13 +60,11 @@ class Catalog extends CatalogWizard
 
     public function getCatalog()
     {
-
         return $this->arrCatalog;
     }
 
     public function getFields(): array
     {
-
         return $this->arrFields;
     }
 
@@ -96,7 +94,6 @@ class Catalog extends CatalogWizard
     {
 
         if (!is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
-
             return null;
         }
 
@@ -127,7 +124,6 @@ class Catalog extends CatalogWizard
 
     public function getDefaultFieldnames(): array
     {
-
         return array_keys($this->getDefaultFields());
     }
 
