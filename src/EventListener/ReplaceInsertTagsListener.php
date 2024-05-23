@@ -7,6 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag;
 use Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag;
 use Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags;
 use Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag;
+use Contao\Controller;
 
 class ReplaceInsertTagsListener
 {

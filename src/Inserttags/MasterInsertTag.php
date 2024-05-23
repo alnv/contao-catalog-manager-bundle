@@ -26,17 +26,17 @@ class MasterInsertTag
 
             switch ($strFieldname[0]) {
                 case 'getParent':
-                    $varValue = $GLOBALS['CM_MASTER']['getParent']()[$strFieldname[1]];
+                    $varValue = $GLOBALS['CM_MASTER']['getParent']()[$strFieldname[1]] ?? '';
                     break;
                 case 'origin':
-                    $varValue = $GLOBALS['CM_MASTER']['origin'][$strFieldname[1]];
+                    $varValue = $GLOBALS['CM_MASTER']['origin'][$strFieldname[1]] ?? '';
                     break;
                 case 'getRelated':
                 case 'getArray':
                     if ($strFieldname[0] == 'getRelated') {
                         $arrArray = $GLOBALS['CM_MASTER']['getRelated']($strFieldname[1]);
                     } else {
-                        $arrArray = $GLOBALS['CM_MASTER'][$strFieldname[1]];
+                        $arrArray = $GLOBALS['CM_MASTER'][$strFieldname[1]] ?? [];
                     }
                     if (is_array($arrArray) && isset($strFieldname[2])) {
                         $arrValues = [];
@@ -47,20 +47,20 @@ class MasterInsertTag
                     }
                     break;
                 default;
-                    $varValue = $GLOBALS['CM_MASTER'][$strFieldname[0]];
+                    $varValue = $GLOBALS['CM_MASTER'][$strFieldname[0]] ?? '';
                     break;
             }
 
-            if ($varValue == null) {
+            if ($varValue === '' || $varValue === null) {
                 return $strDefault;
             }
 
             if (is_array($varValue)) {
                 if ($strValue = Toolkit::parse($varValue)) {
-                    return $strValue ?: $strDefault;
+                    return $strValue;
                 }
                 if ($strImage = Toolkit::parseImage($varValue)) {
-                    return $strImage ?: $strDefault;
+                    return $strImage;
                 }
             }
 

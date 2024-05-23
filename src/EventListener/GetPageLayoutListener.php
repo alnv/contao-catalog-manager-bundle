@@ -45,12 +45,15 @@ class GetPageLayoutListener
             $strAlias = Input::get('auto_item');
         }
 
-        $GLOBALS['CM_MASTER'] = (new Master($strTable, [
+        $arrMaster = (new Master($strTable, [
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
         ]))->parse();
+        $arrMaster = $arrMaster[0] ?? [];
 
-        $GLOBALS['CM_MASTER'] = $GLOBALS['CM_MASTER'][0] ?? [];
+        if (!empty($arrMaster)) {
+            $GLOBALS['CM_MASTER'] = $arrMaster;
+        }
 
         $this->setMetaInformation($strTable);
     }
