@@ -15,7 +15,7 @@ use Contao\System;
 class WatchlistInsertTag
 {
 
-    public function __invoke($strFragment)
+    public function replace($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
@@ -195,5 +195,10 @@ class WatchlistInsertTag
         $arrIds = array_filter($arrIds);
 
         return empty($arrIds) ? '0' : serialize($arrIds);
+    }
+
+    public function __invoke($insertTag)
+    {
+        return $this->replace($insertTag);
     }
 }

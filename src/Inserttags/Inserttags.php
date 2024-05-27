@@ -10,7 +10,7 @@ use Contao\FrontendUser;
 class Inserttags
 {
 
-    public function __invoke($strFragments)
+    public function replace($strFragments)
     {
 
         $arrFragments = explode('::', $strFragments);
@@ -55,5 +55,10 @@ class Inserttags
         }
 
         return false;
+    }
+
+    public function __invoke($insertTag)
+    {
+        return $this->replace($insertTag);
     }
 }

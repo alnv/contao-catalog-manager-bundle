@@ -8,7 +8,7 @@ use Contao\StringUtil;
 class MasterInsertTag
 {
 
-    public function __invoke($strFragment)
+    public function replace($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
@@ -68,5 +68,10 @@ class MasterInsertTag
         }
 
         return false;
+    }
+
+    public function __invoke($insertTag)
+    {
+        return $this->replace($insertTag);
     }
 }

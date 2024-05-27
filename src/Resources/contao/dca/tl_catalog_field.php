@@ -311,12 +311,12 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'tl_class' => 'long clr'
             ],
             'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'checkExtensions']],
-            'sql' => "varchar(255) NOT NULL default 'jpg,jpeg,gif,png,pdf,doc,docx,xls,xlsx,ppt,pptx'"
+            'sql' => "varchar(255) NOT NULL default 'jpg,jpeg,gif,png,pdf,svg,doc,docx,xls,xlsx,ppt,pptx'"
         ],
         'uploadFolder' => [
             'inputType' => 'fileTree',
             'eval' => [
-                'mandatory' => true,
+                'mandatory' => false,
                 'fieldType' => 'radio',
                 'tl_class' => 'clr'
             ],

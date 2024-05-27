@@ -88,35 +88,40 @@ class CatalogField
         $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
         $objDatabaseBuilder = new LDatabase();
 
-        if (!$strFieldname || $objCatalog == null) {
-            throw new \Exception('Something went wrong');
+        $objCatalogField = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE fieldname=? AND id!=? AND pid=?')->execute($strFieldname, $objDataContainer->activeRecord->id, $objDataContainer->activeRecord->pid);
+
+        if ($objCatalogField->numRows) {
+            throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
         }
 
-        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $strFieldname))
-        {
-            throw new \Exception('Special characters are not allowed');
+        if (!$strFieldname || !$objCatalog) {
+            throw new \Exception('something went wrong');
+        }
+
+        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $strFieldname)) {
+            throw new \Exception('special characters are not allowed');
         }
 
         if (in_array($strFieldname, (new Catalog(null))->getDefaultFieldnames())) {
             return $strFieldname;
         }
 
-        $strTable = $objCatalog->table;
-
-        if ($strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists($strFieldname, $strTable, true)) {
+        if ($strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists($strFieldname, $objCatalog->table, true)) {
             return $strFieldname;
         }
 
         if ($objDataContainer->activeRecord->fieldname && $strFieldname != $objDataContainer->activeRecord->fieldname) {
-            if (!$objDatabaseBuilder->renameFieldname($objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql)) {
-                throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
+            if (!$objDatabaseBuilder->renameFieldname($objDataContainer->activeRecord->fieldname, $strFieldname, $objCatalog->table, $strSql)) {
+                throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
             }
             return $strFieldname;
         }
 
+        /*
         if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $strTable, $strSql) && !$objDataContainer->activeRecord->fieldname) {
-            throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
+            throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $strTable));
         }
+        */
 
         return $strFieldname;
     }

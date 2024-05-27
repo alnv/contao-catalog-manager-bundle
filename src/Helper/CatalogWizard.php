@@ -117,8 +117,8 @@ abstract class CatalogWizard
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
-                Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . 'field.title.' . $arrField['fieldname'], $arrField['name']),
-                Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . '.field.description.' . $arrField['fieldname'], $arrField['description']),
+                Translation::getInstance()->translate(($arrCatalog['table'] ? $arrCatalog['table'] . '.' : '') . 'field.title.' . $arrField['fieldname'], $arrField['name']),
+                Translation::getInstance()->translate(($arrCatalog['table'] ? $arrCatalog['table'] . '.' : '') . '.field.description.' . $arrField['fieldname'], $arrField['description']),
             ],
             'eval' => [
                 'tl_class' => 'w50',
@@ -299,9 +299,9 @@ abstract class CatalogWizard
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
 
-                try {
-                    $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid(($arrField['uploadFolder']??''));
-                } catch (\Exception $objError) {}
+                if (($arrField['uploadFolder']??'')) {
+                    $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid($arrField['uploadFolder']);
+                }
 
                 if (isset($arrReturn['eval']['role']) && $arrReturn['eval']['role']) {
 
@@ -343,7 +343,7 @@ abstract class CatalogWizard
                 break;
         }
 
-        if (isset($GLOBALS['CM_ROLES'][$arrField['role']]) && isset($GLOBALS['CM_ROLES'][$arrField['role']]['eval'])) {
+        if (isset($GLOBALS['CM_ROLES'][($arrField['role']??'')]) && isset($GLOBALS['CM_ROLES'][$arrField['role']]['eval'])) {
             foreach ($GLOBALS['CM_ROLES'][$arrField['role']]['eval'] as $strKey => $strOption) {
                 $arrReturn['eval'][$strKey] = $strOption;
             }

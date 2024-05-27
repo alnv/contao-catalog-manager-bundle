@@ -8,7 +8,7 @@ use Contao\PageModel;
 class PageInsertTag
 {
 
-    public function __invoke($strFragment)
+    public function replace($strFragment)
     {
 
         $arrFragments = explode('::', $strFragment);
@@ -80,5 +80,10 @@ class PageInsertTag
         }
 
         return $arrReturn;
+    }
+
+    public function __invoke($insertTag)
+    {
+        return $this->replace($insertTag);
     }
 }
