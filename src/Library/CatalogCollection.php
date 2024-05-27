@@ -8,8 +8,9 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 class CatalogCollection extends CatalogWizard
 {
 
-    protected $arrCatalogs = [];
-    protected $arrTypes = [];
+    protected array $arrCatalogs = [];
+
+    protected array $arrTypes = [];
 
     public function __construct()
     {
@@ -23,19 +24,22 @@ class CatalogCollection extends CatalogWizard
         }
 
         while ($objCatalogs->next()) {
+
             if (!$objCatalogs->table) {
                 continue;
             }
+
             if (!isset($this->arrTypes[$objCatalogs->type])) {
                 $this->arrTypes[$objCatalogs->type] = [];
             }
+
             $this->arrTypes[$objCatalogs->type][] = $objCatalogs->table;
             $this->arrCatalogs[$objCatalogs->table] = $this->parseCatalog($objCatalogs->row());
         }
     }
 
 
-    public function getCatalogs($strType = '')
+    public function getCatalogs($strType = ''): array
     {
 
         if (!$strType) {

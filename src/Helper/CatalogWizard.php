@@ -114,6 +114,7 @@ abstract class CatalogWizard
         $blnMultiple = (bool)$arrField['multiple'];
         $arrField['description'] = trim(strip_tags($arrField['description']));
         $arrReturn = [
+            'inputType' => '',
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
@@ -130,6 +131,7 @@ abstract class CatalogWizard
                 'mandatory' => (bool)$arrField['mandatory'],
                 'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
+            'exclude' => true,
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
         ];
 
@@ -320,6 +322,7 @@ abstract class CatalogWizard
                             $arrReturn['eval']['isGallery'] = true;
                             $arrReturn['eval']['tl_class'] = 'clr';
                             $arrReturn['eval']['fieldType'] = 'checkbox';
+                            $arrReturn['eval']['isSortable'] = true;
                             $arrReturn['eval']['multiple'] = true;
                             if ($arrField['imageSize']) {
                                 $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
@@ -335,6 +338,7 @@ abstract class CatalogWizard
                             $arrReturn['eval']['isFile'] = true;
                             if ($arrReturn['eval']['role'] === 'files') {
                                 $arrReturn['eval']['fieldType'] = 'checkbox';
+                                $arrReturn['eval']['isSortable'] = true;
                                 $arrReturn['eval']['multiple'] = true;
                             }
                             break;

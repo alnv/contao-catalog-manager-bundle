@@ -117,11 +117,9 @@ class CatalogField
             return $strFieldname;
         }
 
-        /*
-        if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $strTable, $strSql) && !$objDataContainer->activeRecord->fieldname) {
-            throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $strTable));
+        if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $objCatalog->table, $strSql) && !$objDataContainer->activeRecord->fieldname) {
+            // throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
         }
-        */
 
         return $strFieldname;
     }

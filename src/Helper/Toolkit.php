@@ -765,7 +765,7 @@ class Toolkit
 
         foreach ($arrJson as $intIndex => $arrQuery) {
 
-            if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
+            if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
 
                 if ((isset($arrQuery['group']) && $arrQuery['group']) || $blnInitialGroup) {
                     $strName = 'group' . $intIndex;
@@ -778,7 +778,6 @@ class Toolkit
                 $varValue = ($arrQuery['value']??null);
 
                 if ($varValue !== null) {
-
                     $varValue = static::replaceInsertTags($varValue, true);
                 }
 
@@ -786,7 +785,7 @@ class Toolkit
                 $varValue = is_array($varValue) ? $varValue : StringUtil::deserialize($varValue, true);
                 foreach ($varValue as $strIndex => $strValue) {
 
-                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
+                    if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
                             $arrColumns[] = static::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
                                 'field' => ($strTable ? $strTable . '.' : '') . $arrQuery['field'],
@@ -800,7 +799,7 @@ class Toolkit
                         ]);
                     }
 
-                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && is_bool($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] == true) {
+                    if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] === true) {
                         continue;
                     }
 
@@ -830,6 +829,7 @@ class Toolkit
             if (empty($arrQuery)) {
                 continue;
             }
+
             if (count($arrQuery) > 1) {
                 $arrReturn['column'][] = '(' . implode(' OR ', $arrQuery) . ')';
             } else {
@@ -857,7 +857,6 @@ class Toolkit
 
     public static function convertArrayItemsToPlaceholders($arrArray, $strPlaceholder = '?'): string
     {
-
         return implode(",", array_fill(0, count($arrArray), $strPlaceholder));
     }
 
