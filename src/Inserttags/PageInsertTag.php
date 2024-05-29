@@ -11,9 +11,9 @@ class PageInsertTag
     public function replace($strFragment)
     {
 
-        $arrFragments = explode('::', $strFragment);
+        $arrFragments = \explode('::', $strFragment);
 
-        if (is_array($arrFragments) && strtoupper($arrFragments[0]) == 'ACTIVE_PAGE') {
+        if (\is_array($arrFragments) && \strtoupper($arrFragments[0]) == 'ACTIVE_PAGE') {
 
             global $objPage;
 
@@ -22,10 +22,10 @@ class PageInsertTag
             $blnTranslate = false;
             $blnReverse = false;
 
-            if (isset($arrFragments[1]) && strpos($arrFragments[1], '?') !== false) {
+            if (isset($arrFragments[1]) && \strpos($arrFragments[1], '?') !== false) {
                 $arrParams = Toolkit::parseParametersFromString($arrFragments[1]);
                 foreach ($arrParams as $strParam) {
-                    list($strKey, $strOption) = explode('=', $strParam);
+                    list($strKey, $strOption) = \explode('=', $strParam);
                     switch ($strKey) {
                         case 'useParent':
                             $blnUseParent = true;
@@ -50,7 +50,7 @@ class PageInsertTag
                 }
             }
 
-            return serialize($this->getCurrentAndAllSubPages($strPageId, $blnReverse));
+            return \serialize($this->getCurrentAndAllSubPages($strPageId, $blnReverse));
         }
 
         return false;
