@@ -131,7 +131,7 @@ abstract class CatalogWizard
                 'mandatory' => (bool)$arrField['mandatory'],
                 'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
-            'exclude' => true,
+            // 'exclude' => true,
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
         ];
 

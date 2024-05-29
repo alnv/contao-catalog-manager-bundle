@@ -185,7 +185,7 @@ class Catalog extends CatalogWizard
                 ],
                 'toggle' => true,
                 'filter' => true,
-                'exclude' => true,
+                // 'exclude' => true,
                 'sql' => "char(1) NOT NULL default ''"
             ],
             'start' => [
@@ -200,7 +200,7 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'exclude' => true,
+                // 'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'stop' => [
@@ -215,7 +215,7 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'exclude' => true,
+                // 'exclude' => true,
                 'sql' => "varchar(10) NOT NULL default ''"
             ],
             'alias' => [
@@ -229,7 +229,7 @@ class Catalog extends CatalogWizard
                     'role' => 'alias'
                 ],
                 'search' => true,
-                'exclude' => true,
+                // 'exclude' => true,
                 'sql' => "varchar(128) NOT NULL default ''"
             ]
         ];
