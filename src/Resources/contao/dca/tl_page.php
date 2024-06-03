@@ -1,6 +1,8 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Input;
 
 $GLOBALS['TL_DCA']['tl_page']['palettes']['filter'] = $GLOBALS['TL_DCA']['tl_page']['palettes']['regular'];
@@ -12,8 +14,14 @@ PaletteManipulator::create()->removeField('routePath')->applyToPalette('filter',
 $GLOBALS['TL_DCA']['tl_page']['config']['ctable'][] = 'tl_page_filter';
 
 $GLOBALS['TL_DCA']['tl_page']['fields']['cmRoutePath'] = [
-    'input_field_callback' => function () {
-        return "";
+    'input_field_callback' => function ($objDataContainer) {
+        $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
+        $strFragments = [$arrActiveRecord['alias']];
+        foreach (Getters::getPageFiltersByPageId($objDataContainer->id) as $objFilterPage) {
+            $strFragments[] = '{'. $objFilterPage->getFieldName() .'}';
+        }
+        $strFragments[] = '{auto_item}';
+        return '<div class="w50 widget"><h3>'. ($GLOBALS['TL_LANG']['tl_page']['routePath'][0]??'') .'</h3><p class="info">'. implode('/', $strFragments) .'</p><p class="tl_help tl_tip">'. ($GLOBALS['TL_LANG']['tl_page']['routePath'][1]??'') .'</p></div>';
     },
     'exclude' => true
 ];
