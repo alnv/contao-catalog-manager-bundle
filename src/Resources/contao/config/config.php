@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION =  "3.0.18";
+const CATALOG_MANAGER_BUNDLE_VERSION =  "3.1.0";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -45,6 +45,14 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
         ]
     ]
 ]);
+
+foreach ($GLOBALS['BE_MOD'] as $strType => $arrModules) {
+    foreach ($arrModules as $strModule => $arrModule) {
+        if (in_array('tl_page', ($arrModule['tables']??[]))) {
+            $GLOBALS['BE_MOD'][$strType][$strModule]['tables'][] = 'tl_page_filter';
+        }
+    }
+}
 
 ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [

@@ -10,7 +10,6 @@ class DcaExtractor extends ContaoDcaExtractor
 
     public function __construct($strTable)
     {
-
         parent::__construct($strTable);
     }
 
@@ -59,26 +58,22 @@ class DcaExtractor extends ContaoDcaExtractor
 
     public function hasVisibility(): bool
     {
-
         $objCatalog = CatalogModel::findByTableOrModule($this->strTable);
 
         if ($objCatalog !== null) {
-
             return (bool)$objCatalog->enableVisibility;
         }
 
         return isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['start']) && isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['stop']) && isset($GLOBALS['TL_DCA'][$this->strTable]['fields']['published']);
     }
 
-    public function getDataContainer()
+    public function getDataContainer(): string
     {
-
-        return $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+        return $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] ?? '';
     }
 
-    public function getField($strFieldname)
+    public function getField($strFieldName): array
     {
-
-        return $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldname] ?? [];
+        return $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldName] ?? [];
     }
 }

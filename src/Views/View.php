@@ -27,10 +27,15 @@ abstract class View extends Controller
 {
 
     public array $arrFormPage = [];
+
     public array $arrMasterPage = [];
+
     protected null|string $strTable = null;
+
     protected array $arrOptions = [];
+
     protected array $arrEntities = [];
+
     protected null|DcaExtractor $dcaExtractor = null;
 
     public function __construct($strTable, $arrOptions = [])
@@ -270,7 +275,7 @@ abstract class View extends Controller
         $arrRow['masterUrl'] = '';
 
         if (isset($this->arrOptions['masterPage']) && $this->arrOptions['masterPage']) {
-            $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias']);
+            $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias'], $arrEntity);
         }
 
         foreach ($arrEntity as $strField => $varValue) {
@@ -451,7 +456,6 @@ abstract class View extends Controller
 
     protected function getPageNumber()
     {
-
         return (int)Input::get('page_e' . $this->arrOptions['id']);
     }
 
@@ -469,7 +473,6 @@ abstract class View extends Controller
 
     public function getAddUrl(): string
     {
-
         return Toolkit::parseDetailLink($this->arrFormPage, '');
     }
 
@@ -487,13 +490,11 @@ abstract class View extends Controller
 
     public function getTable(): string
     {
-
         return $this->strTable;
     }
 
     public function getModuleId()
     {
-
         return $this->arrOptions['id'];
     }
 

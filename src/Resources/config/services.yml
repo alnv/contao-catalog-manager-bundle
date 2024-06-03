@@ -2,10 +2,10 @@ services:
   _defaults:
     autowire: true
     autoconfigure: true
-
+  Alnv\ContaoCatalogManagerBundle\Pages\FilterPageController:
+    tags: [ contao.page ]
   Alnv\ContaoCatalogManagerBundle\Controller\FrontendController:
     public: true
-
   Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag:
     tags:
       - { name: contao.hook, hook: replaceInsertTags }

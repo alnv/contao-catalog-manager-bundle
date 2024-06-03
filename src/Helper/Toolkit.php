@@ -248,28 +248,35 @@ class Toolkit
         }
     }
 
-    public static function parseDetailLink($varPage, $strAlias): string
+    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = []): string
     {
 
-        if (is_numeric($varPage) && $varPage) {
-            $objPage = PageModel::findByPk($varPage);
-            if ($objPage !== null) {
-                return $objPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
-            }
+        if (is_numeric($varPage)) {
+            $varPage = PageModel::findByPk($varPage);
         }
 
         if (is_array($varPage) && isset($varPage['id'])) {
-            $objPage = PageModel::findByPk($varPage['id']);
-            if ($objPage !== null) {
-                return $objPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+            $varPage = PageModel::findByPk($varPage['id']);
+        }
+
+        if (!$varPage) {
+            return '';
+        }
+
+        if ($varPage->type == 'filter') {
+            $strUrlFragments = [];
+            foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
+                $strFieldName = $objPageFilter->getFieldName();
+                $strUrlFragments[] = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName]??'');
             }
+
+            $strUrlFragments[] = $strAlias;
+            $strUrl = (empty($strUrlFragments) ? '' : implode('/', $strUrlFragments));
+
+            return $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
         }
 
-        if ($varPage instanceof PageModel) {
-            return $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
-        }
-
-        return '';
+        return $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
     }
 
     public static function parseImage($varImage)
@@ -444,7 +451,6 @@ class Toolkit
         switch ($arrField['type']) {
 
             case 'text':
-
                 return $arrField['value'];
 
             case 'checkboxWizard':
@@ -536,7 +542,8 @@ class Toolkit
 
                         try {
                             $strUrl = $objPage->getFrontendUrl();
-                        } catch (\Exception $objException) {}
+                        } catch (\Exception $objException) {
+                        }
 
                         $arrValues[$strPageId] = [
                             'url' => $strUrl,
@@ -724,8 +731,8 @@ class Toolkit
             }
 
             if ($strLanguageColumn && $strLangPidColumn) {
-                $arrQueries[] = ' AND `'.$strLangPidColumn.'`!=? AND id!=?';
-                $arrValues[] = ($strLid?:$strId);
+                $arrQueries[] = ' AND `' . $strLangPidColumn . '`!=? AND id!=?';
+                $arrValues[] = ($strLid ?: $strId);
                 $arrValues[] = $strLid;
             }
 
@@ -775,7 +782,7 @@ class Toolkit
                     $arrQueries[$strName] = [];
                 }
 
-                $varValue = ($arrQuery['value']??null);
+                $varValue = ($arrQuery['value'] ?? null);
 
                 if ($varValue !== null) {
                     $varValue = static::replaceInsertTags($varValue, true);
@@ -868,9 +875,9 @@ class Toolkit
     public static function getActiveRecordAsArrayFromDc(DataContainer $objDataContainer): array
     {
         if (method_exists($objDataContainer, 'getCurrentRecord')) {
-           return $objDataContainer->getCurrentRecord();
+            return $objDataContainer->getCurrentRecord();
         } else {
-            return $objDataContainer->activeRecord->row();
+            return $objDataContainer->activeRecord ? $objDataContainer->activeRecord->row() : [];
         }
     }
 }
