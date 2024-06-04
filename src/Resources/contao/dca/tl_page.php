@@ -18,7 +18,7 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cmRoutePath'] = [
         $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
         $strFragments = [$arrActiveRecord['alias']];
         foreach (Getters::getPageFiltersByPageId($objDataContainer->id) as $objFilterPage) {
-            $strFragments[] = '{'. $objFilterPage->getFieldName() .'}';
+            $strFragments[] = '{'. $objFilterPage->getAlias() .'}';
         }
         $strFragments[] = '{auto_item}';
         return '<div class="w50 widget"><h3>'. ($GLOBALS['TL_LANG']['tl_page']['routePath'][0]??'') .'</h3><p class="info">'. implode('/', $strFragments) .'</p><p class="tl_help tl_tip">'. ($GLOBALS['TL_LANG']['tl_page']['routePath'][1]??'') .'</p></div>';
@@ -41,7 +41,7 @@ $GLOBALS['TL_DCA']['tl_page']['fields']['cmRouting'] = [
         'global_operations' => ['new'],
         'editButtonLabel' => $GLOBALS['TL_LANG']['tl_page']['editButtonLabel'],
         'emptyLabel' => $GLOBALS['TL_LANG']['tl_page']['emptyLabel'],
-        'fields' => ['type', 'table', 'column']
+        'fields' => ['type', 'table', 'column', 'alias']
     ],
     'exclude' => true
 ];

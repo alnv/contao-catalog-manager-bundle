@@ -160,6 +160,24 @@ class Toolkit
         return implode('', $arrNewLines);
     }
 
+    public static function getCurrentPathInfo($strAlias = ''): array
+    {
+
+        $arrFragments = [];
+        $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
+
+        foreach (array_filter(explode('/', $strPathInfo)) as $strFragment) {
+
+            if ($strAlias && $strAlias == $strFragment) {
+                continue;
+            }
+
+            $arrFragments[] = $strFragment;
+        }
+
+        return $arrFragments;
+    }
+
     public static function getFilterValue($strField)
     {
 
@@ -264,7 +282,9 @@ class Toolkit
         }
 
         if ($varPage->type == 'filter') {
+
             $strUrlFragments = [];
+
             foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
                 $strFieldName = $objPageFilter->getFieldName();
                 $strUrlFragments[] = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName]??'');

@@ -33,6 +33,13 @@ class PageFilter
         return $arrPageFilter['column'] ?? '';
     }
 
+    public function getAlias()
+    {
+        $arrPageFilter = $this->getPageFilterArray();
+
+        return $arrPageFilter['alias'] ?? '';
+    }
+
     public function getActiveUrlFragment(): string
     {
         return $this->strActiveUrlFragment;
@@ -60,12 +67,11 @@ class PageFilter
         }
 
         $arrPageFilter = $this->getPageFilterArray();
-        $objEntities = Database::getInstance()->prepare('SELECT '. $arrPageFilter['column'] .' FROM ' . $arrPageFilter['table'] . ' WHERE ' . $arrPageFilter['column'] . ' REGEXP ?')->limit(1)->execute($strActiveUrlFragment);
         $objDcaExtractor = new DcaExtractor($arrPageFilter['table']);
 
         $varValue = '';
-        $arrAttribute = Widget::getAttributesFromDca($objDcaExtractor->getField($arrPageFilter['column']), $arrPageFilter['column'], $objEntities->{$arrPageFilter['column']}, $arrPageFilter['column'], $arrPageFilter['table']);
-        $varParsedValue = Toolkit::parseCatalogValue($objEntities->{$arrPageFilter['column']}, $arrAttribute);
+        $arrAttribute = Widget::getAttributesFromDca($objDcaExtractor->getField($arrPageFilter['column']), $arrPageFilter['column'], $strActiveUrlFragment, $arrPageFilter['column'], $arrPageFilter['table']);
+        $varParsedValue = Toolkit::parseCatalogValue($strActiveUrlFragment, $arrAttribute);
 
         if (is_array($varParsedValue)) {
             foreach ($varParsedValue as $arrValues) {
@@ -77,7 +83,7 @@ class PageFilter
             $varValue = $varParsedValue;
         }
 
-        Input::setGet($arrPageFilter['column'], $varValue);
+        Input::setGet($arrPageFilter['alias'], $varValue);
         $this->strActiveUrlFragment = $varValue;
     }
 

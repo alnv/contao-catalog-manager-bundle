@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Pages;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Environment;
 use Contao\Input;
@@ -19,13 +20,7 @@ class FilterPageController
 
         Input::resetUnusedGet();
 
-        $arrFragments = [];
-        foreach (array_filter(explode('/', $request->getPathInfo())) as $strFragment) {
-            if ($pageModel->alias == $strFragment) {
-                continue;
-            }
-            $arrFragments[] = $strFragment;
-        }
+        $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias);
 
         foreach ($_GET as $strGet => $strValue) {
             Input::setGet($strGet, null);

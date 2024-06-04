@@ -4,6 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\Database;
 use Contao\Date;
 use Contao\StringUtil;
 use Contao\System;
@@ -42,6 +43,12 @@ class ActiveInsertTag
                             break;
                         case 'touch':
                             $blnTouch = (bool)$strOption;
+                            break;
+                        case 'source':
+                            $arrOptions = explode(':', $strOption);
+                            $strTable = $arrOptions[0] ?? '';
+                            $strColumn = $arrOptions[1] ?? '';
+                            $varValue = $this->getIdsByTableAndColumn($strTable, $strColumn, $varValue);
                             break;
                         case 'csv':
                             if ($varValue !== '') {
@@ -100,6 +107,27 @@ class ActiveInsertTag
         }
 
         return false;
+    }
+
+    protected function getIdsByTableAndColumn($strTable, $strColumn, $varValue): string
+    {
+
+        if (!Database::getInstance()->tableExists($strTable)) {
+            return '';
+        }
+
+        if (!Database::getInstance()->fieldExists($strColumn, $strTable)) {
+            return '';
+        }
+
+        $objEntities = Database::getInstance()->prepare('SELECT id FROM '. $strTable .' WHERE `'. $strColumn .'` REGEXP ?')->execute('[[:<:]]'. $varValue .'[[:>:]]');
+
+        $arrIds = [];
+        while ($objEntities->next()) {
+            $arrIds[] = $objEntities->id;
+        }
+
+        return empty($arrIds) ? '' : \serialize($arrIds);
     }
 
     public function __invoke($insertTag)

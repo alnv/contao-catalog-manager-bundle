@@ -27,7 +27,7 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             'fields' => ['sorting'],
             'headerFields' => ['type', 'title'],
             'child_record_callback' => function ($arrRow) {
-                return $arrRow['table'] . ' - ' . $arrRow['column'];
+                return $arrRow['table'] . ' - ' . $arrRow['column'] . ' - ALIAS: ' . $arrRow['alias'];
             }
         ],
         'operations' => [
@@ -49,9 +49,9 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
     'palettes' => [
         '__selector__' => ['type'],
         'default' => 'type',
-        'routing_table' => 'type;table,column'
+        'routing_table' => 'type,alias;table,column;robots'
     ],
-    'subpalettes' => [],
+    // 'subpalettes' => [],
     'fields' => [
         'id' => [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
@@ -65,6 +65,16 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
         'pid' => [
             'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
+        'robots' => [
+            'inputType' => 'select',
+            'eval' => [
+                'maxlength' => 32,
+                'tl_class' => 'w50',
+                'includeBlankOption' => true
+            ],
+            'options' => ['index,follow', 'noindex,follow', 'index,nofollow', 'noindex,nofollow'],
+            'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
+        ],
         'type' => [
             'inputType' => 'select',
             'eval' => [
@@ -76,6 +86,23 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             ],
             'options' => ['routing_table'],
             'reference' => &$GLOBALS['TL_LANG']['tl_page_filter'],
+            'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
+        ],
+        'alias' => [
+            'inputType' => 'text',
+            'eval' => [
+                'rgxp' => 'alias',
+                'maxlength' => 32,
+                'tl_class' => 'w50'
+            ],
+            'save_callback' => [function ($strValue, $objDataContainer) {
+                if (!$strValue) {
+                    $arrActiveRecord = Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
+                    $strValue = $arrActiveRecord['column'] ?? '';
+                    $strValue = strtolower($strValue);
+                }
+                return $strValue;
+            }],
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
         ],
         'table' => [
