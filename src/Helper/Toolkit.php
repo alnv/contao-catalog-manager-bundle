@@ -284,10 +284,9 @@ class Toolkit
         if ($varPage->type == 'filter') {
 
             $strUrlFragments = [];
-
             foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
-                $strFieldName = $objPageFilter->getFieldName();
-                $strUrlFragments[] = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName]??'');
+                $strFieldName = $objPageFilter->getAlias();
+                $strUrlFragments[] = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName] ?? '');
             }
 
             $strUrlFragments[] = $strAlias;

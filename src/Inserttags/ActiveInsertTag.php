@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\Date;
@@ -112,6 +113,10 @@ class ActiveInsertTag
     protected function getIdsByTableAndColumn($strTable, $strColumn, $varValue): string
     {
 
+        if (!$varValue) {
+            return '';
+        }
+
         if (!Database::getInstance()->tableExists($strTable)) {
             return '';
         }
@@ -120,14 +125,26 @@ class ActiveInsertTag
             return '';
         }
 
-        $objEntities = Database::getInstance()->prepare('SELECT id FROM '. $strTable .' WHERE `'. $strColumn .'` REGEXP ?')->execute('[[:<:]]'. $varValue .'[[:>:]]');
-
         $arrIds = [];
-        while ($objEntities->next()) {
-            $arrIds[] = $objEntities->id;
+        $arrValues = StringUtil::deserialize($varValue, true);
+
+        foreach ($arrValues as $strValue) {
+            $strTable = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? $strTable;
+            $objModel = new ModelWizard($strTable);
+            $objModel = $objModel->getModel();
+            $objEntities = $objModel->findAll([
+                'column' => [$strTable . '.' . $strColumn . ' REGEXP ?'],
+                'value' => ['[[:<:]]' . $strValue . '[[:>:]]']
+            ]);
+
+            if ($objEntities) {
+                while ($objEntities->next()) {
+                    $arrIds[] = $objEntities->id;
+                }
+            }
         }
 
-        return empty($arrIds) ? '' : \serialize($arrIds);
+        return empty($arrIds) ? '0' : \serialize($arrIds);
     }
 
     public function __invoke($insertTag)

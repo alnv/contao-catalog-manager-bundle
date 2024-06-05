@@ -91,19 +91,18 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
         'alias' => [
             'inputType' => 'text',
             'eval' => [
-                'rgxp' => 'alias',
-                'maxlength' => 32,
+                'rgxp' => 'extnd',
+                'maxlength' => 64,
                 'tl_class' => 'w50'
             ],
             'save_callback' => [function ($strValue, $objDataContainer) {
                 if (!$strValue) {
                     $arrActiveRecord = Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
                     $strValue = $arrActiveRecord['column'] ?? '';
-                    $strValue = strtolower($strValue);
                 }
                 return $strValue;
             }],
-            'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
+            'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'table' => [
             'inputType' => 'select',

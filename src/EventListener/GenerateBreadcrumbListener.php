@@ -22,7 +22,7 @@ class GenerateBreadcrumbListener
                 $arrItems[] = $arrItem;
             }
             foreach ($arrItems as $intIndex => $arrItem) {
-                $arrItems[$intIndex]['isActive'] = $intIndex === count($arrItems)-1;
+                $arrItems[$intIndex]['isActive'] = $intIndex === count($arrItems) - 1;
             }
         }
 
@@ -95,10 +95,11 @@ class GenerateBreadcrumbListener
 
             $strTable = $arrFilterPage['table'] ?? '';
             $strColumn = $arrFilterPage['column'] ?? '';
+            $strColumnTable = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? $strTable;
 
             $arrMasterEntity = (new Listing($strTable, [
-                'column' => ['`'. $strColumn .'` REGEXP ?'],
-                'value' => ['[[:<:]]'. $strActiveUrlFragment .'[[:>:]]'],
+                'column' => [$strColumnTable . '.`' . $strColumn . '` REGEXP ?'],
+                'value' => ['[[:<:]]' . $strActiveUrlFragment . '[[:>:]]'],
                 'fastMode' => true,
                 'ignoreVisibility' => true,
                 'limit' => 1,
@@ -115,7 +116,7 @@ class GenerateBreadcrumbListener
                 continue;
             }
 
-            $strTitle = ($arrMasterEntity[$strColumn]??'') ?? '';
+            $strTitle = ($arrMasterEntity[$strColumn] ?? '') ?? '';
             $strAlias = $arrMasterEntity['roleResolver']()->getFieldByRole('alias');
 
             if ($strAlias === $strColumn || is_numeric($strTitle)) {
@@ -136,7 +137,7 @@ class GenerateBreadcrumbListener
                 'link' => $strTitle,
                 'title' => $strTitle,
                 'isActive' => false,
-                'data' => $arrData
+                // 'data' => $arrData
             ];
 
             $objPage->pageTitle = $strTitle;

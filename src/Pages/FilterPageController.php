@@ -2,15 +2,15 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Pages;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Contao\CoreBundle\Exception\PageNotFoundException;
-use Contao\Environment;
 use Contao\Input;
 use Contao\PageModel;
+use Contao\Environment;
 use Contao\FrontendIndex;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\CoreBundle\Exception\PageNotFoundException;
 
 class FilterPageController
 {

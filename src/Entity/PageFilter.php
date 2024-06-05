@@ -2,12 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Entity;
 
-use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Contao\Database;
-use Contao\Input;
-use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Contao\Widget;
+use Contao\Input;
 
 class PageFilter
 {
@@ -37,7 +37,7 @@ class PageFilter
     {
         $arrPageFilter = $this->getPageFilterArray();
 
-        return $arrPageFilter['alias'] ?? '';
+        return $arrPageFilter['alias'] ?: $arrPageFilter['column'];
     }
 
     public function getActiveUrlFragment(): string
@@ -53,16 +53,69 @@ class PageFilter
         $arrAttribute = Widget::getAttributesFromDca($objDcaExtractor->getField($arrPageFilter['column']), $arrPageFilter['column'], $strActiveUrlFragment, $arrPageFilter['column'], $arrPageFilter['table']);
 
         if (is_array($arrAttribute['value'])) {
-            return $arrAttribute['value'][0] ?? '';
+            $varValue =  $arrAttribute['value'][0] ?? '';
         } else {
-            return $arrAttribute['value'];
+            $varValue =  $arrAttribute['value'] ?? '';
         }
+
+        $arrFragment = is_numeric($varValue) ? $this->getFragmentId($varValue) : [];
+        if (!empty($arrFragment)) {
+            return $arrFragment[$arrPageFilter['column']] ?? '';
+        }
+
+        return $varValue;
+    }
+
+    protected function getFragmentId($strFragmentId): array
+    {
+        $arrPageFilter = $this->getPageFilterArray();
+        $strTable = $GLOBALS['TL_DCA'][$arrPageFilter['table']]['config']['_table'] ?? $arrPageFilter['table'];
+        $objModel = new ModelWizard($arrPageFilter['table']);
+        $objModel = $objModel->getModel();
+        $objEntities = $objModel->findAll([
+            'column' => [$strTable . '.id=?'],
+            'value' => [$strFragmentId],
+            'limit' => 1
+        ]);
+
+        if (!$objEntities) {
+            return [];
+        }
+
+        return $objEntities->row();
+    }
+
+    protected function activeUrlFragmentExist($strActiveUrlFragment): bool
+    {
+
+        $arrPageFilter = $this->getPageFilterArray();
+        if (!$arrPageFilter['table'] || !$arrPageFilter['column']) {
+            return false;
+        }
+
+        $strTable = $GLOBALS['TL_DCA'][$arrPageFilter['table']]['config']['_table'] ?? $arrPageFilter['table'];
+        $arrColumn = [$strTable . '.' . $arrPageFilter['column'] . ' REGEXP ?'];
+        $arrValue = ['[[:<:]]'. $strActiveUrlFragment .'[[:>:]]'];
+
+        $objModel = new ModelWizard($arrPageFilter['table']);
+        $objModel = $objModel->getModel();
+        $objEntities = $objModel->findAll([
+            'column' => $arrColumn,
+            'value' => $arrValue,
+            'limit' => 1
+        ]);
+
+        return (bool) $objEntities;
     }
 
     public function setActiveUrlFragment(string $strActiveUrlFragment): void
     {
 
         if (!$strActiveUrlFragment) {
+            return;
+        }
+
+        if (!$this->activeUrlFragmentExist($strActiveUrlFragment)) {
             return;
         }
 
