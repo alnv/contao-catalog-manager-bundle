@@ -17,6 +17,7 @@ class GetSearchablePagesListener
     {
 
         $arrPages = $this->getSearchablePages($arrPages, $intRoot, $blnIsSitemap, $language);
+
         return $this->getSearchablePagesByPagesRoles($arrPages, $intRoot, $blnIsSitemap, $language);
     }
 
@@ -27,6 +28,7 @@ class GetSearchablePagesListener
             'column' => ['tl_catalog_field.role=?'],
             'value' => ['pages']
         ]);
+
         if ($objCatalogFields === null) {
             return $arrPages;
         }
@@ -39,7 +41,6 @@ class GetSearchablePagesListener
         while ($objCatalogFields->next()) {
 
             $strFieldname = $objCatalogFields->fieldname;
-
             if (!$strFieldname) {
                 continue;
             }
@@ -54,7 +55,6 @@ class GetSearchablePagesListener
             }
 
             $strTable = $objCatalog->table;
-
             if (!$strTable) {
                 continue;
             }
@@ -91,15 +91,15 @@ class GetSearchablePagesListener
     public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false, $strLanguage = '')
     {
 
-        $objModules =  Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing-table', '1');
+        $objModules = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing-table', '1');
 
         if (!$objModules->numRows) {
             return $arrPages;
         }
 
-        $strDNS = '';
+        $strDns = '';
         if ($objRoot = PageModel::findByPk($intRoot)) {
-            $strDNS = $objRoot->dns ?: '';
+            $strDns = $objRoot->dns ?: '';
         }
 
         while ($objModules->next()) {
@@ -121,35 +121,32 @@ class GetSearchablePagesListener
             }
 
             $arrFilter = $this->parseFilter($objModules);
-
             $objModel = new ModelWizard($strTable);
             $objModel = $objModel->getModel();
             $objEntities = $objModel->findAll([
                 'language' => $objPage->language,
-                'column' => isset($arrFilter['column']) ? $arrFilter['column'] : null,
-                'value' => isset($arrFilter['value']) ? $arrFilter['value'] : null
+                'column' => $arrFilter['column'] ?? null,
+                'value' => $arrFilter['value'] ?? null
             ]);
 
+            if (!$objEntities) {
+                return $arrPages;
+            }
 
-            if ($objEntities) {
+            while ($objEntities->next()) {
 
-                while ($objEntities->next()) {
+                if (!$objEntities->alias) {
+                    continue;
+                }
 
-                    $strAlias = $objEntities->alias;
+                $strUrl = $objPage->getAbsoluteUrl('/' . $objEntities->alias);
 
-                    if (!$strAlias) {
-                        continue;
-                    }
-
-                    $strUrl = $objPage->getAbsoluteUrl('/' . $strAlias);
-
-                    if ($strDNS) {
-                        if (strpos($strUrl, $strDNS) !== false) {
-                            $arrPages[] = $strUrl;
-                        }
-                    } else {
+                if ($strDns) {
+                    if (strpos($strUrl, $strDns) !== false) {
                         $arrPages[] = $strUrl;
                     }
+                } else {
+                    $arrPages[] = $strUrl;
                 }
             }
         }
@@ -157,13 +154,10 @@ class GetSearchablePagesListener
         return $arrPages;
     }
 
-    protected function parseFilter($objModules)
+    protected function parseFilter($objModules): array
     {
 
-        $arrReturn = [
-            'column' => [],
-            'value' => []
-        ];
+        $arrReturn = ['column' => [], 'value' => []];
 
         if ($objModules->cmFilter) {
             switch ($objModules->cmFilterType) {

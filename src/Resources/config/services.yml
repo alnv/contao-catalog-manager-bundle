@@ -21,70 +21,63 @@ services:
   Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag:
     tags:
       - { name: contao.hook, hook: replaceInsertTags }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\InitializeSystemListener:
     tags:
       - { name: contao.hook, hook: initializeSystem }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\GenerateBreadcrumbListener:
     tags:
       - { name: contao.hook, hook: generateBreadcrumb }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\GetSearchablePagesListener:
     tags:
       - { name: contao.hook, hook: getSearchablePages }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\ReplaceInsertTagsListener:
     tags:
       - { name: contao.hook, hook: replaceInsertTags }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\LoadDataContainerListener:
     tags:
       - { name: contao.hook, hook: loadDataContainer }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\GetPageLayoutListener:
     tags:
       - { name: contao.hook, hook: getPageLayout }
-
+  Alnv\ContaoCatalogManagerBundle\EventListener\GeneratePageListener:
+    tags:
+      - { name: contao.hook, hook: generatePage }
   Alnv\ContaoCatalogManagerBundle\EventListener\DoctrineSchemaListener:
     arguments:
       - '@contao.framework'
       - '@doctrine'
     tags:
       - { name: doctrine.event_listener, event: postGenerateSchema }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\IsVisibleElementListener:
     tags:
       - { name: contao.hook, hook: isVisibleElement }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\CompileFormFieldsListener:
     tags:
       - { name: contao.hook, hook: compileFormFields }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\GetAttributesFromDcaListener:
     tags:
       - { name: contao.hook, hook: getAttributesFromDca }
-
   Alnv\ContaoCatalogManagerBundle\EventListener\LoadFormFieldListener:
     tags:
       - { name: contao.hook, hook: loadFormField }
-
   catalogmanager.datacontainer.catalog:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog
     public: true
-
   catalogmanager.datacontainer.catalogfield:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField
     public: true
-
   catalogmanager.datacontainer.catalogoption:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogOption
     public: true
-
   catalogmanager.datacontainer.catalogpalette:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette
     public: true
-
   catalogmanager.datacontainer.module:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Module
     public: true
+  catalogmanager.listener.sitemap:
+    class: Alnv\ContaoCatalogManagerBundle\EventListener\SitemapListener
+    arguments:
+      - '@contao.framework'
+      - '@security.helper'
+      - '@contao.routing.content_url_generator'

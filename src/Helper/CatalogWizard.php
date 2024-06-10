@@ -235,6 +235,7 @@ abstract class CatalogWizard
                 $arrReturn['search'] = true;
                 $arrReturn['inputType'] = 'textarea';
                 $arrReturn['eval']['tl_class'] = 'clr';
+                $arrReturn['eval']['style'] = 'min-height:50px';
                 if (isset($arrField['rte']) && $arrField['rte']) {
                     $arrReturn['eval']['rte'] = $arrField['rteType'] ?: 'tinyMCE';
                 }

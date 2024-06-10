@@ -1,15 +1,15 @@
 <?php
 
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel;
 use Alnv\ContaoCatalogManagerBundle\Elements\ContentListView;
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel;
+use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
 use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION =  "3.1.0";
+const CATALOG_MANAGER_BUNDLE_VERSION = "3.1.1";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -48,7 +48,7 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
 
 foreach ($GLOBALS['BE_MOD'] as $strType => $arrModules) {
     foreach ($arrModules as $strModule => $arrModule) {
-        if (in_array('tl_page', ($arrModule['tables']??[]))) {
+        if (in_array('tl_page', ($arrModule['tables'] ?? []))) {
             $GLOBALS['BE_MOD'][$strType][$strModule]['tables'][] = 'tl_page_filter';
         }
     }

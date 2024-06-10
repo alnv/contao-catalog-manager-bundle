@@ -10,7 +10,6 @@ use Contao\Input;
 use Contao\LayoutModel;
 use Contao\PageModel;
 use Contao\PageRegular;
-use Contao\System;
 
 class GetPageLayoutListener
 {
@@ -55,10 +54,11 @@ class GetPageLayoutListener
             $GLOBALS['CM_MASTER'] = $arrMaster;
         }
 
-        $this->setMetaInformation($strTable);
+        // $this->setMetaInformation($strTable);
     }
 
-    protected function setMetaInformation($strTable = null)
+    /*
+    protected function setMetaInformation()
     {
 
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
@@ -67,15 +67,21 @@ class GetPageLayoutListener
 
         global $objPage;
 
-        $objPage->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
-        $objPage->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
+        $responseContext = System::getContainer()->get('contao.routing.response_context_factory')->createContaoWebpageResponseContext($objPage);
+        $headBag = $responseContext->get(HtmlHeadBag::class);
+        $headBag->setTitle('DDD');
+        $headBag->setMetaDescription('DDD');
+
+        $GLOBALS['objPage']->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
+        $GLOBALS['objPage']->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
 
         if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
             foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {
-                System::importStatic($arrCallback[0])->{$arrCallback[1]}($objPage, $strTable);
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($GLOBALS['objPage']);
             }
         }
     }
+    */
 
     protected function searchTableAndReturnTable($strPageId)
     {
@@ -109,6 +115,7 @@ class GetPageLayoutListener
 
             return $objContent->cmTable;
         }
+
         return null;
     }
 
