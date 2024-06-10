@@ -79,5 +79,3 @@ services:
     class: Alnv\ContaoCatalogManagerBundle\EventListener\SitemapListener
     arguments:
       - '@contao.framework'
-      - '@security.helper'
-      - '@contao.routing.content_url_generator'
