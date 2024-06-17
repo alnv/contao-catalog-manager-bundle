@@ -98,7 +98,7 @@ class CatalogField
             throw new \Exception('something went wrong');
         }
 
-        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=_+¬-]/', $strFieldname)) {
+        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=+¬-]/', $strFieldname)) {
             throw new \Exception('special characters are not allowed');
         }
 
