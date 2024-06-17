@@ -12,6 +12,10 @@ class SitemapListener
     public function __invoke(SitemapEvent $objEvent): void
     {
 
+        if (!\method_exists($objEvent, 'addUrlToDefaultUrlSet')) {
+            return;
+        }
+
         foreach ($objEvent->getRootPageIds() as $strRootId) {
 
             $objPage = PageModel::findByPk($strRootId);
