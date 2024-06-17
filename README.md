@@ -195,7 +195,7 @@ Für die Detailansicht steht nur ein Frontend-Modul zur Verfügung. Dieses beste
 
 **Du kannst die Liste und Detailansicht auf derselben Seite anzeigen. Nutze die Funktion "Element verstecken", um jeweils die passenden Module für die Listenansicht und Detailansicht zu steuern. Siehe Screenshot.**
 
-![](https://catalog-manager.org/files/docs/screenshot-hi.png)
+![](https://catalog-manager.org/files/docs/screenshot-hide.png)
 
 ### Filter
 
