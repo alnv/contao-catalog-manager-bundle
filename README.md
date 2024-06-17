@@ -30,12 +30,6 @@ Deinen Katalog kannst Du ganz einfach unter "Catalog Manager" anlegen. Grundsät
 
 Bei den Navigationseinstellungen kannst Du nur bestehende Navigationspunkte auswählen. Wenn Du einen eigenen Navigationspunkt hinzufügen möchtest, musst Du diesen in Deiner **"contao/config/config.php"** deklarieren. Hier ist ein Beispiel, wie das geht:
 
-#### Kind Katalog hinzufügen
-
-Wenn Du eine Eltern-Kind-Beziehung zwischen Deinen Katalogen herstellen möchtest, musst Du Deine Kind-Kataloge einfach als Unterpunkte zum Eltern-Katalog anlegen. Das funktioniert genauso wie beim Anlegen von Unterseiten in der Seitenstruktur.
-
-Wichtig: Sobald Dein Katalog "Datensätze" enthält, kannst Du die Kataloge nicht mehr verschieben!
-
 ``` php
 use Contao\ArrayUtil;
 
@@ -43,6 +37,12 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 1, [
 'my_catalogs' => []
 ]);
 ```
+
+#### Kind Katalog hinzufügen
+
+Wenn Du eine Eltern-Kind-Beziehung zwischen Deinen Katalogen herstellen möchtest, musst Du Deine Kind-Kataloge einfach als Unterpunkte zum Eltern-Katalog anlegen. Das funktioniert genauso wie beim Anlegen von Unterseiten in der Seitenstruktur.
+
+Wichtig: Sobald Dein Katalog "Datensätze" enthält, kannst Du die Kataloge nicht mehr verschieben!
 
 So kannst Du eigene Navigationspunkte erstellen und Deinen Katalog individuell anpassen.
 
@@ -270,3 +270,5 @@ function fetchCatalogData(url) {
   - rs_strt wird zu street
   - rs_cntry wird zu country
   - rs_dstnc wird zu radius
+
+### Mehr Infos folgen …
