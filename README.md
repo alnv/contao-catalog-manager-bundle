@@ -209,7 +209,9 @@ Vereinfacht gesagt kannst du in diesem Widget die Werte eintragen, nach denen du
 
 Wenn du einen Filter erstellen möchtest, benötigst du im Grunde ein Modul, das die gefilterten Parameter als GET-Parameter an den Client übergibt, z.B. https://catalog-manager.org/meine-seite/?category=123. Den GET-Parameter "category" kannst du dann mit {{ACTIVE::category}} auslesen und in den Filtereinstellungen verwenden. Als Modul für den Filter kannst du den Formulargenerator (Formulare) von Contao verwenden oder dein eigenes Formular erstellen.
 
-### JSON und AJAX
+### Entwickler:innen
+
+#### JSON und AJAX
 
 Du kannst die Frontend-Module auch im JSON-Format erhalten, indem du einen POST-Request an folgende URL sendest: `` /catalog-manager/json-listing/<MODULE-ID>/<PAGE-ID> ``
 
@@ -254,6 +256,27 @@ function fetchCatalogData(url) {
         this.loading = false; // Ladevorgang beenden
     });
 }
+```
+
+#### Listen 
+
+Du kannst auch eine Liste mit paar Zeilen PHP-Code ausgeben.
+
+``` php
+<?php 
+
+use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+
+$arrEntities = (new Listing('<DEINE-CM-TABELLE>', [
+  'column' => ['pid=?'], // Hier kannst du deine Wunschabfrage hinterlegen.
+  'value' => [$this->id], // Hier die Datenbankwerte je Abfrage.
+  'order' => 'startDate DESC', // Reihenfolge
+  'masterPage' => "<SEITEN-ID" // Optional
+]))->parse();
+
+<?php foreach ($arrEntities as $arrEntity): ?>
+  <h3><?= $arrEntity['MY_FIELD'] ?></h3>
+<?php endforeach; ?>
 ```
 
 ### v1 und v3 Änderungen 
