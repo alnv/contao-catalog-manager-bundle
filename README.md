@@ -291,7 +291,7 @@ Weisen Sie den einzelnen Feldern die passenden Rollen zu: street (Straße), stre
 
 **2. GEO-Coding-Lizenzschlüssel erstellen:**
 
-Erstelle einen GEO-Coding-Lizenzschlüssel bei Google. Dies kann über den folgenden Link erfolgen: Google API Dashboard.
+Erstelle einen GEO-Coding-Lizenzschlüssel bei Google. Dies kann über den folgenden Link erfolgen: https://console.cloud.google.com/apis/dashboard
 
 **3. Formular mit Adressfeldern erstellen:**
 
