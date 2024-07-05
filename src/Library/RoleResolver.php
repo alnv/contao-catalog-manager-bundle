@@ -144,7 +144,7 @@ class RoleResolver
     {
 
         $arrAddress = [];
-        $arrAddressRoles = ['street', 'streetNumber', 'zip', 'postal', 'city', 'state', 'country'];
+        $arrAddressRoles = ['street', 'streetNumber', 'zip', 'postal', 'city', 'state', 'country', 'address'];
 
         foreach ($arrAddressRoles as $strRole) {
             if ($strValue = $this->getValueByRole($strRole)) {

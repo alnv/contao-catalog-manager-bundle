@@ -79,7 +79,3 @@ services:
     class: Alnv\ContaoCatalogManagerBundle\EventListener\SitemapListener
     arguments:
       - '@contao.framework'
-  catalogmanager.security.dyn_catalog_access_voter:
-    class: Alnv\ContaoCatalogManagerBundle\Security\Voter\DynCatalogAccessVoter
-    arguments:
-      - '@security.access.decision_manager'

@@ -385,6 +385,13 @@ $GLOBALS['CM_ROLES'] = [
         ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
+    'address' => [
+        'group' => 'address',
+        'eval' => [
+            'maxlength' => 255
+        ],
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
     'fullname' => [
         'group' => 'person',
         'eval' => [
