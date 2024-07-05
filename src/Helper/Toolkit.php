@@ -266,7 +266,7 @@ class Toolkit
         }
     }
 
-    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = []): string
+    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = [], bool $blnUseAbsolute = false): string
     {
 
         if (is_numeric($varPage)) {
@@ -292,10 +292,10 @@ class Toolkit
             $strUrlFragments[] = $strAlias;
             $strUrl = (empty($strUrlFragments) ? '' : implode('/', $strUrlFragments));
 
-            return $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
+            return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strUrl ? '/' . $strUrl : '')) : $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
         }
 
-        return $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
     }
 
     public static function parseImage($varImage)

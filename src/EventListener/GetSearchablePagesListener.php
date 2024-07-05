@@ -139,7 +139,7 @@ class GetSearchablePagesListener
                     continue;
                 }
 
-                $strUrl = $objPage->getAbsoluteUrl('/' . $objEntities->alias);
+                $strUrl = Toolkit::parseDetailLink($objPage->row(), $objEntities->alias, $objEntities->row(), true);
 
                 if ($strDns) {
                     if (strpos($strUrl, $strDns) !== false) {
