@@ -279,6 +279,35 @@ $arrEntities = (new Listing('<DEINE-CM-TABELLE>', [
 <?php endforeach; ?>
 ```
 
+
+### Umkreissuche einrichten
+
+Damit die Umkreissuche korrekt funktioniert, müssen folgende Schritte durchgeführt werden:
+
+**1. Adressfelder im Katalog definieren:**
+
+Dein Katalog benötigt spezifische Adressfelder wie Postleitzahl oder Ort und Land. Optional können auch Straße und Hausnummer hinzugefügt werden.
+Weisen Sie den einzelnen Feldern die passenden Rollen zu: street (Straße), streetNumber (Hausnummer), city (Ort), zip (Postleitzahl), postal (Postleitzahl), state (Bundesland), country (Land).
+
+**2. GEO-Coding-Lizenzschlüssel erstellen:**
+
+Erstelle einen GEO-Coding-Lizenzschlüssel bei Google. Dies kann über den folgenden Link erfolgen: Google API Dashboard.
+
+**3. Formular mit Adressfeldern erstellen:**
+
+Erstelle ein Formular, das deine Adressfelder enthält: 
+
+Dazu gehören mindestens Postleitzahl oder Ort sowie Land. Optional können Straße und Hausnummer hinzugefügt werden.
+Verwende die folgenden Feldnamen:
+rs_pstl für Postleitzahl
+rs_cty für Ort
+rs_strt für Straße + Hausnummer
+rs_cntry für Land
+rs_dstnc für Distanz
+Umkreis der Suche definieren:
+
+Im Feld rs_dstnc kann der Suchradius definiert werden. Hierbei werden nur Zahlen akzeptiert.
+
 ### v1 und v3 Änderungen 
 
 - {{CTLG_ACTIVE}} Inserttag wird zu {{ACTIVE}}
