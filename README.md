@@ -3,7 +3,7 @@
 
 ## Catalog Manager (v3) - Die Enterprise-Erweiterung für Contao CMS
 
-Der Catalog Manager hat sich bereits bei über 100 Contao-Projekten bewährt.
+Der Catalog Manager hat sich bereits bei über 100 Contao-Projekten bewährt. 
 
 Überzeuge Dich selbst und installiere eine kostenfreie und uneingeschränkte Testversion. Kaufe erst eine Lizenz, wenn Dein Projekt fertiggestellt ist. Bis dahin stehen wir Dir mit Unterstützung und Beratung zur Seite.
 
@@ -71,7 +71,7 @@ In der neuen Version des Catalog Managers kannst Du keine Backend-CSS-Klassen, S
 
 Ab Version 3.2 wird es möglich sein, eigene Rollen zu definieren.
 
-### Listen
+### Listen 
 
 Auch Listen sind selbsterklärend. Du kannst für alle Deine Kataloge (generell für alle Tabellen) eine Liste ausgeben. Einzig die Ausgabe der Daten im Frontend ist etwas "schwierig". Wie beim Vorgänger gibt es kein Backend-Modul für die Frontend-Ausgabe, das heißt, Du musst auch hier ein Template anlegen.
 
@@ -195,11 +195,11 @@ Für die Detailansicht steht nur ein Frontend-Modul zur Verfügung. Dieses beste
 
 **Du kannst die Liste und Detailansicht auf derselben Seite anzeigen. Nutze die Funktion "Element verstecken", um jeweils die passenden Module für die Listenansicht und Detailansicht zu steuern. Siehe Screenshot.**
 
-![](https://catalog-manager.org/files/docs/screenshot-hide.png)
+![](https://catalog-manager.org/files/docs/screenshot-hi.png)
 
 ### Filter
 
-In der Listenansicht und in einigen anderen Modulen gibt es ein Widget für den Filter. Siehe Screenshot.
+In der Listenansicht und in einigen anderen Modulen gibt es ein Widget für den Filter. Siehe Screenshot. 
 Vereinfacht gesagt kannst du in diesem Widget die Werte eintragen, nach denen du filtern möchtest, entweder als "Klartext" oder "Inserttag". Achte darauf, dass der Feldwert, der tatsächlich in der Datenbank gespeichert ist, mit dem abgefragten Wert übereinstimmt. Außerdem beachte den Operator, der grundsätzlich gilt:
 
 - Bei Zahlen: equal, lower ...
@@ -209,7 +209,9 @@ Vereinfacht gesagt kannst du in diesem Widget die Werte eintragen, nach denen du
 
 Wenn du einen Filter erstellen möchtest, benötigst du im Grunde ein Modul, das die gefilterten Parameter als GET-Parameter an den Client übergibt, z.B. https://catalog-manager.org/meine-seite/?category=123. Den GET-Parameter "category" kannst du dann mit {{ACTIVE::category}} auslesen und in den Filtereinstellungen verwenden. Als Modul für den Filter kannst du den Formulargenerator (Formulare) von Contao verwenden oder dein eigenes Formular erstellen.
 
-### JSON und AJAX
+### Entwickler:innen
+
+#### JSON und AJAX
 
 Du kannst die Frontend-Module auch im JSON-Format erhalten, indem du einen POST-Request an folgende URL sendest: `` /catalog-manager/json-listing/<MODULE-ID>/<PAGE-ID> ``
 
@@ -256,7 +258,57 @@ function fetchCatalogData(url) {
 }
 ```
 
-### v1 und v3 Änderungen
+#### Listen 
+
+Du kannst auch eine Liste mit paar Zeilen PHP-Code ausgeben.
+
+``` php
+<?php 
+
+use Alnv\ContaoCatalogManagerBundle\Views\Listing;
+
+$arrEntities = (new Listing('<DEINE-CM-TABELLE>', [
+  'column' => ['pid=?'], // Hier kannst du deine Wunschabfrage hinterlegen.
+  'value' => [$this->id], // Hier die Datenbankwerte je Abfrage.
+  'order' => 'startDate DESC', // Reihenfolge
+  'masterPage' => "<SEITEN-ID" // Optional
+]))->parse();
+
+<?php foreach ($arrEntities as $arrEntity): ?>
+  <h3><?= $arrEntity['MY_FIELD'] ?></h3>
+<?php endforeach; ?>
+```
+
+
+### Umkreissuche einrichten
+
+Damit die Umkreissuche korrekt funktioniert, müssen folgende Schritte durchgeführt werden:
+
+**1. Adressfelder im Katalog definieren:**
+
+Dein Katalog benötigt spezifische Adressfelder wie Postleitzahl oder Ort und Land. Optional können auch Straße und Hausnummer hinzugefügt werden.
+Weisen Sie den einzelnen Feldern die passenden Rollen zu: street (Straße), streetNumber (Hausnummer), city (Ort), zip (Postleitzahl), postal (Postleitzahl), state (Bundesland), country (Land).
+
+**2. GEO-Coding-Lizenzschlüssel erstellen:**
+
+Erstelle einen GEO-Coding-Lizenzschlüssel bei Google. Dies kann über den folgenden Link erfolgen: https://console.cloud.google.com/apis/dashboard
+
+**3. Formular mit Adressfeldern erstellen:**
+
+Erstelle ein Formular, das deine Adressfelder enthält: 
+
+Dazu gehören mindestens Postleitzahl oder Ort sowie Land. Optional können Straße und Hausnummer hinzugefügt werden.
+Verwende die folgenden Feldnamen:
+rs_pstl für Postleitzahl
+rs_cty für Ort
+rs_strt für Straße + Hausnummer
+rs_cntry für Land
+rs_dstnc für Distanz
+Umkreis der Suche definieren:
+
+Im Feld rs_dstnc kann der Suchradius definiert werden. Hierbei werden nur Zahlen akzeptiert.
+
+### v1 und v3 Änderungen 
 
 - {{CTLG_ACTIVE}} Inserttag wird zu {{ACTIVE}}
 - {{CTLG_MASTER}} Inserttag wird zu {{MASTER}} und keine Einstellungen mehr in der Seitenstruktur erforderlich.
@@ -265,10 +317,10 @@ function fetchCatalogData(url) {
 - Frontend-Editing nicht verfügbar (kommt später).
 - Modifizierer nicht verfügbar (kommt später).
 - Umkreissuche hat neue Feldnamen:
-  - rs_pstl wird zu postal
-  - rs_cty wird zu city
-  - rs_strt wird zu street
-  - rs_cntry wird zu country
-  - rs_dstnc wird zu radius
+    - rs_pstl wird zu postal
+    - rs_cty wird zu city
+    - rs_strt wird zu street
+    - rs_cntry wird zu country
+    - rs_dstnc wird zu radius
 
 ### Mehr Infos folgen …
