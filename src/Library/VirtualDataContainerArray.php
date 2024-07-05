@@ -14,6 +14,7 @@ use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
+use Contao\CoreBundle\ContaoCoreBundle;
 
 class VirtualDataContainerArray
 {
@@ -102,7 +103,7 @@ class VirtualDataContainerArray
 
         if ($this->arrCatalog['sortingType']) {
             if ($this->arrCatalog['sortingType'] == 'fixed') {
-                $arrList['sorting']['mode'] = 1;
+                $arrList['sorting']['mode'] = DataContainer::MODE_SORTED;
                 $arrList['sorting']['flag'] = (int)$this->arrCatalog['flag'];
                 $arrList['sorting']['fields'] = [$this->arrCatalog['flagField']];
                 if (empty($arrList['labels']['fields'])) {
@@ -111,7 +112,7 @@ class VirtualDataContainerArray
             }
             if ($this->arrCatalog['sortingType'] == 'switchable') {
                 $arrSortingFields = [];
-                $arrList['sorting']['mode'] = 2;
+                $arrList['sorting']['mode'] = DataContainer::MODE_SORTABLE;
                 $arrList['sorting']['fields'] = [];
                 foreach ($this->arrCatalog['order'] as $arrOrder) {
                     if (isset($arrOrder['field']) && $arrOrder['field']) {
@@ -143,7 +144,7 @@ class VirtualDataContainerArray
         }
 
         if ($this->arrCatalog['mode'] == 'parent') {
-            $arrList['sorting']['mode'] = 4;
+            $arrList['sorting']['mode'] = DataContainer::MODE_PARENT;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] = function ($arrRow) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
@@ -153,15 +154,16 @@ class VirtualDataContainerArray
         }
 
         if ($this->arrCatalog['mode'] == 'tree') {
-            $arrList['sorting']['mode'] = 5;
+            $arrList['sorting']['mode'] = DataContainer::MODE_TREE;
             $arrList['sorting']['fields'] = ['sorting'];
-            $arrList['sorting']['icon'] = 'articles.svg'; // @todo icon
-            $arrList['labels']['fields'] = $this->arrCatalog['columns'];
+            $arrList['sorting']['icon'] = 'articles.svg';
+            $arrList['labels']['fields'] = empty($this->arrCatalog['columns']) ? ['id'] : $this->arrCatalog['columns'];
             $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
                 return Toolkit::renderTreeRow($arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
-            $arrList['sorting']['fields'] = [];
             $arrList['labels']['showColumns'] = false;
+            $arrList['sorting']['rootPaste'] = true;
+            $arrList['sorting']['showRootTrails'] = true;
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'cut' => [
                     'icon' => 'cut.svg',
@@ -482,7 +484,7 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => 'edit.svg'
+                'icon' => (version_compare('5.0', ContaoCoreBundle::getVersion(), '<=') ? 'children.svg' : 'edit.svg')
             ];
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }
