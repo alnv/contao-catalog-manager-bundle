@@ -40,6 +40,8 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 1, [
 
 So kannst Du eigene Navigationspunkte erstellen und Deinen Katalog individuell anpassen.
 
+Den prod.cache "leeren" nicht vergessen ;)
+
 #### Kind Katalog hinzufügen
 
 Wenn Du eine Eltern-Kind-Beziehung zwischen Deinen Katalogen herstellen möchtest, musst Du Deine Kind-Kataloge einfach als Unterpunkte zum Eltern-Katalog anlegen. Das funktioniert genauso wie beim Anlegen von Unterseiten in der Seitenstruktur.
