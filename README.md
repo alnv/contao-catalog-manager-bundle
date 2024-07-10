@@ -217,6 +217,8 @@ Um deine Kataloge (Produkte, Jobs, Ansprechpartner etc.) mehrsprachig zu gestalt
 
 Die Optionen, Auswahllisten und Feldbezeichnungen kannst du mit dem "Übersetzer"-Modul vom Catalog-Manager übersetzen. Die verfügbaren Optionen werden automatisch im Übersetzer-Modul angelegt, sind jedoch zunächst deaktiviert und nur in der Hauptsprache verfügbar. Wenn du den Übersetzer nutzen möchtest, öffne ihn im Backend, wähle den gewünschten Text aus und klicke auf "Bearbeiten". In der Eingabemaske kannst du dann die Sprache und die Übersetzung aktivieren. Siehe dazu den Screenshot.
 
+![](https://catalog-manager.org/files/docs/screenshot-uebers.png)
+
 Darüber hinaus kannst du den Text kopieren und in einer neuen Sprache anlegen. Wichtig ist hierbei, dass der Feldname gleich bleibt und nicht verändert wird.
 
 Du hast auch die Möglichkeit, eigene Texte mit selbstgewählten Feldnamen anzulegen.
