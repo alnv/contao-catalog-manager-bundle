@@ -251,7 +251,7 @@ Unabhängig von der gewählten Rolle werden die Bilder immer in einem Array ausg
 <figure>
     {{image::<?= $arrImage['path'] ?>?mode=proportional&width=800&height=600}}
     oder
-    {{image::<?= $arrImage['path'] ?>?size=1}}
+    {{picture::<?= $arrImage['path'] ?>?size=1}}
 </figure>
 <?php endforeach; ?>
 ```
