@@ -235,7 +235,7 @@ use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 </div>
 ```
 
-Ab CM 3.2 wird es außerdem ein InsertTag geben: {{TRANSLATION::<FELDNAME>::STANDARD WERT}}
+Ab CM 3.2 wird es außerdem ein InsertTag geben: {{TRANSLATION::FELDNAME::STANDARD WERT}}
 
 ### Bild(er) im Template ausgeben
 
