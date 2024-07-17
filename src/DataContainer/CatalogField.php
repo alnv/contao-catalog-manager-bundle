@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
+use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as LDatabase;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
@@ -51,16 +52,18 @@ class CatalogField
     public function getRoles(DataContainer $dc): array
     {
 
-        $arrRoles = array_keys($GLOBALS['CM_ROLES']);
+        $arrRoles = (new Roles())->get();
+        $arrRoleNames = array_keys($arrRoles);
+        $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($dc);
 
-        if (!$dc->activeRecord->type) {
-            return $arrRoles;
+        if (!$arrActiveRecord['type']) {
+            return $arrRoleNames;
         }
 
-        switch ($dc->activeRecord->type) {
+        switch ($arrActiveRecord['type']) {
             case 'date':
                 $arrDateRoles = [];
-                foreach ($GLOBALS['CM_ROLES'] as $strRole => $arrRole) {
+                foreach ($arrRoles as $strRole => $arrRole) {
                     if ($arrRole['group'] == 'date') {
                         $arrDateRoles[] = $strRole;
                     }
@@ -70,7 +73,7 @@ class CatalogField
                 return ['miscellaneous'];
         }
 
-        return $arrRoles;
+        return $arrRoleNames;
     }
 
     public function watchFieldname($strFieldname, DataContainer $objDataContainer)

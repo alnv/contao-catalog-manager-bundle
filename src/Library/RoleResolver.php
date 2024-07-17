@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
 use Contao\Controller;
@@ -22,8 +23,12 @@ class RoleResolver
 
     protected static FilesystemAdapter $objCache;
 
+    protected static Roles $objRoles;
+
     public static function getInstance($strTable, $arrEntity = [])
     {
+
+        self::$objRoles = new Roles();
 
         if ($strTable === null) {
             return new self;
@@ -32,7 +37,7 @@ class RoleResolver
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
         self::$objCache = new FilesystemAdapter('', 0, $strRootDir . '/var/cache');
 
-        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '') . (md5($arrEntity['tstamp']??'0'));
+        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '') . (md5($arrEntity['tstamp'] ?? '0'));
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
             self::$strTable = $strTable;
@@ -86,8 +91,8 @@ class RoleResolver
                 'name' => $strFieldname,
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
-                'type' => ($arrField['inputType']??''),
-                'role' => $GLOBALS['CM_ROLES'][$strRole] ?? '',
+                'type' => ($arrField['inputType'] ?? ''),
+                'role' => (self::$objRoles)->get()[$strRole] ?? '',
                 'value' => self::$arrEntity[$strFieldname] ?? ''
             ];
         }
@@ -103,7 +108,7 @@ class RoleResolver
 
     public function getRole($strRoleName): array
     {
-        return $GLOBALS['CM_ROLES'][$strRoleName] ?? [];
+        return (self::$objRoles)->get()[$strRoleName] ?? [];
     }
 
     public function getValueByRole($strRoleName): mixed

@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
+use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
@@ -302,7 +303,7 @@ abstract class CatalogWizard
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
 
-                if (($arrField['uploadFolder']??'')) {
+                if (($arrField['uploadFolder'] ?? '')) {
                     $arrReturn['eval']['uploadFolder'] = StringUtil::binToUuid($arrField['uploadFolder']);
                 }
 
@@ -348,8 +349,10 @@ abstract class CatalogWizard
                 break;
         }
 
-        if (isset($GLOBALS['CM_ROLES'][($arrField['role']??'')]) && isset($GLOBALS['CM_ROLES'][$arrField['role']]['eval'])) {
-            foreach ($GLOBALS['CM_ROLES'][$arrField['role']]['eval'] as $strKey => $strOption) {
+        $arrRoles = (new Roles())->get();
+
+        if (isset($arrRoles[($arrField['role'] ?? '')]) && isset($arrRoles[$arrField['role']]['eval'])) {
+            foreach ($arrRoles[$arrField['role']]['eval'] as $strKey => $strOption) {
                 $arrReturn['eval'][$strKey] = $strOption;
             }
         }
