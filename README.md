@@ -17,7 +17,7 @@ Der Catalog Manager hat sich bereits bei über 100 Contao-Projekten bewährt.
 - **Suchen & Filtern**: Nutze leistungsstarke Such- und Filterfunktionen für Deine Daten.
 - **Produktverwaltung**: Organisiere und präsentiere Deine Produkte optimal.
 - **Merklisten/Wunschlisten**: Biete Nutzern die Möglichkeit, Favoriten zu speichern und wiederzufinden.
-- **ehrsprachigkeit**: Unterstütze mehrere Sprachen und erreiche ein internationales Publikum.
+- **Mehrsprachigkeit**: Unterstütze mehrere Sprachen und erreiche ein internationales Publikum.
 
 Teste den Catalog Manager und lass Dich von seinen umfangreichen Funktionen überzeugen. Unser Team unterstützt Dich gerne bei der Umsetzung Deiner Projekte.
 
@@ -38,9 +38,9 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 1, [
 ]);
 ```
 
-So kannst Du eigene Navigationspunkte erstellen und Deinen Katalog individuell anpassen.
+So kannst Du eigene Navigationspunkte erstellen und Deinen Katalog individuell anpassen. Und den prod.cache "leeren" nicht vergessen ;)
 
-### Kind Katalog hinzufügen
+### Kind-Katalog hinzufügen
 
 Wenn Du eine Eltern-Kind-Beziehung zwischen Deinen Katalogen herstellen möchtest, musst Du Deine Kind-Kataloge einfach als Unterpunkte zum Eltern-Katalog anlegen. Das funktioniert genauso wie beim Anlegen von Unterseiten in der Seitenstruktur.
 
@@ -70,7 +70,7 @@ In der neuen Version des Catalog Managers kannst Du keine Backend-CSS-Klassen, S
 
 Ab Version 3.2 wird es möglich sein, eigene Rollen zu definieren.
 
-### Listen 
+### Listen mit Modulen (FE-Modul/Inhaltselement)
 
 Auch Listen sind selbsterklärend. Du kannst für alle Deine Kataloge (generell für alle Tabellen) eine Liste ausgeben. Einzig die Ausgabe der Daten im Frontend ist etwas "schwierig". Wie beim Vorgänger gibt es kein Backend-Modul für die Frontend-Ausgabe, das heißt, Du musst auch hier ein Template anlegen.
 
@@ -102,7 +102,9 @@ Im Gegensatz zum Catalog Manager v1 gibt es hier zwei Listen: einmal als Inhalts
 <?= $this->pagination ?>
 ```
 
-Mit diesem Template kannst Du Deine Katalogeinträge im Frontend anzeigen lassen. Die Einträge werden in einer foreach-Schleife durchlaufen und entsprechend formatiert ausgegeben. Das Frontend-Modul besteht aus einem "wrapper"-Template mod_listing_table und die jeweiligen Einträge werden in einem eigenen Template cm_listing_* ausgegeben. Hier ein Beispiel:
+Mit diesem Template kannst Du Deine Katalogeinträge im Frontend anzeigen lassen. Die Einträge werden in einer foreach-Schleife durchlaufen und entsprechend formatiert ausgegeben. 
+
+Das Frontend-Modul besteht aus einem "wrapper"-Template mod_listing_table und die jeweiligen Einträge werden in einem eigenen Template cm_listing_* ausgegeben. Hier ein Beispiel:
 
 ``` php
 <?php
@@ -224,6 +226,59 @@ Vereinfacht gesagt kannst du in diesem Widget die Werte eintragen, nach denen du
 
 Wenn du einen Filter erstellen möchtest, benötigst du im Grunde ein Modul, das die gefilterten Parameter als GET-Parameter an den Client übergibt, z.B. https://catalog-manager.org/meine-seite/?category=123. Den GET-Parameter "category" kannst du dann mit {{ACTIVE::category}} auslesen und in den Filtereinstellungen verwenden. Als Modul für den Filter kannst du den Formulargenerator (Formulare) von Contao verwenden oder dein eigenes Formular erstellen.
 
+### Übersetzer & Mehrsprachigkeit
+
+Um deine Kataloge (Produkte, Jobs, Ansprechpartner etc.) mehrsprachig zu gestalten, kannst du in den Katalog-Einstellungen unter Data Container die Option "Multilingual" auswählen und so deine Tabelle übersetzen. Hierbei verwenden wir die Erweiterung contao-DC_Multilingual von terminal42 (https://github.com/terminal42/contao-DC_Multilingual).
+
+Die Optionen, Auswahllisten und Feldbezeichnungen kannst du mit dem "Übersetzer"-Modul vom Catalog-Manager übersetzen. Die verfügbaren Optionen werden automatisch im Übersetzer-Modul angelegt, sind jedoch zunächst deaktiviert und nur in der Hauptsprache verfügbar. Wenn du den Übersetzer nutzen möchtest, öffne ihn im Backend, wähle den gewünschten Text aus und klicke auf "Bearbeiten". In der Eingabemaske kannst du dann die Sprache und die Übersetzung aktivieren. Siehe dazu den Screenshot.
+
+![](https://catalog-manager.org/files/docs/screenshot-uebers.png)
+
+Darüber hinaus kannst du den Text kopieren und in einer neuen Sprache anlegen. Wichtig ist hierbei, dass der Feldname gleich bleibt und nicht verändert wird.
+
+Du hast auch die Möglichkeit, eigene Texte mit selbstgewählten Feldnamen anzulegen.
+
+Diese Texte kannst du dann in deinem Template verwenden:
+
+``` php
+<?php
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+?>
+<div>
+    <p><?= Translation::getInstance()->translate('<FELDNAME>') ?></p>
+    <p><?= $this->myValue ?></p>
+</div>
+```
+
+Oder mit InsertTag:
+
+``` php
+<?php
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+?>
+<div>
+    <p>{{TRANSLATE::FELDNAME::STANDARD WERT}}</p>
+    <p><?= $this->myValue ?></p>
+</div>
+```
+
+### Bild(er) im Template ausgeben
+
+Um das Eingabefeld für die Bilderauswahl im Backend zu konfigurieren, kannst du das Eingabefeld "Upload" verwenden. Anschließend musst du die passende Rolle auswählen: "image" für Einzelbilder oder "gallery" für mehrere Bilder.  Unabhängig von der gewählten Rolle werden die Bilder immer in einem Array ausgegeben und haben stets dieselben Feldnamen (im Array). Daher benötigst du in deinem Template eine FOREACH-Schleife (oder vergleichbare PHP-Funktion), um auf die Bilder zugreifen zu können:
+
+``` php
+<?php // Beim Upload-Eingabefeld haben wir den Feldname "images" gewählt, daher $this->images ?>
+<?php foreach ($this->images as $arrImage): // $this->images "images" ist eine Variable (Feldname im Eingabefeld)  ?>
+<figure>
+    {{image::<?= $arrImage['path'] ?>?mode=proportional&width=800&height=600}}
+    oder
+    {{picture::<?= $arrImage['path'] ?>?size=1}}
+</figure>
+<?php endforeach; ?>
+```
+
+Die Bildgröße kannst du über den InsertTag {{image::}} oder {{picture::}} definieren.
+
 ### JSON und AJAX
 
 Du kannst die Frontend-Module auch im JSON-Format erhalten, indem du einen POST-Request an folgende URL sendest: `` /catalog-manager/json-listing/<MODULE-ID>/<PAGE-ID> ``
@@ -271,7 +326,7 @@ function fetchCatalogData(url) {
 }
 ```
 
-### Listen 
+### Listen mit PHP
 
 Du kannst auch eine Liste mit paar Zeilen PHP-Code ausgeben.
 
