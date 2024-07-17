@@ -40,7 +40,7 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 1, [
 
 So kannst Du eigene Navigationspunkte erstellen und Deinen Katalog individuell anpassen.
 
-#### Kind Katalog hinzufügen
+### Kind Katalog hinzufügen
 
 Wenn Du eine Eltern-Kind-Beziehung zwischen Deinen Katalogen herstellen möchtest, musst Du Deine Kind-Kataloge einfach als Unterpunkte zum Eltern-Katalog anlegen. Das funktioniert genauso wie beim Anlegen von Unterseiten in der Seitenstruktur.
 
@@ -56,7 +56,6 @@ Es ist auch möglich, Deinen Katalog nach Fieldsets, Subpaletten oder Typen zu u
 Mit diesen Einstellungen kannst Du Deinen Katalog nach Deinen Bedürfnissen strukturieren und anpassen.
 
 ### Rollen
-
 
 In der neuen Version des Catalog Managers kannst Du keine Backend-CSS-Klassen, SQL-Datentypen oder reguläre Ausdrücke direkt definieren. Stattdessen läuft alles über Rollen, daher ist es wichtig, für jeden Feldtyp die passende Rolle auszuwählen. Hier ist eine Übersicht der wichtigen Rollen:
 
@@ -137,9 +136,7 @@ $strUrl = array_values($arrEvent['pages'])[0]['master'] ?? '';
 
 In diesem Beispiel-Template wird ein einzelner Event-Eintrag im Frontend dargestellt. Die Event-Daten werden mit Hilfe von Contao-Funktionen formatiert und ausgegeben. Das Template kann individuell angepasst werden, um den Anforderungen Deiner Website gerecht zu werden.
 
-### Besondere Funktionen
-
-#### Inhaltselemnte ausgeben
+### Inhaltselemnte ausgeben
 
 Wenn Du in Deinem Backend-Modul "Inhaltselemente" aktivierst, kannst Du für jeden Eintrag individuelle Inhaltselemente anlegen. Diese werden nicht standardmäßig im Template ausgegeben, sondern über eine Funktion:
 
@@ -149,7 +146,7 @@ Wenn Du in Deinem Backend-Modul "Inhaltselemente" aktivierst, kannst Du für jed
 
 Füge diese Funktion in Dein Template ein, um die Inhaltselemente anzuzeigen.
 
-#### Merkliste
+### Merkliste
 
 Deine Einträge können in eine Merkliste eingetragen werden. Füge dazu das folgende Formular in Dein Template ein:
 
@@ -162,7 +159,25 @@ Deine Einträge können in eine Merkliste eingetragen werden. Füge dazu das fol
 
 Als erster Parameter muss die ID des Datensatzes eingegeben werden, und als zweiter Parameter die Tabelle.
 
-#### Kind-Einträge ausgeben
+#### InsertTags für die Merkliste
+
+{{WATCHLIST}}
+
+Liefert die IDs der Datensätze, die in der Merkliste drin sind
+
+{{WATCHLIST-TABLE::?template=ce_watchlist_table&tables=table1,table2}}
+
+Liefert die Tabelle mit allen Datensätzen in der Merkliste
+
+{{WATCHLIST-RESET}}
+
+Leert die Merkliste
+
+{{WATCHLIST-COUNT}}
+
+Liefert die Anzahl der Datensätze in der Merkliste
+
+### Kind-Einträge ausgeben
 
 Über die $this->getRelated('myfieldname') kannst du auf Kind-Elemente zugreifen. Als Rückgabewert erhältst du ein Array, das du mit einer foreach-Schleife durchlaufen und ausgeben kannst. Die einzelnen Datensätze haben wiederum die gleichen Template-Funktionen wie das Eltern-Element.
 
@@ -209,9 +224,7 @@ Vereinfacht gesagt kannst du in diesem Widget die Werte eintragen, nach denen du
 
 Wenn du einen Filter erstellen möchtest, benötigst du im Grunde ein Modul, das die gefilterten Parameter als GET-Parameter an den Client übergibt, z.B. https://catalog-manager.org/meine-seite/?category=123. Den GET-Parameter "category" kannst du dann mit {{ACTIVE::category}} auslesen und in den Filtereinstellungen verwenden. Als Modul für den Filter kannst du den Formulargenerator (Formulare) von Contao verwenden oder dein eigenes Formular erstellen.
 
-### Entwickler:innen
-
-#### JSON und AJAX
+### JSON und AJAX
 
 Du kannst die Frontend-Module auch im JSON-Format erhalten, indem du einen POST-Request an folgende URL sendest: `` /catalog-manager/json-listing/<MODULE-ID>/<PAGE-ID> ``
 
@@ -258,7 +271,7 @@ function fetchCatalogData(url) {
 }
 ```
 
-#### Listen 
+### Listen 
 
 Du kannst auch eine Liste mit paar Zeilen PHP-Code ausgeben.
 
@@ -323,4 +336,4 @@ Im Feld rs_dstnc kann der Suchradius definiert werden. Hierbei werden nur Zahlen
     - rs_cntry wird zu country
     - rs_dstnc wird zu radius
 
-### Mehr Infos folgen …
+**Mehr Infos folgen …**
