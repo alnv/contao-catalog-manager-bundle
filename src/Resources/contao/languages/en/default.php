@@ -11,7 +11,7 @@ $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'] = ['Sortierungsfeld', '']
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'] = ['Reihenfolge', ''];
 $GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'] = [
     'expert' => 'Experte',
-    'wizard' => 'Wizard (Klassisch)'
+    'wizard' => 'Wizard'
 ];
 $GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbOrder'] = [
     'asc' => 'Aufsteigend',

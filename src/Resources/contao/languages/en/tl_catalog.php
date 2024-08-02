@@ -9,6 +9,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['general_settings'] = 'Allgemeine-Einstellunge
 $GLOBALS['TL_LANG']['tl_catalog']['geocoding_settings'] = 'GeoCoding-Einstellungen';
 
 $GLOBALS['TL_LANG']['tl_catalog']['type'] = ['Typ', ''];
+$GLOBALS['TL_LANG']['tl_catalog']['license'] = ['Lizenzieren', ''];
 $GLOBALS['TL_LANG']['tl_catalog']['fields'] = ['Eingabefelder', 'Eingabefelder bearbeiten'];
 $GLOBALS['TL_LANG']['tl_catalog']['name'] = ['Name', 'Bitte geben Sie den Katalognamen ein.'];
 $GLOBALS['TL_LANG']['tl_catalog']['description'] = ['Beschreibung', 'Hier können Sie optional eine Beschreibung zu Ihrem Katalog eingeben.'];

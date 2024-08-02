@@ -70,6 +70,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ]
         ],
         'global_operations' => [
+            'license' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog']['license'],
+                'href' => 'table=tl_catalog_license',
+                'class' => 'header_edit_all',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ],
             'all' => [
                 'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',

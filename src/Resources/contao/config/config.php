@@ -28,7 +28,8 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
                 'tl_catalog',
                 'tl_catalog_field',
                 'tl_catalog_option',
-                'tl_catalog_palette'
+                'tl_catalog_palette',
+                'tl_catalog_license'
             ]
         ],
         'roles' => [

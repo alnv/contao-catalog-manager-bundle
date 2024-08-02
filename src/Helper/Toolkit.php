@@ -456,6 +456,47 @@ class Toolkit
         return Image::getHtml($strImage . '.svg', '', '') . ' ' . $strTemplate;
     }
 
+    public static function findUnknownValues($varValue, $strTable, $strField): array
+    {
+        if (empty($varValue) || !$strTable || !$strField) {
+            return [];
+        }
+
+        $objField = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=(SELECT id FROM tl_catalog WHERE `table`=? LIMIT 1) AND fieldname=?')->limit(1)->execute($strTable, $strField);
+        if (!$objField->numRows) {
+            return [];
+        }
+
+        $arrValues = [];
+        if (is_array($varValue)) {
+            $arrValues = $varValue;
+        }
+
+        if (is_string($varValue)) {
+            $arrValues = explode(',', $varValue);
+        }
+
+        $arrReturn = [];
+        switch ($objField->optionsSource) {
+            case 'dbOptions':
+            case 'dbActiveOptions':
+                foreach ($arrValues as $strValue) {
+
+                    if (Database::getInstance()->fieldExists('lid', $objField->dbTable) && is_numeric($strValue)) {
+                        $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $objField->dbTable . ' WHERE lid=? AND `language`=?')->limit(1)->execute($strValue, ($GLOBALS['TL_LANGUAGE'] ?? ''));
+                        if (!$objEntity->numRows) {
+                            continue;
+                        }
+                        $arrReturn[] = $objEntity->id;
+                    }
+                }
+
+                break;
+        }
+
+        return $arrReturn;
+    }
+
     public static function parseCatalogValue($varValue, $arrField, $arrCatalog = [], $blnStringFormat = false, $blnFastMode = false, $blnIsForm = false)
     {
 
@@ -471,7 +512,6 @@ class Toolkit
 
             case 'text':
                 return $arrField['value'];
-
             case 'checkboxWizard':
             case 'checkbox':
             case 'select':
@@ -484,11 +524,15 @@ class Toolkit
                 $varValue = !is_array($arrField['value']) ? StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
                 $arrOptionValues = static::getSelectedOptions($varValue, ($arrField['options'] ?? []));
 
+                if (empty($arrOptionValues) && isset($arrField['unknownOption']) && $arrField['unknownOption'] && is_array($arrField['unknownOption'])) {
+                    $arrOptionValues = static::getSelectedOptions(static::findUnknownValues($varValue, ($arrField['strTable'] ?? ''), ($arrField['strField'] ?? '')), ($arrField['options'] ?? []));
+                }
+
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
                 }
 
-                if ($blnIsForm && $arrField['type'] == 'checkbox' && $arrField['multiple'] == false) {
+                if ($blnIsForm && $arrField['type'] == 'checkbox' && !($arrField['multiple'] ?? false)) {
                     return $arrField['value'];
                 }
 
@@ -512,7 +556,6 @@ class Toolkit
                 }
 
                 if ((isset($arrField['isImage']) && $arrField['isImage']) || (isset($arrField['isGallery']) && $arrField['isGallery'])) {
-
                     $arrImages = [];
                     return CatalogImage::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
@@ -561,8 +604,7 @@ class Toolkit
 
                         try {
                             $strUrl = $objPage->getFrontendUrl();
-                        } catch (\Exception $objException) {
-                        }
+                        } catch (\Exception $objException) {}
 
                         $arrValues[$strPageId] = [
                             'url' => $strUrl,
@@ -598,11 +640,9 @@ class Toolkit
         }
 
         foreach ($arrValues as $strValue) {
-
             if (!(is_numeric($strValue) || is_string($strValue)) || !isset($arrTemp[$strValue])) {
                 continue;
             }
-
             $arrReturn[] = $arrTemp[$strValue];
         }
 
