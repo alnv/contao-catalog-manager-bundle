@@ -738,7 +738,7 @@ class Toolkit
 
         $arrSet = [];
         $arrSet['tstamp'] = time();
-        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), 'a-zA-Z0-9', ($arrActiveRecord['lid'] ?: null));
+        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), ($arrCatalog['validAliasCharacters'] ?? 'a-zA-Z0-9'), ($arrActiveRecord['lid'] ?: null));
 
         Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
@@ -751,7 +751,7 @@ class Toolkit
 
         $blnAliasFieldExist = $strTable && Database::getInstance()->fieldExists($strAliasField, $strTable);
 
-        if ($strId && $blnAliasFieldExist) {
+        if ($strId && $blnAliasFieldExist && !$strValue) {
             $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `id`=?')->limit(1)->execute($strId);
             if ($objEntity->numRows) {
                 $strValue = $objEntity->{$strAliasField} ?: $strValue;
@@ -933,10 +933,15 @@ class Toolkit
 
     public static function getActiveRecordAsArrayFromDc(DataContainer $objDataContainer): array
     {
+
+        if (method_exists($objDataContainer->activeRecord, 'row')) {
+            return $objDataContainer->activeRecord->row();
+        }
+
         if (method_exists($objDataContainer, 'getCurrentRecord')) {
             return $objDataContainer->getCurrentRecord();
-        } else {
-            return $objDataContainer->activeRecord ? $objDataContainer->activeRecord->row() : [];
         }
+
+        return [];
     }
 }
