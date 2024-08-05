@@ -203,12 +203,16 @@ abstract class View extends Controller
         $objApplication->initializeDataContainerArrayByTable($this->strTable);
 
         if (!isset($GLOBALS['TL_DCA'][$this->strTable])) {
-
             Controller::loadDataContainer($this->strTable);
         }
     }
 
-    protected function getModelOptions()
+    public function getOptions(): array
+    {
+        return $this->arrOptions;
+    }
+
+    public function getModelOptions()
     {
 
         $arrReturn = [];

@@ -68,8 +68,8 @@ class GetPageLayoutListener
 
         global $objPage;
 
-        $objPage->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
-        $objPage->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
+        $objPage->pageTitle = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaTitle') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title'));
+        $objPage->description = strip_tags(($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaDescription') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('description')));
 
         if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
             foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {

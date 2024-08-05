@@ -90,7 +90,6 @@ class FrontendController extends AbstractController
         }
 
         $strClass = Module::findClass($objModule->type);
-
         if (!class_exists($strClass)) {
             return new JsonResponse([]);
         }
@@ -98,7 +97,6 @@ class FrontendController extends AbstractController
         $objModule = new $strClass($objModule);
         $objModule->setOptions();
         $arrOptions = $objModule->getOptions();
-
         $arrOptions['id'] = $module;
 
         $objListing = new Listing($objModule->getTable(), $arrOptions);

@@ -61,6 +61,8 @@ class GenerateBreadcrumbListener
         if (($objPage = PageModel::findByPk($strPageId)) && !$blnRequireItem) {
             try {
                 $arrItem['href'] = $objPage->getFrontendUrl();
+                $arrItem['title'] = $objPage->pageTitle;
+                $arrItem['isRoot'] = false;
             } catch (\Exception $objError) {
                 //
             }
@@ -136,8 +138,7 @@ class GenerateBreadcrumbListener
                 'href' => $strUrl,
                 'link' => $strTitle,
                 'title' => $strTitle,
-                'isActive' => false,
-                // 'data' => $arrData
+                'isActive' => false
             ];
 
             $objPage->pageTitle = $strTitle;

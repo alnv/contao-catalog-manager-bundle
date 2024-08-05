@@ -5,10 +5,12 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
 use Contao\Backend;
+use Contao\Config;
 use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
+use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
 
@@ -24,15 +26,23 @@ class Catalog
         return Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
     }
 
+    public function checkLicense(): void
+    {
+        $strInfo = "Sie verwenden aktuell die uneingeschränkte Testversion. Sobald Ihr Projekt abgeschlossen ist, können Sie unter https://shop.catalog-manager.org/ eine Lizenz erwerben. Mit dem Kauf einer Lizenz unterstützen Sie das Projekt und helfen dabei, dessen Weiterentwicklung zu fördern.";
+        $strLicense = Config::get('cmLicense') ?: '';
+
+        if (!$strLicense) {
+            Message::addInfo($strInfo);
+        }
+    }
+
     public function getCatalogTypes(): array
     {
-
-        return array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type']);
+        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type']);
     }
 
     public function getSortingTypes(): array
     {
-
         return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType']);
     }
 
@@ -82,7 +92,6 @@ class Catalog
 
     public function getFlags(): array
     {
-
         return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     }
 
@@ -226,6 +235,6 @@ class Catalog
 
     public function getOperators(): array
     {
-        return array_keys($GLOBALS['CM_OPERATORS']);
+        return \array_keys($GLOBALS['CM_OPERATORS']);
     }
 }

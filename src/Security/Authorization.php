@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Security;
 
+use Contao\System;
 use Contao\Environment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;

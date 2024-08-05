@@ -23,8 +23,8 @@ class GeneratePageListener
             return null;
         }
 
-        $GLOBALS['objPage']->pageTitle = $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title');
-        $GLOBALS['objPage']->description = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('teaser'));
+        $GLOBALS['objPage']->pageTitle = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaTitle') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title'));
+        $GLOBALS['objPage']->description = strip_tags(($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaDescription') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('description')));
 
         $objResponseContext = System::getContainer()->get('contao.routing.response_context_accessor')->getResponseContext();
         $objHeadBag = $objResponseContext->get(HtmlHeadBag::class);

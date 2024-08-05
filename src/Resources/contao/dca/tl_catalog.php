@@ -11,6 +11,9 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'tl_catalog_field',
             'tl_catalog_palette'
         ],
+        'onload_callback' => [
+            ['catalogmanager.datacontainer.catalog', 'checkLicense']
+        ],
         'onsubmit_callback' => [
             ['catalogmanager.datacontainer.catalog', 'generateModulename'],
             ['catalogmanager.datacontainer.catalog', 'createCustomFields']

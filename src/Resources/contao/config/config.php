@@ -148,6 +148,18 @@ $GLOBALS['CM_ROLES'] = [
         ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
+    'metaTitle' => [
+        'group' => 'meta',
+        'eval' => [
+            'maxlength' => 255
+        ],
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
+    'metaDescription' => [
+        'group' => 'meta',
+        'eval' => [],
+        'sql' => "text NULL"
+    ],
     'headline' => [
         'group' => 'article',
         'eval' => [
