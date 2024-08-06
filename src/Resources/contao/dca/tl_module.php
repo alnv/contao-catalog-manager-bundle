@@ -19,7 +19,6 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},nam
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
 
-
 $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = function (DataContainer $objDataContainer) {
     $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->limit(1)->execute($objDataContainer->id);
     if ($objActiveRecord->type && in_array($objActiveRecord->type, ['listing-table', 'listing-map'])) {
@@ -49,6 +48,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTable'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getTables'],
     'sql' => "varchar(128) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'inputType' => 'select',
     'eval' => [
@@ -60,6 +60,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmTemplate'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getListTemplates'],
     'sql' => "varchar(255) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -68,6 +69,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmPagination'] = [
     ],
     'sql' => "char(1) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreVisibility'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -76,6 +78,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreVisibility'] = [
     ],
     'sql' => "char(1) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     'inputType' => 'text',
     'eval' => [
@@ -83,6 +86,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmLimit'] = [
     ],
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     'inputType' => 'text',
     'eval' => [
@@ -90,6 +94,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOffset'] = [
     ],
     'sql' => "smallint(5) unsigned NOT NULL default '0'"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
     'inputType' => 'select',
     'eval' => [
@@ -101,6 +106,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupBy'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => "varchar(64) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
     'inputType' => 'select',
     'eval' => [
@@ -112,6 +118,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmGroupByHl'] = [
     'options' => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     'sql' => "varchar(2) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
     'inputType' => 'comboWizard',
     'eval' => [
@@ -123,6 +130,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmOrder'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => ['type' => 'blob', 'notnull' => false]
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -132,6 +140,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilter'] = [
     ],
     'sql' => "char(1) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilterType'] = [
     'inputType' => 'radio',
     'default' => 'wizard',
@@ -143,6 +152,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFilterType'] = [
     'reference' => &$GLOBALS['TL_LANG']['tl_module']['reference']['cmFilterType'],
     'sql' => "varchar(12) NOT NULL default 'wizard'"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
     'inputType' => 'comboWizard',
     'eval' => [
@@ -156,6 +166,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmWizardFilterSettings'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => ['type' => 'blob', 'notnull' => false]
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     'inputType' => 'textarea',
     'eval' => [
@@ -163,6 +174,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmColumn'] = [
     ],
     'sql' => "mediumtext NULL"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     'inputType' => 'textarea',
     'eval' => [
@@ -170,6 +182,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmValue'] = [
     ],
     'sql' => "mediumtext NULL"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmInfoContent'] = [
     'inputType' => 'textarea',
     'eval' => [
@@ -178,6 +191,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmInfoContent'] = [
     ],
     'sql' => "mediumtext NULL"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -187,6 +201,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMaster'] = [
     ],
     'sql' => "char(1) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     'inputType' => 'select',
     'eval' => [
@@ -201,6 +216,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterModule'] = [
     ],
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     'inputType' => 'pageTree',
     'eval' => [
@@ -213,6 +229,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmMasterPage'] = [
     ],
     'sql' => "int(10) unsigned NOT NULL default '0'"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
     'inputType' => 'checkbox',
     'eval' => [
@@ -221,6 +238,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmRadiusSearch'] = [
     ],
     'sql' => "char(1) NOT NULL default ''"
 ];
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreFieldsFromParsing'] = [
     'inputType' => 'checkbox',
     'eval' => [

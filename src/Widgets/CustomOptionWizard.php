@@ -38,14 +38,12 @@ class CustomOptionWizard extends Widget
         parent::validate();
     }
 
-    protected function setResources()
+    protected function setResources(): void
     {
-
         $objCombiner = new Combiner();
         $objCombiner->add('bundles/alnvcontaocatalogmanager/js/vue/components/custom-option-wizard-field-component.js');
         $GLOBALS['TL_JAVASCRIPT']['custom_options'] = $objCombiner->getCombinedFile();
     }
-
 
     public function generate(): string
     {
