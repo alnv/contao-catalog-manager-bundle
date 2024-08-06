@@ -2,7 +2,6 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Security;
 
-use Contao\System;
 use Contao\Environment;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
@@ -35,7 +34,7 @@ class Authorization
 
         foreach ($arrItems as $arrItem) {
 
-            if ($arrItem['product_id'] != '2') {
+            if (!in_array($arrItem['product_id'], ['2', '3'])) {
                 continue;
             }
 
