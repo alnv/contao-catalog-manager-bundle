@@ -34,7 +34,7 @@ class Authorization
 
         foreach ($arrItems as $arrItem) {
 
-            if ($arrItem['product_id'] != '2') {
+            if (!in_array($arrItem['product_id'], ['2', '3'])) {
                 continue;
             }
 
