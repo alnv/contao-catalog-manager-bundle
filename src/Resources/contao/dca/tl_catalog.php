@@ -7,6 +7,9 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'tl_catalog_field',
             'tl_catalog_palette'
         ],
+        'onload_callback' => [
+            ['catalogmanager.datacontainer.catalog', 'checkLicense']
+        ],
         'onsubmit_callback' => [
             ['catalogmanager.datacontainer.catalog', 'generateModulename'],
             ['catalogmanager.datacontainer.catalog', 'createCustomFields']
@@ -64,6 +67,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ]
         ],
         'global_operations' => [
+            'license' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog']['license'],
+                'href' => 'table=tl_catalog_license',
+                'class' => 'header_edit_all',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ],
             'all' => [
                 'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',

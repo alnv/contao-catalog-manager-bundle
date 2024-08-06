@@ -1,6 +1,6 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.1.24");
+define("CATALOG_MANAGER_BUNDLE_VERSION", "2.2.0");
 
 array_insert( $GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -10,7 +10,8 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
                 'tl_catalog',
                 'tl_catalog_field',
                 'tl_catalog_option',
-                'tl_catalog_palette'
+                'tl_catalog_palette',
+                'tl_catalog_license'
             ]
         ],
         'reactions' => [
