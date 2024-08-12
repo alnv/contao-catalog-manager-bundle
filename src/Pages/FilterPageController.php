@@ -2,15 +2,15 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Pages;
 
-use Contao\Input;
-use Contao\PageModel;
-use Contao\Environment;
-use Contao\FrontendIndex;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\CoreBundle\Exception\PageNotFoundException;
+use Contao\Environment;
+use Contao\FrontendIndex;
+use Contao\Input;
+use Contao\PageModel;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class FilterPageController
 {
@@ -20,22 +20,32 @@ class FilterPageController
 
         Input::resetUnusedGet();
 
+        $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
         $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias);
 
+        if (isset($_GET['auto_item'])) {
+            Input::setGet('auto_item', null);
+        }
+
+        /*
         foreach ($_GET as $strGet => $strValue) {
             Input::setGet($strGet, null);
         }
+        */
 
-        $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
         foreach ($arrPageFilters as $intIndex => $objPageFilter) {
-            $objPageFilter->setActiveUrlFragment(($arrFragments[$intIndex]??''));
-            if (($arrFragments[$intIndex]??'') && !$objPageFilter->activeUrlFragmentExists()) {
+
+            $objPageFilter->setActiveUrlFragment(($arrFragments[$intIndex] ?? ''));
+
+            if (($arrFragments[$intIndex] ?? '') && !$objPageFilter->activeUrlFragmentExists()) {
                 throw new PageNotFoundException('Page not found: ' . Environment::get('url'));
             }
+
             unset($arrFragments[$intIndex]);
         }
 
         if (!empty($arrFragments)) {
+
             $strAutoItem = array_values($arrFragments)[0];
             Input::setGet('auto_item', $strAutoItem);
         }

@@ -49,7 +49,9 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'] = [
     'checkboxWizard' => 'Checkbox Wizard',
     'listWizard' => 'List wizard'
 ];
+
 $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'options' => 'Options',
-    'dbOptions' => 'Datenbank Tabelle'
+    'dbOptions' => 'Datenbank Tabelle',
+    'dbActiveOptions' => 'Datenbank Tabelle (zugewiesen)'
 ];

@@ -458,7 +458,7 @@ abstract class View extends Controller
         return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm'] ?? false));
     }
 
-    protected function getPageNumber()
+    protected function getPageNumber(): int
     {
         return (int)Input::get('page_e' . $this->arrOptions['id']);
     }

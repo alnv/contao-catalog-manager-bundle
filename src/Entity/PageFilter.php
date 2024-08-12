@@ -2,12 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Entity;
 
-use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
+use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
-use Contao\Widget;
+use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 use Contao\Input;
+use Contao\Widget;
 
 class PageFilter
 {
@@ -53,9 +53,9 @@ class PageFilter
         $arrAttribute = Widget::getAttributesFromDca($objDcaExtractor->getField($arrPageFilter['column']), $arrPageFilter['column'], $strActiveUrlFragment, $arrPageFilter['column'], $arrPageFilter['table']);
 
         if (is_array($arrAttribute['value'])) {
-            $varValue =  $arrAttribute['value'][0] ?? '';
+            $varValue = $arrAttribute['value'][0] ?? '';
         } else {
-            $varValue =  $arrAttribute['value'] ?? '';
+            $varValue = $arrAttribute['value'] ?? '';
         }
 
         $arrFragment = is_numeric($varValue) ? $this->getFragmentId($varValue) : [];
@@ -95,7 +95,7 @@ class PageFilter
 
         $strTable = $GLOBALS['TL_DCA'][$arrPageFilter['table']]['config']['_table'] ?? $arrPageFilter['table'];
         $arrColumn = [$strTable . '.' . $arrPageFilter['column'] . ' REGEXP ?'];
-        $arrValue = ['[[:<:]]'. $strActiveUrlFragment .'[[:>:]]'];
+        $arrValue = ['[[:<:]]' . $strActiveUrlFragment . '[[:>:]]'];
 
         $objModel = new ModelWizard($arrPageFilter['table']);
         $objModel = $objModel->getModel();
@@ -105,7 +105,7 @@ class PageFilter
             'limit' => 1
         ]);
 
-        return (bool) $objEntities;
+        return (bool)$objEntities;
     }
 
     public function setActiveUrlFragment(string $strActiveUrlFragment): void
@@ -142,6 +142,6 @@ class PageFilter
 
     public function activeUrlFragmentExists(): bool
     {
-        return (bool) $this->strActiveUrlFragment;
+        return (bool)$this->strActiveUrlFragment;
     }
 }
