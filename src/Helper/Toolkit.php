@@ -221,7 +221,6 @@ class Toolkit
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['rgxp']) && $arrRole['rgxp']) {
-
             return $arrRole['rgxp'];
         }
 
@@ -298,7 +297,7 @@ class Toolkit
         return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
     }
 
-    public static function parseImage($varImage)
+    public static function parseImage($varImage): string
     {
         if (!is_array($varImage) && (Validator::isBinaryUuid($varImage) || Validator::isUuid($varImage))) {
             $objFile = FilesModel::findByUuid($varImage);
@@ -667,7 +666,7 @@ class Toolkit
 
         $arrEntity = [];
         if (!$arrActiveRecord['id']) {
-            return null;
+            return;
         }
 
         foreach ($arrActiveRecord as $strField => $strValue) {
@@ -677,6 +676,11 @@ class Toolkit
         $objRoleResolver = RoleResolver::getInstance($strTable, $arrEntity);
         $arrGeoFields = $objRoleResolver->getGeoCodingFields();
         $strAddress = $objRoleResolver->getGeoCodingAddress();
+
+        if (!$strAddress) {
+            return;
+        }
+
         $objGeoCoding = new GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
@@ -685,6 +689,7 @@ class Toolkit
         }
 
         if ($arrGeoCoding !== null && !empty($arrGeoFields)) {
+
             $arrSet = [];
             $arrSet['tstamp'] = time();
             $arrSet[$arrGeoFields['longitude']] = $arrGeoCoding['longitude'];
