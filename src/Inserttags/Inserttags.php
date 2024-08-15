@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\Date;
+use Contao\Config;
 use Contao\FrontendUser;
 
 class Inserttags
@@ -36,11 +37,12 @@ class Inserttags
             case 'TIMESTAMP':
                 $strMethod = $arrFragments[1] ?? 'tstamp';
                 $strStrToTimeParameter = $arrFragments[2] ?: '';
+                $strCurrentTstamp = \time();
                 if ($strStrToTimeParameter) {
-                    return strtotime($strStrToTimeParameter, (new Date())->{$strMethod});
-                } else {
-                    return (new Date())->{$strMethod};
+                    $strCurrentTstamp = \strtotime($strStrToTimeParameter, $strCurrentTstamp);
                 }
+                $strDate = \date(Config::get('datimFormat'), $strCurrentTstamp);
+                return (new Date($strDate, Config::get('datimFormat')))->{$strMethod};
             case 'LAST-ADDED-MASTER-VIEW-IDS':
                 $strTable = $arrFragments[1] ?? '';
                 if (!$strTable) {
@@ -51,7 +53,6 @@ class Inserttags
                     return '0';
                 }
                 return serialize($arrIds);
-
         }
 
         return false;

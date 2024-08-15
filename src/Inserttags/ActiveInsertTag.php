@@ -28,6 +28,7 @@ class ActiveInsertTag
             $blnUseCsv = false;
             $strDefault = null;
             $blnUseDefault = false;
+            $strDateFormat = 'dayBegin';
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
 
             if (isset($arrFragments[2]) && strpos($arrFragments[2], '?') !== false) {
@@ -41,6 +42,9 @@ class ActiveInsertTag
                             break;
                         case 'mode':
                             $strMode = $strOption; // BE || FE
+                            break;
+                        case 'dateMethod':
+                            $strDateFormat = $strOption;
                             break;
                         case 'touch':
                             $blnTouch = (bool)$strOption;
@@ -65,11 +69,11 @@ class ActiveInsertTag
             }
 
             if (Validator::isDate($varValue)) {
-                $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
+                $varValue = (new Date($varValue, $objPage->dateFormat))->{$strDateFormat};
             }
 
             if (Validator::isDatim($varValue)) {
-                $varValue = (new Date($varValue, $objPage->dateFormat))->dayBegin;
+                $varValue = (new Date($varValue, $objPage->dateFormat))->{$strDateFormat};
             }
 
             if ($blnTouch && !empty($varValue)) {
