@@ -24,12 +24,16 @@ class ActiveInsertTag
             global $objPage;
 
             $strMode = null;
-            $blnTouch = false;
             $blnUseCsv = false;
             $strDefault = null;
             $blnUseDefault = false;
-            $strDateFormat = 'dayBegin';
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
+
+            $arrActiveOptions = [
+                'touch' => false,
+                'dateMethod' => 'dayBegin',
+                'dateFormat' => $objPage->dateFormat
+            ];
 
             if (isset($arrFragments[2]) && strpos($arrFragments[2], '?') !== false) {
                 $arrParams = Toolkit::parseParametersFromString($arrFragments[2]);
@@ -44,10 +48,13 @@ class ActiveInsertTag
                             $strMode = $strOption; // BE || FE
                             break;
                         case 'dateMethod':
-                            $strDateFormat = $strOption;
+                            $arrActiveOptions['dateMethod'] = $strOption;
+                            break;
+                        case 'dateFormat':
+                            $arrActiveOptions['dateFormat'] = $strOption;
                             break;
                         case 'touch':
-                            $blnTouch = (bool)$strOption;
+                            $arrActiveOptions['touch'] = (bool)$strOption;
                             break;
                         case 'source':
                             $arrOptions = explode(':', $strOption);
@@ -68,25 +75,13 @@ class ActiveInsertTag
                 $varValue = $strDefault;
             }
 
-            if (Validator::isDate($varValue)) {
-                $varValue = (new Date($varValue, $objPage->dateFormat))->{$strDateFormat};
-            }
-
-            if (Validator::isDatim($varValue)) {
-                $varValue = (new Date($varValue, $objPage->dateFormat))->{$strDateFormat};
-            }
-
-            if ($blnTouch && !empty($varValue)) {
-                $_varValue = StringUtil::deserialize($varValue);
-                if (is_array($_varValue)) {
-                    $arrValues = [];
-                    foreach ($_varValue as $strKey => $strValue) {
-                        $arrValues[$strKey] = '[[:<:]]' . $strValue . '[[:>:]]';
-                    }
-                    $varValue = serialize($arrValues);
-                } elseif (is_string($_varValue)) {
-                    $varValue = '[[:<:]]' . $_varValue . '[[:>:]]';
+            $varValue = StringUtil::deserialize($varValue);
+            if (\is_array($varValue)) {
+                foreach ($varValue as $intIndex => $strValue) {
+                    $varValue[$intIndex] = $this->parseValue($strValue, $arrActiveOptions);
                 }
+            } else {
+                $varValue = $this->parseValue($varValue, $arrActiveOptions);
             }
 
             if ($blnUseCsv) {
@@ -112,6 +107,28 @@ class ActiveInsertTag
         }
 
         return false;
+    }
+
+    protected function parseValue($strValue, $arrOptions = []): string
+    {
+
+        $strDateMethod = $arrOptions['dateMethod'] ?? 'dayBegin';
+        $strDateFormat = $arrOptions['dateFormat'] ?? 'date';
+        $blnTouch = $arrOptions['touch'] ?? false;
+
+        if (Validator::isDate($strValue)) {
+            $strValue = (new Date($strValue, $strDateFormat))->{$strDateMethod};
+        }
+
+        if (Validator::isDatim($strValue)) {
+            $strValue = (new Date($strValue, $strDateFormat))->{$strDateMethod};
+        }
+
+        if ($blnTouch) {
+            $strValue = '[[:<:]]' . $strValue . '[[:>:]]';
+        }
+
+        return $strValue;
     }
 
     protected function getIdsByTableAndColumn($strTable, $strColumn, $varValue): string
