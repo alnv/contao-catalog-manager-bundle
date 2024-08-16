@@ -14,6 +14,8 @@ use Contao\DataContainer;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
+use Contao\Image;
+use Contao\Backend;
 use Contao\CoreBundle\ContaoCoreBundle;
 
 class VirtualDataContainerArray
@@ -89,6 +91,8 @@ class VirtualDataContainerArray
             ]
         ];
 
+        $blnUseCut = false;
+
         if ($this->arrCatalog['enablePanel']) {
             $arrList['sorting']['panelLayout'] = 'filter,search,sort;limit';
         }
@@ -102,14 +106,32 @@ class VirtualDataContainerArray
         }
 
         if ($this->arrCatalog['sortingType']) {
+
             if ($this->arrCatalog['sortingType'] == 'fixed') {
+
                 $arrList['sorting']['mode'] = DataContainer::MODE_SORTED;
                 $arrList['sorting']['flag'] = (int)$this->arrCatalog['flag'];
                 $arrList['sorting']['fields'] = [$this->arrCatalog['flagField']];
+
                 if (empty($arrList['labels']['fields'])) {
                     $arrList['labels']['fields'] = [$this->arrCatalog['flagField']];
                 }
+
+                if ($this->arrCatalog['flagField'] === 'sorting') {
+
+                    $arrList['sorting']['mode'] = 5;
+                    $arrList['sorting']['rootPaste'] = true;
+                    $arrList['sorting']['fields'] = ['sorting'];
+                    $arrList['sorting']['paste_button_callback'] = function (DataContainer $dc, $row, $table, $cr, $arrClipboard = null) {
+                        return ($arrClipboard['mode'] == 'cut' && ($arrClipboard['id'] == $row['id'] || $cr)) ? Image::getHtml('pasteafter_.svg') . ' ' : '<a href="' . Backend::addToUrl('act=' . $arrClipboard['mode'] . '&mode=1&pid=' . $row['id'] . '&id=' . $arrClipboard['id']) . '" title="' . StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '</a> ';
+                    };
+
+                    $blnUseCut = true;
+                    $this->arrCatalog['showColumns'] = '';
+                    unset($arrList['sorting']['flag']);
+                }
             }
+
             if ($this->arrCatalog['sortingType'] == 'switchable') {
                 $arrSortingFields = [];
                 $arrList['sorting']['mode'] = DataContainer::MODE_SORTABLE;
@@ -164,6 +186,10 @@ class VirtualDataContainerArray
             $arrList['labels']['showColumns'] = false;
             $arrList['sorting']['rootPaste'] = true;
             $arrList['sorting']['showRootTrails'] = true;
+            $blnUseCut =  true;
+        }
+
+        if ($blnUseCut) {
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'cut' => [
                     'icon' => 'cut.svg',
