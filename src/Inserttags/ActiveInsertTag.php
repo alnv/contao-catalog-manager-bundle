@@ -35,7 +35,7 @@ class ActiveInsertTag
                 'dateFormat' => $objPage->dateFormat
             ];
 
-            if (isset($arrFragments[2]) && strpos($arrFragments[2], '?') !== false) {
+            if (isset($arrFragments[2]) && \strpos($arrFragments[2], '?') !== false) {
                 $arrParams = Toolkit::parseParametersFromString($arrFragments[2]);
                 foreach ($arrParams as $strParam) {
                     list($strKey, $strOption) = explode('=', $strParam);
@@ -75,6 +75,10 @@ class ActiveInsertTag
                 $varValue = $strDefault;
             }
 
+            if ($blnUseCsv && is_string($varValue)) {
+                $varValue = \serialize(\explode(',', $varValue));
+            }
+
             $varValue = StringUtil::deserialize($varValue);
             if (\is_array($varValue)) {
                 foreach ($varValue as $intIndex => $strValue) {
@@ -82,10 +86,6 @@ class ActiveInsertTag
                 }
             } else {
                 $varValue = $this->parseValue($varValue, $arrActiveOptions);
-            }
-
-            if ($blnUseCsv) {
-                $varValue = serialize(explode(',', $varValue));
             }
 
             if (isset($GLOBALS['TL_HOOKS']['replaceActiveInserttag']) && is_array($GLOBALS['TL_HOOKS']['replaceActiveInserttag'])) {
@@ -103,6 +103,10 @@ class ActiveInsertTag
                 }
             }
 
+            if (\is_array($varValue)) {
+                return \serialize($varValue);
+            }
+
             return $varValue;
         }
 
@@ -115,6 +119,10 @@ class ActiveInsertTag
         $strDateMethod = $arrOptions['dateMethod'] ?? 'dayBegin';
         $strDateFormat = $arrOptions['dateFormat'] ?? 'date';
         $blnTouch = $arrOptions['touch'] ?? false;
+
+        if ($strValue === '') {
+            return $strValue;
+        }
 
         if (Validator::isDate($strValue)) {
             $strValue = (new Date($strValue, $strDateFormat))->{$strDateMethod};

@@ -172,33 +172,17 @@ class Listing extends Hybrid
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-                $this->cmValue = Toolkit::replaceInsertTags($this->cmValue);
-                $this->arrOptions['column'] = explode(';', StringUtil::decodeEntities($this->cmColumn));
-                $this->arrOptions['value'] = explode(';', StringUtil::decodeEntities($this->cmValue));
-                if ((is_array($this->arrOptions['value']) && !empty($this->arrOptions['value']))) {
-                    $intIndex = -1;
-                    $this->arrOptions['value'] = array_filter($this->arrOptions['value'], function ($strValue) use (&$intIndex) {
-                        $intIndex = $intIndex + 1;
-                        if ($strValue === '' || $strValue === null) {
-                            unset($this->arrOptions['column'][$intIndex]);
-                            return false;
-                        }
-                        return true;
-                    });
-                    if (empty($this->arrOptions['value'])) {
-                        unset($this->arrOptions['value']);
-                        unset($this->arrOptions['column']);
-                    }
+                foreach (Toolkit::convertExpertQueries(($this->cmColumn ?: ''), ($this->cmValue ?: '')) as $strKey => $strValue) {
+                    $this->arrOptions[$strKey] = $strValue;
                 }
                 break;
         }
     }
 
-    protected function setOrder()
+    protected function setOrder(): void
     {
 
         if ($this->cmOrder) {
-
             $strOrder = Toolkit::getOrderByStatementFromArray(WidgetToolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'

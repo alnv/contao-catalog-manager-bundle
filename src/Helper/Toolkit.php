@@ -810,6 +810,39 @@ class Toolkit
         return $strValue;
     }
 
+    public static function convertExpertQueries($strColumn, $strValue): array
+    {
+
+        $arrReturn = [];
+        $strValue = Toolkit::replaceInsertTags($strValue);
+        $strColumn = Toolkit::replaceInsertTags($strColumn);
+
+        $arrReturn['column'] = explode(';', StringUtil::decodeEntities($strColumn));
+        $arrReturn['value'] = explode(';', StringUtil::decodeEntities($strValue));
+        $arrReturn['value'] = array_filter($arrReturn['value']);
+
+        if ((is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
+            $intIndex = -1;
+            $arrReturn['value'] = array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
+                $intIndex = $intIndex + 1;
+                if ($strValue === '' || $strValue === null) {
+                    unset($arrReturn['column'][$intIndex]);
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        if (empty($arrReturn['column'])) {
+            unset($arrReturn['column']);
+        }
+        if (empty($arrReturn['value'])) {
+            unset($arrReturn['value']);
+        }
+
+        return $arrReturn;
+    }
+
     public static function convertComboWizardToModelValues($strValue, $strTable = ''): array
     {
 

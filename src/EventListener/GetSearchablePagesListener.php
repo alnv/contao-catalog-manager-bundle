@@ -168,19 +168,8 @@ class GetSearchablePagesListener
                     $arrReturn['value'] = $arrQueries['value'];
                     break;
                 case 'expert':
-                    $objModules->cmValue = Toolkit::replaceInsertTags($objModules->cmValue);
-                    $arrReturn['column'] = explode(';', StringUtil::decodeEntities($objModules->cmColumn));
-                    $arrReturn['value'] = explode(';', StringUtil::decodeEntities($objModules->cmValue));
-                    if ((is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
-                        $intIndex = -1;
-                        $arrReturn['value'] = array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
-                            $intIndex = $intIndex + 1;
-                            if ($strValue === '' || $strValue === null) {
-                                unset($arrReturn['column'][$intIndex]);
-                                return false;
-                            }
-                            return true;
-                        });
+                    foreach (Toolkit::convertExpertQueries(($objModules->cmColumn ?: ''), ($objModules->cmValue ?: '')) as $strKey => $strValue) {
+                        $arrReturn[$strKey] = $strValue;
                     }
                     break;
             }
