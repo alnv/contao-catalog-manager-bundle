@@ -33,8 +33,13 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
 
+        $strRoutingYmlFile = 'routing.yml';
+        if (version_compare(ContaoCoreBundle::getVersion(), '5.4.0', '>=')) {
+            $strRoutingYmlFile = 'routing_c5.yml';
+        }
+
         return $resolver
-            ->resolve(__DIR__ . '/../Resources/config/routing.yml')
-            ->load(__DIR__ . '/../Resources/config/routing.yml');
+            ->resolve(__DIR__ . '/../Resources/config/' . $strRoutingYmlFile)
+            ->load(__DIR__ . '/../Resources/config/' . $strRoutingYmlFile);
     }
 }
