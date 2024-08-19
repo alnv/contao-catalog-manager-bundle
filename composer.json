@@ -29,7 +29,7 @@
     "terminal42/dcawizard": "^3.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.6",
     "alnv/translation-manager-bundle": "^3.0",
-    "alnv/widget-collection-bundle": "^3.0",
+    "alnv/widget-collection-bundle": "^3.0 || @dev",
     "alnv/catalog-manager-multilingual-adapter-bundle": "^3.0",
     "alnv/contao-geocoding": "^3.0",
     "guzzlehttp/guzzle": "^7.9"

@@ -452,7 +452,7 @@ class VirtualDataContainerArray
                 'operations' => [
                     'edit' => [
                         'href' => 'act=edit',
-                        'icon' => 'header.svg'
+                        'icon' => 'edit.svg'
                     ],
                     'delete' => [
                         'href' => 'act=delete',
@@ -510,7 +510,7 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => (version_compare('5.0', ContaoCoreBundle::getVersion(), '<=') ? 'children.svg' : 'edit.svg')
+                'icon' => (version_compare('5.0', ContaoCoreBundle::getVersion(), '<=') ? 'children.svg' : 'header.svg')
             ];
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }

@@ -972,12 +972,13 @@ class Toolkit
     public static function getActiveRecordAsArrayFromDc(DataContainer $objDataContainer): array
     {
 
-        if (method_exists($objDataContainer->activeRecord, 'row')) {
+        if (method_exists(($objDataContainer->activeRecord ?: ''), 'row')) {
             return $objDataContainer->activeRecord->row();
         }
 
-        if (method_exists($objDataContainer, 'getCurrentRecord')) {
-            return $objDataContainer->getCurrentRecord();
+        if (method_exists(($objDataContainer ?: ''), 'getCurrentRecord')) {
+            return (array)$objDataContainer->getCurrentRecord();
+
         }
 
         return [];

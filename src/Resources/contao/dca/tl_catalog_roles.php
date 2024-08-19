@@ -25,7 +25,7 @@ $GLOBALS['TL_DCA']['tl_catalog_roles'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.svg'
+                'icon' => 'edit.svg'
             ],
             'delete' => [
                 'href' => 'act=delete',
@@ -39,7 +39,6 @@ $GLOBALS['TL_DCA']['tl_catalog_roles'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'

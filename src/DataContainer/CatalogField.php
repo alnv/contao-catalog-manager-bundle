@@ -56,7 +56,7 @@ class CatalogField
         $arrRoleNames = array_keys($arrRoles);
         $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($dc);
 
-        if (!$arrActiveRecord['type']) {
+        if (!($arrActiveRecord['type'] ?? '')) {
             return $arrRoleNames;
         }
 

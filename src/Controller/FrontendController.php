@@ -7,20 +7,20 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
 use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\AbstractController;
+use Contao\Database;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
 use Contao\ModuleModel;
 use Contao\PageModel;
 use Contao\StringUtil;
-use Contao\Database;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -211,7 +211,7 @@ class FrontendController extends AbstractController
     public function deleteOption(): JsonResponse
     {
 
-        $this->container->get( 'contao.framework' )->initialize();
+        $this->container->get('contao.framework')->initialize();
 
         $objCatalog = CatalogModel::findByTableOrModule(Input::post('table'));
         if ($objCatalog === null) {
@@ -231,7 +231,7 @@ class FrontendController extends AbstractController
                 }
                 break;
             case 'dbOptions':
-                Database::getInstance()->prepare('DELETE FROM ' . $objField->dbTable . ' WHERE `'.$objField->dbKey.'`=?')->execute(Input::post('option'));
+                Database::getInstance()->prepare('DELETE FROM ' . $objField->dbTable . ' WHERE `' . $objField->dbKey . '`=?')->execute(Input::post('option'));
                 break;
         }
 

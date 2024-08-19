@@ -44,7 +44,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.svg'
+                'icon' => 'edit.svg'
             ],
             'fields' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['fields'],
