@@ -52,7 +52,6 @@ class Application
         ];
 
         if (\in_array('tl_content', $arrTables)) {
-
             $arrBEModule['table'] = [BackendCsvImportController::class, 'importTableWizardAction'];
             $arrBEModule['list'] = [BackendCsvImportController::class, 'importListWizardAction'];
         }
@@ -75,14 +74,21 @@ class Application
     public function initializeDataContainerArrayByTable($strTable): void
     {
 
+        if ($strTable == 'catalog-manager') {
+
+            if ((Input::get('act') == '' && Input::get('key') == '') || 'select' === Input::get('act')) {
+                return;
+            }
+
+            $strTable = Input::get('id');
+        }
+
         $objVDataContainerArray = new VirtualDataContainerArray($strTable);
         $objVDataContainerArray->generate();
         $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
 
         if (is_array($arrRelatedTables) && !empty($arrRelatedTables)) {
-
             foreach ($arrRelatedTables as $strTable) {
-
                 $this->initializeDataContainerArrayByTable($strTable);
             }
         }

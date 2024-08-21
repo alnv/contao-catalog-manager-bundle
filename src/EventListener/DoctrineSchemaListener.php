@@ -49,26 +49,31 @@ class DoctrineSchemaListener
 
                 $origin_type = strtok(strtolower($arrField['origtype']), '(), ');
                 $connection = $this->doctrine->getConnection();
-                $type = $connection->getDatabasePlatform()->getDoctrineTypeMapping($origin_type);
-                $length = (int)strtok('(), ');
 
-                $arrOptions = [
-                    'length' => $length,
-                    'unsigned' => $unsigned,
-                    'fixed' => $origin_type == 'char',
-                    'default' => $default,
-                    'notnull' => $notnull,
-                    'scale' => null,
-                    'precision' => null,
-                    'autoincrement' => $autoincrement,
-                    'comment' => null,
-                ];
+                try {
 
-                $objTable->addColumn($strField, $type, $arrOptions);
+                    $type = $connection->getDatabasePlatform()->getDoctrineTypeMapping($origin_type);
+                    $length = (int)strtok('(), ');
 
-                if ($strField == 'id') {
-                    $objTable->setPrimaryKey([$strField]);
-                }
+                    $arrOptions = [
+                        'length' => $length,
+                        'unsigned' => $unsigned,
+                        'fixed' => $origin_type == 'char',
+                        'default' => $default,
+                        'notnull' => $notnull,
+                        'scale' => null,
+                        'precision' => null,
+                        'autoincrement' => $autoincrement,
+                        'comment' => null,
+                    ];
+
+                    $objTable->addColumn($strField, $type, $arrOptions);
+
+                    if ($strField == 'id') {
+                        $objTable->setPrimaryKey([$strField]);
+                    }
+
+                } catch (\Exception $objError) {}
             }
         }
     }

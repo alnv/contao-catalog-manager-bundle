@@ -10,6 +10,7 @@ use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Controller;
 
 class Catalog extends CatalogWizard
 {
@@ -22,40 +23,51 @@ class Catalog extends CatalogWizard
     {
 
         if ($strIdentifier === null) {
-            return null;
+            return;
         }
 
         $this->strIdentifier = $strIdentifier;
         $objCatalog = CatalogModel::findByTableOrModule($this->strIdentifier);
 
         if ($objCatalog === null) {
-            return null;
+            return;
         }
 
         $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog($objCatalog->row());
+        $this->setAllFields();
+
+        $this->setDefaultFields();
+    }
+
+    protected function setAllFields(): void
+    {
+
+        Controller::loadDataContainer($this->arrCatalog['table']);
+        Controller::loadLanguageFile($this->arrCatalog['table']);
+
+        foreach ($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] ?? [] as $strField => $arrField) {
+            $arrField['label'] = $arrField['label']  ?? [$strField, ''];
+            $this->arrFields[$strField] = $arrField;
+        }
+
         $objFields = CatalogFieldModel::findAll([
             'column' => ['pid=?', 'published=?'],
             'value' => [$this->arrCatalog['id'], '1'],
             'order' => 'sorting ASC'
         ]);
 
-        if ($objFields === null) {
-            return null;
+        if (!$objFields) {
+            return;
         }
 
         while ($objFields->next()) {
-
             $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
-
             if ($arrField === null) {
                 continue;
             }
-
             $this->arrFields[$objFields->fieldname] = $arrField;
         }
-
-        $this->setDefaultFields();
     }
 
     public function getCatalog()
@@ -156,6 +168,7 @@ class Catalog extends CatalogWizard
                     Translation::getInstance()->translate($strKeyName . 'field.title.sorting', Toolkit::getLabel('sorting')),
                     Translation::getInstance()->translate($strKeyName . 'field.description.sorting', '')
                 ],
+                'flag' => 11,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [

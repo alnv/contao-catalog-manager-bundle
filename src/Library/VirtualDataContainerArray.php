@@ -9,14 +9,14 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
+use Contao\Backend;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\Database;
 use Contao\DataContainer;
+use Contao\Image;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
-use Contao\Image;
-use Contao\Backend;
-use Contao\CoreBundle\ContaoCoreBundle;
 
 class VirtualDataContainerArray
 {
@@ -28,9 +28,12 @@ class VirtualDataContainerArray
     public function __construct($strModule)
     {
 
+        System::loadLanguageFile('default');
+
         $objCatalog = new Catalog($strModule);
         $this->arrCatalog = $objCatalog->getCatalog();
         $this->arrFields = $objCatalog->getFields();
+
         $this->generateEmptyDataContainer();
     }
 
@@ -38,12 +41,12 @@ class VirtualDataContainerArray
     {
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_table'] = $this->arrCatalog['table'];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] = Toolkit::extendField(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] ?? []), ($this->arrCatalog['ctable'] ?? []));
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] ?? $this->getDataContainerNamespace($this->arrCatalog['dataContainer']);
+
         if ($this->arrCatalog['ptable']) {
             $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable'] = $this->arrCatalog['ptable'];
         }
-
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] = $this->arrCatalog['ctable'];
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $this->getDataContainerNamespace($this->arrCatalog['dataContainer']);
 
         if ($this->arrCatalog['enableGeocoding']) {
             $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
@@ -54,23 +57,19 @@ class VirtualDataContainerArray
         }
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onload_callback'][] = function ($objDataContainer = null) {
-
             if (!$objDataContainer) {
                 return;
             }
-
             if ($objDataContainer->id) {
                 $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
-
                 if (!$objActiveRecord->numRows) {
                     return;
                 }
-
                 Cache::set('activeRecord', $objActiveRecord->row());
             }
         };
 
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = true;
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['enableVersioning'] ?? true;
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['hasVisibilityFields'] = (bool)$this->arrCatalog['enableVisibility'];
     }
 
@@ -118,7 +117,6 @@ class VirtualDataContainerArray
                 }
 
                 if ($this->arrCatalog['flagField'] === 'sorting') {
-
                     $arrList['sorting']['mode'] = 5;
                     $arrList['sorting']['rootPaste'] = true;
                     $arrList['sorting']['fields'] = ['sorting'];
@@ -166,12 +164,12 @@ class VirtualDataContainerArray
         }
 
         if ($this->arrCatalog['mode'] == 'parent') {
+            $arrList['sorting']['fields'] = empty($this->arrCatalog['columns']) ? ['id'] : $this->arrCatalog['columns'];
             $arrList['sorting']['mode'] = DataContainer::MODE_PARENT;
             $arrList['sorting']['headerFields'] = empty($this->arrCatalog['headerFields']) ? ['id'] : $this->arrCatalog['headerFields'];
             $arrList['sorting']['child_record_callback'] = function ($arrRow) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
-
             $arrList['labels']['showColumns'] = false;
         }
 
@@ -186,12 +184,13 @@ class VirtualDataContainerArray
             $arrList['labels']['showColumns'] = false;
             $arrList['sorting']['rootPaste'] = true;
             $arrList['sorting']['showRootTrails'] = true;
-            $blnUseCut =  true;
+            $blnUseCut = true;
         }
 
-        if ($blnUseCut) {
+        if ($blnUseCut && !in_array('cut', array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'cut' => [
+                    'label' => $GLOBALS['TL_LANG']['DCA']['cut'] ?? '',
                     'icon' => 'cut.svg',
                     'href' => 'act=paste&amp;mode=cut',
                     'attributes' => 'onclick="Backend.getScrollOffset()"'
@@ -202,18 +201,20 @@ class VirtualDataContainerArray
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['label'] = $arrList['labels'];
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['sorting'] = $arrList['sorting'];
 
-        if ($this->arrCatalog['enableCopy']) {
+        if ($this->arrCatalog['enableCopy'] && !in_array('copy', array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, [
                 'copy' => [
+                    'label' => $GLOBALS['TL_LANG']['DCA']['copy'] ?? '',
                     'href' => 'act=copy',
                     'icon' => 'copy.svg'
                 ]
             ]);
         }
 
-        if ($this->arrCatalog['enableVisibility']) {
+        if ($this->arrCatalog['enableVisibility'] && !in_array('toggle', array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], count($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations']) - 1, [
                 'toggle' => [
+                    'label' => $GLOBALS['TL_LANG']['DCA']['toggle'][0] ?? '',
                     'href' => 'act=toggle&amp;field=published',
                     'icon' => 'visible.svg',
                     'showInHeader' => true
@@ -312,7 +313,7 @@ class VirtualDataContainerArray
     protected function addSubmitOnChange($strField): void
     {
 
-        if (isset($this->arrFields[$strField]) && isset($this->arrFields[$strField]['eval'])) {
+        if (isset($this->arrFields[$strField]['eval'])) {
             $this->arrFields[$strField]['eval']['submitOnChange'] = true;
         }
     }
@@ -420,62 +421,74 @@ class VirtualDataContainerArray
         }
     }
 
-    protected function generateEmptyDataContainer()
+    protected function generateEmptyDataContainer(): void
     {
 
         if (!isset($this->arrCatalog['table'])) {
-            return null;
+            return;
         }
 
-        if (!isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']])) {
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = [];
+        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_loaded']) && $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_loaded'] === true) {
+            return;
         }
 
-        $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = [
-            'config' => [
-                'onsubmit_callback' => [
-                    function (DataContainer $objDataContainer) {
-                        if ($objDataContainer->activeRecord) {
-                            Toolkit::saveAlias(Toolkit::getActiveRecordAsArrayFromDc($objDataContainer), $this->arrFields, $this->arrCatalog);
-                        }
-                    }
-                ],
-                'sql' => [
-                    'keys' => [
-                        'id' => 'primary'
-                    ]
-                ]
-            ],
-            'list' => [
-                'label' => [],
-                'sorting' => [],
-                'operations' => [
-                    'edit' => [
-                        'href' => 'act=edit',
-                        'icon' => 'edit.svg'
-                    ],
-                    'delete' => [
-                        'href' => 'act=delete',
-                        'icon' => 'delete.svg',
-                        'attributes' => 'onclick="if(!confirm(\'' . $GLOBALS['TL_LANG']['MSC']['deleteConfirm'] . '\'))return false;Backend.getScrollOffset()"'
-                    ],
-                    'show' => [
-                        'href' => 'act=show',
-                        'icon' => 'show.svg'
-                    ]
-                ],
-                'global_operations' => [
-                    'all' => [
-                        'href' => 'act=select',
-                        'class' => 'header_edit_all',
-                        'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-                    ]
-                ]
-            ],
-            'palettes' => ['__selector__' => [], 'default' => ''],
-            'subpalettes' => [],
-            'fields' => []
+        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'])) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_modified'] = true;
+        }
+
+        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'])) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['modified'] = true;
+        }
+
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']] ?? [];
+
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'] ?? [];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_loaded'] = true;
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
+            if ($objDataContainer->activeRecord) {
+                Toolkit::saveAlias(Toolkit::getActiveRecordAsArrayFromDc($objDataContainer), $this->arrFields, $this->arrCatalog);
+            }
+        };
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['sql'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['sql'] ?? [
+            'keys' => [
+                'id' => 'primary'
+            ]
         ];
+
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list'] ?? [];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['label'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['label'] ?? [];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['sorting'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['sorting'] ?? [];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [
+            'edit' => [
+                'label' => $GLOBALS['TL_LANG']['DCA']['edit'] ?? '',
+                'href' => 'act=edit',
+                'icon' => 'edit.svg'
+            ],
+            'delete' => [
+                'label' => $GLOBALS['TL_LANG']['DCA']['delete'] ?? '',
+                'href' => 'act=delete',
+                'icon' => 'delete.svg',
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
+            ],
+            'show' => [
+                'label' => $GLOBALS['TL_LANG']['DCA']['show'] ?? '',
+                'href' => 'act=show',
+                'icon' => 'show.svg'
+            ]
+        ];
+
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['global_operations'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['global_operations'] ?? [
+            'all' => [
+                'label' => $GLOBALS['TL_LANG']['DCA']['all'] ?? '',
+                'href' => 'act=select',
+                'class' => 'header_edit_all',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ]
+        ];
+
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes'] ?? ['__selector__' => [], 'default' => ''];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['subpalettes'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['subpalettes'] ?? [];
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] ?? [];
     }
 
     public function getRelatedTables()
@@ -503,8 +516,14 @@ class VirtualDataContainerArray
                 $strTitle = $objCatalog->name;
                 $strDescription = $objCatalog->description;
             }
+
+            $strKey = 'child_' . $strTable;
+            if (in_array($strKey, array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
+                continue;
+            }
+
             $arrOperation = [];
-            $arrOperation['child_' . $strTable] = [
+            $arrOperation[$strKey] = [
                 'label' => [
                     Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
@@ -512,15 +531,16 @@ class VirtualDataContainerArray
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
                 'icon' => (version_compare('5.0', ContaoCoreBundle::getVersion(), '<=') ? 'children.svg' : 'header.svg')
             ];
+
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }
     }
 
-    public function generate()
+    public function generate(): void
     {
 
         if (empty($this->arrCatalog)) {
-            return null;
+            return;
         }
 
         $this->setConfig();

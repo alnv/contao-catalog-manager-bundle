@@ -8,27 +8,25 @@ use Contao\Message;
 class Database
 {
 
-    public function createTableIfNotExist($strTable)
+    public function createTableIfNotExist($strTable): void
     {
 
-        if (ContaoDatabase::getInstance()->tableExists($strTable, true)) {
-            return false;
+        $blnExist = ContaoDatabase::getInstance()->tableExists($strTable, true);
+
+        if (!$blnExist) {
+            $strFields =
+                "`stop` varchar(16) NOT NULL default ''," .
+                "`start` varchar(16) NOT NULL default ''," .
+                "`published` char(1) NOT NULL default ''," .
+                "`alias` varchar(255) NOT NULL default ''," .
+                "`pid` int(10) unsigned NOT NULL default '0'," .
+                "`id` int(10) unsigned NOT NULL auto_increment," .
+                "`tstamp` int(10) unsigned NOT NULL default '0'," .
+                "`sorting` int(10) unsigned NOT NULL default '0'," .
+                "PRIMARY KEY  (`id`), INDEX (`alias`,`pid`)";
+
+            ContaoDatabase::getInstance()->prepare(sprintf('CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=UTF8', $strTable, $strFields))->execute();
         }
-
-        $strFields =
-            "`stop` varchar(16) NOT NULL default ''," .
-            "`start` varchar(16) NOT NULL default ''," .
-            "`published` char(1) NOT NULL default ''," .
-            "`alias` varchar(255) NOT NULL default ''," .
-            "`pid` int(10) unsigned NOT NULL default '0'," .
-            "`id` int(10) unsigned NOT NULL auto_increment," .
-            "`tstamp` int(10) unsigned NOT NULL default '0'," .
-            "`sorting` int(10) unsigned NOT NULL default '0'," .
-            "PRIMARY KEY  (`id`), INDEX (`alias`,`pid`)";
-
-        ContaoDatabase::getInstance()->prepare(sprintf('CREATE TABLE IF NOT EXISTS `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=UTF8', $strTable, $strFields))->execute();
-
-        return true;
     }
 
     public function createCustomFieldsIfNotExists($strTable)

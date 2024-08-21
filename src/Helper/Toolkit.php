@@ -944,19 +944,48 @@ class Toolkit
         return $arrReturn;
     }
 
-    public static function getTableByDo()
+    public static function getTableByDo($strDoParam = ''): string
     {
 
-        if (!Input::get('do')) {
-            return null;
+        if (!$strDoParam) {
+            $strDoParam = Input::get('do') ?: '';
         }
 
-        if (Input::get('do') && Input::get('table')) {
-            return Input::get('table');
+        if (!$strDoParam) {
+            return '';
         }
 
-        $objCatalog = new Catalog(Input::get('do'));
-        return $objCatalog->getCatalog()['table'];
+        if ($strTable = (Input::get('table') ?: '')) {
+            return $strTable;
+        }
+
+        $objCatalog = new Catalog($strDoParam);
+
+        return $objCatalog->getCatalog()['table'] ?? '';
+    }
+
+    public static function getModuleNameByTable($strTable): string
+    {
+        if (!is_array($GLOBALS['BE_MOD']) || empty($GLOBALS['BE_MOD'])) {
+            return '';
+        }
+
+        foreach ($GLOBALS['BE_MOD'] as $arrModules) {
+            foreach ($arrModules as $strModule => $arrModule) {
+                foreach (($arrModule['tables'] ?? []) as $strModuleTable) {
+                    if ($strTable === $strModuleTable) {
+                        return $strModule;
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    public static function extendField(array $base, array $extend): array
+    {
+        return array_merge($base, $extend);
     }
 
     public static function convertArrayItemsToPlaceholders($arrArray, $strPlaceholder = '?'): string

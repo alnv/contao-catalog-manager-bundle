@@ -13,8 +13,8 @@ class CatalogModel extends Model
     public static function findByTableOrModule($strIdentifier, array $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.table=? OR $strT.module=? OR $strT.id=?"];
+        $strTable = static::$strTable;
+        $arrColumns = ["$strTable.table=? OR $strTable.module=? OR $strTable.id=?"];
 
         return static::findOneBy($arrColumns, [$strIdentifier, $strIdentifier, (int)$strIdentifier], $arrOptions);
     }

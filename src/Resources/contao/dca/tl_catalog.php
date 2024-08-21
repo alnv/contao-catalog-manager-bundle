@@ -12,6 +12,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'tl_catalog_palette'
         ],
         'onload_callback' => [
+            ['catalogmanager.datacontainer.catalog', 'setPalette'],
             ['catalogmanager.datacontainer.catalog', 'checkLicense']
         ],
         'onsubmit_callback' => [
@@ -78,20 +79,13 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
                 'href' => 'table=tl_catalog_license',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
-            ],
-            'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
-                'href' => 'act=select',
-                'class' => 'header_edit_all',
-                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
             ]
         ]
     ],
     'palettes' => [
         '__selector__' => ['type', 'mode', 'sortingType'],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding',
-        // 'modifier' => '{type_settings},type;{general_settings},name;'
+        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding'
     ],
     'subpalettes' => [
         'sortingType_fixed' => 'flagField,flag',
@@ -117,6 +111,11 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'module' => [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
+        /*
+        'modifierMode' => [
+            'sql' => ['type' => 'string', 'fixed' => true, 'length' => 1, 'default' => '']
+        ],
+        */
         'name' => [
             'inputType' => 'text',
             'eval' => [

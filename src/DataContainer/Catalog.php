@@ -2,14 +2,17 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
+use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
 use Contao\Backend;
 use Contao\Config;
 use Contao\Controller;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
+use Contao\Input;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
@@ -107,7 +110,7 @@ class Catalog
         return $objCatalog->getNaturalFields();
     }
 
-    public function getFields($objDataContainer = null)
+    public function getFields($objDataContainer = null): array
     {
 
         if ($objDataContainer === null) {
@@ -123,28 +126,58 @@ class Catalog
         return $objCatalog->getNaturalFields();
     }
 
+    public function setPalette(): void
+    {
+        if ((Input::get('act') == '' && Input::get('key') == '') || 'select' === Input::get('act')) {
+            return;
+        }
+
+        $intId = (int) Input::get('id');
+        $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_catalog WHERE id=?')->limit(1)->execute($intId);
+
+        if (!$objActiveRecord->numRows) {
+            return;
+        }
+
+        if (!($GLOBALS['TL_DCA'][$objActiveRecord->table]['config']['_modified'] ?? false)) {
+            return;
+        }
+
+        PaletteManipulator::create()->removeField('validAliasCharacters')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('dataContainer')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('description')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('name')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('mode')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableCopy')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableVisibility')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enablePanel')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableContentElements')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('navigation')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('position')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableGeocoding')->applyToPalette('catalog', 'tl_catalog');
+    }
+
     public function generateModulename(DataContainer $objDataContainer)
     {
 
-        if ($objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table) {
+        if (!$objDataContainer->activeRecord->table) {
             return null;
         }
 
-        $strModulename = 'module_' . strtolower($objDataContainer->activeRecord->table);
-        Database::getInstance()->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
+        $strModule = Toolkit::getModuleNameByTable($objDataContainer->activeRecord->table) ?: 'module_' . strtolower($objDataContainer->activeRecord->table);
+
+        Database::getInstance()->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModule])->execute($objDataContainer->id);
     }
 
     public function getNavigation(): array
     {
 
         $arrReturn = [];
-
         if (!is_array($GLOBALS['BE_MOD']) || empty($GLOBALS['BE_MOD'])) {
             return $arrReturn;
         }
 
         foreach ($GLOBALS['BE_MOD'] as $strModulename => $arrModules) {
-
             $strModuleLabel = $GLOBALS['TL_LANG']['MOD'][$strModulename] ?: $strModulename;
             $arrReturn[$strModulename] = $strModuleLabel;
         }
@@ -166,15 +199,12 @@ class Catalog
         }
 
         if ($strTable != $objDataContainer->activeRecord->table && $objDataContainer->activeRecord->table) {
-
             if (!$objDatabaseBuilder->renameTable($objDataContainer->activeRecord->table, $strTable)) {
                 throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
             }
         }
 
-        if (!$objDatabaseBuilder->createTableIfNotExist($strTable)) {
-            throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
-        }
+        $objDatabaseBuilder->createTableIfNotExist($strTable);
 
         return $strTable;
     }
