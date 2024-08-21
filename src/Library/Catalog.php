@@ -43,6 +43,10 @@ class Catalog extends CatalogWizard
     protected function setAllFields(): void
     {
 
+        if (!($this->arrCatalog['table'] ?? '')) {
+            return;
+        }
+
         Controller::loadDataContainer($this->arrCatalog['table']);
         Controller::loadLanguageFile($this->arrCatalog['table']);
 

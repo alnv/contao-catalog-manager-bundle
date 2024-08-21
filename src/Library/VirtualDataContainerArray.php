@@ -424,7 +424,7 @@ class VirtualDataContainerArray
     protected function generateEmptyDataContainer(): void
     {
 
-        if (!isset($this->arrCatalog['table'])) {
+        if (!isset($this->arrCatalog['table']) || !$this->arrCatalog['table']) {
             return;
         }
 

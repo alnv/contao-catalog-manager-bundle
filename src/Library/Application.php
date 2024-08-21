@@ -80,7 +80,7 @@ class Application
                 return;
             }
 
-            $strTable = Input::get('id');
+            $strTable = Input::get('id') ?: $strTable;
         }
 
         $objVDataContainerArray = new VirtualDataContainerArray($strTable);
