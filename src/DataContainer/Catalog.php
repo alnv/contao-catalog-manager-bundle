@@ -227,6 +227,10 @@ class Catalog
             return null;
         }
 
+        if (($GLOBALS['TL_DCA'][$objDataContainer->activeRecord->table]['config']['_modified'] ?? false)) {
+            return;
+        }
+
         $objDatabaseBuilder = new CatalogDatabase();
         $objDatabaseBuilder->deleteTable($objDataContainer->activeRecord->table);
     }
