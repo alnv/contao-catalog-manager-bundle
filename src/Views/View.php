@@ -76,6 +76,9 @@ abstract class View extends Controller
                 case 'fastMode':
                     $this->arrOptions['fastMode'] = (bool)$varValue;
                     break;
+                case 'stringMode':
+                    $this->arrOptions['stringMode'] = (bool)$varValue;
+                    break;
                 case 'offset':
                     $this->arrOptions['offset'] = (int)$varValue;
                     break;
@@ -285,6 +288,7 @@ abstract class View extends Controller
         foreach ($arrEntity as $strField => $varValue) {
             $strParsedValue = $this->parseField($varValue, $strField, $arrEntity, [
                 'fastMode' => $this->arrOptions['fastMode'] ?? false,
+                'stringMode' => $this->arrOptions['stringMode'] ?? false,
                 'ignoreFieldsFromParsing' => $this->arrOptions['ignoreFieldsFromParsing'] ?? []
             ]);
             if ($strParsedValue !== $varValue) {
@@ -431,6 +435,7 @@ abstract class View extends Controller
     {
 
         $blnFastMode = $arrOptions['fastMode'] ?? false;
+        $blnStringMode = $arrOptions['stringMode'] ?? false;
         $arrIgnoreFieldsFromParsing = $arrOptions['ignoreFieldsFromParsing'] ?? [];
 
         if (isset($GLOBALS['TL_HOOKS']['parseFieldValue']) && is_array($GLOBALS['TL_HOOKS']['parseFieldValue'])) {
@@ -455,7 +460,7 @@ abstract class View extends Controller
             Cache::set($strHash, $arrAttribute);
         }
 
-        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, false, $blnFastMode, ($this->arrOptions['isForm'] ?? false));
+        return Toolkit::parseCatalogValue($varValue, $arrAttribute, $arrValues, $blnStringMode, $blnFastMode, ($this->arrOptions['isForm'] ?? false));
     }
 
     protected function getPageNumber(): int
