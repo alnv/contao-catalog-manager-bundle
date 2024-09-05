@@ -55,6 +55,19 @@ Es ist auch möglich, Deinen Katalog nach Fieldsets, Subpaletten oder Typen zu u
 
 Mit diesen Einstellungen kannst Du Deinen Katalog nach Deinen Bedürfnissen strukturieren und anpassen.
 
+#### Palette je Typ
+
+Zunächst musst du in deinem Katalog ein Eingabefeld namens "type" erstellen. Dieses Feld sollte die Rolle "type" übernehmen und "type" sollte im Feldname stehen. Idealerweise wird das "type"-Feld als Select-Menü umgesetzt, um eine Auswahl von Optionen bereitzustellen. Definiere hierzu die gewünschten Optionen, die im Select-Menü angezeigt werden sollen.
+
+Sobald das "type"-Eingabefeld angelegt ist, kannst du für jede Option eine entsprechende Palette erstellen. Bei den Paletten hast du die Möglichkeit, für jede Option im Select-Menü eine eigene Palette zuzuweisen. Wähle dann im Selektor die jeweilige Option aus, um die dazugehörige Palette anzuzeigen.
+
+Falls du keinen Standardwert für das "type"-Feld definierst, wird eine Default-Palette benötigt, die in diesem Fall als Fallback verwendet wird. Siehe Screenshots.
+
+![](https://catalog-manager.org/files/docs/screenshot_type.png)
+![](https://catalog-manager.org/files/docs/screenshot_default.png)
+![](https://catalog-manager.org/files/docs/screenshot_news.png)
+![](https://catalog-manager.org/files/docs/screenshot_event.png)
+
 ### Rollen
 
 In der neuen Version des Catalog Managers kannst Du keine Backend-CSS-Klassen, SQL-Datentypen oder reguläre Ausdrücke direkt definieren. Stattdessen läuft alles über Rollen, daher ist es wichtig, für jeden Feldtyp die passende Rolle auszuwählen. Hier ist eine Übersicht der wichtigen Rollen:
