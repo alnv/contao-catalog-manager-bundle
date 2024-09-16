@@ -9,6 +9,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Config;
 use Contao\Validator;
 
 class ActiveInsertTag
@@ -32,7 +33,7 @@ class ActiveInsertTag
             $arrActiveOptions = [
                 'touch' => false,
                 'dateMethod' => 'dayBegin',
-                'dateFormat' => $objPage->dateFormat
+                'dateFormat' => $objPage?->dateFormat ?: Config::get('dateFormat')
             ];
 
             if (isset($arrFragments[2]) && \strpos($arrFragments[2], '?') !== false) {

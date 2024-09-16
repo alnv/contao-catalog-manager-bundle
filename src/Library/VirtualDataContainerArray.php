@@ -158,7 +158,7 @@ class VirtualDataContainerArray
         }
 
         if (count($arrList['labels']['fields']) > 0) {
-            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
+            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
         }
@@ -178,7 +178,7 @@ class VirtualDataContainerArray
             $arrList['sorting']['fields'] = ['sorting'];
             $arrList['sorting']['icon'] = 'articles.svg';
             $arrList['labels']['fields'] = empty($this->arrCatalog['columns']) ? ['id'] : $this->arrCatalog['columns'];
-            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc = null, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
+            $arrList['labels']['label_callback'] = function ($arrRow, $strLabel, DataContainer $dc, $strImageAttribute = '', $blnReturnImage = false, $blnProtected = false) use ($arrList) {
                 return Toolkit::renderTreeRow($arrRow, $strLabel, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
             $arrList['labels']['showColumns'] = false;
@@ -218,6 +218,20 @@ class VirtualDataContainerArray
                     'href' => 'act=toggle&amp;field=published',
                     'icon' => 'visible.svg',
                     'showInHeader' => true
+                ]
+            ]);
+        }
+
+        if (($this->arrCatalog['enablePreview'] ?? false) && !in_array('preview', array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], count($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations']), [
+                'preview' => [
+                    'label' => $GLOBALS['TL_LANG']['DCA']['preview'][0] ?? '',
+                    'showInHeader' => true,
+                    'button_callback' => function ($arrRow, $strHref, $strTitle, $_strLabel, $_strIcon, $strHtmlAttributes, $strTable) {
+                        $strIcon = Image::getHtml('forward_2.svg');
+                        $strUrl = Toolkit::getDetailPageFromEntityByIdAndTable($strTable, $arrRow['id']);
+                        return '<a target="blank" href="' . $strUrl . '" title="' . StringUtil::specialchars($strTitle) . '" onclick="Backend.getScrollOffset()">' . $strIcon . '</a>';
+                    }
                 ]
             ]);
         }

@@ -10,6 +10,7 @@ use Contao\Controller;
 use Contao\Database;
 use Contao\PageModel;
 use Contao\StringUtil;
+use Contao\Widget;
 
 class GetSearchablePagesListener
 {
@@ -25,8 +26,8 @@ class GetSearchablePagesListener
     {
 
         $objCatalogFields = CatalogFieldModel::findAll([
-            'column' => ['tl_catalog_field.role=?'],
-            'value' => ['pages']
+            'column' => ['tl_catalog_field.role=? OR tl_catalog_field.role=?'],
+            'value' => ['pages', 'page']
         ]);
 
         if ($objCatalogFields === null) {
@@ -55,6 +56,7 @@ class GetSearchablePagesListener
             }
 
             $strTable = $objCatalog->table;
+
             if (!$strTable) {
                 continue;
             }
@@ -63,15 +65,16 @@ class GetSearchablePagesListener
             $objModel = $objModel->getModel();
             $objEntities = $objModel->findAll();
 
+            Controller::loadDataContainer($strTable);
+
             if ($objEntities) {
-
                 while ($objEntities->next()) {
-
                     $arrEntity = $objEntities->row();
+                    $varPages = $arrEntity[$strFieldname] ?? '';
+                    $varPages = Toolkit::parseCatalogValue($varPages, Widget::getAttributesFromDca(($GLOBALS['TL_DCA'][$strTable]['fields'][$strFieldname] ?? []), $strFieldname, $varPages, $strFieldname, $strTable), $arrEntity, false);
 
-                    if (is_array($arrEntity[$strFieldname]) && !empty($arrEntity[$strFieldname])) {
-
-                        foreach ($arrEntity[$strFieldname] as $arrUrl) {
+                    if (is_array($varPages) && !empty($varPages)) {
+                        foreach ($varPages as $arrUrl) {
                             if ($strDns) {
                                 if (str_contains($arrUrl['absolute'], $strDns)) {
                                     $arrPages[] = $arrUrl['absolute'];

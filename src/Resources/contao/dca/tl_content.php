@@ -50,7 +50,6 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['cmHide'] = [
     'exclude' => true,
     'sql' => "varchar(16) NOT NULL default ''"
 ];
-
 $GLOBALS['TL_DCA']['tl_content']['fields']['cmTable'] = [
     'inputType' => 'select',
     'eval' => [

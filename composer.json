@@ -3,7 +3,7 @@
   "type": "contao-bundle",
   "license": "proprietary",
   "description": "Catalog Manager for Contao CMS",
-  "keywords": ["contao", "catalog", "filter", "frontend editing", "radius search"],
+  "keywords": ["contao", "catalog", "filter", "umkreissuche", "merkliste", "wunschliste", "immobilien", "jobs", "stellenbörse", "produkte", "pim", "mediathek", "events", "news", "blog"],
   "homepage": "https://catalog-manager.org",
   "authors": [
     {

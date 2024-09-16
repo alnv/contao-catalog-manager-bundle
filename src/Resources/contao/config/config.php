@@ -618,3 +618,10 @@ if (Mode::get() == 'BE') {
     $objCombiner->add('/bundles/alnvcontaocatalogmanager/css/backend.scss');
     $GLOBALS['TL_CSS']['catalog-manager-backend-css'] = $objCombiner->getCombinedFile();
 }
+
+/*
+(new \Alnv\ContaoCatalogManagerBundle\Helper\Export('diggies'))->byTable('cm_diggies', [
+    'ignore_fields' => ['origin', '_table', 'masterUrl', 'stop', 'start', 'published', 'pid', 'alias', 'lid', 'language', 'tstamp', 'sorting', 'images', 'internal_id', 'origin_alias', 'teaser'],
+    'limit' => 1000
+])->prompt();
+*/

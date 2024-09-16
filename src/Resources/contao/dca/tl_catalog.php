@@ -85,7 +85,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
     'palettes' => [
         '__selector__' => ['type', 'mode', 'sortingType'],
         'default' => '{type_settings},type;',
-        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding'
+        'catalog' => '{type_settings},type;{catalog_settings},table,dataContainer,validAliasCharacters;{general_settings},name,description;{mode_settings},mode;{extended_settings},enableCopy,enableVisibility,enablePanel,enablePreview,enableContentElements;{navigation_settings},navigation,position;{geocoding_settings:hide},enableGeocoding'
     ],
     'subpalettes' => [
         'sortingType_fixed' => 'flagField,flag',
@@ -322,6 +322,14 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
         ],
         'enableVisibility' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr',
+                'multiple' => false
+            ],
+            'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '']
+        ],
+        'enablePreview' => [
             'inputType' => 'checkbox',
             'eval' => [
                 'tl_class' => 'clr',

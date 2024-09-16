@@ -33,6 +33,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['order'] = ['Sortierfelder', 'Eines oder mehre
 $GLOBALS['TL_LANG']['tl_catalog']['enableGeocoding'] = ['GeoCoding aktivieren', ''];
 $GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint'] = 'Es können nur leere Tabellen verschoben werden.';
 $GLOBALS['TL_LANG']['tl_catalog']['palettes'] = ['Paletten', 'Paletten bearbeiten'];
+$GLOBALS['TL_LANG']['tl_catalog']['enablePreview'] = ['Vorschau aktivieren', 'Vorschau im Backend aktivieren.'];
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
     'none' => 'Keine Sortierung',

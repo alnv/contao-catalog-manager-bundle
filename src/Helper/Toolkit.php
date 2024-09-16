@@ -6,11 +6,13 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Image as CatalogImage;
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
 use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Ausi\SlugGenerator\SlugGenerator;
 use Ausi\SlugGenerator\SlugOptions;
+use Contao\Controller;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Date;
@@ -45,6 +47,63 @@ class Toolkit
         $objCatalogData->tstamp = time();
 
         return $objCatalogData->save()->row();
+    }
+
+    public static function getDetailPageFromEntityByIdAndTable($strTable, $strId): string
+    {
+
+        $objCatalog = CatalogModel::findByTableOrModule($strTable);
+        if (!$objCatalog) {
+            return '';
+        }
+
+        Controller::loadDataContainer($strTable);
+
+        $objModel = new ModelWizard($strTable);
+        $objModel = $objModel->getModel();
+        $objEntity = $objModel->findByPk($strId);
+
+        if (!$objEntity) {
+            return '';
+        }
+
+        $arrMasterPages = [];
+        $objCeElements = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE type=? AND cmMaster=? AND cmTable=?')->limit(1)->execute('listview', '1', $strTable);
+        if ($objCeElements->cmMasterPage) {
+            $arrMasterPages[] = $objCeElements->cmMasterPage;
+        }
+
+        $objModules = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE type=? AND cmMaster=? AND cmTable=?')->limit(1)->execute('listing-table', '1', $strTable);
+        if ($objModules->cmMasterPage) {
+            $arrMasterPages[] = $objModules->cmMasterPage;
+        }
+
+        $arrMasterPages = array_unique($arrMasterPages);
+        $arrMasterPages = array_filter($arrMasterPages);
+
+        if ($strPageID = ($arrMasterPages[0] ?? 0)) {
+            return static::parseDetailLink($strPageID, $objEntity->alias, $objEntity->row(), false, true);
+        }
+
+        $objCatalogFields = CatalogFieldModel::findAll([
+            'column' => ['tl_catalog_field.pid=?', 'tl_catalog_field.role=? OR tl_catalog_field.role=?'],
+            'value' => [$objCatalog->id, 'pages', 'page'],
+            'limit' => 1
+        ]);
+
+        if ($objCatalogFields) {
+            $strField = $objCatalogFields->row()['fieldname'] ?? '';
+            $varPages = ($objEntity->{$strField} ?? '');
+            $varPages = static::parseCatalogValue($varPages, Widget::getAttributesFromDca(($GLOBALS['TL_DCA'][$strTable]['fields'][$strField] ?? []), $strField, $varPages, $strField, $strTable), $objEntity->row(), false);
+
+            if (is_array($varPages) && !empty($varPages)) {
+                foreach ($varPages as $varPage) {
+                    return $varPage['absolute'] ?? '';
+                }
+            }
+        }
+
+        return '';
     }
 
     public static function addCount($strType, $strTable, $strIdentifier): void
@@ -265,7 +324,7 @@ class Toolkit
         }
     }
 
-    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = [], bool $blnUseAbsolute = false): string
+    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = [], bool $blnUseAbsolute = false, $blnPreview = false): string
     {
 
         if (is_numeric($varPage)) {
@@ -285,16 +344,18 @@ class Toolkit
             $strUrlFragments = [];
             foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
                 $strFieldName = $objPageFilter->getAlias();
-                $strUrlFragments[] = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName] ?? '');
+                if ($strFragment = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName] ?? '')) {
+                    $strUrlFragments[] = $strFragment;
+                }
             }
 
             $strUrlFragments[] = $strAlias;
             $strUrl = (empty($strUrlFragments) ? '' : implode('/', $strUrlFragments));
 
-            return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strUrl ? '/' . $strUrl : '')) : $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
+            return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strUrl ? '/' . $strUrl : '')) : ($blnPreview ? 'preview.php/' : '') . $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
         }
 
-        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : ($blnPreview ? 'preview.php/' : '')  . $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
     }
 
     public static function parseImage($varImage): string
@@ -599,16 +660,24 @@ class Toolkit
                     if ($blnStringFormat) {
                         $arrValues[] = $objPage->pageTitle ?: $objPage->title;
                     } else {
+
                         $strUrl = '';
+                        $strMaster = '';
+                        $strAbsolute = '';
 
                         try {
-                            $strUrl = $objPage->getFrontendUrl();
-                        } catch (\Exception $objException) {}
+                            $arrPage = $objPage->row();
+                            $strUrl = static::parseDetailLink($arrPage, '', $arrCatalog);
+                            $strMaster = static::parseDetailLink($arrPage, $arrCatalog['alias'], $arrCatalog);
+                            $strAbsolute = static::parseDetailLink($arrPage, $arrCatalog['alias'], $arrCatalog, true);
+
+                        } catch (\Exception $objException) {
+                        }
 
                         $arrValues[$strPageId] = [
                             'url' => $strUrl,
-                            'master' => $objPage->getFrontendUrl('/' . $arrCatalog['alias']),
-                            'absolute' => $objPage->getAbsoluteUrl('/' . $arrCatalog['alias'])
+                            'master' => $strMaster,
+                            'absolute' => $strAbsolute
                         ];
                     }
                 }
