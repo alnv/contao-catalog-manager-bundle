@@ -74,6 +74,12 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ]
         ],
         'global_operations' => [
+            'vector_files' => [
+                'label' => &$GLOBALS['TL_LANG']['tl_catalog']['vector_files'],
+                'href' => 'table=tl_catalog_vector_files',
+                'class' => 'header_edit_all',
+                'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
+            ],
             'license' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['license'],
                 'href' => 'table=tl_catalog_license',

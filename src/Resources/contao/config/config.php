@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "3.3.0";
+const CATALOG_MANAGER_BUNDLE_VERSION = "3.4.0";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -29,7 +29,8 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_field',
                 'tl_catalog_option',
                 'tl_catalog_palette',
-                'tl_catalog_license'
+                'tl_catalog_license',
+                'tl_catalog_vector_files'
             ]
         ],
         'roles' => [
