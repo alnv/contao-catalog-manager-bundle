@@ -13,6 +13,7 @@ use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
 use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
+use Alnv\ContaoCatalogManagerBundle\AI\AiChatComponentParser;
 use Alnv\ContaoCatalogManagerBundle\Widgets\CustomOptionWizard;
 use Contao\ArrayUtil;
 use Contao\Combiner;
@@ -69,6 +70,11 @@ ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
         'master' => MasterModule::class
     ]
 ]);
+
+$GLOBALS['OPEN_AI_MESSAGE_PARSER']['catalog-manager'] = [
+    'label' => 'Catalog-Manager',
+    'class' => AiChatComponentParser::class
+];
 
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
@@ -619,10 +625,3 @@ if (Mode::get() == 'BE') {
     $objCombiner->add('/bundles/alnvcontaocatalogmanager/css/backend.scss');
     $GLOBALS['TL_CSS']['catalog-manager-backend-css'] = $objCombiner->getCombinedFile();
 }
-
-/*
-(new \Alnv\ContaoCatalogManagerBundle\Helper\Export('diggies'))->byTable('cm_diggies', [
-    'ignore_fields' => ['origin', '_table', 'masterUrl', 'stop', 'start', 'published', 'pid', 'alias', 'lid', 'language', 'tstamp', 'sorting', 'images', 'internal_id', 'origin_alias', 'teaser'],
-    'limit' => 1000
-])->prompt();
-*/

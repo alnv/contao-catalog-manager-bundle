@@ -34,11 +34,11 @@ class Authorization
 
         foreach ($arrItems as $arrItem) {
 
-            if (!in_array($arrItem['product_id'], ['2', '3'])) {
+            if (!\in_array($arrItem['product_id'], ['2', '3'])) {
                 continue;
             }
 
-            $arrAttributes = array_values($arrItem['attributes'] ?? []);
+            $arrAttributes = \array_values($arrItem['attributes'] ?? []);
             foreach ($arrAttributes as $arrData) {
 
                 foreach ($arrData as $strDomain) {

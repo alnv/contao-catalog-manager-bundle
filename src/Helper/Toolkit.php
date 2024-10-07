@@ -474,7 +474,7 @@ class Toolkit
             if ($strValue === '' || $strValue === null) {
                 continue;
             }
-            if (in_array($strField, ['sorting'])) {
+            if ($strField === 'sorting') {
                 continue;
             }
             $intIndex += 1;

@@ -47,7 +47,6 @@ class ModelWizard
 
     public function getModel()
     {
-
         return $this->objModel;
     }
 

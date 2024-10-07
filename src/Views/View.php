@@ -56,12 +56,18 @@ abstract class View extends Controller
                 case 'isForm':
                     $this->arrOptions['isForm'] = (bool)$varValue;
                     break;
+                case 'masterUrl':
+                    $this->arrOptions['masterUrl'] = $varValue;
+                    break;
                 case 'masterPage':
                     $objPage = PageModel::findByPk($varValue);
                     if ($objPage !== null) {
                         $this->arrMasterPage = $objPage->row();
                         $this->arrOptions['masterPage'] = true;
                     }
+                    break;
+                case 'useAbsoluteUrl':
+                    $this->arrOptions['useAbsoluteUrl'] = (bool) $varValue;
                     break;
                 case 'formPage':
                     $objPage = PageModel::findByPk($varValue);
@@ -279,10 +285,10 @@ abstract class View extends Controller
         $arrRow = [];
         $arrRow['origin'] = [];
         $arrRow['_table'] = $this->strTable;
-        $arrRow['masterUrl'] = '';
+        $arrRow['masterUrl'] = $this->arrOptions['masterUrl'] ?? '';
 
         if (isset($this->arrOptions['masterPage']) && $this->arrOptions['masterPage']) {
-            $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias'], $arrEntity);
+            $arrRow['masterUrl'] = Toolkit::parseDetailLink($this->arrMasterPage, $arrEntity['alias'], $arrEntity, ($this->arrOptions['useAbsoluteUrl'] ?? false));
         }
 
         foreach ($arrEntity as $strField => $varValue) {

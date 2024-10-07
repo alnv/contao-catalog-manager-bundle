@@ -3,6 +3,7 @@
 use Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Entity\CatalogVectorFile;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Contao\Controller;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
@@ -69,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_catalog_vector_files'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'name,dbTable,fields;dbWizardFilterSettings'
+        'default' => 'name,dbTable,fields;dbWizardFilterSettings;masterPage,template'
     ],
     'fields' => [
         'id' => [
@@ -122,7 +123,14 @@ $GLOBALS['TL_DCA']['tl_catalog_vector_files'] = [
             ],
             'options_callback' => function (DataContainer $objDataContainer) {
                 $objDataContainer->activeRecord->table = $objDataContainer->activeRecord->dbTable;
-                return (new Catalog())->getFields($objDataContainer);
+                $arrFields = [];
+                foreach ((new Catalog())->getFields($objDataContainer) as $strField => $strLabel) {
+                    if (in_array($strField, ['id', 'tstamp', 'sorting', 'lid', 'pid', 'published', 'alias', 'start', 'stop'])) {
+                        continue;
+                    }
+                    $arrFields[$strField] = $strLabel;
+                }
+                return $arrFields;
             },
             'sql' => 'blob NULL'
         ],
@@ -138,6 +146,32 @@ $GLOBALS['TL_DCA']['tl_catalog_vector_files'] = [
             ],
             'options_callback' => ['catalogmanager.datacontainer.catalog', 'getDbFields'],
             'sql' => ['type' => 'blob', 'notnull' => false]
+        ],
+        'masterPage' => [
+            'inputType' => 'pageTree',
+            'eval' => [
+                'tl_class' => 'w50 clr'
+            ],
+            'foreignKey' => 'tl_page.title',
+            'relation' => [
+                'load' => 'lazy',
+                'type' => 'hasOne'
+            ],
+            'sql' => "int(10) unsigned NOT NULL default '0'"
+        ],
+        'template' => [
+            'inputType' => 'select',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 255,
+                'tl_class' => 'w50',
+                'mandatory' => false,
+                'includeBlankOption' => true
+            ],
+            'options_callback' => function () {
+                return Controller::getTemplateGroup('cm_listing_');
+            },
+            'sql' => "varchar(255) NOT NULL default ''"
         ],
         'file' => [
             'sql' => 'blob NULL'

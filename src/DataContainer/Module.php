@@ -66,7 +66,6 @@ class Module
 
     public function getOrderByStatements(): array
     {
-
         return [
             'ASC',
             'DESC'

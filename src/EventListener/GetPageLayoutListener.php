@@ -110,6 +110,7 @@ class GetPageLayoutListener
 
             return $objContent->cmTable;
         }
+
         return null;
     }
 
