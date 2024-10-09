@@ -7,6 +7,8 @@ use Contao\Controller;
 use Contao\DataContainer;
 use Contao\DC_Table;
 use Contao\System;
+use Contao\Database;
+use Contao\Input;
 
 System::loadLanguageFile('tl_catalog_field');
 
