@@ -9,6 +9,7 @@ use Contao\DC_Table;
 use Contao\System;
 use Contao\Database;
 use Contao\Input;
+use Contao\Environment;
 
 System::loadLanguageFile('tl_catalog_field');
 
