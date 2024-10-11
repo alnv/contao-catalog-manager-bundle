@@ -3,10 +3,14 @@
 use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
-use Contao\DC_Table;
+use Contao\Controller;
 use Contao\StringUtil;
+use Contao\DC_Table;
+use Contao\Database;
+use Contao\Widget;
 
 $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
     'config' => [
@@ -31,11 +35,31 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                     }
                 }
 
-                if ($objField = CatalogFieldModel::findByFieldnameAndPid('type', $objCurrent->pid)) {
-                    PaletteManipulator::create()
-                        ->addField('selector_type', 'name')
-                        ->applyToPalette('palette', 'tl_catalog_palette');
-                    $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new CatalogPalette())->getFieldOptions($objField->id);
+                $objCatalog = CatalogModel::findByPk($objCurrent->pid);
+
+                if ($objCatalog) {
+
+                    $strTable = $objCatalog->table;
+
+                    Controller::loadDataContainer($strTable);
+
+                    if (!empty($GLOBALS['TL_DCA'][$strTable]['fields']['type'])) {
+
+                        $arrTypeAttributes = Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$strTable]['fields']['type'], 'type', '', 'type', $strTable, $objDataContainer);
+                        $arrOptions = [];
+                        foreach (($arrTypeAttributes['options'] ?? []) as $arrOption) {
+                            if (!$arrOption['value']) {
+                                continue;
+                            }
+                            $arrOptions[$arrOption['value']] = $arrOption['label'] ?? '-';
+                        }
+
+                        PaletteManipulator::create()
+                            ->addField('selector_type', 'name')
+                            ->applyToPalette('palette', 'tl_catalog_palette');
+
+                        $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = $arrOptions;
+                    }
                 }
 
                 $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
@@ -46,7 +70,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
 
                 $arrFields = [];
                 $intPosition = 0;
-                $arrFieldsets = StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
+                $arrFieldSets = StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
 
                 foreach (StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
                     if ($arrField['field'] === '__FIELDSET__') {
@@ -55,23 +79,28 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                     }
                 }
 
-                $objCurrent = CatalogPaletteModel::findByPk($objDataContainer->id);
-                if (count($arrFieldsets) != count($arrFields)) {
+                if (\count($arrFieldSets) != \count($arrFields)) {
                     $arrNewSets = [];
                     foreach ($arrFields as $strIndex => $strField) {
                         $strLabel = $strField;
-                        if (isset($arrFieldsets[$strIndex])) {
-                            $strLabel = $arrFieldsets[$strIndex]['label'] ?: $strField;
+                        if (isset($arrFieldSets[$strIndex])) {
+                            $strLabel = $arrFieldSets[$strIndex]['label'] ?: $strField;
                         }
                         $arrNewSets[] = [
                             'label' => $strLabel,
-                            'hide' => $arrFieldsets[$strIndex]['hide'] ? '1' : ''
+                            'hide' => $arrFieldSets[$strIndex]['hide'] ? '1' : ''
                         ];
                     }
-                    $objCurrent->fieldsets = serialize($arrNewSets);
-                }
 
-                $objCurrent->save();
+                    Database::getInstance()
+                        ->prepare('UPDATE tl_catalog_palette %s WHERE id=?')
+                        ->set([
+                            'tstamp' => \time(),
+                            'fieldsets' => \serialize($arrNewSets)
+                        ])
+                        ->limit(1)
+                        ->execute($objDataContainer->id);
+                }
             }
         ],
         'sql' => [

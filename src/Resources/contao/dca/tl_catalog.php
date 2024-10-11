@@ -13,7 +13,8 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         ],
         'onload_callback' => [
             ['catalogmanager.datacontainer.catalog', 'setPalette'],
-            ['catalogmanager.datacontainer.catalog', 'checkLicense']
+            ['catalogmanager.datacontainer.catalog', 'checkLicense'],
+            ['catalogmanager.datacontainer.catalog', 'checkAiBundle']
         ],
         'onsubmit_callback' => [
             ['catalogmanager.datacontainer.catalog', 'generateModulename'],

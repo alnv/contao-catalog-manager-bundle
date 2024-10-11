@@ -7,7 +7,9 @@ use Alnv\ContaoCatalogManagerBundle\Library\Options;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\Controller;
 use Contao\DataContainer;
+use Contao\System;
 
 class CatalogPalette
 {
@@ -51,7 +53,7 @@ class CatalogPalette
             $arrReturn['start'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.start', Toolkit::getLabel('start'));
         }
 
-        return $arrReturn;
+        return $this->extendWithDcaFields($objCatalog->table, $arrReturn);
     }
 
     public function getFields(DataContainer $objDataContainer): array
@@ -74,5 +76,27 @@ class CatalogPalette
         }
 
         return $arrReturn;
+    }
+
+    protected function extendWithDcaFields($strTable, $arrFields): array
+    {
+
+        Controller::loadDataContainer($strTable);
+        System::loadLanguageFile($strTable);
+
+        foreach (($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) as $strField => $arrField) {
+
+            if (isset($arrReturn[$strField])) {
+                continue;
+            }
+
+            if (!isset($arrField['inputType'])) {
+                continue;
+            }
+
+            $arrFields[$strField] = $GLOBALS['TL_LANG'][$strTable][$strField][0] ?? $strField;
+        }
+
+        return $arrFields;
     }
 }

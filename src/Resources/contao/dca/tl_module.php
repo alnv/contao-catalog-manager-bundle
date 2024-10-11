@@ -4,6 +4,8 @@ use Contao\Controller;
 use Contao\DataContainer;
 use Contao\Database;
 
+$GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
+
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilter';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmMaster';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'cmFilterType';
@@ -14,10 +16,8 @@ $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilterType_expert'] = 'cmColum
 $GLOBALS['TL_DCA']['tl_module']['subpalettes']['cmFilterType_wizard'] = 'cmWizardFilterSettings';
 
 $GLOBALS['TL_DCA']['tl_module']['palettes']['listing-table'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmGroupBy,cmGroupByHl,cmOrder;{radius_search_settings},cmRadiusSearch;{performance_settings:hide},cmIgnoreFieldsFromParsing;{template_legend:hide},cmTemplate,customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmIgnoreVisibility;{template_legend:hide},cmTemplate,customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['master'] = '{title_legend},name,headline,type;{master_settings},cmTable,cmFilter,cmIgnoreVisibility;{template_legend:hide},cmTemplate,customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['listing-map'] = '{title_legend},name,headline,type;{listing_settings},cmTable,cmTemplate,cmMaster,cmFilter,cmIgnoreVisibility,cmPagination,cmLimit,cmOffset,cmOrder,cmInfoContent;{radius_search_settings},cmRadiusSearch;{performance_settings:hide},cmIgnoreFieldsFromParsing;{template_legend:hide},customTpl;{protected_legend:hide:hide},protected;{expert_legend:hide},guests,cssID,space';
-
-$GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
 
 $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = function (DataContainer $objDataContainer) {
     $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->limit(1)->execute($objDataContainer->id);

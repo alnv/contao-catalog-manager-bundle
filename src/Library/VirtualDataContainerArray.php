@@ -117,15 +117,19 @@ class VirtualDataContainerArray
                 }
 
                 if ($this->arrCatalog['flagField'] === 'sorting') {
-                    $arrList['sorting']['mode'] = 5;
+
+                    $arrList['sorting']['mode'] = DataContainer::MODE_TREE;
                     $arrList['sorting']['rootPaste'] = true;
+                    $arrList['sorting']['showRootTrails'] = true;
                     $arrList['sorting']['fields'] = ['sorting'];
+
                     $arrList['sorting']['paste_button_callback'] = function (DataContainer $dc, $row, $table, $cr, $arrClipboard = null) {
-                        return ($arrClipboard['mode'] == 'cut' && ($arrClipboard['id'] == $row['id'] || $cr)) ? Image::getHtml('pasteafter_.svg') . ' ' : '<a href="' . Backend::addToUrl('act=' . $arrClipboard['mode'] . '&mode=1&pid=' . $row['id'] . '&id=' . $arrClipboard['id']) . '" title="' . StringUtil::specialchars(sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('pasteafter.svg', sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '</a> ';
+                        return ($arrClipboard['mode'] == 'cut' && ($arrClipboard['id'] == $row['id'] || $cr)) ? Image::getHtml('pasteafter_.svg') . ' ' : '<a href="' . Backend::addToUrl('act=' . $arrClipboard['mode'] . '&mode=1&pid=' . $row['id'] . '&id=' . $arrClipboard['id']) . '" title="' . StringUtil::specialchars(\sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('pasteafter.svg', \sprintf($GLOBALS['TL_LANG'][$dc->table]['pasteafter'][1], $row['id'])) . '</a> ';
                     };
 
                     $blnUseCut = true;
                     $this->arrCatalog['showColumns'] = '';
+
                     unset($arrList['sorting']['flag']);
                 }
             }
@@ -266,8 +270,8 @@ class VirtualDataContainerArray
 
         while ($objPalettes->next()) {
 
-            $arrLegends = [];
             $strLegend = '';
+            $arrLegends = [];
             $strName = StringUtil::generateAlias(strtolower($objPalettes->name));
             $arrFields = StringUtil::deserialize($objPalettes->fields, true);
             $arrFieldsets = StringUtil::deserialize($objPalettes->fieldsets, true);
@@ -316,7 +320,6 @@ class VirtualDataContainerArray
                 if (!in_array('type', $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'])) {
                     $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'][] = 'type';
                 }
-
                 $strName = $objPalettes->selector_type;
             }
 
@@ -557,13 +560,20 @@ class VirtualDataContainerArray
             return;
         }
 
-        $this->setConfig();
-        $this->setList();
-        $this->setOperations();
-        $this->setPalettes();
-        $this->setSubPalettes();
-        $this->setFields();
-        $this->setLabels();
+        if (($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_modified'] ?? false)) {
+            $this->setPalettes();
+            $this->setSubPalettes();
+            $this->setFields();
+            $this->setLabels();
+        } else {
+            $this->setConfig();
+            $this->setList();
+            $this->setOperations();
+            $this->setPalettes();
+            $this->setSubPalettes();
+            $this->setFields();
+            $this->setLabels();
+        }
 
         if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
             foreach ($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback) {
