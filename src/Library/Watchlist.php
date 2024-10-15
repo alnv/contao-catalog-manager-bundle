@@ -3,8 +3,8 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
-use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Contao\Combiner;
 use Contao\FrontendTemplate;
 use Contao\FrontendUser;
@@ -19,7 +19,7 @@ class Watchlist
 
         $objCombiner = new Combiner();
         $objCombiner->add('bundles/alnvcontaocatalogmanager/js/vue/components/watchlist-form-component.js');
-        $GLOBALS['TL_HEAD']['watchlist-form-component'] = '<script src="'. $objCombiner->getCombinedFile() .'"></script>';
+        $GLOBALS['TL_HEAD']['watchlist-form-component'] = '<script src="' . $objCombiner->getCombinedFile() . '"></script>';
 
         $objTemplate = new FrontendTemplate('ce_watchlist_form');
         $arrData = self::getWatchlistData($strIdentifier, $strTable);
@@ -29,7 +29,7 @@ class Watchlist
             'units' => $arrData['units'],
             'added' => isset($arrData['id']),
             'id' => 'id_' . md5($strIdentifier . ':' . $strTable),
-            'useUnits' => (bool)($arrOptions['useUnits']??false),
+            'useUnits' => (bool)($arrOptions['useUnits'] ?? false),
             'buttonAddLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListAddButtonLabel'],
             'buttonRemoveLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListRemoveButtonLabel'],
             'buttonUnitsLabel' => &$GLOBALS['TL_LANG']['MSC']['watchListUnitsButtonLabel'],

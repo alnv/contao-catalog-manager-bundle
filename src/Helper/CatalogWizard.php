@@ -113,7 +113,8 @@ abstract class CatalogWizard
         }
 
         $blnMultiple = (bool)$arrField['multiple'];
-        $arrField['description'] = trim(strip_tags($arrField['description']));
+        $arrField['description'] = \trim(\strip_tags($arrField['description']));
+
         $arrReturn = [
             'inputType' => '',
             'sorting' => !$blnMultiple,
@@ -132,7 +133,6 @@ abstract class CatalogWizard
                 'mandatory' => (bool)$arrField['mandatory'],
                 'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
-            // 'exclude' => true,
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
         ];
 
@@ -163,7 +163,7 @@ abstract class CatalogWizard
                 ];
             }
 
-            if ($arrField['csv']) {
+            if (isset($arrField['csv']) && $arrField['csv']) {
                 $arrReturn['eval']['csv'] = ',';
             }
         }

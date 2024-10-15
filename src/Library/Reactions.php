@@ -132,7 +132,7 @@ class Reactions
     protected function getAlias(): string
     {
 
-        return $_GET['auto_item'] ? '/' . Input::get('auto_item') : '';
+        return ($_GET['auto_item'] ?? '') ? '/' . Input::get('auto_item') : '';
     }
 
     protected function reload()

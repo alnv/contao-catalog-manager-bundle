@@ -458,7 +458,6 @@ class VirtualDataContainerArray
         }
 
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']] ?? [];
-
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'] ?? [];
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_loaded'] = true;
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {

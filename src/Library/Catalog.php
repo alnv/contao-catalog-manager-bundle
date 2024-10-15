@@ -66,10 +66,13 @@ class Catalog extends CatalogWizard
         }
 
         while ($objFields->next()) {
+
             $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
+
             if ($arrField === null) {
                 continue;
             }
+
             $this->arrFields[$objFields->fieldname] = $arrField;
         }
     }
