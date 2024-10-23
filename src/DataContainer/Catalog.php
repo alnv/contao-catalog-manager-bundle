@@ -32,7 +32,9 @@ class Catalog
     public function checkAiBundle(): void
     {
 
-        if (!System::getContainer()->get('kernel')->getBundles()['AlnvContaoOpenAiAssistantBundle']) {
+        $arrBundles = System::getContainer()->get('kernel')->getBundles();
+
+        if (!($arrBundles['AlnvContaoOpenAiAssistantBundle'] ?? '')) {
             unset($GLOBALS['TL_DCA']['tl_catalog']['list']['global_operations']['vector_files']);
         }
     }
@@ -139,7 +141,7 @@ class Catalog
             return;
         }
 
-        $intId = (int) Input::get('id');
+        $intId = (int)Input::get('id');
         $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_catalog WHERE id=?')->limit(1)->execute($intId);
 
         if (!$objActiveRecord->numRows) {
