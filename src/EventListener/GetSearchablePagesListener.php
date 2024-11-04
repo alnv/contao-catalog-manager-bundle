@@ -133,7 +133,7 @@ class GetSearchablePagesListener
             ]);
 
             if (!$objEntities) {
-                return $arrPages;
+                continue;
             }
 
             while ($objEntities->next()) {
