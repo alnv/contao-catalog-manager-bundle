@@ -60,7 +60,6 @@ class PageInsertTag
     {
 
         $objPage = PageModel::findByPk($strId);
-
         if ($objPage === null) {
             return $arrReturn;
         }

@@ -46,7 +46,7 @@ $GLOBALS['TL_DCA']['tl_catalog_roles'] = [
         ]
     ],
     'palettes' => [
-        'default' => 'name;maxlength,minlength;maxval,minval;class;rgxp;sql'
+        'default' => 'name;maxlength,minlength;maxval,minval;class;rgxp;isUnique;sql'
     ],
     'fields' => [
         'id' => [
@@ -120,6 +120,13 @@ $GLOBALS['TL_DCA']['tl_catalog_roles'] = [
                 'decodeEntities' => true
             ],
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
+        ],
+        'isUnique' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'tl_class' => 'clr'
+            ],
+            'sql' => ['type' => 'string', 'length' => 1, 'fixed' => true, 'default' => '0']
         ],
         'rgxp' => [
             'inputType' => 'text',

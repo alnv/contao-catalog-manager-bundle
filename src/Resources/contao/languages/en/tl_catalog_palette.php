@@ -15,6 +15,7 @@ $GLOBALS['TL_LANG']['tl_catalog_palette']['subpalette'] = ['Subpalette', 'Zur Su
 $GLOBALS['TL_LANG']['tl_catalog_palette']['hide'] = ['Verstecken', ''];
 $GLOBALS['TL_LANG']['tl_catalog_palette']['label'] = ['Bezeichnung', ''];
 $GLOBALS['TL_LANG']['tl_catalog_palette']['published'] = ['Veröffentlichen', ''];
+$GLOBALS['TL_LANG']['tl_catalog_palette']['isUnique'] = ['Einzigartig', 'Der Feldwert kann nicht gespeichert werden, wenn es bereits existiert.'];
 
 $GLOBALS['TL_LANG']['tl_catalog_palette']['reference']['type'] = [
     'palette' => 'Palette',

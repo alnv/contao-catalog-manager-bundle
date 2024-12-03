@@ -69,6 +69,10 @@ class Roles
                 $arrRole['eval']['rgxp'] = $objRoles->maxval;
             }
 
+            if ($objRoles->isUnique) {
+                $arrRole['eval']['unique'] = true;
+            }
+
             $arrRoles[$objRoles->name] = $arrRole;
         }
 

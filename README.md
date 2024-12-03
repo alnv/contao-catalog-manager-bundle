@@ -226,7 +226,7 @@ function fetchCatalogData(url) {
 
     // Falls keine URL übergeben wurde, wird eine Standard-URL verwendet
     if (!url) {
-        url = '/catalog-manager/json-listing/<MODULE-ID>/<MODULE-ID>';
+        url = '/catalog-manager/json-listing/<MODULE-ID>/<PAGE-ID>';
     }
 
     // AJAX-POST-Anfrage mit fetch API

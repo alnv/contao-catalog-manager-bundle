@@ -94,8 +94,9 @@ class CatalogPalette
                 continue;
             }
 
-            $arrFields[$strField] = $GLOBALS['TL_LANG'][$strTable][$strField][0] ?? $strField;
+            $arrFields[$strField] = ($GLOBALS['TL_LANG'][$strTable][$strField][0] ?? '') ?: (($arrFields[$strField] ?? '') ?: $strField);
         }
+
 
         return $arrFields;
     }
