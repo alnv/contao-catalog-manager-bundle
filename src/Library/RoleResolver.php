@@ -35,7 +35,7 @@ class RoleResolver
         }
 
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
-        self::$objCache = new FilesystemAdapter('', 0, $strRootDir . '/var/cache');
+        self::$objCache = new FilesystemAdapter('cm.roles.cache', 60, $strRootDir . '/var/cache');
 
         $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '') . (md5($arrEntity['tstamp'] ?? '0'));
 
