@@ -321,31 +321,55 @@ abstract class View extends Controller
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
+
             if (empty($arrRow[$strField])) {
                 return [];
             }
+
             if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField])) {
                 return [];
             }
-            if (!is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation']) || empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'])) {
+
+            if (!\is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation']) || empty($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'])) {
                 return [];
             }
-            $arrColumns = [];
+
             $arrValues = [];
-            foreach ($arrRow[$strField] as $varValue) {
-                if (is_string($varValue)) {
+            $arrColumns = [];
+            $varValues = $arrRow[$strField];
+
+            if (isset($arrRow['origin'][$strField])) {
+
+                $varOriginValues = StringUtil::deserialize($arrRow['origin'][$strField]);
+                if (\is_string($varOriginValues)) {
+                    $varOriginValues = explode(',', $varOriginValues);
+                }
+
+                if (\is_array($varOriginValues)) {
+                    $varValues = $varOriginValues;
+                }
+            }
+
+            foreach ($varValues as $varValue) {
+
+                if (\is_string($varValue)) {
                     $arrValues[] = $varValue;
                     continue;
                 }
-                if (is_array($varValue) && isset($varValue['value'])) {
+
+                if (\is_array($varValue) && isset($varValue['value'])) {
                     $arrValues[] = $varValue['value'];
                     continue;
                 }
-                $varValue = array_values($varValue);
+
+                $varValue = \array_values($varValue);
+
                 foreach ($varValue as $strValue) {
+
                     if ($strValue == '' || $strValue == null) {
                         continue;
                     }
+
                     $arrValues[] = $strValue;
                 }
             }
@@ -367,7 +391,7 @@ abstract class View extends Controller
             }
 
             $objList = new Listing($arrRelation['table'], [
-                'column' => [implode('OR ', $arrColumns)],
+                'column' => [\implode('OR ', $arrColumns)],
                 'value' => $arrValues,
                 'order' => 'FIELD(' . $strField . ', ' . implode(',', $arrValues) . ')' // @exp.
             ]);
