@@ -219,18 +219,21 @@ class Toolkit
         return implode('', $arrNewLines);
     }
 
-    public static function getCurrentPathInfo($strAlias = ''): array
+    public static function getCurrentPathInfo($strAlias = '', $strLanguage = ''): array
     {
 
         $arrFragments = [];
         $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
 
-        foreach (array_filter(explode('/', $strPathInfo)) as $strFragment) {
+        if ($strAlias) {
+            $strPathInfo = str_replace('/' . $strAlias, '', $strPathInfo);
+        }
 
-            if ($strAlias && $strAlias == $strFragment) {
-                continue;
-            }
+        if ($strLanguage) {
+            $strPathInfo = str_replace('/' . $strLanguage, '', $strPathInfo);
+        }
 
+        foreach (\array_filter(\explode('/', $strPathInfo)) as $strFragment) {
             $arrFragments[] = $strFragment;
         }
 
@@ -355,7 +358,7 @@ class Toolkit
             return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strUrl ? '/' . $strUrl : '')) : ($blnPreview ? 'preview.php/' : '') . $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
         }
 
-        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : ($blnPreview ? 'preview.php/' : '')  . $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : ($blnPreview ? 'preview.php/' : '') . $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
     }
 
     public static function parseImage($varImage): string

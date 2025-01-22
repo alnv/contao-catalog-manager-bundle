@@ -15,22 +15,26 @@ class GenerateBreadcrumbListener
     public function __invoke(array $arrItems, Module $module): array
     {
 
-        $arrActiveUrlFragmentItems = $this->getActiveUrlFragments(($arrItems[count($arrItems) - 1]['data'] ?? []));
+        $arrActiveUrlFragmentItems = $this->getActiveUrlFragments(($arrItems[\count($arrItems) - 1]['data'] ?? []));
+
         if (!empty($arrActiveUrlFragmentItems)) {
-            $arrItems[count($arrItems) - 1] = $this->resetLastItemHref($arrItems[count($arrItems) - 1]);
+
+            $arrItems[\count($arrItems) - 1] = $this->resetLastItemHref($arrItems[\count($arrItems) - 1]);
+
             foreach ($arrActiveUrlFragmentItems as $arrItem) {
                 $arrItems[] = $arrItem;
             }
+
             foreach ($arrItems as $intIndex => $arrItem) {
-                $arrItems[$intIndex]['isActive'] = $intIndex === count($arrItems) - 1;
+                $arrItems[$intIndex]['isActive'] = $intIndex === \count($arrItems) - 1;
             }
         }
 
-        if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
+        if (!\is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return $arrItems;
         }
 
-        $intLastItemId = count($arrItems) - 1;
+        $intLastItemId = \count($arrItems) - 1;
         $arrItems[$intLastItemId] = $this->resetLastItemHref($arrItems[$intLastItemId]);
         $blnRequireItem = $arrItems[$intLastItemId]['data']['requireItem'] ?? false;
 
@@ -83,7 +87,7 @@ class GenerateBreadcrumbListener
         }
 
         $arrPrevUrlFragments = [];
-        $arrFragments = Toolkit::getCurrentPathInfo($objPage->alias);
+        $arrFragments = Toolkit::getCurrentPathInfo($objPage->alias, $objPage->language);
 
         foreach (Getters::getPageFiltersByPageId($objPage->id) as $intIndex => $objPageFilter) {
 

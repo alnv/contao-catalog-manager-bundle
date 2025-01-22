@@ -21,17 +21,11 @@ class FilterPageController
         Input::resetUnusedGet();
 
         $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
-        $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias);
+        $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias, $pageModel->language);
 
         if (isset($_GET['auto_item'])) {
             Input::setGet('auto_item', null);
         }
-
-        /*
-        foreach ($_GET as $strGet => $strValue) {
-            Input::setGet($strGet, null);
-        }
-        */
 
         foreach ($arrPageFilters as $intIndex => $objPageFilter) {
 
@@ -45,8 +39,7 @@ class FilterPageController
         }
 
         if (!empty($arrFragments)) {
-
-            $strAutoItem = array_values($arrFragments)[0];
+            $strAutoItem = \array_values($arrFragments)[0];
             Input::setGet('auto_item', $strAutoItem);
         }
 
