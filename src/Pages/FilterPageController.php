@@ -18,6 +18,8 @@ class FilterPageController
     public function __invoke(Request $request, PageModel $pageModel): Response
     {
 
+        $GLOBALS['TL_LANGUAGE'] = $pageModel->language ?: $GLOBALS['TL_LANGUAGE'];
+
         Input::resetUnusedGet();
 
         $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
