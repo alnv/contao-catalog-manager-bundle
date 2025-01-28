@@ -362,7 +362,7 @@ abstract class View extends Controller
                     continue;
                 }
 
-                $varValue = \array_values($varValue);
+                $varValue = \array_values(($varValue ?? []));
 
                 foreach ($varValue as $strValue) {
 

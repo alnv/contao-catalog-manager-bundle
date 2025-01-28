@@ -6,6 +6,7 @@ use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\LayoutModel;
 use Contao\PageModel;
 use Contao\PageRegular;
+use Contao\StringUtil;
 use Contao\System;
 
 class GeneratePageListener
@@ -28,8 +29,9 @@ class GeneratePageListener
 
         $objResponseContext = System::getContainer()->get('contao.routing.response_context_accessor')->getResponseContext();
         $objHeadBag = $objResponseContext->get(HtmlHeadBag::class);
-        $objHeadBag->setTitle($GLOBALS['objPage']->pageTitle ?: '');
-        $objHeadBag->setMetaDescription($GLOBALS['objPage']->description ?: '');
+
+        $objHeadBag->setTitle(StringUtil::decodeEntities($GLOBALS['objPage']->pageTitle ?: ''));
+        $objHeadBag->setMetaDescription(StringUtil::decodeEntities($GLOBALS['objPage']->description ?: ''));
 
         if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
             foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {

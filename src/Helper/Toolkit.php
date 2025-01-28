@@ -49,7 +49,7 @@ class Toolkit
         return $objCatalogData->save()->row();
     }
 
-    public static function getDetailPageFromEntityByIdAndTable($strTable, $strId): string
+    public static function getDetailPageFromEntityByIdAndTable($strTable, $strId, $blnPreview = true): string
     {
 
         $objCatalog = CatalogModel::findByTableOrModule($strTable);
@@ -82,7 +82,7 @@ class Toolkit
         $arrMasterPages = array_filter($arrMasterPages);
 
         if ($strPageID = ($arrMasterPages[0] ?? 0)) {
-            return static::parseDetailLink($strPageID, $objEntity->alias, $objEntity->row(), false, true);
+            return static::parseDetailLink($strPageID, $objEntity->alias, $objEntity->row(), false, $blnPreview);
         }
 
         $objCatalogFields = CatalogFieldModel::findAll([
