@@ -567,7 +567,7 @@ class Toolkit
             return $varValue;
         }
 
-        if (!isset($arrField['type']) && !$arrField['value']) {
+        if (!isset($arrField['type']) && !($arrField['value'] ?? '')) {
             return $varValue;
         }
 
@@ -705,7 +705,7 @@ class Toolkit
 
         $arrTemp = [];
         foreach ($arrOptions as $arrValue) {
-            if (in_array($arrValue['value'], $arrValues)) {
+            if (\in_array(($arrValue['value'] ?? ''), $arrValues)) {
                 $arrTemp[$arrValue['value']] = $arrValue;
             }
         }

@@ -13,6 +13,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\ShareButtons;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
+use Alnv\ContaoCatalogManagerBundle\Library\PlaceholderDataContainer;
 use Contao\Date;
 use Contao\FrontendTemplate;
 use Contao\Input;
@@ -67,7 +68,7 @@ abstract class View extends Controller
                     }
                     break;
                 case 'useAbsoluteUrl':
-                    $this->arrOptions['useAbsoluteUrl'] = (bool) $varValue;
+                    $this->arrOptions['useAbsoluteUrl'] = (bool)$varValue;
                     break;
                 case 'formPage':
                     $objPage = PageModel::findByPk($varValue);
@@ -253,7 +254,7 @@ abstract class View extends Controller
                 }
 
                 $intTime = Date::floorToMinute();
-                $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
+                $strTable = ($GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?? '') ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
             }
         }
@@ -272,7 +273,7 @@ abstract class View extends Controller
             }
         }
 
-        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple'] ?? false)) {
             return false;
         }
 
@@ -486,7 +487,8 @@ abstract class View extends Controller
         if (Cache::has($strHash)) {
             $arrAttribute = Cache::get($strHash);
         } else {
-            $arrAttribute = Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
+            $objDataContainer = new PlaceholderDataContainer($this->strTable);
+            $arrAttribute = Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable, $objDataContainer);
             Cache::set($strHash, $arrAttribute);
         }
 
@@ -505,7 +507,7 @@ abstract class View extends Controller
             return '';
         }
 
-        $objPagination = new Pagination(($this->arrOptions['total']??0), ($this->arrOptions['limit']??0), Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
+        $objPagination = new Pagination(($this->arrOptions['total'] ?? 0), ($this->arrOptions['limit'] ?? 0), Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
 
         return $objPagination->generate("\n  ");
     }
