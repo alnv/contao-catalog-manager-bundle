@@ -14,7 +14,7 @@ use Contao\Widget;
 
 class GetSearchablePagesListener
 {
-    public function __invoke(array $arrPages, $intRoot = 0, bool $blnIsSitemap = false, string $language = null): array
+    public function __invoke(array $arrPages, $intRoot = 0, bool $blnIsSitemap = false, string $language = ''): array
     {
 
         $arrPages = $this->getSearchablePages($arrPages, $intRoot, $blnIsSitemap, $language);
@@ -22,7 +22,7 @@ class GetSearchablePagesListener
         return $this->getSearchablePagesByPagesRoles($arrPages, $intRoot, $blnIsSitemap, $language);
     }
 
-    public function getSearchablePagesByPagesRoles($arrPages, $intRoot = 0, $blnIsSitemap = false, $language = null)
+    public function getSearchablePagesByPagesRoles($arrPages, $intRoot = 0, $blnIsSitemap = false, $language = '')
     {
 
         $objCatalogFields = CatalogFieldModel::findAll([

@@ -20,7 +20,7 @@ use Contao\System;
 class Catalog
 {
 
-    public function addIcon($arrRow, $strLabel, DataContainer $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false): string
+    public function addIcon($arrRow, $strLabel, DataContainer|null $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false): string
     {
 
         $strIcon = 'bundles/alnvcontaocatalogmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
