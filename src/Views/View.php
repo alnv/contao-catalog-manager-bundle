@@ -353,7 +353,7 @@ abstract class View extends Controller
 
             foreach ($varValues as $varValue) {
 
-                if (\is_string($varValue)) {
+                if (\is_string($varValue) || \is_numeric($varValue)) {
                     $arrValues[] = $varValue;
                     continue;
                 }
