@@ -213,10 +213,10 @@ class Toolkit
 
         foreach ($arrLines as $strLine) {
             if (!empty($strLine))
-                $arrNewLines[] = trim($strLine);
+                $arrNewLines[] = \trim($strLine);
         }
 
-        return implode('', $arrNewLines);
+        return \implode('', $arrNewLines);
     }
 
     public static function getCurrentPathInfo($strAlias = '', $strLanguage = ''): array
@@ -226,11 +226,11 @@ class Toolkit
         $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
 
         if ($strAlias) {
-            $strPathInfo = str_replace('/' . $strAlias, '', $strPathInfo);
+            $strPathInfo = \str_replace('/' . $strAlias, '', $strPathInfo);
         }
 
         if ($strLanguage) {
-            $strPathInfo = str_replace('/' . $strLanguage, '', $strPathInfo);
+            $strPathInfo = \str_replace('/' . $strLanguage, '', $strPathInfo);
         }
 
         foreach (\array_filter(\explode('/', $strPathInfo)) as $strFragment) {
@@ -787,7 +787,11 @@ class Toolkit
     {
 
         if (!$arrActiveRecord['id']) {
-            return null;
+            return;
+        }
+
+        if (!empty($arrActiveRecord['alias'])) {
+            return;
         }
 
         $arrValues = [];
@@ -808,13 +812,13 @@ class Toolkit
         }
 
         if (empty($arrValues)) {
-            $strAlias = md5(time() . '/' . $arrActiveRecord['id']);
+            $strAlias = \md5(\time() . '/' . $arrActiveRecord['id']);
         } else {
-            $strAlias = implode('-', $arrValues);
+            $strAlias = \implode('-', $arrValues);
         }
 
         $arrSet = [];
-        $arrSet['tstamp'] = time();
+        $arrSet['tstamp'] = \time();
         $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), ($arrCatalog['validAliasCharacters'] ?? 'a-zA-Z0-9'), ($arrActiveRecord['lid'] ?: null));
 
         Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
@@ -836,7 +840,7 @@ class Toolkit
         }
 
         if (!$strValue) {
-            return md5(time());
+            return \md5(\time());
         }
 
         $objCatalog = CatalogModel::findByTableOrModule($strTable);
@@ -846,14 +850,11 @@ class Toolkit
             }
         }
 
-        $objSlugGenerator = new SlugGenerator((new SlugOptions)
-            ->setValidChars($strValidChars)
-            ->setLocale('de')
-            ->setDelimiter('-'));
+        $objSlugGenerator = new SlugGenerator((new SlugOptions)->setValidChars($strValidChars)->setLocale('de')->setDelimiter('-'));
         $strValue = $objSlugGenerator->generate($strValue);
 
-        if (strlen($strValue) > 120) {
-            $strValue = substr($strValue, 0, 120);
+        if (\strlen($strValue) > 120) {
+            $strValue = \substr($strValue, 0, 120);
         }
 
         if ($blnAliasFieldExist && $strId) {
@@ -889,13 +890,13 @@ class Toolkit
         $strValue = Toolkit::replaceInsertTags($strValue);
         $strColumn = Toolkit::replaceInsertTags($strColumn);
 
-        $arrReturn['column'] = explode(';', StringUtil::decodeEntities($strColumn));
-        $arrReturn['value'] = explode(';', StringUtil::decodeEntities($strValue));
-        $arrReturn['value'] = array_filter($arrReturn['value']);
+        $arrReturn['column'] = \explode(';', StringUtil::decodeEntities($strColumn));
+        $arrReturn['value'] = \explode(';', StringUtil::decodeEntities($strValue));
+        $arrReturn['value'] = \array_filter($arrReturn['value']);
 
-        if ((is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
+        if ((\is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
             $intIndex = -1;
-            $arrReturn['value'] = array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
+            $arrReturn['value'] = \array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
                 $intIndex = $intIndex + 1;
                 if ($strValue === '' || $strValue === null) {
                     unset($arrReturn['column'][$intIndex]);
@@ -924,7 +925,7 @@ class Toolkit
         $strName = 'group0';
         $blnInitialGroup = true;
 
-        if (is_string($strValue)) {
+        if (\is_string($strValue)) {
             $strValue = StringUtil::decodeEntities($strValue);
         }
 

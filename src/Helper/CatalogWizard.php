@@ -152,13 +152,13 @@ abstract class CatalogWizard
 
                 $strTable = '';
                 if (isset($GLOBALS['TL_DCA'][$arrField['dbTable']])) {
-                    $strTable = $GLOBALS['TL_DCA'][$arrField['dbTable']]['config']['_table'];
+                    $strTable = ($GLOBALS['TL_DCA'][$arrField['dbTable']]['config']['_table'] ?? '');
                 }
 
                 $arrReturn['relation'] = [
                     'load' => 'lazy',
                     'field' => $arrField['dbKey'],
-                    'table' => $strTable ?: $arrField['dbTable'],
+                    'table' => $strTable ?: ($arrField['dbTable'] ?? ''),
                     'type' => $blnMultiple ? 'hasMany' : 'hasOne'
                 ];
             }

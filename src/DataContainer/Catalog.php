@@ -188,7 +188,7 @@ class Catalog
         }
 
         foreach ($GLOBALS['BE_MOD'] as $strModulename => $arrModules) {
-            $strModuleLabel = $GLOBALS['TL_LANG']['MOD'][$strModulename] ?: $strModulename;
+            $strModuleLabel = ($GLOBALS['TL_LANG']['MOD'][$strModulename] ?? '') ?: $strModulename;
             $arrReturn[$strModulename] = $strModuleLabel;
         }
 

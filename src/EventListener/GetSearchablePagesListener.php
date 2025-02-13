@@ -8,8 +8,8 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Contao\Controller;
 use Contao\Database;
+use Contao\Date;
 use Contao\PageModel;
-use Contao\StringUtil;
 use Contao\Widget;
 
 class GetSearchablePagesListener
@@ -95,7 +95,6 @@ class GetSearchablePagesListener
     {
 
         $objModules = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing-table', '1');
-
         if (!$objModules->numRows) {
             return $arrPages;
         }
@@ -123,7 +122,24 @@ class GetSearchablePagesListener
                 continue;
             }
 
+            $objCatalog = CatalogModel::findByTableOrModule($strTable);
+            $blnVisibility = (bool)$objCatalog?->enableVisibility;
             $arrFilter = $this->parseFilter($objModules);
+
+
+            if ($blnVisibility) {
+
+                Controller::loadDataContainer($strTable);
+
+                if (!isset($arrFilter['column']) || !is_array($arrFilter['column'])) {
+                    $arrFilter['column'] = [];
+                }
+
+                $intTime = Date::floorToMinute();
+                $strTable = ($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable;
+                $arrFilter['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
+            }
+
             $objModel = new ModelWizard($strTable);
             $objModel = $objModel->getModel();
             $objEntities = $objModel->findAll([
@@ -145,7 +161,7 @@ class GetSearchablePagesListener
                 $strUrl = Toolkit::parseDetailLink($objPage->row(), $objEntities->alias, $objEntities->row(), true);
 
                 if ($strDns) {
-                    if (strpos($strUrl, $strDns) !== false) {
+                    if (\strpos($strUrl, $strDns) !== false) {
                         $arrPages[] = $strUrl;
                     }
                 } else {
