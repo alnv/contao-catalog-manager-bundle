@@ -127,11 +127,11 @@ class GetSearchablePagesListener
             $arrFilter = $this->parseFilter($objModules);
 
 
-            if ($blnVisibility) {
+            if ($blnVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
 
                 Controller::loadDataContainer($strTable);
 
-                if (!isset($arrFilter['column']) || !is_array($arrFilter['column'])) {
+                if (!isset($arrFilter['column']) || !\is_array($arrFilter['column'])) {
                     $arrFilter['column'] = [];
                 }
 
