@@ -34,14 +34,20 @@ class Authorization
 
         foreach ($arrItems as $arrItem) {
 
-            if (!in_array($arrItem['product_id'], ['2', '3'])) {
+            if (!\in_array($arrItem['product_id'], ['2', '3'])) {
                 continue;
             }
 
-            $arrAttributes = array_values($arrItem['attributes'] ?? []);
+            $arrAttributes = \array_values($arrItem['attributes'] ?? []);
+
             foreach ($arrAttributes as $arrData) {
 
+                if (\is_string($arrData)) {
+                    $arrData = [$arrData];
+                }
+
                 foreach ($arrData as $strDomain) {
+
                     if ($this->parseDomain($strUrl) === $this->parseDomain($strDomain)) {
                         return true;
                     }
@@ -55,6 +61,8 @@ class Authorization
     public function parseDomain(string $strDomain): string
     {
 
+        $strDomain = \str_replace('www.', '', $strDomain);
+
         $arrFragments = \parse_url($strDomain) ?? [];
         $strHost = $arrFragments['host'] ?? '';
         $strPort = $arrFragments['port'] ?? '';
@@ -62,8 +70,6 @@ class Authorization
         if (!$strHost) {
             return $strDomain;
         }
-
-        $strHost = \str_replace('www.', '', $strHost);
 
         return \trim($strHost) . ($strPort ? ':' . $strPort : '');
     }
