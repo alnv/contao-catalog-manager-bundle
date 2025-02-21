@@ -346,8 +346,15 @@ class Toolkit
 
             $strUrlFragments = [];
             foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
+
                 $strFieldName = $objPageFilter->getAlias();
-                if ($strFragment = $objPageFilter->parseActiveUrlFragment($arrEntity[$strFieldName] ?? '')) {
+                $strFieldValue = $arrEntity['origin'][$strFieldName] ?? '';
+
+                if (!$strFieldValue) {
+                    $strFieldValue = static::parse($arrEntity[$strFieldName] ?? '');
+                }
+
+                if ($strFragment = $objPageFilter->parseActiveUrlFragment($strFieldValue)) {
                     $strUrlFragments[] = $strFragment;
                 }
             }

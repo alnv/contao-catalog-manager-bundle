@@ -1,8 +1,14 @@
 <div class="cm_master default">
+
     <?php if ($strTitle = $this->roleResolver()->getValueByRole('title')): ?>
-        <h2><?= $strTitle ?></h2>
+        <h1><?= $strTitle ?></h1>
     <?php endif; ?>
+
     <?php if ($strContent = $this->roleResolver()->getValueByRole('content')): ?>
         <?= $strContent ?>
     <?php endif; ?>
+
+    <?php if ($strContentElements = $this->getContentElements()): ?>
+        <?= $strContentElements ?>
+    <?php endif;?>
 </div>

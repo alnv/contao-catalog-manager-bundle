@@ -31,7 +31,7 @@ class Listing extends Hybrid
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
             $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['FMD'][$this->type][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . \strtoupper(($GLOBALS['TL_LANG']['FMD'][$this->type][0] ?? '')) . ' ###';
             return $objTemplate->parse();
         }
 
@@ -39,7 +39,7 @@ class Listing extends Hybrid
             return null;
         }
 
-        if (Input::get('auto_item') && $this->cmMasterModule) {
+        if ((($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '') && $this->cmMasterModule) {
             return Controller::getFrontendModule($this->cmMasterModule);
         }
 
@@ -61,8 +61,8 @@ class Listing extends Hybrid
         ];
 
         $this->setOptions();
-        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
 
+        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
         $this->Template->rows = $objListing->countRows();
         $this->Template->entities = $objListing->parse();
         $this->Template->pagination = $objListing->getPagination();
@@ -84,25 +84,21 @@ class Listing extends Hybrid
 
     public function getOptions(): array
     {
-
         return $this->arrOptions;
     }
 
     public function getTable(): string
     {
-
         return $this->cmTable;
     }
 
     protected function setIgnoreVisibility(): void
     {
-
         $this->arrOptions['ignoreVisibility'] = (bool)$this->cmIgnoreVisibility;
     }
 
     protected function setIgnoreFieldsFromParsing(): void
     {
-
         $this->arrOptions['ignoreFieldsFromParsing'] = StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
     }
 
@@ -127,7 +123,7 @@ class Listing extends Hybrid
             'city' => Toolkit::getValueFromUrl(Input::get('city')),
         ];
 
-        if (empty(array_filter($arrAddress))) {
+        if (empty(\array_filter($arrAddress))) {
             return false;
         }
 
@@ -195,7 +191,7 @@ class Listing extends Hybrid
 
         if ($this->cmFilter && ($this->cmWizardFilterSettings || $this->cmValue)) {
             $strFilterValues = $this->cmWizardFilterSettings ?: $this->cmValue;
-            if (strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
+            if (\strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
                 $arrIds = Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
                 if (!$this->arrOptions['order']) {
                     $this->arrOptions['order'] = '';
@@ -207,7 +203,7 @@ class Listing extends Hybrid
         }
 
         $arrInputOrder = Input::get('order') ?? [];
-        if (is_array($arrInputOrder) && !empty($arrInputOrder)) {
+        if (\is_array($arrInputOrder) && !empty($arrInputOrder)) {
             if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
                 $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
             }
@@ -218,7 +214,7 @@ class Listing extends Hybrid
     {
 
         if ($this->cmPagination) {
-            $this->arrOptions['pagination'] = $this->cmPagination ? true : false;
+            $this->arrOptions['pagination'] = (bool) $this->cmPagination;
         }
 
         if ($this->cmLimit) {
