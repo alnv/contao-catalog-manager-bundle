@@ -797,36 +797,43 @@ class Toolkit
             return;
         }
 
+        /*
         if (!empty($arrActiveRecord['alias'])) {
             return;
         }
+        */
 
-        $arrValues = [];
 
-        foreach ($arrFields as $strFieldname => $arrField) {
+        $strAlias = $arrActiveRecord['alias'] ?? '';
 
-            if (!isset($arrField['eval'])) {
-                continue;
+        if (!$strAlias) {
+
+            $arrValues = [];
+            foreach ($arrFields as $strFieldname => $arrField) {
+
+                if (!isset($arrField['eval'])) {
+                    continue;
+                }
+
+                if (!isset($arrField['eval']['useAsAlias']) || !$arrField['eval']['useAsAlias']) {
+                    continue;
+                }
+
+                if (isset($arrActiveRecord[$strFieldname]) && $arrActiveRecord[$strFieldname] !== '') {
+                    $arrValues[] = $arrActiveRecord[$strFieldname];
+                }
             }
 
-            if (!isset($arrField['eval']['useAsAlias']) || !$arrField['eval']['useAsAlias']) {
-                continue;
+            if (empty($arrValues)) {
+                $strAlias = \md5(\time() . '/' . $arrActiveRecord['id']);
+            } else {
+                $strAlias = \implode('-', $arrValues);
             }
-
-            if (isset($arrActiveRecord[$strFieldname]) && $arrActiveRecord[$strFieldname] !== '') {
-                $arrValues[] = $arrActiveRecord[$strFieldname];
-            }
-        }
-
-        if (empty($arrValues)) {
-            $strAlias = \md5(\time() . '/' . $arrActiveRecord['id']);
-        } else {
-            $strAlias = \implode('-', $arrValues);
         }
 
         $arrSet = [];
         $arrSet['tstamp'] = \time();
-        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), ($arrCatalog['validAliasCharacters'] ?? 'a-zA-Z0-9'), ($arrActiveRecord['lid'] ?: null));
+        $arrSet['alias'] = static::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), ($arrCatalog['validAliasCharacters'] ?? 'a-zA-Z0-9'), ($arrActiveRecord['lid'] ?: null));
 
         Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
@@ -836,7 +843,6 @@ class Toolkit
 
         $strLanguageColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langColumnName'] ?? '';
         $strLangPidColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langPid'] ?? '';
-
         $blnAliasFieldExist = $strTable && Database::getInstance()->fieldExists($strAliasField, $strTable);
 
         if ($strId && $blnAliasFieldExist && !$strValue) {

@@ -16,17 +16,25 @@ class SitemapListener
             return;
         }
 
+        $arrPages = [];
+
         foreach ($objEvent->getRootPageIds() as $strRootId) {
 
             $objPage = PageModel::findByPk($strRootId);
 
             foreach ((new GetSearchablePagesListener())->getSearchablePagesByPagesRoles([], $strRootId, true, $objPage->language) as $strPage) {
-                $objEvent->addUrlToDefaultUrlSet($strPage);
+                $arrPages[] = $strPage;
             }
 
             foreach ((new GetSearchablePagesListener())->getSearchablePages([], $strRootId, true, $objPage->language) as $strPage) {
-                $objEvent->addUrlToDefaultUrlSet($strPage);
+                $arrPages[] = $strPage;
             }
+        }
+
+        $arrPages = \array_values(\array_unique($arrPages));
+
+        foreach ($arrPages as $strPage) {
+            $objEvent->addUrlToDefaultUrlSet($strPage);
         }
     }
 }

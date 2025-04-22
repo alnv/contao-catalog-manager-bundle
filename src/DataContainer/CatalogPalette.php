@@ -44,7 +44,7 @@ class CatalogPalette
         }
 
         while ($objFields->next()) {
-            $arrReturn[$objFields->id] = $objFields->name;
+            $arrReturn[($objFields->fieldname?:$objFields->id)] = $objFields->name;
         }
 
         if ($objCatalog->enableVisibility) {

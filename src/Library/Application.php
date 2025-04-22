@@ -24,7 +24,7 @@ class Application
 
             $arrModule = [];
             $arrModule[$arrCatalog['module']] = $this->generateBeModConfig($arrCatalog);
-            ArrayUtil::arrayInsert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
+            ArrayUtil::arrayInsert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], (int)($arrCatalog['position'] ?? 0), $arrModule);
         }
     }
 

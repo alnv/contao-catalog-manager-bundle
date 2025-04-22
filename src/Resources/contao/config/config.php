@@ -19,7 +19,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "3.4.12";
+const CATALOG_MANAGER_BUNDLE_VERSION = "3.4.13";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -242,7 +242,8 @@ $GLOBALS['CM_ROLES'] = [
     'alias' => [
         'group' => 'article',
         'eval' => [
-            'rgxp' => 'alias'
+            'rgxp' => 'alias',
+            'doNotCopy' => true
         ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
