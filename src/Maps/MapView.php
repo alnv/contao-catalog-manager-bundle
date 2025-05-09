@@ -32,6 +32,7 @@ abstract class MapView
             $arrLocation['map']['location'] = $arrLocation['roleResolver']()->getValueByRole('location');
             $arrLocation['map']['title'] = $arrLocation['roleResolver']()->getValueByRole('title');
             $arrLocation['map']['text'] = $arrLocation['roleResolver']()->getValueByRole('teaser');
+            $arrLocation['map']['_distance'] = (((int)$arrLocation['_distance'] ?? 0) > 0 ? \number_format($arrLocation['_distance'], '2', '.') : '');
             $arrLocation['map']['latitude'] = $arrLocation['roleResolver']()->getValueByRole('latitude');
             $arrLocation['map']['longitude'] = $arrLocation['roleResolver']()->getValueByRole('longitude');
             $arrLocation['map']['infoContent'] = Toolkit::replaceInsertTags(Toolkit::parseSimpleTokens($this->arrOptions['infoContent'], $this->parseTokens($arrLocation)));
@@ -43,21 +44,31 @@ abstract class MapView
     {
         $arrTokens = [];
         foreach ($arrLocation as $strField => $varValue) {
-            if (is_callable($varValue)) {
+
+            if (\is_callable($varValue)) {
                 continue;
             }
+
             if ($strField == 'origin') {
                 continue;
             }
+
             if ($strField == 'map') {
                 continue;
             }
+
+            if ($strField == '_distance' && $varValue) {
+                $varValue = \number_format($arrLocation['_distance'], '2', '.');
+            }
+
             if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree') {
                 $varValue = Toolkit::parseImage($varValue);
             }
-            if (is_array($varValue)) {
+
+            if (\is_array($varValue)) {
                 $varValue = Toolkit::parse($varValue);
             }
+
             $arrTokens[$strField] = $varValue;
         }
         return $arrTokens;
