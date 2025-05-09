@@ -18,6 +18,7 @@ class Image
 
         $objContainer = System::getContainer();
         $arrUuids = StringUtil::deserialize($strUuid, true);
+
         foreach ($arrUuids as $strUuid) {
 
             if (!Validator::isUuid($strUuid)) {

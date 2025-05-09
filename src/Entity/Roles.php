@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Entity;
 
 use Contao\Database;
+use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 
 class Roles
 {
@@ -21,17 +22,27 @@ class Roles
 
     protected function setup(): void
     {
-        $arrRoles = ($GLOBALS['CM_ROLES'] ?? []);
 
+        if (Cache::has('all_roles')) {
+            $this->arrRoles = Cache::get('all_roles');
+            return;
+        }
+
+        $arrRoles = ($GLOBALS['CM_ROLES'] ?? []);
         foreach ($this->getCustomRoles() as $strName => $arrRole) {
             $arrRoles[$strName] = $arrRole;
         }
 
         $this->arrRoles = $arrRoles;
+        Cache::set('all_roles', $this->arrRoles);
     }
 
     private function getCustomRoles(): array
     {
+
+        if (Cache::has('custom_roles')) {
+            return Cache::get('custom_roles');
+        }
 
         $arrRoles = [];
         $objRoles = Database::getInstance()->prepare('SELECT * FROM tl_catalog_roles ORDER BY name ASC')->execute();
@@ -75,6 +86,8 @@ class Roles
 
             $arrRoles[$objRoles->name] = $arrRole;
         }
+
+        Cache::set('custom_roles', $arrRoles);
 
         return $arrRoles;
     }

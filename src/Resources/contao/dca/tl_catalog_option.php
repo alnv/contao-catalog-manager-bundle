@@ -29,7 +29,9 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
                 $objActive = Database::getInstance()->prepare('SELECT * FROM tl_catalog_option WHERE id=?')->limit(1)->execute($objDataContainer->activeRecord->id);
                 $arrSet = [];
                 $arrSet['tstamp'] = time();
-                $arrSet['value'] = Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
+                if (!$objActive->value) {
+                    $arrSet['value'] = Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
+                }
                 Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
             }
         ],
