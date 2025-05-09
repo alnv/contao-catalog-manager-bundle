@@ -20,12 +20,15 @@ class File
     {
 
         $strFile = Input::get('file');
+
         if (!$strFile) {
             return null;
         }
+
         if (!is_array($arrFiles) || empty($arrFiles)) {
             return null;
         }
+
         foreach ($arrFiles as $arrFile) {
             if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
                 if (isset($GLOBALS['TL_HOOKS']['beforeDownload']) && is_array($GLOBALS['TL_HOOKS']['beforeDownload'])) {
@@ -111,7 +114,7 @@ class File
                     }
 
                     $arrMeta = Frontend::getMetaData($objSubfiles->meta, $objContainer->get('request_stack')->getCurrentRequest()->getLocale());
-                    if ($arrMeta['title'] == '') {
+                    if (($arrMeta['title'] ?? '') == '') {
                         $arrMeta['title'] = StringUtil::specialchars($objFile->basename);
                     }
 
@@ -141,18 +144,23 @@ class File
         }
 
         if (!empty($arrOrderField)) {
+
             $arrOrder = \array_map(function () {
             }, \array_flip($arrOrderField));
+
             foreach ($arrFiles as $strKey => $arrValue) {
                 if (\array_key_exists($arrValue['uuid'], $arrOrder)) {
                     $arrOrder[$arrValue['uuid']] = $arrValue;
                     unset($arrFiles[$strKey]);
                 }
             }
+
             if (!empty($arrImages)) {
                 $arrOrder = \array_merge($arrOrder, \array_values($arrImages));
             }
+
             $arrFiles = \array_values(array_filter($arrOrder));
+
             unset($arrOrder);
         }
 
