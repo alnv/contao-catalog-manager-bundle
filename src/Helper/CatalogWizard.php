@@ -172,6 +172,14 @@ abstract class CatalogWizard
             $arrReturn['eval']['rgxp'] = $strRgxp;
         }
 
+        $arrRoles = (new Roles())->get();
+
+        if (isset($arrRoles[($arrField['role'] ?? '')]) && isset($arrRoles[$arrField['role']]['eval'])) {
+            foreach ($arrRoles[$arrField['role']]['eval'] as $strKey => $strOption) {
+                $arrReturn['eval'][$strKey] = $strOption;
+            }
+        }
+
         switch ($arrField['type']) {
             case 'explanation':
                 $arrReturn['inputType'] = 'explanation';
@@ -195,7 +203,7 @@ abstract class CatalogWizard
                 $arrReturn['sorting'] = true;
                 $arrReturn['inputType'] = 'text';
                 $arrReturn['eval']['tl_class'] = 'w50 wizard';
-                if (isset($arrReturn['eval']['rgxp']) && in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
+                if (isset($arrReturn['eval']['rgxp']) && \in_array($arrReturn['eval']['rgxp'], ['date', 'time', 'datim'])) {
                     $arrReturn['eval']['dateFormat'] = Date::getFormatFromRgxp($arrReturn['eval']['rgxp']);
                 }
                 $arrReturn['eval']['datepicker'] = true;
@@ -347,14 +355,6 @@ abstract class CatalogWizard
                     }
                 }
                 break;
-        }
-
-        $arrRoles = (new Roles())->get();
-
-        if (isset($arrRoles[($arrField['role'] ?? '')]) && isset($arrRoles[$arrField['role']]['eval'])) {
-            foreach ($arrRoles[$arrField['role']]['eval'] as $strKey => $strOption) {
-                $arrReturn['eval'][$strKey] = $strOption;
-            }
         }
 
         if (isset($GLOBALS['TL_HOOKS']['parseCatalogField']) && is_array($GLOBALS['TL_HOOKS']['parseCatalogField'])) {

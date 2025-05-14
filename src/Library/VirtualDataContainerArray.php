@@ -578,7 +578,7 @@ class VirtualDataContainerArray
             $this->setLabels();
         }
 
-        if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
+        if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && \is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
             foreach ($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback) {
                 System::importStatic($arrCallback[0])->{$arrCallback[1]}($this->arrCatalog['table'], $this);
             }

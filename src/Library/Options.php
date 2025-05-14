@@ -60,6 +60,7 @@ class Options
             return Cache::get($strGetter);
         }
 
+
         switch (self::$arrField['optionsSource']) {
             case 'options':
                 $objOptions = CatalogOptionModel::findAll([

@@ -55,7 +55,9 @@ class CustomOptionWizard extends Widget
         DataContainer::loadDataContainer($this->strTable);
         System::loadLanguageFile($this->strTable);
 
-        $arrAttributes = $this->getAttributesFromDca($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strName], $this->strName, null, $this->strName, $this->strTable, null);
+        $strFieldName = \str_replace('_' . $this->activeRecord->id, '', $this->strName);
+
+        $arrAttributes = $this->getAttributesFromDca($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldName], $this->strName, null, $this->strName, $this->strTable, null);
         $arrAttributes['_table'] = $this->strTable;
 
         if (empty($this->varValue)) {
@@ -70,7 +72,7 @@ class CustomOptionWizard extends Widget
 
         $arrOptions = $arrAttributes['options'] ?? [];
         \asort($arrOptions);
-        $arrAttributes['options'] = array_values($arrOptions);
+        $arrAttributes['options'] = \array_values($arrOptions);
 
         $objTemplate = new FrontendTemplate('be_widget_custom_options');
         $objTemplate->setData([
