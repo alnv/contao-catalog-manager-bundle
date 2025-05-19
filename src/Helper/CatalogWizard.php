@@ -3,18 +3,20 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 
-abstract class CatalogWizard extends \System {
+abstract class CatalogWizard extends \System
+{
 
     protected $arrCache = [];
 
-    protected function parseCatalog($arrCatalog) {
+    protected function parseCatalog($arrCatalog)
+    {
 
         $strIdentifier = 'catalog_' . $arrCatalog['table'];
-        if (\Cache::has( $strIdentifier)) {
+        if (\Cache::has($strIdentifier)) {
             return \Cache::get($strIdentifier);
         }
 
@@ -44,7 +46,7 @@ abstract class CatalogWizard extends \System {
         if (isset($GLOBALS['TL_HOOKS']['parseCatalog']) && is_array($GLOBALS['TL_HOOKS']['parseCatalog'])) {
             foreach ($GLOBALS['TL_HOOKS']['parseCatalog'] as $arrCallback) {
                 $this->import($arrCallback[0]);
-                $arrCatalog = $this->{$arrCallback[0]}->{$arrCallback[1]}( $arrCatalog, $this );
+                $arrCatalog = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrCatalog, $this);
             }
         }
 
@@ -53,7 +55,8 @@ abstract class CatalogWizard extends \System {
         return $arrCatalog;
     }
 
-    protected function getRelatedTablesByCatalog($arrCatalog, &$arrRelated, &$arrChildren, $intLevel=0) {
+    protected function getRelatedTablesByCatalog($arrCatalog, &$arrRelated, &$arrChildren, $intLevel = 0)
+    {
 
         $objChildCatalogs = CatalogModel::findChildrenCatalogsById($arrCatalog['id']);
 
@@ -80,22 +83,24 @@ abstract class CatalogWizard extends \System {
         }
     }
 
-    protected function getParentCatalogByPid($strPid) {
+    protected function getParentCatalogByPid($strPid)
+    {
 
         $objParent = CatalogModel::findByPk($strPid);
 
-        if ( $objParent === null ) {
+        if ($objParent === null) {
             return '';
         }
 
         return $objParent->table;
     }
 
-    public function parseField($arrField, $arrCatalog = []) {
+    public function parseField($arrField, $arrCatalog = [])
+    {
 
         $strIdentifier = 'catalog_field_' . $arrField['id'];
 
-        if (\Cache::has( $strIdentifier)) {
+        if (\Cache::has($strIdentifier)) {
             return \Cache::get($strIdentifier);
         }
 
@@ -103,14 +108,14 @@ abstract class CatalogWizard extends \System {
             return null;
         }
 
-        $blnMultiple = (bool) $arrField['multiple'];
+        $blnMultiple = (bool)$arrField['multiple'];
         $arrField['description'] = trim(strip_tags($arrField['description']));
         $arrReturn = [
             'sorting' => !$blnMultiple,
             'name' => $arrField['name'],
             'label' => [
-                Translation::getInstance()->translate(($this->arrCatalog['table']?$this->arrCatalog['table'].'.':'') . 'field.title.' . $arrField['fieldname'], $arrField['name']),
-                Translation::getInstance()->translate(($this->arrCatalog['table']?$this->arrCatalog['table'].'.':'') . '.field.description.' . $arrField['fieldname'], $arrField['description']),
+                Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . 'field.title.' . $arrField['fieldname'], $arrField['name']),
+                Translation::getInstance()->translate(($this->arrCatalog['table'] ? $this->arrCatalog['table'] . '.' : '') . '.field.description.' . $arrField['fieldname'], $arrField['description']),
             ],
             'eval' => [
                 'tl_class' => 'w50',
@@ -119,7 +124,7 @@ abstract class CatalogWizard extends \System {
                 'multiple' => $blnMultiple,
                 'role' => $arrField['role'] ?: '',
                 'useAsAlias' => $arrField['useAsAlias'] ?: '',
-                'mandatory' => (bool) $arrField['mandatory'],
+                'mandatory' => (bool)$arrField['mandatory'],
                 'size' => $arrField['size'] ? intval($arrField['size']) : 1
             ],
             'sql' => Toolkit::getSql($arrField['type'], $arrField)
@@ -273,13 +278,17 @@ abstract class CatalogWizard extends \System {
                 $arrReturn['eval']['imageWidth'] = $arrField['imageWidth'];
                 $arrReturn['eval']['imageHeight'] = $arrField['imageHeight'];
                 $arrReturn['eval']['doNotOverwrite'] = $arrField['doNotOverwrite'];
-                $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid( $arrField['uploadFolder'] );
+
+                if (isset($arrField['uploadFolder'])) {
+                    $arrReturn['eval']['uploadFolder'] = \StringUtil::binToUuid($arrField['uploadFolder']);
+                }
+
                 if ($arrReturn['eval']['role']) {
                     $objRoleResolver = RoleResolver::getInstance(null);
                     switch ($objRoleResolver->getRole($arrReturn['eval']['role'])['type']) {
                         case 'image':
                             $arrReturn['eval']['isImage'] = true;
-                            if ( $arrField['imageSize'] ) {
+                            if ($arrField['imageSize']) {
                                 $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
                             }
                             break;
@@ -290,11 +299,11 @@ abstract class CatalogWizard extends \System {
                             $arrReturn['eval']['tl_class'] = 'clr';
                             $arrReturn['eval']['fieldType'] = 'checkbox';
                             $arrReturn['eval']['multiple'] = true;
-                            if ( $arrField['imageSize'] ) {
+                            if ($arrField['imageSize']) {
                                 $arrReturn['eval']['imageSize'] = $arrField['imageSize'];
                             }
                             if (!empty($arrCatalog)) {
-                                $arrReturn['eval']['orderField'] = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND role=?')->limit(1)->execute($arrCatalog['id'],'orderSRC')->fieldname;
+                                $arrReturn['eval']['orderField'] = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND role=?')->limit(1)->execute($arrCatalog['id'], 'orderSRC')->fieldname;
                             }
                             break;
                         case 'files':
@@ -319,7 +328,7 @@ abstract class CatalogWizard extends \System {
         }
 
         if (isset($GLOBALS['TL_HOOKS']['parseCatalogField']) && is_array($GLOBALS['TL_HOOKS']['parseCatalogField'])) {
-            foreach ( $GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback ) {
+            foreach ($GLOBALS['TL_HOOKS']['parseCatalogField'] as $arrCallback) {
                 $this->import($arrCallback[0]);
                 $arrReturn = $this->{$arrCallback[0]}->{$arrCallback[1]}($arrReturn, $arrField, $this);
             }

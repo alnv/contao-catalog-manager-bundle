@@ -494,7 +494,7 @@ abstract class View extends Controller
             }
         }
 
-        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple']) {
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree' && ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['multiple'] ?? false)) {
             return false;
         }
 
