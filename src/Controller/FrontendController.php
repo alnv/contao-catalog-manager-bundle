@@ -5,20 +5,13 @@ namespace Alnv\ContaoCatalogManagerBundle\Controller;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Component\Routing\Annotation\Route;
 
-/**
- *
- * @Route("/catalog-manager", defaults={"_scope" = "frontend", "_token_check" = false})
- */
+#[Route(path: '/catalog-manager', name: 'catalog-manager-controller', defaults: ['_scope' => 'frontend', '_token_check' => false])]
 class FrontendController extends \Contao\CoreBundle\Controller\AbstractController
 {
 
-    /**
-     *
-     * @Route("/watchlist/update", methods={"POST"}, name="update-watchlist")
-     */
+    #[Route(path: '/watchlist/update', methods: ["POST"])]
     public function updateWatchlist()
     {
 
@@ -30,10 +23,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         return new JsonResponse(\Alnv\ContaoCatalogManagerBundle\Library\Watchlist::updateWatchlist($strIdentifier, $strTable, \Input::post('items')));
     }
 
-    /**
-     *
-     * @Route("/view-listing/{module}/{page}", methods={"POST", "GET"}, name="view-listing")
-     */
+    #[Route(path: '/view-listing/{module}/{page}', methods: ["POST", "GET"])]
     public function getViewListing($module, $page)
     {
 
@@ -59,10 +49,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         ]);
     }
 
-    /**
-     *
-     * @Route("/json-listing/{module}/{page}", methods={"POST", "GET"}, name="json-listing")
-     */
+    #[Route(path: '/json-listing/{module}/{page}', methods: ["POST", "GET"])]
     public function getJsonListing($module, $page)
     {
 
@@ -101,10 +88,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         ]);
     }
 
-    /**
-     *
-     * @Route("/view-map/{module}/{page}", methods={"GET"}, name="view-map")
-     */
+    #[Route(path: '/view-map/{module}/{page}', methods: ["GET"])]
     public function getViewMap($module, $page)
     {
 
@@ -116,10 +100,7 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         return new JsonResponse(['locations' => $strListing]);
     }
 
-    /**
-     *
-     * @Route("/async-image", methods={"POST"}, name="async-image")
-     */
+    #[Route(path: '/async-image', methods: ["POST", "GET"])]
     public function getAsyncImage()
     {
 
@@ -135,16 +116,13 @@ class FrontendController extends \Contao\CoreBundle\Controller\AbstractControlle
         $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(\Input::post('table'), $objEntity->parse()[0]);
         $arrImage = $objRoleResolver->getValueByRole(\Input::post('role'));
         if (is_array($arrImage) && !empty($arrImage)) {
-            $arrReturn['src'] = $arrImage[0]['img']['srcset'];
-            $arrReturn['alt'] = $arrImage[0]['alt'];
+            $arrReturn['src'] = $arrImage[0]['img']['srcset'] ?? '';
+            $arrReturn['alt'] = $arrImage[0]['alt'] ?? '';
         }
         return new JsonResponse($arrReturn);
     }
 
-    /**
-     *
-     * @Route("/icalendar", methods={"GET"}, name="getICalendar")
-     */
+    #[Route(path: '/icalendar', methods: ["GET"])]
     public function getICalendar()
     {
 

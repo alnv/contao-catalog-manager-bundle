@@ -442,7 +442,7 @@ class Toolkit
                     return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
 
-                if ($arrField['isFile']) {
+                if ($arrField['isFile'] ?? '') {
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }
@@ -478,8 +478,8 @@ class Toolkit
                         } catch (\Exception $objException) {}
                         $arrValues[$strPageId] = [
                             'url' => $strUrl,
-                            'master' => $objPage->getFrontendUrl('/' . $arrCatalog['alias']),
-                            'absolute' => $objPage->getAbsoluteUrl('/' . $arrCatalog['alias'])
+                            'master' => $objPage->getFrontendUrl((($arrCatalog['alias'] ?? '') ? '/' . $arrCatalog['alias'] : '')),
+                            'absolute' => $objPage->getAbsoluteUrl((($arrCatalog['alias'] ?? '') ? '/' . $arrCatalog['alias'] : ''))
                         ];
                     }
                 }
@@ -502,7 +502,7 @@ class Toolkit
 
         $arrTemp = [];
         foreach ($arrOptions as $arrValue) {
-            if (in_array($arrValue['value'], $arrValues)) {
+            if (in_array(($arrValue['value'] ?? ''), $arrValues)) {
                 $arrTemp[$arrValue['value']] = $arrValue;
             }
         }

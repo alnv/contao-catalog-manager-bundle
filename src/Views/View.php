@@ -7,6 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Application;
 use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
+use Alnv\ContaoCatalogManagerBundle\Library\PlaceholderDataContainer;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Library\ShareButtons;
 use Cache;
@@ -234,7 +235,7 @@ abstract class View extends Controller
                 }
 
                 $intTime = Date::floorToMinute();
-                $strTable = $GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?: $this->strTable;
+                $strTable = ($GLOBALS['TL_DCA'][$this->strTable]['config']['_table'] ?? '') ?: $this->strTable;
                 $arrReturn['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
             }
         }
@@ -476,7 +477,8 @@ abstract class View extends Controller
         if (Cache::has($strHash)) {
             $arrAttribute = Cache::get($strHash);
         } else {
-            $arrAttribute = Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable);
+            $objDataContainer = new PlaceholderDataContainer($this->strTable);
+            $arrAttribute = Widget::getAttributesFromDca($this->dcaExtractor->getField($strField), $strField, $varValue, $strField, $this->strTable, $objDataContainer);
             Cache::set($strHash, $arrAttribute);
         }
 

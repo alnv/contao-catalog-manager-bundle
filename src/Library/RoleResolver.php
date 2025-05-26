@@ -17,7 +17,7 @@ class RoleResolver extends \System {
         }
 
         self::$objCache = new \Symfony\Component\Cache\Adapter\FilesystemAdapter('cm.roleresolver.cache', 60, TL_ROOT . '/var/cache');
-        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '');
+        $strInstanceKey = 'roles_' . $strTable . (($arrEntity['id'] ?? '') ? '_' . $arrEntity['id'] : '');
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
             self::$strTable = $strTable;
@@ -73,7 +73,7 @@ class RoleResolver extends \System {
                 'eval' => $arrField['eval'],
                 'label' => $arrField['label'],
                 'type' => $arrField['inputType'],
-                'role' => $GLOBALS['CM_ROLES'][$strRole],
+                'role' => $GLOBALS['CM_ROLES'][$strRole] ?? '',
                 'value' => isset(self::$arrEntity[$strFieldname]) ? self::$arrEntity[$strFieldname] : ''
             ];
         }
