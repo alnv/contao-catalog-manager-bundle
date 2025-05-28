@@ -15,20 +15,20 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
         'onsubmit_callback' => [
             function (DataContainer $objDataContainer) {
                 if (!$objDataContainer->activeRecord || !Input::get('dcaWizard')) {
-                    return null;
+                    return;
                 }
                 $arrSet = [];
-                $arrSet['tstamp'] = time();
+                $arrSet['tstamp'] = \time();
                 $arrSet['pid'] = Input::get('dcaWizard');
                 Database::getInstance()->prepare('UPDATE tl_catalog_option %s WHERE id=?')->set($arrSet)->execute($objDataContainer->activeRecord->id);
             },
             function (DataContainer $objDataContainer) {
                 if (!$objDataContainer->activeRecord) {
-                    return null;
+                    return;
                 }
                 $objActive = Database::getInstance()->prepare('SELECT * FROM tl_catalog_option WHERE id=?')->limit(1)->execute($objDataContainer->activeRecord->id);
                 $arrSet = [];
-                $arrSet['tstamp'] = time();
+                $arrSet['tstamp'] = \time();
                 if (!$objActive->value) {
                     $arrSet['value'] = Toolkit::generateAlias($objActive->label, 'value', 'tl_catalog_option', $objDataContainer->activeRecord->id, $objActive->pid, 'a-z0-9');
                 }

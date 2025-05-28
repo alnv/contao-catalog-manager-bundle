@@ -22,14 +22,16 @@ class LoadDataContainerListener
             return;
         }
 
-        if ($strTable && !isset($GLOBALS['TL_DCA'][$strTable])) {
+        if ($strTable && !isset($GLOBALS['TL_DCA'][$strTable]['config']['dataContainer'])) {
 
             $objCatalog = CatalogModel::findByTableOrModule($strTable);
 
-            if ($objCatalog !== null) {
-                $objVirtualDataContainerArray = new Application();
-                $objVirtualDataContainerArray->initializeDataContainerArrayByTable($strTable);
+            if (!$objCatalog) {
+                return;
             }
+
+            $objVirtualDataContainerArray = new Application();
+            $objVirtualDataContainerArray->initializeDataContainerArrayByTable($strTable);
         }
     }
 }

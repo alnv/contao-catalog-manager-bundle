@@ -87,7 +87,7 @@ class Application
         $objVDataContainerArray->generate();
         $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
 
-        if (is_array($arrRelatedTables) && !empty($arrRelatedTables)) {
+        if (!empty($arrRelatedTables) && \is_array($arrRelatedTables)) {
             foreach ($arrRelatedTables as $strTable) {
                 $this->initializeDataContainerArrayByTable($strTable);
             }
