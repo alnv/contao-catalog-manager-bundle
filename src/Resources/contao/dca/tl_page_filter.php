@@ -139,7 +139,7 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             'options_callback' => function (DataContainer $objDataContainer) {
                 $arrReturn = [];
                 $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
-                if (!$arrActiveRecord['table']) {
+                if (!($arrActiveRecord['table'] ?? '')) {
                     return $arrReturn;
                 }
                 $objCatalog = CatalogModel::findByTableOrModule($arrActiveRecord['table']);

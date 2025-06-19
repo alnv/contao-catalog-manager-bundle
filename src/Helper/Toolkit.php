@@ -230,7 +230,7 @@ class Toolkit
         }
 
         if ($strLanguage) {
-            $strPathInfo = \str_replace('/' . $strLanguage, '', $strPathInfo);
+            $strPathInfo = \preg_replace('/' . \preg_quote('/' . $strLanguage, '/') . '/', '', $strPathInfo, 1);
         }
 
         foreach (\array_filter(\explode('/', $strPathInfo)) as $strFragment) {
