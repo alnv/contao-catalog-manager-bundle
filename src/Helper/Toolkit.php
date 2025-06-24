@@ -224,12 +224,15 @@ class Toolkit
 
         $arrFragments = [];
         $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
+        $arrFirstFragments = \explode('/', $strPathInfo);
+        $arrFirstFragments = \array_filter($arrFirstFragments);
+        $strFirstFragment = $arrFirstFragments[0] ?? '';
 
         if ($strAlias) {
             $strPathInfo = \str_replace('/' . $strAlias, '', $strPathInfo);
         }
 
-        if ($strLanguage) {
+        if ($strLanguage && $strLanguage == $strFirstFragment) {
             $strPathInfo = \preg_replace('/' . \preg_quote('/' . $strLanguage, '/') . '/', '', $strPathInfo, 1);
         }
 
