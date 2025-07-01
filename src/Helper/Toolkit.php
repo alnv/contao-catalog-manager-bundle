@@ -224,8 +224,10 @@ class Toolkit
 
         $arrFragments = [];
         $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
+
         $arrFirstFragments = \explode('/', $strPathInfo);
         $arrFirstFragments = \array_filter($arrFirstFragments);
+        $arrFirstFragments = \array_values($arrFirstFragments);
         $strFirstFragment = $arrFirstFragments[0] ?? '';
 
         if ($strAlias) {
