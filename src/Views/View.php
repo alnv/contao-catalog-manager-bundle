@@ -497,7 +497,7 @@ abstract class View extends Controller
 
     protected function getPageNumber(): int
     {
-        return (int)Input::get('page_e' . $this->arrOptions['id']);
+        return (int)Input::get('page_e' . ($this->arrOptions['id'] ?? 0));
     }
 
     public function getPagination(): string
@@ -507,7 +507,7 @@ abstract class View extends Controller
             return '';
         }
 
-        $objPagination = new Pagination(($this->arrOptions['total'] ?? 0), ($this->arrOptions['limit'] ?? 0), Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
+        $objPagination = new Pagination(($this->arrOptions['total'] ?? 0), ($this->arrOptions['limit'] ?? 0), Config::get('maxPaginationLinks'), 'page_e' . ($this->arrOptions['id'] ?? 0));
 
         return $objPagination->generate("\n  ");
     }
@@ -536,7 +536,7 @@ abstract class View extends Controller
 
     public function getModuleId()
     {
-        return $this->arrOptions['id'];
+        return $this->arrOptions['id'] ?? '0';
     }
 
     abstract public function parse();

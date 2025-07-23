@@ -22,6 +22,7 @@ class ActiveInsertTag
 
         if (is_array($arrFragments) && strtoupper($arrFragments[0]) == 'ACTIVE' && isset($arrFragments[1])) {
 
+
             global $objPage;
 
             $strMode = null;
@@ -29,15 +30,17 @@ class ActiveInsertTag
             $strDefault = null;
             $blnUseDefault = false;
             $varValue = Toolkit::getValueFromUrl(Toolkit::getFilterValue($arrFragments[1]));
+            $strParams = StringUtil::decodeEntities($arrFragments[2] ?? '');
 
             $arrActiveOptions = [
                 'touch' => false,
+                'isDate' => false,
                 'dateMethod' => 'dayBegin',
                 'dateFormat' => $objPage?->dateFormat ?: Config::get('dateFormat')
             ];
 
-            if (isset($arrFragments[2]) && \strpos($arrFragments[2], '?') !== false) {
-                $arrParams = Toolkit::parseParametersFromString($arrFragments[2]);
+            if (isset($strParams) && \strpos($strParams, '?') !== false) {
+                $arrParams = Toolkit::parseParametersFromString($strParams);
                 foreach ($arrParams as $strParam) {
                     list($strKey, $strOption) = explode('=', $strParam);
                     switch ($strKey) {
@@ -47,6 +50,9 @@ class ActiveInsertTag
                             break;
                         case 'mode':
                             $strMode = $strOption; // BE || FE
+                            break;
+                        case 'isDate':
+                            $arrActiveOptions['isDate'] = true;
                             break;
                         case 'dateMethod':
                             $arrActiveOptions['dateMethod'] = $strOption;
@@ -120,16 +126,17 @@ class ActiveInsertTag
         $strDateMethod = $arrOptions['dateMethod'] ?? 'dayBegin';
         $strDateFormat = $arrOptions['dateFormat'] ?? 'date';
         $blnTouch = $arrOptions['touch'] ?? false;
+        $blnIsDate = $arrOptions['isDate'] ?? false;
 
         if ($strValue === '') {
             return $strValue;
         }
 
-        if (Validator::isDate($strValue)) {
+        if (Validator::isDate($strValue) || $blnIsDate) {
             $strValue = (new Date($strValue, $strDateFormat))->{$strDateMethod};
         }
 
-        if (Validator::isDatim($strValue)) {
+        if (Validator::isDatim($strValue) || $blnIsDate) {
             $strValue = (new Date($strValue, $strDateFormat))->{$strDateMethod};
         }
 

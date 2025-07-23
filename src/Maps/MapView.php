@@ -42,7 +42,9 @@ abstract class MapView
 
     protected function parseTokens($arrLocation): array
     {
+
         $arrTokens = [];
+
         foreach ($arrLocation as $strField => $varValue) {
 
             if (\is_callable($varValue)) {
@@ -61,7 +63,7 @@ abstract class MapView
                 $varValue = \number_format($arrLocation['_distance'], '2', '.');
             }
 
-            if ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'fileTree') {
+            if (($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] ?? '') == 'fileTree') {
                 $varValue = Toolkit::parseImage($varValue);
             }
 
