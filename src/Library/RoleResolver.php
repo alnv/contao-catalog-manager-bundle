@@ -2,7 +2,8 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-class RoleResolver extends \System {
+class RoleResolver extends \System
+{
 
     public static $strTable = null;
     public static $arrRoles = null;
@@ -10,7 +11,8 @@ class RoleResolver extends \System {
     protected static $arrInstances = [];
     protected static $objCache;
 
-    public static function getInstance($strTable, $arrEntity=[]) {
+    public static function getInstance($strTable, $arrEntity = [])
+    {
 
         if ($strTable === null) {
             return new self;
@@ -37,7 +39,8 @@ class RoleResolver extends \System {
         return self::$arrInstances[$strInstanceKey];
     }
 
-    protected static function setRoles() {
+    protected static function setRoles()
+    {
 
         \Controller::loadDataContainer(self::$strTable);
         \System::loadLanguageFile(self::$strTable);
@@ -87,21 +90,24 @@ class RoleResolver extends \System {
         return $arrRoles;
     }
 
-    public function getRole($strRolename) {
+    public function getRole($strRolename)
+    {
 
         return $GLOBALS['CM_ROLES'][$strRolename] ?? [];
     }
 
-    public function getValueByRole($strRolename) {
+    public function getValueByRole($strRolename)
+    {
 
         if (!isset(self::$arrRoles[$strRolename])) {
             return '';
         }
 
-        return self::$arrRoles[$strRolename]['value'];
+        return self::$arrRoles[$strRolename]['value'] ?? '';
     }
 
-    public function getFieldByRole($strRolename) {
+    public function getFieldByRole($strRolename)
+    {
 
         if (!isset(self::$arrRoles[$strRolename])) {
             return '';
@@ -110,7 +116,8 @@ class RoleResolver extends \System {
         return self::$arrRoles[$strRolename]['name'];
     }
 
-    public function getFieldsByRoles($arrRoles) {
+    public function getFieldsByRoles($arrRoles)
+    {
 
         $arrReturn = [];
         foreach ($arrRoles as $strRole) {
@@ -123,7 +130,8 @@ class RoleResolver extends \System {
         return empty($arrReturn) ? null : $arrReturn;
     }
 
-    public function getGeoCodingAddress($strDelimiter=', ') {
+    public function getGeoCodingAddress($strDelimiter = ', ')
+    {
 
         $arrAddress = [];
         $arrAddressRoles = ['street', 'streetNumber', 'zip', 'city', 'state', 'country'];
@@ -138,19 +146,21 @@ class RoleResolver extends \System {
         return $objAddress->getAddress($strDelimiter);
     }
 
-    public function getGeoCodingFields() {
+    public function getGeoCodingFields()
+    {
 
         $arrReturn = [];
         $arrGeoRoles = ['latitude', 'longitude'];
 
         foreach ($arrGeoRoles as $strRole) {
-            $arrReturn[$strRole] = self::$arrRoles[$strRole]['name'];
+            $arrReturn[$strRole] = self::$arrRoles[$strRole]['name'] ?? '';
         }
 
         return $arrReturn;
     }
 
-    protected function getKeyValueByRoles($arrRoles) {
+    protected function getKeyValueByRoles($arrRoles)
+    {
 
         $arrReturn = [];
 
@@ -160,12 +170,17 @@ class RoleResolver extends \System {
                 continue;
             }
 
-            $arrReturn[self::$arrRoles[ $strRole ]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
+            $arrReturn[self::$arrRoles[$strRole]['name']] = self::$arrEntity[self::$arrRoles[$strRole]['name']];
         }
 
         return $arrReturn;
     }
 
-    private function __clone(){}
-    public function __wakeup(){}
+    private function __clone()
+    {
+    }
+
+    public function __wakeup()
+    {
+    }
 }
