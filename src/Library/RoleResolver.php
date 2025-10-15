@@ -35,9 +35,10 @@ class RoleResolver
         }
 
         $strRootDir = System::getContainer()->getParameter('kernel.project_dir');
+
         self::$objCache = new FilesystemAdapter('cm.roles.cache', 60, $strRootDir . '/var/cache');
 
-        $strInstanceKey = 'roles_' . $strTable . ($arrEntity['id'] ? '_' . $arrEntity['id'] : '') . (md5($arrEntity['tstamp'] ?? '0'));
+        $strInstanceKey = 'roles_' . $strTable . (($arrEntity['id'] ?? '') ? '_' . $arrEntity['id'] : '') . (($arrEntity['tstamp'] ?? '') ? \md5($arrEntity['tstamp']) : '');
 
         if (!array_key_exists($strInstanceKey, self::$arrInstances)) {
             self::$strTable = $strTable;
