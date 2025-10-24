@@ -8,7 +8,7 @@ use Contao\Model;
 class ModelWizard
 {
 
-    protected $objModel = null;
+    protected $objModel;
 
     public function __construct($strTable)
     {
@@ -27,7 +27,7 @@ class ModelWizard
 
         if ($strModel && $this->modelExist($strModel)) {
             $this->objModel = new $strModel();
-            return null;
+            return;
         }
 
         if (isset($GLOBALS['CM_MODELS'][$strTable]) && $this->modelExist($GLOBALS['CM_MODELS'][$strTable])) {
@@ -35,7 +35,7 @@ class ModelWizard
             $objMultilingualDynModel->createDynTable($strTable);
             $this->objModel = $objMultilingualDynModel;
             $GLOBALS['TL_MODELS'][$strTable] = $objMultilingualDynModel::class;
-            return null;
+            return;
         }
 
         $objDynModel = new DynModel();

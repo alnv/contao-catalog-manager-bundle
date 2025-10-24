@@ -90,17 +90,19 @@ class Options
                 if ($objEntities === null) {
                     return $arrReturn;
                 }
+
                 while ($objEntities->next()) {
 
                     $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
 
                     foreach ($varValues as $strValue) {
 
+                        $strValue = trim($strValue);
+
                         if (in_array($strValue, $arrTemps)) {
                             continue;
                         }
 
-                        $strValue = trim($strValue);
                         $arrTemps[] = $strValue;
                         $strLabel = self::getCleanLabel($objEntities->{$arrField['dbLabel']}, $arrField['dbLabel'], $arrField['dbTable']);
                         if ($blnAsAssoc) {
@@ -130,11 +132,12 @@ class Options
 
                     foreach ($varValues as $strValue) {
 
+                        $strValue = trim($strValue);
+
                         if (in_array($strValue, $arrTemps)) {
                             continue;
                         }
 
-                        $strValue = trim($strValue);
                         $arrTemps[] = $strValue;
                         $strLabel = self::getCleanLabel($strValue, $arrField['dbKey'], $arrField['dbTable']);
 

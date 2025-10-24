@@ -78,6 +78,7 @@ class Listing extends Hybrid
         $this->setDistance();
         $this->setMasterPage();
         $this->setPagination();
+        $this->setLanguage();
         $this->setIgnoreVisibility();
         $this->setIgnoreFieldsFromParsing();
     }
@@ -90,6 +91,11 @@ class Listing extends Hybrid
     public function getTable(): string
     {
         return $this->cmTable;
+    }
+
+    public function setLanguage()
+    {
+        $this->arrOptions['language'] = System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale();
     }
 
     protected function setIgnoreVisibility(): void
@@ -210,7 +216,7 @@ class Listing extends Hybrid
         }
     }
 
-    protected function setPagination()
+    protected function setPagination(): void
     {
 
         if ($this->cmPagination) {
@@ -226,7 +232,7 @@ class Listing extends Hybrid
         }
     }
 
-    protected function setGroup()
+    protected function setGroup(): void
     {
 
         if ($this->cmGroupBy) {
@@ -238,11 +244,11 @@ class Listing extends Hybrid
         }
     }
 
-    protected function setMasterPage()
+    protected function setMasterPage(): void
     {
 
         if (!$this->cmMaster) {
-            return null;
+            return;
         }
         if (!$this->cmMasterPage) {
             global $objPage;
@@ -252,11 +258,11 @@ class Listing extends Hybrid
         $this->arrOptions['masterPage'] = $this->cmMasterPage;
     }
 
-    protected function setFormPage()
+    protected function setFormPage(): void
     {
 
         if (!$this->cmForm || !$this->cmFormPage) {
-            return null;
+            return;
         }
 
         $this->arrOptions['formPage'] = $this->cmFormPage;

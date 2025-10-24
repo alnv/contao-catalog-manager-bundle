@@ -376,7 +376,9 @@ abstract class View extends Controller
             }
 
             $arrRelation = $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['relation'];
+
             Controller::loadDataContainer($arrRelation['table']);
+
             $strTable = $GLOBALS['TL_DCA'][$arrRelation['table']]['config']['_table'] ?? $arrRelation['table'];
             $strField = $strTable . '.' . $arrRelation['field'];
 

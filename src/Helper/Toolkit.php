@@ -934,6 +934,18 @@ class Toolkit
         return $arrReturn;
     }
 
+    public static function pluckTableFromField($strField, $strDefault = '', $blnDot = false): string
+    {
+
+        $arrFragments = \explode('.', $strField);
+
+        if (\count($arrFragments) > 1) {
+            return ($arrFragments[0] ?? '') ? '' : ($strDefault ? $strDefault . ($blnDot ? '.' : '') : '');
+        }
+
+        return ($strDefault ? $strDefault . ($blnDot ? '.' : '') : '');
+    }
+
     public static function convertComboWizardToModelValues($strValue, $strTable = ''): array
     {
 
@@ -977,19 +989,21 @@ class Toolkit
                 }
 
                 $arrColumns = [];
-                $varValue = is_array($varValue) ? $varValue : StringUtil::deserialize($varValue, true);
+                $varValue = \is_array($varValue) ? $varValue : StringUtil::deserialize($varValue, true);
+
                 foreach ($varValue as $strIndex => $strValue) {
 
                     if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
                             $arrColumns[] = static::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
-                                'field' => ($strTable ? $strTable . '.' : '') . $arrQuery['field'],
+                                'field' => static::pluckTableFromField($arrQuery['field'], $strTable, true) . $arrQuery['field'],
                                 'value' => '?'
                             ]);
                         }
                     } else {
+
                         $arrColumns[] = static::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
-                            'field' => ($strTable ? $strTable . '.' : '') . $arrQuery['field'],
+                            'field' => static::pluckTableFromField($arrQuery['field'], $strTable, true) . $arrQuery['field'],
                             'value' => '?'
                         ]);
                     }
@@ -1002,8 +1016,8 @@ class Toolkit
                 }
 
                 if (!empty($arrColumns)) {
-                    if (count($arrColumns) > 1) {
-                        $strColumn = '(' . implode(' OR ', $arrColumns) . ')';
+                    if (\count($arrColumns) > 1) {
+                        $strColumn = '(' . \implode(' OR ', $arrColumns) . ')';
                     } else {
                         $strColumn = $arrColumns[0];
                     }
@@ -1025,7 +1039,7 @@ class Toolkit
                 continue;
             }
 
-            if (count($arrQuery) > 1) {
+            if (\count($arrQuery) > 1) {
                 $arrReturn['column'][] = '(' . implode(' OR ', $arrQuery) . ')';
             } else {
                 $arrReturn['column'][] = $arrQuery[0];

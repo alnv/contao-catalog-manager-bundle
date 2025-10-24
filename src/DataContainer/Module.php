@@ -5,7 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 use Contao\Controller;
 use Contao\DataContainer;
 use Contao\Input;
-use Contao\StringUtil;
+use Terminal42\DcMultilingualBundle\Driver;
 use Contao\System;
 
 class Module
@@ -13,7 +13,6 @@ class Module
 
     public function getTables(): array
     {
-
         return (new Catalog())->getTables();
     }
 
@@ -33,10 +32,15 @@ class Module
         System::loadLanguageFile($dc->activeRecord->cmTable, Input::post('language'));
         Controller::loadDataContainer($dc->activeRecord->cmTable);
 
-        foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
+        $strTable = ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['_table'] ?? '');
 
-            $strValue = \is_array($arrField['label']) ? $arrField['label'][0] : $strField;
-            $arrReturn[$strField] = StringUtil::decodeEntities($strValue);
+        foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
+            // $strValue = \is_array($arrField['label']) ? $arrField['label'][0] : $strField;
+            $arrReturn[$strField] = $strTable . '.' . $strField; // StringUtil::decodeEntities($strValue);
+
+            if ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['dataContainer'] == Driver::class && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
+                $arrReturn['translation.' . $strField] =  'translation.' . $strField;
+            }
         }
 
         return $arrReturn;
@@ -74,7 +78,6 @@ class Module
 
     public function getOperators(): array
     {
-
         return \array_keys($GLOBALS['CM_OPERATORS']);
     }
 }
