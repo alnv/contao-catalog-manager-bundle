@@ -256,7 +256,7 @@ abstract class View extends Controller
             return '';
         }
 
-        $objPagination = new Pagination($this->arrOptions['total'], $this->arrOptions['limit'], Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
+        $objPagination = new Pagination($this->arrOptions['total'] ?? 0, $this->arrOptions['limit'] ?? 0, Config::get('maxPaginationLinks'), 'page_e' . $this->arrOptions['id']);
 
         return $objPagination->generate("\n  ");
     }
