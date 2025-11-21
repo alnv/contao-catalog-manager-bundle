@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Models;
 use Contao\Database;
 use Contao\DcaExtractor;
 use Contao\Model;
+use Contao\System;
 
 class DynModel extends Model
 {
@@ -119,6 +120,12 @@ class DynModel extends Model
 
         if (isset($arrOptions['order'])) {
             $strQuery .= " ORDER BY " . $arrOptions['order'];
+        }
+
+        if (isset($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery']) && \is_array($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'])) {
+            foreach ($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'] as $arrCallback) {
+                $strQuery = System::importStatic($arrCallback[0])->{$arrCallback[1]}($strQuery, $arrOptions);
+            }
         }
 
         return $strQuery;
