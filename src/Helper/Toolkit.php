@@ -795,21 +795,14 @@ class Toolkit
         return false;
     }
 
-    public static function saveAlias($arrActiveRecord, $arrFields, $arrCatalog)
+    public static function saveAlias($arrActiveRecord, $arrFields, $arrCatalog): void
     {
 
         if (!$arrActiveRecord['id']) {
             return;
         }
-
-        /*
-        if (!empty($arrActiveRecord['alias'])) {
-            return;
-        }
-        */
-
-
-        $strAlias = $arrActiveRecord['alias'] ?? '';
+        
+        $strAlias = Input::post('alias') ?: ''; // $arrActiveRecord['alias'] ?? '';
 
         if (!$strAlias) {
 
@@ -828,7 +821,6 @@ class Toolkit
                     $arrValues[] = $arrActiveRecord[$strFieldname];
                 }
             }
-
             if (empty($arrValues)) {
                 $strAlias = \md5(\time() . '/' . $arrActiveRecord['id']);
             } else {
@@ -1110,7 +1102,7 @@ class Toolkit
             return $objDataContainer->activeRecord->row();
         }
 
-        if (method_exists(($objDataContainer ?: ''), 'getCurrentRecord')) {
+        if (method_exists(($objDataContainer), 'getCurrentRecord')) {
             return (array)$objDataContainer->getCurrentRecord();
 
         }
