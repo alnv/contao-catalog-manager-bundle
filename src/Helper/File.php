@@ -20,7 +20,6 @@ class File
     {
 
         $strFile = Input::get('file');
-
         if (!$strFile) {
             return null;
         }
@@ -29,13 +28,16 @@ class File
             return null;
         }
 
+        $strFile = StringUtil::decodeEntities($strFile);
         foreach ($arrFiles as $arrFile) {
             if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
+
                 if (isset($GLOBALS['TL_HOOKS']['beforeDownload']) && is_array($GLOBALS['TL_HOOKS']['beforeDownload'])) {
                     foreach ($GLOBALS['TL_HOOKS']['beforeDownload'] as $arrCallback) {
                         System::importStatic($arrCallback[0])->{$arrCallback[1]}($strFile);
                     }
                 }
+
                 Controller::sendFileToBrowser($strFile, $blnInline);
             }
         }
@@ -82,7 +84,7 @@ class File
 
                 $arrFiles[$objFiles->path] = [
                     'id' => $objFiles->id,
-                    'uuid' => StringUtil::binToUuid(($objFiles->uuid?:'')),
+                    'uuid' => StringUtil::binToUuid(($objFiles->uuid ?: '')),
                     'name' => $objFile->basename,
                     'title' => StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                     'link' => $arrMeta['title'],

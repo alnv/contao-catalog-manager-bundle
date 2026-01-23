@@ -193,7 +193,6 @@ class FrontendController extends AbstractController
                 }
 
                 $objInsert = Database::getInstance()->prepare('INSERT INTO ' . $objField->dbTable . ' %s')->set($arrSet)->execute();
-
                 if ($objField->dbKey == 'id') {
                     $strValue = $objInsert->insertId;
                 }
