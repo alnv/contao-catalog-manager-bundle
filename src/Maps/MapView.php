@@ -32,7 +32,7 @@ abstract class MapView
             $arrLocation['map']['location'] = $arrLocation['roleResolver']()->getValueByRole('location');
             $arrLocation['map']['title'] = $arrLocation['roleResolver']()->getValueByRole('title');
             $arrLocation['map']['text'] = $arrLocation['roleResolver']()->getValueByRole('teaser');
-            $arrLocation['map']['_distance'] = (((int)$arrLocation['_distance'] ?? 0) > 0 ? \number_format($arrLocation['_distance'], '2', '.') : '');
+            $arrLocation['map']['_distance'] = ((int)($arrLocation['_distance'] ?? 0) > 0 ? \number_format($arrLocation['_distance'], '2', '.') : '');
             $arrLocation['map']['latitude'] = $arrLocation['roleResolver']()->getValueByRole('latitude');
             $arrLocation['map']['longitude'] = $arrLocation['roleResolver']()->getValueByRole('longitude');
             $arrLocation['map']['infoContent'] = Toolkit::replaceInsertTags(Toolkit::parseSimpleTokens($this->arrOptions['infoContent'], $this->parseTokens($arrLocation)));

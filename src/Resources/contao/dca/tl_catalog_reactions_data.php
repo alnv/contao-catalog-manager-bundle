@@ -8,6 +8,7 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions_data'] = [
         'sql' => [
             'keys' => [
                 'id' => 'primary',
+                'table,identifier,reaction_key' => 'index',
                 'table,session,member,identifier,reaction' => 'index',
             ]
         ]
