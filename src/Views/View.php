@@ -265,8 +265,9 @@ abstract class View extends Controller
     protected function validOrigin($strValue, $strField): bool
     {
 
-        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard' && is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'])) {
-            foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['eval']['columnFields'] as $arrField) {
+        if (isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType']) && $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['inputType'] == 'rowWizard' && \is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['fields'])) {
+            foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strField]['fields'] as $arrField) {
+
                 if ($arrField['inputType'] == 'fileTree') {
                     return false;
                 }

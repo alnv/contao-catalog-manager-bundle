@@ -642,16 +642,18 @@ class Toolkit
 
                 return [];
 
-            case 'multiColumnWizard':
+            case 'rowWizard':
 
                 $arrReturn = [];
                 $varEntities = StringUtil::deserialize($varValue, true);
 
                 foreach ($varEntities as $arrEntity) {
+
                     $arrRow = [];
                     foreach ($arrEntity as $strField => $strValue) {
-                        $arrRow[$strField] = static::parseCatalogValue($strValue, Widget::getAttributesFromDca($arrField['columnFields'][$strField], $strField, $strValue, $strField, null), $arrCatalog, true, true);;
+                        $arrRow[$strField] = static::parseCatalogValue($strValue, Widget::getAttributesFromDca(($arrField['fields'][$strField] ?? []), $strField, $strValue, $strField, null), $arrCatalog, true, true);;
                     }
+
                     $arrReturn[] = $arrRow;
                 }
 
@@ -734,6 +736,7 @@ class Toolkit
 
     public function cmp($a, $b)
     {
+        
         $strKey = 'value';
 
         if ($a[$strKey] < $b[$strKey]) {

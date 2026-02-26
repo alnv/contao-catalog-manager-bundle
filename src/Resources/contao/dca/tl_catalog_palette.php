@@ -1,15 +1,15 @@
 <?php
 
 use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-use Contao\CoreBundle\DataContainer\PaletteManipulator;
-use Contao\DataContainer;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
 use Contao\Controller;
-use Contao\StringUtil;
-use Contao\DC_Table;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\Database;
+use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\StringUtil;
 use Contao\Widget;
 
 $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
@@ -62,7 +62,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                     }
                 }
 
-                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
+                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['fields']['field']['options'] = (new CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
             }
         ],
         'onsubmit_callback' => [
@@ -232,54 +232,69 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'mandatory' => true,
                 'doNotCopy' => true,
                 'submitOnChange' => true,
-                'includeBlankOption' => true
+                'includeBlankOption' => true,
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
             ],
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'fields' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'decodeEntities' => true,
                 'submitOnChange' => true,
                 'tl_class' => 'clr w50',
-                'columnFields' => [
-                    'field' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['field'],
-                        'inputType' => 'select',
-                        'eval' => [
-                            'chosen' => true,
-                            'style' => 'width:100%;max-width:375px',
-                            'includeBlankOption' => true
-                        ]
+            ],
+            'fields' => [
+                'field' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['field'],
+                    'inputType' => 'select',
+                    'eval' => [
+                        'chosen' => true,
+                        'style' => 'width: 100%;max-width: 375px',
+                        'includeBlankOption' => true
                     ]
                 ]
             ],
-            'sql' => 'blob NULL',
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'fieldsets' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'tl_class' => 'clr w50',
                 'decodeEntities' => true,
-                'buttons' => ['new' => false, 'copy' => false, 'delete' => false, 'up' => false, 'down' => false, 'move' => false],
-                'columnFields' => [
-                    'label' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['label'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:100%;max-width:400px'
-                        ]
-                    ],
-                    'hide' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['hide'],
-                        'inputType' => 'checkbox',
-                        'eval' => [
-                            'multiple' => false
-                        ]
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
+            ],
+            'fields' => [
+                'label' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['label'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:100%;max-width:400px'
+                    ]
+                ],
+                'hide' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['hide'],
+                    'inputType' => 'checkbox',
+                    'eval' => [
+                        'multiple' => false
                     ]
                 ]
             ],
-            'sql' => 'blob NULL'
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'published' => [
             'inputType' => 'checkbox',

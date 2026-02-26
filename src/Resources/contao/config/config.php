@@ -13,13 +13,12 @@ use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
 use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
-use Alnv\ContaoCatalogManagerBundle\AI\AiChatComponentParser;
 use Alnv\ContaoCatalogManagerBundle\Widgets\CustomOptionWizard;
 use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "3.4.27";
+const CATALOG_MANAGER_BUNDLE_VERSION = "4.0.0";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -30,8 +29,7 @@ ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_field',
                 'tl_catalog_option',
                 'tl_catalog_palette',
-                'tl_catalog_license',
-                'tl_catalog_vector_files'
+                'tl_catalog_license'
             ]
         ],
         'roles' => [
@@ -70,11 +68,6 @@ ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
         'master' => MasterModule::class
     ]
 ]);
-
-$GLOBALS['OPEN_AI_MESSAGE_PARSER']['catalog-manager'] = [
-    'label' => 'Catalog-Manager',
-    'class' => AiChatComponentParser::class
-];
 
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
@@ -243,14 +236,16 @@ $GLOBALS['CM_ROLES'] = [
         'group' => 'article',
         'eval' => [
             'rgxp' => 'alias',
-            'doNotCopy' => true
+            'doNotCopy' => true,
+            'maxlength' => 255
         ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'type' => [
         'group' => 'article',
         'eval' => [
-            'submitOnChange' => true
+            'submitOnChange' => true,
+            'maxlength' => 128
         ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],

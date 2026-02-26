@@ -186,11 +186,12 @@ class Options
         $objModel = new ModelWizard(self::$arrField['dbTable']);
         $objModel = $objModel->getModel();
         $arrModelOptions = [];
+
         ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
 
         if (self::$arrField['dbOrderField']) {
-            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable']; //isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
-            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
+            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable'];
+            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? \strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
 
         return $objModel->findAll($arrModelOptions);
@@ -220,9 +221,12 @@ class Options
                 $arrOptions['value'] = $arrQueries['value'] ?? [];
                 break;
             case 'expert':
+
                 self::$arrField['dbFilterValue'] = Toolkit::replaceInsertTags(self::$arrField['dbFilterValue']);
+
                 $arrOptions['column'] = explode(';', StringUtil::decodeEntities(self::$arrField['dbFilterColumn']));
                 $arrOptions['value'] = explode(';', StringUtil::decodeEntities(self::$arrField['dbFilterValue']));
+
                 if ((is_array($arrOptions['value']) && !empty($arrOptions['value']))) {
                     $intIndex = -1;
                     $arrOptions['value'] = array_filter($arrOptions['value'], function ($strValue) use (&$intIndex, $arrOptions) {
@@ -242,6 +246,7 @@ class Options
         }
 
         if (empty($arrOptions['value'])) {
+
             unset($arrOptions['value']);
             unset($arrOptions['column']);
         }

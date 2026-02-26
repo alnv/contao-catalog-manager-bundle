@@ -2,6 +2,7 @@
 
 use Contao\Config;
 use Contao\DC_Table;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 
 $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
     'config' => [
@@ -67,40 +68,48 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'reactions' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'tl_class' => 'clr w50',
-                'columnFields' => [
-                    'name' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['name'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:150px',
-                            'mandatory' => true
-                        ]
-                    ],
-                    'key' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['key'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:150px',
-                            'mandatory' => true,
-                            'rgxp' => 'alias'
-                        ]
-                    ],
-                    'icon' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['icon'],
-                        'inputType' => 'fileTree',
-                        'eval' => [
-                            'filesOnly' => true,
-                            'fieldType' => 'radio',
-                            'extensions' => Config::get('validImageTypes'),
-                            'tl_class' => 'clr'
-                        ]
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
+            ],
+            'fields' => [
+                'name' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['name'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:150px',
+                        'mandatory' => true
+                    ]
+                ],
+                'key' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['key'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:150px',
+                        'mandatory' => true,
+                        'rgxp' => 'alias'
+                    ]
+                ],
+                'icon' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['icon'],
+                    'inputType' => 'fileTree',
+                    'eval' => [
+                        'filesOnly' => true,
+                        'fieldType' => 'radio',
+                        'extensions' => Config::get('validImageTypes'),
+                        'tl_class' => 'clr'
                     ]
                 ]
             ],
-            'sql' => 'blob NULL'
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'template' => [
             'inputType' => 'select',
