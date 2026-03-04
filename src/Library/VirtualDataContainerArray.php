@@ -182,10 +182,12 @@ class VirtualDataContainerArray
             $arrList['sorting']['child_record_callback'] = function ($arrRow) use ($arrList) {
                 return Toolkit::renderRow($arrRow, $arrList['labels']['fields'], $this->arrCatalog, $this->arrFields);
             };
+
             $arrList['labels']['showColumns'] = false;
         }
 
         if ($this->arrCatalog['mode'] == 'tree') {
+
             $arrList['sorting']['mode'] = DataContainer::MODE_TREE;
             $arrList['sorting']['fields'] = ['sorting'];
             $arrList['sorting']['icon'] = 'articles.svg';

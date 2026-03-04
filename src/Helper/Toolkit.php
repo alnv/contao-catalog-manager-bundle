@@ -453,32 +453,33 @@ class Toolkit
 
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
             if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
+
                 switch ($arrFields[$strField]['eval']['role']) {
                     case 'redirects':
                     case 'pages':
                     case 'page':
-                        if (!is_array($arrColumns[$strField])) {
+                        if (!\is_array($arrColumns[$strField])) {
                             break;
                         }
                         $arrPages = [];
-                        $arrPageIds = array_keys($arrColumns[$strField]);
+                        $arrPageIds = \array_keys($arrColumns[$strField]);
                         foreach ($arrPageIds as $strPageId) {
                             if ($objPage = PageModel::findByPk($strPageId)) {
                                 $arrPages[] = $objPage->pageTitle ?: $objPage->title;
                             }
                         }
-                        $arrColumns[$strField] = implode(', ', $arrPages);
+                        $arrColumns[$strField] = \implode(', ', $arrPages);
                         break;
                 }
             }
         }
 
-        if (count($arrColumns) < 2 && $arrCatalog['showColumns']) {
-            return array_values($arrColumns)[0];
+        if (\count($arrColumns) < 2 && $arrCatalog['showColumns']) {
+            return \array_values($arrColumns)[0];
         }
 
         if ($arrCatalog['showColumns'] && $arrCatalog['mode'] == 'list') {
-            return $arrColumns;
+            return \array_values($arrColumns);
         }
 
         $intIndex = -1;
@@ -500,8 +501,8 @@ class Toolkit
             $arrLabels[] = $strValue;
         }
 
-        if (is_array($arrLabels) && !empty($arrLabels)) {
-            $strTemplate .= '<span style="color:#999;padding-left:3px">(' . implode(' - ', $arrLabels) . ')</span>' . '</div>';
+        if (\is_array($arrLabels) && !empty($arrLabels)) {
+            $strTemplate .= '<span style="color:#999;padding-left:3px">(' . \implode(' - ', $arrLabels) . ')</span>' . '</div>';
         }
 
         return $strTemplate;
