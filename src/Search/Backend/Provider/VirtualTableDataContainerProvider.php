@@ -46,6 +46,7 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
     public function updateIndex(ReindexConfig $config): iterable
     {
+
         foreach ($this->getTables($config) as $table) {
 
             foreach ($this->findDocuments($table, $config) as $document) {
@@ -56,10 +57,10 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
     public function convertDocumentToHit(Document $document): Hit|null
     {
+
         $document = $this->addCurrentRowToDocumentIfNotAlreadyLoaded($document);
         $row = $document->getMetadata()['row'] ?? null;
 
-        // Entry does not exist anymore -> no hit
         if (null === $row) {
             return null;
         }
@@ -97,7 +98,7 @@ class VirtualTableDataContainerProvider implements ProviderInterface
             return false;
         }
 
-        return true;
+        return true; // todo
     }
 
     public function convertTypeToVisibleType(string $type): string
@@ -163,13 +164,20 @@ class VirtualTableDataContainerProvider implements ProviderInterface
             },
         );
 
-        $virtualFields = [];
-        $select = array_unique(['id', ...array_map(static fn(string $field) => $virtualFields[$field] ?? $field, array_keys($searchableFields))]);
-        $qb = $this->createQueryBuilderForTable($table, implode(',', $select));
+        $fields = ['id', ...array_keys($searchableFields)];
+        $select = [];
 
-        System::getContainer()
-            ->get('monolog.logger.contao')
-            ->log(LogLevel::ERROR, 'SELECT: ' . $table . ' -> ' . serialize($select), ['contao' => new ContaoContext(__CLASS__ . '::' . __FUNCTION__)]);
+        foreach ($fields as $field) {
+            $value = $virtualFields[$field] ?? $field;
+
+            if (preg_match('/^[a-zA-Z0-9_]+$/', $value)) {
+                $value = '`' . str_replace('`', '``', $value) . '`';
+            }
+
+            $select[$value] = true;
+        }
+
+        $qb = $this->createQueryBuilderForTable($table, implode(',', array_keys($select)));
 
         if ($reindexConfig->getUpdateSince() && isset($GLOBALS['TL_DCA'][$table]['fields']['tstamp'])) {
             $qb->andWhere('tstamp <= ', $qb->createNamedParameter($reindexConfig->getUpdateSince()));
@@ -206,10 +214,8 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
     private function extractSearchableContent(string $table, array $row, array $fieldsConfig, array $searchableFields): string
     {
-        $searchableContent = [];
 
-        // Expand virtual fields
-        // $row = $this->virtualFieldsHandler->expandFields($row, $table);
+        $searchableContent = [];
 
         foreach (array_keys($searchableFields) as $field) {
             if (isset($row[$field])) {
@@ -234,7 +240,6 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
     private function createQueryBuilderForTable(string $table, string $select): QueryBuilder
     {
-
         return $this->connection
             ->createQueryBuilder()
             ->select($select)
