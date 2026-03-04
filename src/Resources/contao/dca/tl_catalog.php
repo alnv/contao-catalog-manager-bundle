@@ -14,7 +14,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'onload_callback' => [
             ['catalogmanager.datacontainer.catalog', 'setPalette'],
             ['catalogmanager.datacontainer.catalog', 'checkLicense'],
-            ['catalogmanager.datacontainer.catalog', 'checkAiBundle']
         ],
         'onsubmit_callback' => [
             ['catalogmanager.datacontainer.catalog', 'generateModulename'],
@@ -135,7 +134,6 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'search' => true,
             'sorting' => true,
-            'defaultSearchField' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'description' => [
@@ -179,6 +177,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             'save_callback' => [
                 ['catalogmanager.datacontainer.catalog', 'watchTable']
             ],
+            'backendSearch' => false,
             'search' => true,
             'sorting' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']

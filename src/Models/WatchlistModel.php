@@ -15,17 +15,17 @@ class WatchlistModel extends Model
     {
 
         $strTable = static::$strTable;
-        $arrIdentifiers = ["$strTable.session=?"];
+        $arrIdentifiers = ["$strTable.`session`=?"];
 
-        $arrColumns = ["$strTable.identifier=? AND $strTable.table=? AND $strTable.sent!=?"];
+        $arrColumns = ["$strTable.`identifier`=? AND $strTable.`table`=? AND $strTable.`sent`!=?"];
         $arrValues = [$strIdentifier, $strTablename, '1', Watchlist::getSessionId()];
 
         if (FrontendUser::getInstance()->id) {
-            $arrIdentifiers[] = "$strTable.member=?";
+            $arrIdentifiers[] = "$strTable.`member`=?";
             $arrValues[] = FrontendUser::getInstance()->id;
         }
 
-        $arrColumns[] = '(' . implode(' OR ', $arrIdentifiers) . ')';
+        $arrColumns[] = '(' . \implode(' OR ', $arrIdentifiers) . ')';
 
         return static::findOneBy($arrColumns, $arrValues, $arrOptions);
     }
@@ -35,8 +35,8 @@ class WatchlistModel extends Model
 
         $strTable = static::$strTable;
 
-        $arrIdentifiers = ["$strTable.session=?"];
-        $arrOptions['column'] = ["$strTable.sent!=?"];
+        $arrIdentifiers = ["$strTable.`session`=?"];
+        $arrOptions['column'] = ["$strTable.`sent`!=?"];
         $arrOptions['value'] = ['1', Watchlist::getSessionId()];
 
         if (FrontendUser::getInstance()->id) {
@@ -44,7 +44,7 @@ class WatchlistModel extends Model
             $arrOptions['value'][] = FrontendUser::getInstance()->id;
         }
 
-        $arrOptions['column'][] = '(' . implode(' OR ', $arrIdentifiers) . ')';
+        $arrOptions['column'][] = '(' . \implode(' OR ', $arrIdentifiers) . ')';
         $arrOptions['order'] = "$strTable.created_at DESC";
 
         return static::findAll($arrOptions);

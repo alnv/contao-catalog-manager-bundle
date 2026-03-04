@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_catalog_roles']['tableLabel'] = 'CM Rollen';
+
 $GLOBALS['TL_LANG']['tl_catalog_roles']['name'] = ['Bezeichnung', ''];
 $GLOBALS['TL_LANG']['tl_catalog_roles']['maxlength'] = ['Maximale Länge', 'Maximale Anzahl von Zeichen, die im Feld zulässig sind.'];
 $GLOBALS['TL_LANG']['tl_catalog_roles']['minlength'] = ['Minimale Länge', 'Mindestanzahl von Zeichen, die eingegeben werden müssen.'];

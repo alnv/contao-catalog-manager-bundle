@@ -40,6 +40,7 @@ class VirtualDataContainerArray
     protected function setConfig(): void
     {
 
+        $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['backendSearchIgnore'] = true;
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_table'] = $this->arrCatalog['table'];
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] = Toolkit::extendField(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ctable'] ?? []), ($this->arrCatalog['ctable'] ?? []));
         $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] = $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['dataContainer'] ?? $this->getDataContainerNamespace($this->arrCatalog['dataContainer']);
@@ -61,10 +62,13 @@ class VirtualDataContainerArray
                 return;
             }
             if ($objDataContainer->id) {
+
                 $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
+
                 if (!$objActiveRecord->numRows) {
                     return;
                 }
+
                 Cache::set('activeRecord', $objActiveRecord->row());
             }
         };
@@ -435,6 +439,7 @@ class VirtualDataContainerArray
             }
 
             $strName = isset($arrField['name']) && $arrField['name'] ? $arrField['name'] : '';
+
             $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname] = [
                 Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $strName),
                 Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $strName)

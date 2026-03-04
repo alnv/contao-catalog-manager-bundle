@@ -13,8 +13,8 @@ class CatalogModel extends Model
     public static function findByTableOrModule($strIdentifier, array $arrOptions = [])
     {
 
-        $strTable = static::$strTable;
-        $arrColumns = ["$strTable.table=? OR $strTable.module=? OR $strTable.id=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`table`=? OR $table.`module`=? OR $table.`id`=?"];
 
         return static::findOneBy($arrColumns, [$strIdentifier, $strIdentifier, (int)$strIdentifier], $arrOptions);
     }
@@ -22,9 +22,9 @@ class CatalogModel extends Model
     public static function findChildrenCatalogsById($strId)
     {
 
-        $strT = static::$strTable;
+        $table = static::$strTable;
         $objChildTables = Database::getInstance()
-            ->prepare('SELECT * FROM ' . $strT . ' WHERE pid=? ORDER BY sorting DESC')
+            ->prepare('SELECT * FROM ' . $table . ' WHERE pid=? ORDER BY `sorting` DESC')
             ->execute($strId);
 
         if ($objChildTables->numRows < 1) {
@@ -37,8 +37,8 @@ class CatalogModel extends Model
     public static function findParentCatalogByTable($strTable)
     {
 
-        $strT = static::$strTable;
-        $objParent = Database::getInstance()->prepare('SELECT * FROM ' . $strT . ' WHERE id=(SELECT pid FROM ' . $strT . ' WHERE `table`=? LIMIT 1)')->limit(1)->execute($strTable);
+        $table = static::$strTable;
+        $objParent = Database::getInstance()->prepare('SELECT * FROM ' . $table . ' WHERE id=(SELECT pid FROM ' . $table . ' WHERE `table`=? LIMIT 1)')->limit(1)->execute($strTable);
 
         if ($objParent->numRows < 1) {
             return null;

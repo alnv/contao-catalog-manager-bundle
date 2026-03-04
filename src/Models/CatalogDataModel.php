@@ -14,8 +14,8 @@ class CatalogDataModel extends Model
     public static function getByTypeAndTableAndIdentifier($strType, $strTable, $strIdentifier, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND ($strT.session=? OR $strT.member=?)"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`type`=? AND $table.`table`=? AND $table.`identifier`=? AND ($table.`session`=? OR $table.`member`=?)"];
         $arrOptions['limit'] = 1;
 
         return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, Toolkit::getSessionId(), (FrontendUser::getInstance()->id ?: 0)], $arrOptions);
@@ -24,11 +24,11 @@ class CatalogDataModel extends Model
     public static function getLastAddedByType($strType, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
+        $table = static::$strTable;
         $arrOptions = [
             'value' => [$strType, Toolkit::getSessionId(), (FrontendUser::getInstance()->id ?: 0)],
-            'column' => ["$strT.type=? AND ($strT.session=? OR $strT.member=?)"],
-            'order' => "$strT.tstamp DESC",
+            'column' => ["$table.`type`=? AND ($table.`session`=? OR $table.`member`=?)"],
+            'order' => "$table.tstamp DESC",
             'limit' => $arrOptions['limit']
         ];
 
@@ -38,8 +38,8 @@ class CatalogDataModel extends Model
     public static function getByTypeAndTableIdentifierAndDayPeriod($strType, $strTable, $strIdentifier, $intDayPeriod, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.day=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`type`=? AND $table.`table`=? AND $table.`identifier`=? AND $table.`day`=?"];
         $arrOptions['limit'] = 1;
 
         return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intDayPeriod], $arrOptions);
@@ -48,8 +48,8 @@ class CatalogDataModel extends Model
     public static function getByTypeAndTableIdentifierAndMonthPeriod($strType, $strTable, $strIdentifier, $intMonthPeriod, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.month=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.type=? AND $table.`table`=? AND $table.identifier=? AND $table.month=?"];
         $arrOptions['limit'] = 1;
 
         return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intMonthPeriod], $arrOptions);
@@ -58,8 +58,8 @@ class CatalogDataModel extends Model
     public static function getByTypeAndTableIdentifierAndYearPeriod($strType, $strTable, $strIdentifier, $intYearPeriod, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.type=? AND $strT.table=? AND $strT.identifier=? AND $strT.year=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.type=? AND $table.`table`=? AND $table.identifier=? AND $table.year=?"];
         $arrOptions['limit'] = 1;
 
         return static::findOneBy($arrColumns, [$strType, $strTable, $strIdentifier, $intYearPeriod], $arrOptions);

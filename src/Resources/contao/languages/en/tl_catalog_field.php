@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_catalog_field']['tableLabel'] = 'CM Felder';
+
 $GLOBALS['TL_LANG']['tl_catalog_field']['general_settings'] = 'Allgemeine-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog_field']['options_legend'] = 'Auswahlliste-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog_field']['field_settings'] = 'Feld-Einstellungen';

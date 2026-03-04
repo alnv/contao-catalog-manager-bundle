@@ -148,6 +148,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'rte' => 'tinyMCE',
                 'allowHtml' => true
             ],
+            'search' => true,
             'sql' => "text NULL"
         ],
         'useAsAlias' => [
@@ -194,6 +195,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'mandatory' => true,
                 'tl_class' => 'clr'
             ],
+            'search' => true,
             'sql' => 'text NULL'
         ],
         'optionsSource' => [

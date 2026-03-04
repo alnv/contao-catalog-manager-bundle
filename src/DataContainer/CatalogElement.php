@@ -7,7 +7,6 @@ class CatalogElement
 
     public function getArticleElements(): array
     {
-
         return [];
     }
 }

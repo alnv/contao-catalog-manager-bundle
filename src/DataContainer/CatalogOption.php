@@ -9,14 +9,13 @@ class CatalogOption
 
     public function getFieldLabels(): array
     {
-        $objFields = CatalogFieldModel::findAll();
 
+        $objFields = CatalogFieldModel::findAll();
         if ($objFields === null) {
             return [];
         }
 
         $arrOptions = [];
-
         while ($objFields->next()) {
             $arrOptions[$objFields->id] = $objFields->name;
         }

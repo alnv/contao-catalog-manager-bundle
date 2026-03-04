@@ -12,8 +12,8 @@ class CatalogFieldModel extends Model
     public static function findByFieldname($strFieldname, array $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.fieldname=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`fieldname`=?"];
 
         return static::findOneBy($arrColumns, $strFieldname, $arrOptions);
     }
@@ -21,8 +21,8 @@ class CatalogFieldModel extends Model
     public static function findByFieldnameAndPid($strFieldname, $strId, array $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.fieldname=?", "$strT.pid=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`fieldname`=?", "$table.`pid`=?"];
 
         return static::findOneBy($arrColumns, [$strFieldname, $strId], $arrOptions);
     }
@@ -30,11 +30,12 @@ class CatalogFieldModel extends Model
     public static function findByParent($strId)
     {
 
-        $strT = static::$strTable;
+        $table = static::$strTable;
+
         $arrOptions = [
-            'column' => ["$strT.pid=?"],
+            'column' => ["$table.pid=?"],
             'value' => [$strId],
-            'order' => "$strT.sorting"
+            'order' => "$table.`sorting`"
         ];
 
         return static::findAll($arrOptions);

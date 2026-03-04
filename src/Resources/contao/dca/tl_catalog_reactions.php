@@ -8,6 +8,7 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
+        'backendSearchIgnore' => true,
         'sql' => [
             'keys' => [
                 'id' => 'primary'

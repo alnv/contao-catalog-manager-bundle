@@ -5,6 +5,7 @@ use Contao\DC_Table;
 $GLOBALS['TL_DCA']['tl_watchlist'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
+        'backendSearchIgnore' => true,
         'sql' => [
             'keys' => [
                 'id' => 'primary',

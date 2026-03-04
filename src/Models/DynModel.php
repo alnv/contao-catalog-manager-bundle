@@ -27,9 +27,11 @@ class DynModel extends Model
 
         static::$strTable = $strTable;
 
+        /*
         if (isset(static::$arrClassNames)) {
             static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
         }
+        */
 
         parent::__construct($objResult);
     }

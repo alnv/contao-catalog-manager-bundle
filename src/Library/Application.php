@@ -46,6 +46,8 @@ class Application
             ];
         }
 
+        $GLOBALS['TL_LANG'][$arrCatalog['table']]['tableLabel'] = Translation::getInstance()->translate($arrCatalog['table'] . '.tableLabel', $arrCatalog['name']);
+
         $arrBEModule = [
             'name' => $arrCatalog['module'],
             'tables' => $arrTables

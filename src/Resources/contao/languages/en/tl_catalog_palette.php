@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_catalog_palette']['tableLabel'] = 'CM Paletten';
+
 $GLOBALS['TL_LANG']['tl_catalog_palette']['name'] = ['Bezeichnung', ''];
 $GLOBALS['TL_LANG']['tl_catalog_palette']['alias'] = ['Alias', ''];
 $GLOBALS['TL_LANG']['tl_catalog_palette']['field'] = ['Eingabefeld', ''];

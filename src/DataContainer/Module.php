@@ -16,7 +16,7 @@ class Module
         return (new Catalog())->getTables();
     }
 
-    public function getFields($dc = null)
+    public function getFields($dc = null): array
     {
 
         $arrReturn = [];
@@ -35,8 +35,7 @@ class Module
         $strTable = ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['_table'] ?? '');
 
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
-            // $strValue = \is_array($arrField['label']) ? $arrField['label'][0] : $strField;
-            $arrReturn[$strField] = $strTable . '.' . $strField; // StringUtil::decodeEntities($strValue);
+            $arrReturn[$strField] = $strTable . '.' . $strField;
 
             if ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['dataContainer'] == Driver::class && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
                 $arrReturn['translation.' . $strField] =  'translation.' . $strField;

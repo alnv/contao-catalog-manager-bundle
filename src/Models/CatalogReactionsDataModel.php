@@ -14,17 +14,17 @@ class CatalogReactionsDataModel extends Model
     public static function getReaction($strTable, $strIdentifier, $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.table=?", "$strT.identifier=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`table`=?", "$table.`identifier`=?"];
         $arrValues = [$strTable, $strIdentifier];
         $arrOptions['limit'] = 1;
 
         if (FrontendUser::getInstance()->id) {
-            $arrColumns[] = "($strT.session=? OR $strT.member=?)";
+            $arrColumns[] = "($table.`session`=? OR $table.`member`=?)";
             $arrValues[] = Toolkit::getSessionId();
             $arrValues[] = FrontendUser::getInstance()->id;
         } else {
-            $arrColumns[] = "$strT.session=?";
+            $arrColumns[] = "$table.`session`=?";
             $arrValues[] = Toolkit::getSessionId();
         }
 

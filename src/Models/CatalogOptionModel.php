@@ -12,8 +12,8 @@ class CatalogOptionModel extends Model
     public static function findByValueAndPid($strValue, $strPid, array $arrOptions = [])
     {
 
-        $strT = static::$strTable;
-        $arrColumns = ["$strT.value=? AND $strT.pid=?"];
+        $table = static::$strTable;
+        $arrColumns = ["$table.`value`=? AND $table.pid=?"];
 
         return static::findOneBy($arrColumns, [$strValue, $strPid], $arrOptions);
     }

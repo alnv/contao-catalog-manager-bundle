@@ -36,7 +36,6 @@ class Catalog extends CatalogWizard
         $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog($objCatalog->row());
         $this->setAllFields();
-
         $this->setDefaultFields();
     }
 

@@ -12,8 +12,8 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
         'closed' => true,
         'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
+        'backendSearchIgnore' => true,
         'ptable' => 'tl_page',
-        'onsubmit_callback' => [],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -51,7 +51,6 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
         'default' => 'type',
         'routing_table' => 'type,alias;table,column;robots'
     ],
-    // 'subpalettes' => [],
     'fields' => [
         'id' => [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
@@ -97,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             ],
             'save_callback' => [function ($strValue, $objDataContainer) {
                 if (!$strValue) {
-                    $arrActiveRecord = Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
+                    $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
                     $strValue = $arrActiveRecord['column'] ?? '';
                 }
                 return $strValue;
@@ -116,10 +115,12 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             ],
             'options_callback' => function () {
                 $arrReturn = [];
+
                 $objCatalogs = CatalogModel::findAll();
                 if (!$objCatalogs) {
                     return $arrReturn;
                 }
+
                 while ($objCatalogs->next()) {
                     $arrReturn[] = $objCatalogs->table;
                 }
@@ -138,21 +139,26 @@ $GLOBALS['TL_DCA']['tl_page_filter'] = [
             ],
             'options_callback' => function (DataContainer $objDataContainer) {
                 $arrReturn = [];
+
                 $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
                 if (!($arrActiveRecord['table'] ?? '')) {
                     return $arrReturn;
                 }
+
                 $objCatalog = CatalogModel::findByTableOrModule($arrActiveRecord['table']);
                 if (!$objCatalog) {
                     return $arrReturn;
                 }
+
                 $objCatalogFields = CatalogFieldModel::findByParent($objCatalog->id);
                 if (!$objCatalogFields) {
                     return $arrReturn;
                 }
+
                 while ($objCatalogFields->next()) {
                     $arrReturn[] = $objCatalogFields->fieldname;
                 }
+
                 return $arrReturn;
             },
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']

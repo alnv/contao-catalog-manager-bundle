@@ -16,6 +16,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
+        'backendSearchIgnore' => true,
         'ptable' => 'tl_catalog',
         'onload_callback' => [
             function (DataContainer $objDataContainer) {

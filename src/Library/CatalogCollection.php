@@ -16,7 +16,7 @@ class CatalogCollection extends CatalogWizard
     {
 
         $objCatalogs = CatalogModel::findAll([
-            'order' => 'sorting ASC'
+            'order' => '`sorting` ASC'
         ]);
 
         if ($objCatalogs === null) {

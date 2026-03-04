@@ -29,16 +29,6 @@ class Catalog
         return Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
     }
 
-    public function checkAiBundle(): void
-    {
-
-        $arrBundles = System::getContainer()->get('kernel')->getBundles();
-
-        if (!($arrBundles['AlnvContaoOpenAiAssistantBundle'] ?? '')) {
-            unset($GLOBALS['TL_DCA']['tl_catalog']['list']['global_operations']['vector_files']);
-        }
-    }
-
     public function checkLicense(): void
     {
         $strInfo = "Sie verwenden aktuell die uneingeschränkte Testversion. Sobald Ihr Projekt abgeschlossen ist, können Sie unter https://shop.catalog-manager.org/ eine Lizenz erwerben. Mit dem Kauf einer Lizenz unterstützen Sie das Projekt und helfen dabei, dessen Weiterentwicklung zu fördern.";
@@ -67,7 +57,7 @@ class Catalog
         }
 
         $objEntities = Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'])->limit(1)->execute();
-        $objPid = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND fieldname=? AND published=?')->limit(1)->execute($arrRow['id'], 'pid', '1');
+        $objPid = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE `pid`=? AND `fieldname`=? AND `published`=?')->limit(1)->execute($arrRow['id'], 'pid', '1');
 
         if ($objEntities->numRows && !$objPid->numRows) {
             return '<a title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) . '">' . Image::getHtml(\preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';

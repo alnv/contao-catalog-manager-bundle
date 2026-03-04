@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_LANG']['tl_catalog']['tableLabel'] = 'CM Tabellen';
+
 $GLOBALS['TL_LANG']['tl_catalog']['type_settings'] = 'Typ-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['extended_settings'] = 'Erweiterte-Einstellungen';
 $GLOBALS['TL_LANG']['tl_catalog']['catalog_settings'] = 'Katalog-Einstellungen';
@@ -43,8 +45,7 @@ $GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] = [
 ];
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] = [
-    'catalog' => 'Katalog',
-    // 'modifier' => 'Modifizierer'
+    'catalog' => 'Katalog'
 ];
 
 $GLOBALS['TL_LANG']['tl_catalog']['reference']['mode'] = [

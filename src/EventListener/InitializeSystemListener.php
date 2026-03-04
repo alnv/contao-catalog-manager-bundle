@@ -7,23 +7,23 @@ use Contao\System;
 
 class InitializeSystemListener
 {
+
     public function __invoke(): void
     {
         $this->initializeBackendModules();
         $this->generateDataContainerArray();
     }
 
-    public function initializeBackendModules()
+    public function initializeBackendModules(): void
     {
 
         $objRequest = System::getContainer()->get('request_stack')->getCurrentRequest();
-
         if (!$objRequest) {
-            return null;
+            return;
         }
 
         if ($objRequest->get('_route') == 'contao_install') {
-            return null;
+            return;
         }
 
         if ($objRequest->get('_scope') == 'backend') {
@@ -32,17 +32,17 @@ class InitializeSystemListener
         }
     }
 
-    public function generateDataContainerArray()
+    public function generateDataContainerArray(): void
     {
 
         $objRequest = System::getContainer()->get('request_stack')->getCurrentRequest();
 
         if (!$objRequest) {
-            return null;
+            return;
         }
 
         if ($objRequest->get('_route') == 'contao_install') {
-            return null;
+            return;
         }
 
         if ($objRequest->get('_scope') == 'backend') {
