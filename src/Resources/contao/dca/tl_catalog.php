@@ -46,12 +46,14 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'edit.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'fields' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['fields'],
                 'href' => 'table=tl_catalog_field',
-                'icon' => '/bundles/alnvcontaocatalogmanager/icons/fields-icon.svg'
+                'icon' => '/bundles/alnvcontaocatalogmanager/icons/fields-icon.svg',
+                'primary' => true
             ],
             'palettes' => [
                 'label' => &$GLOBALS['TL_LANG']['tl_catalog']['palettes'],
@@ -133,6 +135,7 @@ $GLOBALS['TL_DCA']['tl_catalog'] = [
             ],
             'search' => true,
             'sorting' => true,
+            'defaultSearchField' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'description' => [

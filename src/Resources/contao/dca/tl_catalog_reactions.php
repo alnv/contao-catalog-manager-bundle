@@ -24,7 +24,8 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'edit.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'delete' => [
                 'href' => 'act=delete',

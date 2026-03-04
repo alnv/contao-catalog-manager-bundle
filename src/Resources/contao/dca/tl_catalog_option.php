@@ -55,6 +55,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             'edit' => [
                 'href' => 'act=edit',
                 'icon' => 'edit.svg',
+                'primary' => true
             ],
             'delete' => [
                 'href' => 'act=delete',
