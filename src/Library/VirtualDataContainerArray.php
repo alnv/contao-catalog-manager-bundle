@@ -14,6 +14,7 @@ use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
+use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
@@ -556,8 +557,10 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => (version_compare('5.0', ContaoCoreBundle::getVersion(), '<=') ? 'children.svg' : 'header.svg')
+                'icon' => 'children.svg'
             ];
+
+            Cache::set('sourceTable', $this->arrCatalog['table']);
 
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }

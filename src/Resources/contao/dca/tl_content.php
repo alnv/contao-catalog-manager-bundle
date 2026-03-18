@@ -1,6 +1,7 @@
 <?php
 
 use Contao\Input;
+use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\EventListener\IsVisibleElementListener;
@@ -8,9 +9,14 @@ use Alnv\ContaoCatalogManagerBundle\EventListener\IsVisibleElementListener;
 $GLOBALS['TL_DCA']['tl_content']['palettes']['listview'] = '{type_legend},type,headline;{listing_settings},cmTable,cmMaster,cmFilter,cmPagination,cmLimit,cmOffset,cmOrder;{radius_search_settings},cmRadiusSearch;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID;{invisible_legend:hide},invisible,start,stop';
 
 if (Input::get('do')) {
+    if (!Input::get('sourceTable')) {
+        Input::setGet('sourceTable', Cache::get('sourceTable') ?: '');
+    }
+
     $objCatalog = CatalogModel::findByTableOrModule((Input::get('sourceTable') ?: Input::get('do')), [
         'limit' => 1
     ]);
+
     if ($objCatalog !== null) {
         if ($objCatalog->enableContentElements) {
             $GLOBALS['TL_DCA']['tl_content']['config']['ptable'] = $objCatalog->table;
