@@ -61,10 +61,10 @@ class DoctrineSchemaListener
                         'fixed' => $origin_type == 'char',
                         'default' => $default,
                         'notnull' => $notnull,
-                        'scale' => null,
-                        'precision' => null,
+                        'scale' => 0,
+                        'precision' => 10,
                         'autoincrement' => $autoincrement,
-                        'comment' => null,
+                        'comment' => '',
                     ];
 
                     $objTable->addColumn($strField, $type, $arrOptions);
