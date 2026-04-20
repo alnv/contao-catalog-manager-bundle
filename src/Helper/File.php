@@ -18,7 +18,6 @@ class File
 
     public static function sendFileToBrowser($arrFiles, $blnInline = false)
     {
-
         $strFile = Input::get('file');
         if (!$strFile) {
             return null;
@@ -29,6 +28,8 @@ class File
         }
 
         $strFile = StringUtil::decodeEntities($strFile);
+        $strFile = ltrim($strFile, '/');
+
         foreach ($arrFiles as $arrFile) {
             if ($strFile == $arrFile['urlpath'] || \dirname($strFile) == $arrFile['urlpath']) {
 
