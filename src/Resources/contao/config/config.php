@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "4.0.3";
+const CATALOG_MANAGER_BUNDLE_VERSION = "4.0.5";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -564,7 +564,7 @@ $GLOBALS['CM_ROLES'] = [
         'eval' => [
             'maxlength' => 32
         ],
-        'sql' => "varchar(32) NOT NULL default '0.000000'"
+        'sql' => "DECIMAL(10,8) NOT NULL DEFAULT 0.00000000"
     ],
     'longitude' => [
         'group' => 'geo',
@@ -589,7 +589,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'decimal' => [
         'group' => 'number',
-        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
+        'sql' => "DECIMAL(10,8) NOT NULL DEFAULT 0.00000000"
     ],
     'integer' => [
         'group' => 'number',

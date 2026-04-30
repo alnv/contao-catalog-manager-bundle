@@ -26,7 +26,6 @@ class DoctrineSchemaListener
         $objCatalogs = Database::getInstance()->prepare('SELECT * FROM tl_catalog ORDER BY `table`')->execute();
 
         while ($objCatalogs->next()) {
-
             if (!$objCatalogs->table) {
                 continue;
             }
@@ -37,12 +36,10 @@ class DoctrineSchemaListener
             foreach ($arrFields as $strIndex => $arrField) {
 
                 $strField = $arrField['name'];
-
-                if (in_array($strIndex, ['PRIMARY', 'alias'])) {
+                if (\in_array($strIndex, ['PRIMARY', 'alias'])) {
                     continue;
                 }
 
-                $default = $arrField['default'];
                 $unsigned = ($arrField['attributes'] ?? '') == 'unsigned';
                 $notnull = ($arrField['null'] ?? '') == 'NOT NULL';
                 $autoincrement = ($arrField['extra'] ?? '') == 'auto_increment';
@@ -59,13 +56,16 @@ class DoctrineSchemaListener
                         'length' => $length,
                         'unsigned' => $unsigned,
                         'fixed' => $origin_type == 'char',
-                        'default' => $default,
                         'notnull' => $notnull,
-                        'scale' => null,
-                        'precision' => null,
+                        // 'scale' => 0,
+                        // 'precision' => 0,
                         'autoincrement' => $autoincrement,
-                        'comment' => null,
+                        // 'comment' => null,
                     ];
+
+                    if (isset($arrField['default'])) {
+                        $arrOptions['default'] = $arrField['default'];
+                    }
 
                     $objTable->addColumn($strField, $type, $arrOptions);
 
@@ -73,7 +73,8 @@ class DoctrineSchemaListener
                         $objTable->setPrimaryKey([$strField]);
                     }
 
-                } catch (\Exception $objError) {}
+                } catch (\Exception $objError) {
+                }
             }
         }
     }

@@ -8,9 +8,9 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
+use Contao\Controller;
 use Contao\StringUtil;
 use Contao\System;
-use Contao\Controller;
 
 class Catalog extends CatalogWizard
 {
@@ -21,7 +21,6 @@ class Catalog extends CatalogWizard
 
     public function __construct($strIdentifier)
     {
-
         if ($strIdentifier === null) {
             return;
         }
@@ -41,7 +40,6 @@ class Catalog extends CatalogWizard
 
     protected function setAllFields(): void
     {
-
         if (!($this->arrCatalog['table'] ?? '')) {
             return;
         }
@@ -50,7 +48,7 @@ class Catalog extends CatalogWizard
         Controller::loadLanguageFile($this->arrCatalog['table']);
 
         foreach ($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] ?? [] as $strField => $arrField) {
-            $arrField['label'] = $arrField['label']  ?? [$strField, ''];
+            $arrField['label'] = $arrField['label'] ?? [$strField, ''];
             $this->arrFields[$strField] = $arrField;
         }
 
@@ -65,7 +63,6 @@ class Catalog extends CatalogWizard
         }
 
         while ($objFields->next()) {
-
             $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
 
             if ($arrField === null) {
@@ -88,11 +85,10 @@ class Catalog extends CatalogWizard
 
     public function getNaturalFields($blnLabelOnly = true): array
     {
-
         $arrReturn = [];
 
         foreach ($this->arrFields as $strFieldname => $arrField) {
-            $arrReturn[$strFieldname] = $blnLabelOnly ? StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
+            $arrReturn[$strFieldname] = $blnLabelOnly ? StringUtil::decodeEntities($arrField['label'][0] ?? '') : $strFieldname;
         }
 
         return $arrReturn;
@@ -110,7 +106,6 @@ class Catalog extends CatalogWizard
 
     protected function setCustomFields()
     {
-
         if (!is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
             return null;
         }
@@ -204,7 +199,7 @@ class Catalog extends CatalogWizard
                 ],
                 'toggle' => true,
                 'filter' => true,
-                'sql' => "char(1) NOT NULL default ''"
+                'sql' => ['type' => 'boolean', 'default' => false]
             ],
             'start' => [
                 'label' => [
@@ -218,7 +213,7 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'sql' => "varchar(10) NOT NULL default ''"
+                'sql' => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
             ],
             'stop' => [
                 'label' => [
@@ -232,7 +227,7 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'sql' => "varchar(10) NOT NULL default ''"
+                'sql' => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
             ],
             'alias' => [
                 'label' => [
@@ -245,7 +240,7 @@ class Catalog extends CatalogWizard
                     'role' => 'alias'
                 ],
                 'search' => true,
-                'sql' => "varchar(128) NOT NULL default ''"
+                'sql' => "varchar(255) BINARY NOT NULL default ''"
             ]
         ];
 

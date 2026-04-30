@@ -54,7 +54,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'toggle' => [
                 'href' => 'act=toggle&amp;field=published',
                 'icon' => 'visible.svg',
-                'showInHeader' => true
+                'showInHeader' => true,
+                'primary' => true
             ],
             'show' => [
                 'href' => 'act=show',

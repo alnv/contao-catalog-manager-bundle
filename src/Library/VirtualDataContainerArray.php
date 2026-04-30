@@ -436,7 +436,6 @@ class VirtualDataContainerArray
     {
 
         foreach ($this->arrFields as $strFieldname => $arrField) {
-
             if (isset($GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname])) {
                 continue;
             }
@@ -452,7 +451,6 @@ class VirtualDataContainerArray
 
     protected function generateEmptyDataContainer(): void
     {
-
         if (!isset($this->arrCatalog['table']) || !$this->arrCatalog['table']) {
             return;
         }
