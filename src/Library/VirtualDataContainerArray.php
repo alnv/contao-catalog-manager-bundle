@@ -221,7 +221,8 @@ class VirtualDataContainerArray
                 'copy' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['copy'] ?? '',
                     'href' => 'act=copy',
-                    'icon' => 'copy.svg'
+                    'icon' => 'copy.svg',
+                    'primary' => true
                 ]
             ]);
         }
@@ -232,7 +233,8 @@ class VirtualDataContainerArray
                     'label' => $GLOBALS['TL_LANG']['DCA']['toggle'][0] ?? '',
                     'href' => 'act=toggle&amp;field=published',
                     'icon' => 'visible.svg',
-                    'showInHeader' => true
+                    'showInHeader' => true,
+                    'primary' => true
                 ]
             ]);
         }
@@ -490,7 +492,8 @@ class VirtualDataContainerArray
             'edit' => [
                 'label' => $GLOBALS['TL_LANG']['DCA']['edit'] ?? '',
                 'href' => 'act=edit',
-                'icon' => 'edit.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'delete' => [
                 'label' => $GLOBALS['TL_LANG']['DCA']['delete'] ?? '',
