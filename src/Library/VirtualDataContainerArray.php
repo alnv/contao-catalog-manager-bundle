@@ -560,7 +560,8 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => 'children.svg'
+                'icon' => 'children.svg',
+                'primary' => true
             ];
 
             Cache::set('sourceTable', $this->arrCatalog['table']);
