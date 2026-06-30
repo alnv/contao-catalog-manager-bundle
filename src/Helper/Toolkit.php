@@ -464,7 +464,7 @@ class Toolkit
                         $arrPageIds = array_keys($arrColumns[$strField]);
                         foreach ($arrPageIds as $strPageId) {
                             if ($objPage = PageModel::findByPk($strPageId)) {
-                                $arrPages[] = $objPage->pageTitle ?: $objPage->title;
+                                $arrPages[] = $objPage->title ?: $objPage->pageTitle;
                             }
                         }
                         $arrColumns[$strField] = implode(', ', $arrPages);
@@ -584,7 +584,6 @@ class Toolkit
         }
 
         switch ($arrField['type']) {
-
             case 'text':
                 return $arrField['value'];
             case 'checkboxWizard':
@@ -673,7 +672,7 @@ class Toolkit
                     }
 
                     if ($blnStringFormat) {
-                        $arrValues[] = $objPage->pageTitle ?: $objPage->title;
+                        $arrValues[] = $objPage->title ?: $objPage->pageTitle;
                     } else {
 
                         $strUrl = '';
