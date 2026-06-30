@@ -14,40 +14,55 @@ use Contao\System;
 
 class Catalog extends CatalogWizard
 {
+    protected static array $runtimeCache = [];
 
     protected array $arrFields = [];
     protected array $arrCatalog = [];
     protected string|null $strIdentifier = null;
 
-    public function __construct($strIdentifier)
+    public function __construct(?string $strIdentifier)
     {
         if ($strIdentifier === null) {
             return;
         }
 
         $this->strIdentifier = $strIdentifier;
+
+        if (isset(self::$runtimeCache[$strIdentifier])) {
+            $this->arrCatalog = self::$runtimeCache[$strIdentifier]['catalog'];
+            $this->arrFields = self::$runtimeCache[$strIdentifier]['fields'];
+            return;
+        }
+
         $objCatalog = CatalogModel::findByTableOrModule($this->strIdentifier);
 
         if ($objCatalog === null) {
             return;
         }
 
-        $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog($objCatalog->row());
+
+        $this->setCustomFields();
         $this->setAllFields();
         $this->setDefaultFields();
+
+        self::$runtimeCache[$strIdentifier] = [
+            'catalog' => $this->arrCatalog,
+            'fields' => $this->arrFields
+        ];
     }
 
     protected function setAllFields(): void
     {
-        if (!($this->arrCatalog['table'] ?? '')) {
+        $strTable = $this->arrCatalog['table'] ?? '';
+        if (!$strTable) {
             return;
         }
 
-        Controller::loadDataContainer($this->arrCatalog['table']);
-        Controller::loadLanguageFile($this->arrCatalog['table']);
+        Controller::loadDataContainer($strTable);
+        Controller::loadLanguageFile($strTable);
 
-        foreach ($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['fields'] ?? [] as $strField => $arrField) {
+        foreach ($GLOBALS['TL_DCA'][$strTable]['fields'] ?? [] as $strField => $arrField) {
             $arrField['label'] = $arrField['label'] ?? [$strField, ''];
             $this->arrFields[$strField] = $arrField;
         }
@@ -73,7 +88,7 @@ class Catalog extends CatalogWizard
         }
     }
 
-    public function getCatalog()
+    public function getCatalog(): array
     {
         return $this->arrCatalog;
     }
@@ -96,7 +111,10 @@ class Catalog extends CatalogWizard
 
     protected function setDefaultFields(): void
     {
-        foreach ($this->getDefaultFields() as $strAlias => $arrField) {
+        // Performance-Fix: Methode nur 1x aufrufen statt in jedem Schleifendurchlauf
+        $defaultFields = $this->getDefaultFields();
+
+        foreach ($defaultFields as $strAlias => $arrField) {
             if (isset($this->arrFields[$strAlias])) {
                 continue;
             }
@@ -104,28 +122,28 @@ class Catalog extends CatalogWizard
         }
     }
 
-    protected function setCustomFields()
+    protected function setCustomFields(): void
     {
-        if (!is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
-            return null;
+        if (empty($GLOBALS['CM_CUSTOM_FIELDS']) || !is_array($GLOBALS['CM_CUSTOM_FIELDS'])) {
+            return;
         }
 
         $arrFields = [];
+        $strTable = $this->arrCatalog['table'] ?? '';
+        $translator = Translation::getInstance(); // 1x holen statt in der Schleife
 
         foreach ($GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField) {
-            if (isset($arrField['table']) && $this->arrCatalog['table'] != $arrField['table']) {
+            if (isset($arrField['table']) && $strTable !== $arrField['table']) {
                 continue;
             }
 
-            $strTable = $this->arrCatalog['table'] ?? '';
             $arrLangSets = $GLOBALS['TL_LANG']['MSC'][$strFieldname] ?? [];
-
             unset($arrField['index']);
 
             if (!isset($arrField['label'])) {
                 $arrField['label'] = [
-                    Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . 'field.title.' . $strFieldname, $arrLangSets[0] ?? ''),
-                    Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . 'field.description.' . $strFieldname, $arrLangSets[1] ?? '')
+                    $translator->translate(($strTable ? $strTable . '.' : '') . 'field.title.' . $strFieldname, $arrLangSets[0] ?? ''),
+                    $translator->translate(($strTable ? $strTable . '.' : '') . 'field.description.' . $strFieldname, $arrLangSets[1] ?? '')
                 ];
             }
 
@@ -142,40 +160,40 @@ class Catalog extends CatalogWizard
 
     public function getDefaultFields(): array
     {
-
         System::loadLanguageFile('default');
 
         $strTable = $this->arrCatalog['table'] ?? '';
         $strKeyName = ($strTable ? $strTable . '.' : '');
+        $translator = Translation::getInstance();
 
         $arrReturn = [
             'id' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.id', Toolkit::getLabel('id')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.id', '')
+                    $translator->translate($strKeyName . 'field.title.id', Toolkit::getLabel('id')),
+                    $translator->translate($strKeyName . 'field.description.id', '')
                 ],
                 'search' => true,
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.pid', Toolkit::getLabel('pid')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.pid', '')
+                    $translator->translate($strKeyName . 'field.title.pid', Toolkit::getLabel('pid')),
+                    $translator->translate($strKeyName . 'field.description.pid', '')
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'sorting' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.sorting', Toolkit::getLabel('sorting')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.sorting', '')
+                    $translator->translate($strKeyName . 'field.title.sorting', Toolkit::getLabel('sorting')),
+                    $translator->translate($strKeyName . 'field.description.sorting', '')
                 ],
                 'flag' => 11,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.tstamp', Toolkit::getLabel('tstamp')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.tstamp', '')
+                    $translator->translate($strKeyName . 'field.title.tstamp', Toolkit::getLabel('tstamp')),
+                    $translator->translate($strKeyName . 'field.description.tstamp', '')
                 ],
                 'eval' => [
                     'rgxp' => 'datim',
@@ -188,8 +206,8 @@ class Catalog extends CatalogWizard
             ],
             'published' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.published', Toolkit::getLabel('published')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.published', '')
+                    $translator->translate($strKeyName . 'field.title.published', Toolkit::getLabel('published')),
+                    $translator->translate($strKeyName . 'field.description.published', '')
                 ],
                 'inputType' => 'checkbox',
                 'eval' => [
@@ -203,8 +221,8 @@ class Catalog extends CatalogWizard
             ],
             'start' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.start', Toolkit::getLabel('start')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.start', '')
+                    $translator->translate($strKeyName . 'field.title.start', Toolkit::getLabel('start')),
+                    $translator->translate($strKeyName . 'field.description.start', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -217,8 +235,8 @@ class Catalog extends CatalogWizard
             ],
             'stop' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.stop', Toolkit::getLabel('stop')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.stop', '')
+                    $translator->translate($strKeyName . 'field.title.stop', Toolkit::getLabel('stop')),
+                    $translator->translate($strKeyName . 'field.description.stop', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -231,8 +249,8 @@ class Catalog extends CatalogWizard
             ],
             'alias' => [
                 'label' => [
-                    Translation::getInstance()->translate($strKeyName . 'field.title.alias', Toolkit::getLabel('alias')),
-                    Translation::getInstance()->translate($strKeyName . 'field.description.alias', '')
+                    $translator->translate($strKeyName . 'field.title.alias', Toolkit::getLabel('alias')),
+                    $translator->translate($strKeyName . 'field.description.alias', '')
                 ],
                 'eval' => [
                     'doNotCopy' => true,

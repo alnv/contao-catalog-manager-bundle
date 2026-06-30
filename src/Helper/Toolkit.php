@@ -405,7 +405,6 @@ class Toolkit
 
     public static function getValueFromUrl($arrValue): string
     {
-
         if ($arrValue === '' || $arrValue === null) {
             return '';
         }
@@ -419,7 +418,6 @@ class Toolkit
 
     public static function getOrderByStatementFromArray($arrOrders): string
     {
-
         if (isset($arrOrders['field']) && isset($arrOrders['order'])) {
             return $arrOrders['field'] . ' ' . $arrOrders['order'];
         }
@@ -438,43 +436,41 @@ class Toolkit
 
         $arrColumns = [];
 
-        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField'] && $arrCatalog['showColumns']) {
+        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField'] && !empty($arrCatalog['showColumns'])) {
             if (!in_array($arrCatalog['flagField'], $arrColumns)) {
                 $arrLabelFields[] = $arrCatalog['sortingType'] !== 'none' ? $arrCatalog['flagField'] : '-';
             }
         }
 
         foreach ($arrLabelFields as $strField) {
-
             if (!isset($arrRow[$strField])) {
                 $arrColumns[$strField] = '';
                 continue;
             }
 
             $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
-            if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
 
-                switch ($arrFields[$strField]['eval']['role']) {
-                    case 'redirects':
-                    case 'pages':
-                    case 'page':
-                        if (!\is_array($arrColumns[$strField])) {
-                            break;
-                        }
-                        $arrPages = [];
-                        $arrPageIds = \array_keys($arrColumns[$strField]);
-                        foreach ($arrPageIds as $strPageId) {
-                            if ($objPage = PageModel::findByPk($strPageId)) {
-                                $arrPages[] = $objPage->pageTitle ?: $objPage->title;
-                            }
-                        }
-                        $arrColumns[$strField] = \implode(', ', $arrPages);
+            switch ($arrFields[$strField]['eval']['role'] ?? '') {
+                case 'redirects':
+                case 'pages':
+                case 'page':
+                    if (!\is_array($arrColumns[$strField])) {
                         break;
-                }
+                    }
+                    $arrPages = [];
+                    $arrPageIds = \array_keys($arrColumns[$strField]);
+                    foreach ($arrPageIds as $strPageId) {
+                        if ($objPage = PageModel::findByPk($strPageId)) {
+                            $arrPages[] = $objPage->title ?: $objPage->pageTitle;
+                        }
+                    }
+                    $arrColumns[$strField] = \implode(', ', $arrPages);
+                    break;
             }
         }
 
-        if (\count($arrColumns) < 2 && $arrCatalog['showColumns']) {
+
+        if (\count($arrColumns ?? []) < 2) {
             return \array_values($arrColumns)[0];
         }
 
@@ -557,8 +553,7 @@ class Toolkit
             case 'dbOptions':
             case 'dbActiveOptions':
                 foreach ($arrValues as $strValue) {
-
-                    if (Database::getInstance()->fieldExists('lid', $objField->dbTable) && is_numeric($strValue)) {
+                    if (Database::getInstance()->fieldExists('lid', $objField->dbTable) && \is_numeric($strValue)) {
                         $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $objField->dbTable . ' WHERE lid=? AND `language`=?')->limit(1)->execute($strValue, ($GLOBALS['TL_LANGUAGE'] ?? ''));
                         if (!$objEntity->numRows) {
                             continue;
@@ -587,56 +582,56 @@ class Toolkit
         switch ($arrField['type']) {
 
             case 'text':
-                return $arrField['value'];
+                return $arrField['value'] ?? '';
+
             case 'checkboxWizard':
             case 'checkbox':
             case 'select':
             case 'radio':
+                $mixValue = $arrField['value'] ?? '';
 
-                if (isset($arrField['csv']) && $arrField['csv'] && is_string($arrField['value'])) {
-                    $arrField['value'] = explode($arrField['csv'], $arrField['value']);
+                if (($arrField['csv'] ?? false) && is_string($mixValue)) {
+                    $mixValue = explode($arrField['csv'], $mixValue);
                 }
 
-                $varValue = !is_array($arrField['value']) ? StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
+                $varValue = !is_array($mixValue) ? StringUtil::deserialize($mixValue, true) : $mixValue;
                 $arrOptionValues = static::getSelectedOptions($varValue, ($arrField['options'] ?? []));
 
-                if (empty($arrOptionValues) && isset($arrField['unknownOption']) && $arrField['unknownOption'] && is_array($arrField['unknownOption'])) {
-                    $arrOptionValues = static::getSelectedOptions(static::findUnknownValues($varValue, ($arrField['strTable'] ?? ''), ($arrField['strField'] ?? '')), ($arrField['options'] ?? []));
+                if (empty($arrOptionValues) && ($arrField['unknownOption'] ?? false) && is_array($arrField['unknownOption'])) {
+                    $arrOptionValues = static::getSelectedOptions(
+                        static::findUnknownValues($varValue, ($arrField['strTable'] ?? ''), ($arrField['strField'] ?? '')),
+                        ($arrField['options'] ?? [])
+                    );
                 }
 
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
                 }
 
-                if ($blnIsForm && $arrField['type'] == 'checkbox' && !($arrField['multiple'] ?? false)) {
-                    return $arrField['value'];
+                if ($blnIsForm && $arrField['type'] === 'checkbox' && !($arrField['multiple'] ?? false)) {
+                    return $arrField['value'] ?? '';
                 }
 
                 return $arrOptionValues;
 
             case 'fileTree':
-
-                $strSizeId = null;
-                $arrOrderField = [];
-
-                if (isset($arrField['orderField']) && $arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
-                    $arrOrderField = CatalogImage::getUuids($arrCatalog[$arrField['orderField']]);
-                }
-
-                if (isset($arrField['imageSize']) && $arrField['imageSize']) {
-                    $strSizeId = $arrField['imageSize'];
-                }
-
                 if ($blnFastMode) {
                     return CatalogImage::getUuids($varValue);
                 }
 
-                if ((isset($arrField['isImage']) && $arrField['isImage']) || (isset($arrField['isGallery']) && $arrField['isGallery'])) {
+                $strSizeId = $arrField['imageSize'] ?? null;
+                $arrOrderField = [];
+
+                if (($arrField['orderField'] ?? false) && isset($arrCatalog[$arrField['orderField']])) {
+                    $arrOrderField = CatalogImage::getUuids($arrCatalog[$arrField['orderField']]);
+                }
+
+                if (($arrField['isImage'] ?? false) || ($arrField['isGallery'] ?? false)) {
                     $arrImages = [];
                     return CatalogImage::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
 
-                if (isset($arrField['isFile']) && $arrField['isFile']) {
+                if ($arrField['isFile'] ?? false) {
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }
@@ -644,60 +639,69 @@ class Toolkit
                 return [];
 
             case 'rowWizard':
-
                 $arrReturn = [];
                 $varEntities = StringUtil::deserialize($varValue, true);
 
                 foreach ($varEntities as $arrEntity) {
+                    if (!is_array($arrEntity)) {
+                        continue;
+                    }
 
                     $arrRow = [];
                     foreach ($arrEntity as $strField => $strValue) {
-                        $arrRow[$strField] = static::parseCatalogValue($strValue, Widget::getAttributesFromDca(($arrField['fields'][$strField] ?? []), $strField, $strValue, $strField, null), $arrCatalog, true, true);;
-                    }
+                        $arrSubField = $arrField['fields'][$strField] ?? [];
+                        $arrAttributes = Widget::getAttributesFromDca($arrSubField, $strField, $strValue, $strField, null);
 
+                        $arrRow[$strField] = static::parseCatalogValue($strValue, $arrAttributes, $arrCatalog, true, true);
+                    }
                     $arrReturn[] = $arrRow;
                 }
 
                 return $arrReturn;
 
             case 'pageTree':
-
                 if (!$varValue) {
                     return '';
                 }
+
                 $arrValues = [];
-                $varValue = explode(',', $varValue);
+                $arrPageIds = is_array($varValue) ? $varValue : explode(',', $varValue);
 
-                foreach ($varValue as $strPageId) {
+                foreach ($arrPageIds as $strPageId) {
+                    $strPageId = trim($strPageId);
+                    if ($strPageId === '') {
+                        continue;
+                    }
+
                     $objPage = PageModel::findByPk($strPageId);
-
                     if ($objPage === null) {
                         continue;
                     }
 
                     if ($blnStringFormat) {
-                        $arrValues[] = $objPage->pageTitle ?: $objPage->title;
-                    } else {
-
-                        $strUrl = '';
-                        $strMaster = '';
-                        $strAbsolute = '';
-
-                        try {
-                            $arrPage = $objPage->row();
-                            $strUrl = static::parseDetailLink($arrPage, '', $arrCatalog);
-                            $strMaster = static::parseDetailLink($arrPage, $arrCatalog['alias'], $arrCatalog);
-                            $strAbsolute = static::parseDetailLink($arrPage, $arrCatalog['alias'], $arrCatalog, true);
-
-                        } catch (\Exception $objException) {
-                        }
-
-                        $arrValues[$strPageId] = [
-                            'url' => $strUrl,
-                            'master' => $strMaster,
-                            'absolute' => $strAbsolute
-                        ];
+                        $arrValues[] = $objPage->title ?: $objPage->pageTitle;
+                        continue;
                     }
+
+                    $strUrl = '';
+                    $strMaster = '';
+                    $strAbsolute = '';
+                    $strAlias = $arrCatalog['alias'] ?? '';
+
+                    try {
+                        $arrPage = $objPage->row();
+                        $strUrl = static::parseDetailLink($arrPage, '', $arrCatalog);
+                        $strMaster = static::parseDetailLink($arrPage, $strAlias, $arrCatalog);
+                        $strAbsolute = static::parseDetailLink($arrPage, $strAlias, $arrCatalog, true);
+                    } catch (\Exception $objException) {
+
+                    }
+
+                    $arrValues[$strPageId] = [
+                        'url' => $strUrl,
+                        'master' => $strMaster,
+                        'absolute' => $strAbsolute
+                    ];
                 }
 
                 if ($blnStringFormat) {
@@ -707,12 +711,11 @@ class Toolkit
                 return $arrValues;
         }
 
-        return $arrField['value'];
+        return $arrField['value'] ?? '';
     }
 
     public static function getSelectedOptions($arrValues, $arrOptions): array
     {
-
         $arrReturn = [];
         if (!is_array($arrOptions) || !is_array($arrValues)) {
             return $arrReturn;
@@ -737,7 +740,7 @@ class Toolkit
 
     public function cmp($a, $b)
     {
-        
+
         $strKey = 'value';
 
         if ($a[$strKey] < $b[$strKey]) {
@@ -805,7 +808,7 @@ class Toolkit
         if (!$arrActiveRecord['id']) {
             return;
         }
-        
+
         $strAlias = Input::post('alias') ?: ''; // $arrActiveRecord['alias'] ?? '';
 
         if (!$strAlias) {
@@ -1045,24 +1048,24 @@ class Toolkit
         return $arrReturn;
     }
 
-    public static function getTableByDo($strDoParam = ''): string
+    public static function getTableByDo(string $strDoParam = ''): string
     {
-
-        if (!$strDoParam) {
-            $strDoParam = Input::get('do') ?: '';
+        if ($strTable = Input::get('table')) {
+            return (string) $strTable;
         }
 
-        if (!$strDoParam) {
+        if ($strDoParam === '') {
+            $strDoParam = (string) Input::get('do');
+        }
+
+        if ($strDoParam === '') {
             return '';
         }
 
-        if ($strTable = (Input::get('table') ?: '')) {
-            return $strTable;
-        }
-
         $objCatalog = new Catalog($strDoParam);
+        $arrCatalog = $objCatalog->getCatalog();
 
-        return $objCatalog->getCatalog()['table'] ?? '';
+        return $arrCatalog['table'] ?? '';
     }
 
     public static function getModuleNameByTable($strTable): string

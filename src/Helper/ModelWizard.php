@@ -7,21 +7,17 @@ use Contao\Model;
 
 class ModelWizard
 {
+    protected ?Model $objModel = null;
 
-    protected $objModel;
-
-    public function __construct($strTable)
+    public function __construct(string $table)
     {
-
         $strModel = '';
-
         try {
-            $strModel = Model::getClassFromTable($strTable);
-        } catch (\Exception $objError) {
-            //
+            $strModel = Model::getClassFromTable($table);
+        } catch (\Exception $error) {
         }
 
-        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
+        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
             $strModel = '';
         }
 
@@ -30,37 +26,28 @@ class ModelWizard
             return;
         }
 
-        if (isset($GLOBALS['CM_MODELS'][$strTable]) && $this->modelExist($GLOBALS['CM_MODELS'][$strTable])) {
-            $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][$strTable]();
-            $objMultilingualDynModel->createDynTable($strTable);
-            $this->objModel = $objMultilingualDynModel;
-            $GLOBALS['TL_MODELS'][$strTable] = $objMultilingualDynModel::class;
+        $strGlobalModel = $GLOBALS['CM_MODELS'][$table] ?? '';
+        if ($strGlobalModel && $this->modelExist($strGlobalModel)) {
+            $this->objModel = $strGlobalModel::createDynTable($table);
+            $GLOBALS['TL_MODELS'][$table] = $strGlobalModel;
             return;
         }
 
-        $objDynModel = new DynModel();
-        $objDynModel->createDynTable($strTable);
-        $this->objModel = $objDynModel;
-
-        $GLOBALS['TL_MODELS'][$strTable] = DynModel::class;
+        $this->objModel = DynModel::createDynTable($table);
+        $GLOBALS['TL_MODELS'][$table] = DynModel::class;
     }
 
-    public function getModel()
+    public function getModel(): ?Model
     {
         return $this->objModel;
     }
 
-    protected function modelExist($strModel): bool
+    protected function modelExist(string $strModel): bool
     {
-
-        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
+        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models')) {
             return false;
         }
 
-        if (!class_exists($strModel)) {
-            return false;
-        }
-
-        return true;
+        return class_exists($strModel);
     }
 }

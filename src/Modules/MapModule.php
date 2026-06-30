@@ -6,7 +6,6 @@ use Alnv\ContaoCatalogManagerBundle\Maps\GMap;
 
 class MapModule extends Listing
 {
-
     protected $strKey = 'id';
     protected $arrOptions = [];
     protected $strTable = 'tl_module';
@@ -14,7 +13,6 @@ class MapModule extends Listing
 
     protected function compile(): void
     {
-
         $this->arrOptions = [
             'infoContent' => $this->cmInfoContent ?: '',
             'template' => $this->cmTemplate ?: 'cm_map_view_gmap'

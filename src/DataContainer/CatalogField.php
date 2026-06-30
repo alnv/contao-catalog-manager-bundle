@@ -15,12 +15,10 @@ use Contao\StringUtil;
 
 class CatalogField
 {
-
-    public function checkExtensions($varValue, DataContainer $dc): string
+    public function checkExtensions($value, DataContainer $dc): string
     {
-
-        $varValue = strtolower($varValue);
-        $arrExtensions = StringUtil::trimsplit(',', $varValue);
+        $value = strtolower($value);
+        $arrExtensions = StringUtil::trimsplit(',', $value);
         $arrUploadTypes = StringUtil::trimsplit(',', strtolower(Config::get('uploadTypes')));
         $arrNotAllowed = array_diff($arrExtensions, $arrUploadTypes);
 
@@ -28,18 +26,16 @@ class CatalogField
             throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['forbiddenExtensions'], implode(', ', $arrNotAllowed)));
         }
 
-        return $varValue;
+        return $value;
     }
 
     public function listFields($arrRow): string
     {
-
         return $arrRow['name'] . '<span style="color:#999;padding-left:3px">[' . $arrRow['fieldname'] . ']</span>';
     }
 
     public function getFieldTypes(): array
     {
-
         $arrReturn = [];
 
         foreach ($GLOBALS['CM_FIELDS'] as $strType) {
@@ -144,6 +140,7 @@ class CatalogField
         }
 
         $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, Toolkit::getActiveRecordAsArrayFromDc($objDataContainer));
+
         (new LDatabase())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;
@@ -151,19 +148,17 @@ class CatalogField
 
     public function getImageSizes(): array
     {
+        $return = [];
+        $imagesSize = Database::getInstance()->prepare('SELECT * FROM tl_image_size')->execute();
 
-        $arrReturn = [];
-        $objDatabase = Database::getInstance();
-        $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
-
-        if (!$objImagesSize->numRows) {
-            return $arrReturn;
+        if (!$imagesSize->numRows) {
+            return $return;
         }
 
-        while ($objImagesSize->next()) {
-            $arrReturn[$objImagesSize->id] = $objImagesSize->name;
+        while ($imagesSize->next()) {
+            $return[$imagesSize->id] = $imagesSize->name;
         }
 
-        return $arrReturn;
+        return $return;
     }
 }

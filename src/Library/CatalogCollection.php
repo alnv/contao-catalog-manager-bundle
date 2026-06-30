@@ -7,6 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
 class CatalogCollection extends CatalogWizard
 {
+    protected static ?array $runtimeCache = null;
 
     protected array $arrCatalogs = [];
 
@@ -14,17 +15,21 @@ class CatalogCollection extends CatalogWizard
 
     public function __construct()
     {
+        if (self::$runtimeCache !== null) {
+            $this->arrCatalogs = self::$runtimeCache['catalogs'];
+            $this->arrTypes    = self::$runtimeCache['types'];
+            return;
+        }
 
         $objCatalogs = CatalogModel::findAll([
             'order' => '`sorting` ASC'
         ]);
 
         if ($objCatalogs === null) {
-            return null;
+            return;
         }
 
         while ($objCatalogs->next()) {
-
             if (!$objCatalogs->table) {
                 continue;
             }
@@ -36,23 +41,28 @@ class CatalogCollection extends CatalogWizard
             $this->arrTypes[$objCatalogs->type][] = $objCatalogs->table;
             $this->arrCatalogs[$objCatalogs->table] = $this->parseCatalog($objCatalogs->row());
         }
-    }
 
+        self::$runtimeCache = [
+            'catalogs' => $this->arrCatalogs,
+            'types'    => $this->arrTypes
+        ];
+    }
 
     public function getCatalogs($strType = ''): array
     {
-
         if (!$strType) {
             return $this->arrCatalogs;
         }
 
-        $arrReturn = [];
+        if (!isset($this->arrTypes[$strType])) {
+            return [];
+        }
 
-        foreach ($this->arrCatalogs as $strTable => $arrCatalog) {
-            if ($arrCatalog['type'] != $strType) {
-                continue;
+        $arrReturn = [];
+        foreach ($this->arrTypes[$strType] as $strTable) {
+            if (isset($this->arrCatalogs[$strTable])) {
+                $arrReturn[$strTable] = $this->arrCatalogs[$strTable];
             }
-            $arrReturn[$strTable] = $arrCatalog;
         }
 
         return $arrReturn;

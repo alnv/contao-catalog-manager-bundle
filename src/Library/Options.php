@@ -10,31 +10,31 @@ use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
 use Contao\Controller;
 use Contao\DataContainer;
+use Contao\Model\Collection;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
 
 class Options
 {
-
     protected static array $arrField = [];
+
+    protected static ?string $strInstanceId = null;
+
+    protected static DataContainer|array|null $arrDataContainer = null;
 
     protected static array $arrInstances = [];
 
-    protected static null|string $strInstanceId = null;
-
-    protected static null|array|DataContainer $arrDataContainer = null;
-
-    public static function getInstance($strInstanceId)
+    public static function getInstance(?string $strInstanceId = null): static
     {
-
-        if (!$strInstanceId) {
-            $strInstanceId = uniqid();
+        if (empty($strInstanceId)) {
+            $strInstanceId = uniqid('', true);
         }
 
         if (!array_key_exists($strInstanceId, static::$arrInstances)) {
+            $instance = new static();
             static::$strInstanceId = $strInstanceId;
-            static::$arrInstances[$strInstanceId] = new static;
+            static::$arrInstances[$strInstanceId] = $instance;
         }
 
         return static::$arrInstances[$strInstanceId];
@@ -42,126 +42,86 @@ class Options
 
     protected static function getGetterId(): string
     {
-
         self::$arrField['id'] = self::$arrField['id'] ?? '';
         self::$arrField['fieldname'] = self::$arrField['fieldname'] ?? '';
 
         return (self::$arrField['fieldname'] ? self::$arrField['fieldname'] . '.' : '') . (self::$arrField['id'] ?: static::$strInstanceId);
     }
 
-    public static function getOptions($blnAsAssoc = false): array
+    public static function getOptions(bool $blnAsAssoc = false): array
     {
-
-        $arrTemps = [];
-        $arrReturn = [];
         $strGetter = static::getGetterId();
 
         if (Cache::has($strGetter)) {
-            return Cache::get($strGetter);
+            $arrReturn = Cache::get($strGetter);
+        } else {
+            $arrReturn = [];
+            $optionsSource = self::$arrField['optionsSource'] ?? '';
+
+            switch ($optionsSource) {
+                case 'options':
+                    $objOptions = CatalogOptionModel::findAll([
+                        'column' => ['pid=?'],
+                        'value' => [self::$arrField['id']],
+                        'order' => 'sorting ASC'
+                    ]);
+
+                    if ($objOptions !== null) {
+                        while ($objOptions->next()) {
+                            $arrReturn[$objOptions->value] = self::getLabel($objOptions->value, $objOptions->label);
+                        }
+                    }
+                    break;
+
+                case 'dbOptions':
+                case 'dbActiveOptions':
+                    $arrField = self::$arrField;
+                    $objEntities = self::getEntities();
+
+                    if ($objEntities === null) {
+                        break;
+                    }
+
+                    $arrTemps = [];
+                    while ($objEntities->next()) {
+                        $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
+
+                        foreach ($varValues as $strValue) {
+                            $strValue = trim($strValue);
+
+                            if (in_array($strValue, $arrTemps, true)) {
+                                continue;
+                            }
+                            $arrTemps[] = $strValue;
+
+                            if ($optionsSource === 'dbOptions') {
+                                $strLabel = self::getCleanLabel($objEntities->{$arrField['dbLabel']}, $arrField['dbLabel'], $arrField['dbTable']);
+                            } else {
+                                $strLabel = self::getCleanLabel($strValue, $arrField['dbKey'], $arrField['dbTable']);
+                                if (!$strLabel) {
+                                    continue;
+                                }
+                            }
+
+                            $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
+                        }
+                    }
+                    break;
+            }
+
+            Cache::set($strGetter, $arrReturn);
         }
 
-
-        switch (self::$arrField['optionsSource']) {
-            case 'options':
-                $objOptions = CatalogOptionModel::findAll([
-                    'column' => ['pid=?'],
-                    'value' => [self::$arrField['id']],
-                    'order' => 'sorting ASC'
-                ]);
-                if ($objOptions === null) {
-                    return $arrReturn;
-                }
-                while ($objOptions->next()) {
-                    $strLabel = self::getLabel($objOptions->value, $objOptions->label);
-                    $strValue = $objOptions->value;
-                    if ($blnAsAssoc) {
-                        $arrReturn[] = [
-                            'value' => $strValue,
-                            'label' => $strLabel
-                        ];
-                        continue;
-                    }
-                    $arrReturn[$strValue] = $strLabel;
-                }
-                break;
-            case 'dbOptions':
-                $arrField = self::$arrField;
-                $objEntities = self::getEntities();
-                if ($objEntities === null) {
-                    return $arrReturn;
-                }
-
-                while ($objEntities->next()) {
-
-                    $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
-
-                    foreach ($varValues as $strValue) {
-
-                        $strValue = trim($strValue);
-
-                        if (in_array($strValue, $arrTemps)) {
-                            continue;
-                        }
-
-                        $arrTemps[] = $strValue;
-                        $strLabel = self::getCleanLabel($objEntities->{$arrField['dbLabel']}, $arrField['dbLabel'], $arrField['dbTable']);
-                        if ($blnAsAssoc) {
-                            $arrReturn[] = [
-                                'value' => $strValue,
-                                'label' => self::getLabel($strValue, $strLabel)
-                            ];
-                            continue;
-                        }
-
-                        $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
-                    }
-                }
-                Cache::set($strGetter, $arrReturn);
-                return $arrReturn;
-
-            case 'dbActiveOptions':
-                $arrField = self::$arrField;
-                $objEntities = self::getEntities();
-
-                if ($objEntities === null) {
-                    return $arrReturn;
-                }
-
-                while ($objEntities->next()) {
-                    $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
-
-                    foreach ($varValues as $strValue) {
-
-                        $strValue = trim($strValue);
-
-                        if (in_array($strValue, $arrTemps)) {
-                            continue;
-                        }
-
-                        $arrTemps[] = $strValue;
-                        $strLabel = self::getCleanLabel($strValue, $arrField['dbKey'], $arrField['dbTable']);
-
-                        if (!$strLabel) {
-                            continue;
-                        }
-
-                        if ($blnAsAssoc) {
-                            $arrReturn[] = [
-                                'value' => $strValue,
-                                'label' => self::getLabel($strValue, $strLabel)
-                            ];
-                            continue;
-                        }
-
-                        $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
-                    }
-                }
-
-                Cache::set($strGetter, $arrReturn);
-                return $arrReturn;
+        if ($blnAsAssoc) {
+            $arrAssocReturn = [];
+            foreach ($arrReturn as $strValue => $strLabel) {
+                $arrAssocReturn[] = [
+                    'value' => $strValue,
+                    'label' => $strLabel
+                ];
+            }
+            return $arrAssocReturn;
         }
-
-        Cache::set($strGetter, $arrReturn);
 
         return $arrReturn;
     }
@@ -180,18 +140,27 @@ class Options
         return StringUtil::deserialize($strValue, true);
     }
 
-    protected static function getEntities()
+    protected static function getEntities(): ?Collection
     {
+        $strTable = self::$arrField['dbTable'] ?? '';
+        if (empty($strTable)) {
+            return null;
+        }
 
-        $objModel = new ModelWizard(self::$arrField['dbTable']);
+        $objModel = new ModelWizard($strTable);
         $objModel = $objModel->getModel();
+        if ($objModel === null) {
+            return null;
+        }
+
         $arrModelOptions = [];
 
         ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
 
-        if (self::$arrField['dbOrderField']) {
-            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable'];
-            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? \strtoupper(self::$arrField['dbOrder']) : 'ASC');
+        if (!empty(self::$arrField['dbOrderField'])) {
+            $strRealTable = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? $strTable;
+            $strDirection = !empty(self::$arrField['dbOrder']) ? strtoupper(self::$arrField['dbOrder']) : 'ASC';
+            $arrModelOptions['order'] = sprintf('%s.%s %s', $strRealTable, self::$arrField['dbOrderField'], $strDirection);
         }
 
         return $objModel->findAll($arrModelOptions);
@@ -199,7 +168,6 @@ class Options
 
     protected static function getCleanLabel($strValue, $strField, $strTable)
     {
-
         if (!$strTable || !$strField) {
             return $strValue;
         }
@@ -246,7 +214,6 @@ class Options
         }
 
         if (empty($arrOptions['value'])) {
-
             unset($arrOptions['value']);
             unset($arrOptions['column']);
         }

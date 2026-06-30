@@ -16,7 +16,6 @@ use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 
-
 class Listing extends Hybrid
 {
 
@@ -30,8 +29,9 @@ class Listing extends Hybrid
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->href = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
             $objTemplate->wildcard = '### ' . \strtoupper(($GLOBALS['TL_LANG']['FMD'][$this->type][0] ?? '')) . ' ###';
+
             return $objTemplate->parse();
         }
 
@@ -54,7 +54,6 @@ class Listing extends Hybrid
 
     protected function compile(): void
     {
-
         $this->arrOptions = [
             'template' => $this->cmTemplate,
             'id' => $this->id
@@ -62,15 +61,15 @@ class Listing extends Hybrid
 
         $this->setOptions();
 
-        $objListing = new ViewListing($this->cmTable, $this->arrOptions);
-        $this->Template->rows = $objListing->countRows();
-        $this->Template->entities = $objListing->parse();
-        $this->Template->pagination = $objListing->getPagination();
+        $listing = new ViewListing($this->cmTable, $this->arrOptions);
+
+        $this->Template->rows = $listing->countRows();
+        $this->Template->entities = $listing->parse();
+        $this->Template->pagination = $listing->getPagination();
     }
 
     public function setOptions(): void
     {
-
         $this->setOrder();
         $this->setGroup();
         $this->setFilter();
@@ -110,7 +109,6 @@ class Listing extends Hybrid
 
     protected function setDistance(): bool
     {
-
         if (!$this->cmRadiusSearch) {
             return false;
         }
@@ -161,7 +159,6 @@ class Listing extends Hybrid
 
     protected function setFilter(): void
     {
-
         if (!$this->cmFilter) {
             return;
         }
@@ -183,7 +180,6 @@ class Listing extends Hybrid
 
     protected function setOrder(): void
     {
-
         if ($this->cmOrder) {
             $strOrder = Toolkit::getOrderByStatementFromArray(WidgetToolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
@@ -218,9 +214,8 @@ class Listing extends Hybrid
 
     protected function setPagination(): void
     {
-
         if ($this->cmPagination) {
-            $this->arrOptions['pagination'] = (bool) $this->cmPagination;
+            $this->arrOptions['pagination'] = (bool)$this->cmPagination;
         }
 
         if ($this->cmLimit) {
@@ -234,7 +229,6 @@ class Listing extends Hybrid
 
     protected function setGroup(): void
     {
-
         if ($this->cmGroupBy) {
             $this->arrOptions['groupBy'] = $this->cmGroupBy;
         }
@@ -246,7 +240,6 @@ class Listing extends Hybrid
 
     protected function setMasterPage(): void
     {
-
         if (!$this->cmMaster) {
             return;
         }
@@ -260,7 +253,6 @@ class Listing extends Hybrid
 
     protected function setFormPage(): void
     {
-
         if (!$this->cmForm || !$this->cmFormPage) {
             return;
         }

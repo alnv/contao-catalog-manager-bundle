@@ -7,22 +7,29 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 
 class Roles
 {
+    protected static ?array $runtimeCache = null;
 
     protected array $arrRoles = [];
 
     public function __construct()
     {
+        if (self::$runtimeCache !== null) {
+            $this->arrRoles = self::$runtimeCache;
+            return;
+        }
+
         $this->setup();
+
+        self::$runtimeCache = $this->arrRoles;
     }
 
-    public function get()
+    public function get(): array
     {
         return $this->arrRoles;
     }
 
     protected function setup(): void
     {
-
         if (Cache::has('all_roles')) {
             $this->arrRoles = Cache::get('all_roles');
             return;
@@ -39,16 +46,20 @@ class Roles
 
     private function getCustomRoles(): array
     {
-
         if (Cache::has('custom_roles')) {
             return Cache::get('custom_roles');
         }
 
         $arrRoles = [];
-        $objRoles = Database::getInstance()->prepare('SELECT * FROM tl_catalog_roles ORDER BY name ASC')->execute();
+        $objRoles = Database::getInstance()
+            ->prepare('SELECT * FROM tl_catalog_roles ORDER BY name ASC')
+            ->execute();
+
+        if ($objRoles === null) {
+            return [];
+        }
 
         while ($objRoles->next()) {
-
             if (!$objRoles->name) {
                 continue;
             }
@@ -59,16 +70,16 @@ class Roles
                 'sql' => $objRoles->sql ?: ''
             ];
 
-            if ($objRoles->maxlength) {
+            if ($objRoles->maxlength !== null && $objRoles->maxlength !== '') {
                 $arrRole['eval']['maxlength'] = (int)$objRoles->maxlength;
             }
-            if ($objRoles->minlength) {
+            if ($objRoles->minlength !== null && $objRoles->minlength !== '') {
                 $arrRole['eval']['minlength'] = (int)$objRoles->minlength;
             }
-            if ($objRoles->minval) {
+            if ($objRoles->minval !== null && $objRoles->minval !== '') {
                 $arrRole['eval']['minval'] = (int)$objRoles->minval;
             }
-            if ($objRoles->maxval) {
+            if ($objRoles->maxval !== null && $objRoles->maxval !== '') {
                 $arrRole['eval']['maxval'] = (int)$objRoles->maxval;
             }
 
@@ -77,7 +88,7 @@ class Roles
             }
 
             if ($objRoles->rgxp) {
-                $arrRole['eval']['rgxp'] = $objRoles->maxval;
+                $arrRole['eval']['rgxp'] = $objRoles->rgxp;
             }
 
             if ($objRoles->isUnique) {
