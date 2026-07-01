@@ -4,14 +4,17 @@ namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\ArrayUtil;
 use Contao\Backend;
+use Contao\CoreBundle\ContaoCoreBundle;
 use Contao\Database;
 use Contao\DataContainer;
 use Contao\Image;
+use Contao\Input;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
@@ -19,9 +22,8 @@ use Contao\Widget;
 class VirtualDataContainerArray
 {
     protected array $arrCatalog = [];
-    protected array $arrFields = [];
 
-    protected static array $arrFieldIdToNameMap = [];
+    protected array $arrFields = [];
 
     public function __construct($strModule)
     {
@@ -30,12 +32,6 @@ class VirtualDataContainerArray
         $objCatalog = new Catalog($strModule);
         $this->arrCatalog = $objCatalog->getCatalog();
         $this->arrFields = $objCatalog->getFields();
-
-        foreach ($this->arrFields as $strFieldname => $arrField) {
-            if (isset($arrField['id'])) {
-                self::$arrFieldIdToNameMap[(int)$arrField['id']] = $strFieldname;
-            }
-        }
 
         $this->generateEmptyDataContainer();
     }
@@ -66,11 +62,16 @@ class VirtualDataContainerArray
                 return;
             }
 
-            $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')->limit(1)->execute($objDataContainer->id);
+            $objActiveRecord = Database::getInstance()
+                ->prepare('SELECT * FROM ' . $objDataContainer->table . ' WHERE id=?')
+                ->limit(1)
+                ->execute($objDataContainer->id);
 
-            if ($objActiveRecord && $objActiveRecord->numRows) {
-                Cache::set('activeRecord', $objActiveRecord->row());
+            if (!$objActiveRecord->numRows) {
+                return;
             }
+
+            Cache::set('activeRecord', $objActiveRecord->row());
         };
 
         $GLOBALS['TL_DCA'][$strTable]['config']['enableVersioning'] = $GLOBALS['TL_DCA'][$strTable]['config']['enableVersioning'] ?? true;
@@ -84,7 +85,6 @@ class VirtualDataContainerArray
 
     protected function setList(): void
     {
-        $strTable = $this->arrCatalog['table'];
         $arrList = [
             'labels' => [
                 'fields' => ['id']
@@ -149,11 +149,11 @@ class VirtualDataContainerArray
                 }
             }
 
-            if (\in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable'], true) && !$this->arrCatalog['showColumns']) {
+            if (\in_array($this->arrCatalog['sortingType'], ['fixed', 'switchable']) && !$this->arrCatalog['showColumns']) {
                 $arrList['labels']['group_callback'] = function ($strGroupValue, $strMode, $strField, $arrRecord, DataContainer $dc) {
                     try {
                         $varReturn = Toolkit::parseCatalogValue($strGroupValue, Widget::getAttributesFromDca($this->arrFields[$strField] ?? [], $strField, $strGroupValue, $strField, $dc->table), $arrRecord, true);
-                    } catch (\Exception $objError) {
+                    } catch (\Exception $error) {
                         $varReturn = '';
                     }
                     return $varReturn ?: '';
@@ -195,11 +195,9 @@ class VirtualDataContainerArray
             $blnUseCut = true;
         }
 
-        // Performance-Fix: isset() statt in_array(..., array_keys(...))
-        $operations = $GLOBALS['TL_DCA'][$strTable]['list']['operations'] ?? [];
-
-        if ($blnUseCut && !isset($operations['cut'])) {
-            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$strTable]['list']['operations'], 1, [
+        $table = $this->arrCatalog['table'];
+        if ($blnUseCut && !\in_array('cut', \array_keys(($GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [])))) {
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$table]['list']['operations'], 1, [
                 'cut' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['cut'] ?? '',
                     'icon' => 'cut.svg',
@@ -209,11 +207,11 @@ class VirtualDataContainerArray
             ]);
         }
 
-        $GLOBALS['TL_DCA'][$strTable]['list']['label'] = $arrList['labels'];
-        $GLOBALS['TL_DCA'][$strTable]['list']['sorting'] = $arrList['sorting'];
+        $GLOBALS['TL_DCA'][$table]['list']['label'] = $arrList['labels'];
+        $GLOBALS['TL_DCA'][$table]['list']['sorting'] = $arrList['sorting'];
 
-        if ($this->arrCatalog['enableCopy'] && !isset($operations['copy'])) {
-            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$strTable]['list']['operations'], 1, [
+        if ($this->arrCatalog['enableCopy'] && !\in_array('copy', \array_keys(($GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [])))) {
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$table]['list']['operations'], 1, [
                 'copy' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['copy'] ?? '',
                     'href' => 'act=copy',
@@ -222,8 +220,8 @@ class VirtualDataContainerArray
             ]);
         }
 
-        if ($this->arrCatalog['enableVisibility'] && !isset($operations['toggle'])) {
-            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$strTable]['list']['operations'], \count($GLOBALS['TL_DCA'][$strTable]['list']['operations']) - 1, [
+        if ($this->arrCatalog['enableVisibility'] && !\in_array('toggle', array_keys(($GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [])))) {
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$table]['list']['operations'], \count($GLOBALS['TL_DCA'][$table]['list']['operations']) - 1, [
                 'toggle' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['toggle'][0] ?? '',
                     'href' => 'act=toggle&amp;field=published',
@@ -233,13 +231,15 @@ class VirtualDataContainerArray
             ]);
         }
 
-        if (($this->arrCatalog['enablePreview'] ?? false) && !isset($operations['preview'])) {
-            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$strTable]['list']['operations'], \count($GLOBALS['TL_DCA'][$strTable]['list']['operations']), [
+        if (($this->arrCatalog['enablePreview'] ?? false) && !\in_array('preview', \array_keys(($GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [])))) {
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$table]['list']['operations'], \count($GLOBALS['TL_DCA'][$table]['list']['operations']), [
                 'preview' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['preview'][0] ?? '',
                     'showInHeader' => true,
                     'button_callback' => function ($arrRow, $strHref, $strTitle, $_strLabel, $_strIcon, $strHtmlAttributes, $strTable) {
-                        return '<a target="blank" href="' . Toolkit::getDetailPageFromEntityByIdAndTable($strTable, $arrRow['id']) . '" title="' . StringUtil::specialchars($strTitle) . '" onclick="Backend.getScrollOffset()">' . Image::getHtml('forward_2.svg') . '</a>';
+                        $strIcon = Image::getHtml('forward_2.svg');
+                        $strUrl = Toolkit::getDetailPageFromEntityByIdAndTable($strTable, $arrRow['id']);
+                        return '<a target="blank" href="' . $strUrl . '" title="' . StringUtil::specialchars($strTitle) . '" onclick="Backend.getScrollOffset()">' . $strIcon . '</a>';
                     }
                 ]
             ]);
@@ -253,24 +253,25 @@ class VirtualDataContainerArray
 
     protected function setPalettes(): void
     {
-        $strTable = $this->arrCatalog['table'];
         $objPalettes = CatalogPaletteModel::findAll([
             'column' => ['type=? AND published=? AND pid=?'],
             'value' => ['palette', '1', $this->arrCatalog['id']],
             'sorting' => 'sorting ASC'
         ]);
 
-        if (!isset($GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'])) {
-            $GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'] = [];
+        $table = $this->arrCatalog['table'];
+        if (!isset($GLOBALS['TL_DCA'][$table]['palettes']['__selector__'])) {
+            $GLOBALS['TL_DCA'][$table]['palettes']['__selector__'] = [];
         }
 
         if (!$objPalettes) {
-            $GLOBALS['TL_DCA'][$strTable]['palettes']['default'] = implode(',', $this->getDefaultPalettes());
+            $GLOBALS['TL_DCA'][$table]['palettes']['default'] = implode(',', $this->getDefaultPalettes());
             return;
         }
 
-        $arrPalettes = ['default' => []];
-        $translator = Translation::getInstance();
+        $arrPalettes = [
+            'default' => []
+        ];
 
         while ($objPalettes->next()) {
             $strLegend = '';
@@ -280,13 +281,11 @@ class VirtualDataContainerArray
             $arrFieldsets = StringUtil::deserialize($objPalettes->fieldsets, true);
 
             foreach ($arrFields as $arrField) {
-                if ($arrField['field'] === '__FIELDSET__') {
+                if ($arrField['field'] == '__FIELDSET__') {
                     $arrFieldset = \current($arrFieldsets);
-                    if ($arrFieldset) {
-                        $strLegend = StringUtil::generateAlias($arrFieldset['label']) . '_legend';
-                        $GLOBALS['TL_LANG'][$strTable][$strLegend] = $translator->translate(($strTable ? $strTable . '.' : '') . 'fieldset.' . $strLegend, $arrFieldset['label']);
-                        $strLegend .= ($arrFieldset['hide'] ? ':hide' : '');
-                    }
+                    $strLegend = StringUtil::generateAlias($arrFieldset['label']) . '_legend';
+                    $GLOBALS['TL_LANG'][$table][$strLegend] = Translation::getInstance()->translate(($table ? $table . '.' : '') . 'fieldset.' . $strLegend, $arrFieldset['label']);
+                    $strLegend .= ($arrFieldset['hide'] ? ':hide' : '');
                     \next($arrFieldsets);
                     continue;
                 }
@@ -296,23 +295,23 @@ class VirtualDataContainerArray
                 }
 
                 $strField = $arrField['field'];
-                if (\is_numeric($strField)) {
-                    // Performance-Fix: RAM-Lookup statt relationalem DB-Query
-                    $strField = self::$arrFieldIdToNameMap[(int)$strField] ?? null;
-                    if ($strField === null) {
+                if (\is_numeric($arrField['field'])) {
+                    $objField = CatalogFieldModel::findByPk($arrField['field']);
+                    if (!$objField) {
                         continue;
                     }
+                    $strField = $objField->fieldname;
                 }
 
                 $arrLegends[$strLegend][] = $strField;
             }
 
             $strLegendFields = '';
-            foreach ($arrLegends as $strLegendKey => $arrFieldsList) {
-                if (!$strLegendKey) {
-                    $strLegendFields .= \implode(',', $arrFieldsList) . ';';
+            foreach ($arrLegends as $strLegend => $arrFields) {
+                if (!$strLegend) {
+                    $strLegendFields .= \implode(',', $arrFields) . ';';
                 } else {
-                    $strLegendFields .= '{' . $strLegendKey . '},' . implode(',', $arrFieldsList) . ';';
+                    $strLegendFields .= '{' . $strLegend . '},' . implode(',', $arrFields) . ';';
                 }
             }
 
@@ -321,13 +320,13 @@ class VirtualDataContainerArray
             }
 
             if ($objPalettes->selector_type) {
-                if (!\in_array('type', $GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'], true)) {
-                    $GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'][] = 'type';
+                if (!\in_array('type', $GLOBALS['TL_DCA'][$table]['palettes']['__selector__'])) {
+                    $GLOBALS['TL_DCA'][$table]['palettes']['__selector__'][] = 'type';
                 }
                 $strName = $objPalettes->selector_type;
             }
 
-            $GLOBALS['TL_DCA'][$strTable]['palettes'][$strName] = $strLegendFields;
+            $GLOBALS['TL_DCA'][$table]['palettes'][$strName] = $strLegendFields;
         }
     }
 
@@ -340,27 +339,25 @@ class VirtualDataContainerArray
 
     protected function getDefaultPalettes(): array
     {
-        $arrReturn = [];
-        $blnEnableVisibility = (bool)$this->arrCatalog['enableVisibility'];
-
+        $return = [];
         foreach ($this->arrFields as $strFieldname => $arrField) {
-            if (($arrField['type'] ?? '') === 'empty') {
+            $strType = $this->arrFields['type'] ?? '';
+            if ($strType == 'empty') {
                 continue;
             }
 
-            if (!$blnEnableVisibility && \in_array($strFieldname, ['published', 'start', 'stop'], true)) {
+            if (!$this->arrCatalog['enableVisibility'] && \in_array($strFieldname, ['published', 'start', 'stop'])) {
                 continue;
             }
 
-            $arrReturn[] = $strFieldname;
+            $return[] = $strFieldname;
         }
 
-        return $arrReturn;
+        return $return;
     }
 
     protected function setSubPalettes(): void
     {
-        $strTable = $this->arrCatalog['table'];
         $objSubPalettes = CatalogPaletteModel::findAll([
             'column' => ['type=? AND published=?'],
             'value' => ['subpalette', '1'],
@@ -371,47 +368,49 @@ class VirtualDataContainerArray
             return;
         }
 
-        if (!isset($GLOBALS['TL_DCA'][$strTable]['subpalettes'])) {
-            $GLOBALS['TL_DCA'][$strTable]['subpalettes'] = [];
+        if (!isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['subpalettes'])) {
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['subpalettes'] = [];
         }
 
         while ($objSubPalettes->next()) {
+
             $strFieldname = $objSubPalettes->selector;
-            if (\is_numeric($strFieldname)) {
-                $strFieldname = self::$arrFieldIdToNameMap[(int)$strFieldname] ?? null;
-                if ($strFieldname === null) {
+            if (is_numeric($objSubPalettes->selector)) {
+                $objField = CatalogFieldModel::findByPk($objSubPalettes->selector);
+                if (!$objField) {
                     continue;
                 }
+                $strFieldname = $objField->fieldname;
             }
 
             $arrFields = $this->getFieldsOnly(StringUtil::deserialize($objSubPalettes->fields, true));
             $strPalette = $strFieldname;
             $this->addSubmitOnChange($strFieldname);
-
-            if (!\in_array($strFieldname, $GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'], true)) {
-                $GLOBALS['TL_DCA'][$strTable]['palettes']['__selector__'][] = $strFieldname;
-            }
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['palettes']['__selector__'][] = $strFieldname;
 
             if ($objSubPalettes->selector_option) {
                 $strPalette .= '_' . $objSubPalettes->selector_option;
             }
 
-            $GLOBALS['TL_DCA'][$strTable]['subpalettes'][$strPalette] = empty($arrFields) ? '' : implode(',', $arrFields);
+            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['subpalettes'][$strPalette] = empty($arrFields) ? '' : implode(',', $arrFields);
         }
     }
 
     protected function getFieldsOnly($arrFields): array
     {
+
         $arrReturn = [];
 
         foreach ($arrFields as $arrField) {
+
             $strField = $arrField['field'];
 
-            if (\is_numeric($strField)) {
-                $strField = self::$arrFieldIdToNameMap[(int)$strField] ?? null;
-                if ($strField === null) {
+            if (is_numeric($strField)) {
+                $objField = CatalogFieldModel::findByPk($arrField['field']);
+                if (!$objField) {
                     continue;
                 }
+                $strField = $objField->fieldname;
             }
 
             $arrReturn[] = $strField;
@@ -422,76 +421,77 @@ class VirtualDataContainerArray
 
     protected function setLabels(): void
     {
-        $strTable = $this->arrCatalog['table'];
-        $translator = Translation::getInstance(); // 1x holen
 
         foreach ($this->arrFields as $strFieldname => $arrField) {
-            if (isset($GLOBALS['TL_LANG'][$strTable][$strFieldname])) {
+            if (isset($GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname])) {
                 continue;
             }
 
-            $strName = $arrField['name'] ?? '';
+            $strName = isset($arrField['name']) && $arrField['name'] ? $arrField['name'] : '';
 
-            $GLOBALS['TL_LANG'][$strTable][$strFieldname] = [
-                $translator->translate($strTable . '.field.title.' . $strFieldname, $strName),
-                $translator->translate($strTable . '.field.description' . $strFieldname, $strName)
+            $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname] = [
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $strName),
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $strName)
             ];
         }
     }
 
     protected function generateEmptyDataContainer(): void
     {
-        $strTable = $this->arrCatalog['table'] ?? '';
-        if (!$strTable) {
+        $table = $this->arrCatalog['table'] ?? '';
+        if (!$table) {
             return;
         }
 
-        if (($GLOBALS['TL_DCA'][$strTable]['config']['_loaded'] ?? false) === true) {
+        if (isset($GLOBALS['TL_DCA'][$table]['config']['_loaded']) && $GLOBALS['TL_DCA'][$table]['config']['_loaded'] === true) {
             return;
         }
 
-        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'])) {
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_modified'] = true;
+        if (isset($GLOBALS['TL_DCA'][$table]['config'])) {
+            $GLOBALS['TL_DCA'][$table]['config']['_modified'] = true;
         }
 
-        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config'])) {
-            $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['modified'] = true;
+        if (isset($GLOBALS['TL_DCA'][$table]['config'])) {
+            $GLOBALS['TL_DCA'][$table]['config']['modified'] = true;
         }
 
-        $GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
+        $GLOBALS['TL_DCA'][$table] = $GLOBALS['TL_DCA'][$table] ?? [];
+        $GLOBALS['TL_DCA'][$table]['config'] = $GLOBALS['TL_DCA'][$table]['config'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['config']['_loaded'] = true;
+        $GLOBALS['TL_DCA'][$table]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) {
             if ($objDataContainer->activeRecord) {
                 Toolkit::saveAlias(Toolkit::getActiveRecordAsArrayFromDc($objDataContainer), $this->arrFields, $this->arrCatalog);
             }
         };
-
-        $GLOBALS['TL_DCA'][$strTable]['config']['sql'] = $GLOBALS['TL_DCA'][$strTable]['config']['sql'] ?? [
-            'keys' => ['id' => 'primary']
+        $GLOBALS['TL_DCA'][$table]['config']['sql'] = $GLOBALS['TL_DCA'][$table]['config']['sql'] ?? [
+            'keys' => [
+                'id' => 'primary'
+            ]
         ];
 
-        $GLOBALS['TL_DCA'][$strTable]['list'] = $GLOBALS['TL_DCA'][$strTable]['list'] ?? [];
-        $GLOBALS['TL_DCA'][$strTable]['list']['label'] = $GLOBALS['TL_DCA'][$strTable]['list']['label'] ?? [];
-        $GLOBALS['TL_DCA'][$strTable]['list']['sorting'] = $GLOBALS['TL_DCA'][$strTable]['list']['sorting'] ?? [];
-
-        $GLOBALS['TL_DCA'][$strTable]['list']['operations'] = $GLOBALS['TL_DCA'][$strTable]['list']['operations'] ?? [
+        $GLOBALS['TL_DCA'][$table]['list'] = $GLOBALS['TL_DCA'][$table]['list'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['list']['label'] = $GLOBALS['TL_DCA'][$table]['list']['label'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['list']['sorting'] = $GLOBALS['TL_DCA'][$table]['list']['sorting'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['list']['operations'] = $GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [
             'edit' => [
-                'label' => $GLOBALS['TL_LANG']['DCA']['edit'] ?? '',
+                'label' => $GLOBALS['TL_LANG']['DCA']['edit'] ?? [],
                 'href' => 'act=edit',
                 'icon' => 'edit.svg'
             ],
             'delete' => [
-                'label' => $GLOBALS['TL_LANG']['DCA']['delete'] ?? '',
+                'label' => $GLOBALS['TL_LANG']['DCA']['delete'] ?? [],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
-                'label' => $GLOBALS['TL_LANG']['DCA']['show'] ?? '',
+                'label' => $GLOBALS['TL_LANG']['DCA']['show'] ?? [],
                 'href' => 'act=show',
                 'icon' => 'show.svg'
             ]
         ];
 
-        $GLOBALS['TL_DCA'][$strTable]['list']['global_operations'] = $GLOBALS['TL_DCA'][$strTable]['list']['global_operations'] ?? [
+        $GLOBALS['TL_DCA'][$table]['list']['global_operations'] = $GLOBALS['TL_DCA'][$table]['list']['global_operations'] ?? [
             'all' => [
                 'label' => $GLOBALS['TL_LANG']['DCA']['all'] ?? '',
                 'href' => 'act=select',
@@ -500,54 +500,53 @@ class VirtualDataContainerArray
             ]
         ];
 
-        $GLOBALS['TL_DCA'][$strTable]['palettes'] = $GLOBALS['TL_DCA'][$strTable]['palettes'] ?? ['__selector__' => [], 'default' => ''];
-        $GLOBALS['TL_DCA'][$strTable]['subpalettes'] = $GLOBALS['TL_DCA'][$strTable]['subpalettes'] ?? [];
-        $GLOBALS['TL_DCA'][$strTable]['fields'] = $GLOBALS['TL_DCA'][$strTable]['fields'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['palettes'] = $GLOBALS['TL_DCA'][$table]['palettes'] ?? ['__selector__' => [], 'default' => ''];
+        $GLOBALS['TL_DCA'][$table]['subpalettes'] = $GLOBALS['TL_DCA'][$table]['subpalettes'] ?? [];
+        $GLOBALS['TL_DCA'][$table]['fields'] = $GLOBALS['TL_DCA'][$table]['fields'] ?? [];
     }
 
-    public function getRelatedTables(): array
+    public function getRelatedTables()
     {
-        return $this->arrCatalog['related'] ?? [];
-    }
-
-    protected function setOperations(): void
-    {
-        if (empty($this->arrCatalog['ctable']) || !is_array($this->arrCatalog['ctable'])) {
-            return;
+        if (!isset($this->arrCatalog['related'])) {
+            return [];
         }
 
-        $strTable = $this->arrCatalog['table'];
-        $translator = Translation::getInstance();
-        $operations = $GLOBALS['TL_DCA'][$strTable]['list']['operations'] ?? [];
+        return $this->arrCatalog['related'];
+    }
 
-        foreach ($this->arrCatalog['ctable'] as $strChildTable) {
-            $strKey = 'child_' . $strChildTable;
-            if (isset($operations[$strKey])) {
-                continue;
-            }
+    protected function setOperations()
+    {
+        if (empty($this->arrCatalog['ctable']) || !is_array($this->arrCatalog['ctable'])) {
+            return null;
+        }
 
+        foreach ($this->arrCatalog['ctable'] as $strTable) {
             $strTitle = '';
             $strDescription = '';
-
-            $objCatalog = CatalogModel::findByTableOrModule($strChildTable);
+            $objCatalog = CatalogModel::findByTableOrModule($strTable);
             if ($objCatalog !== null) {
                 $strTitle = $objCatalog->name;
                 $strDescription = $objCatalog->description;
             }
 
-            $arrOperation = [
-                $strKey => [
-                    'label' => [
-                        $translator->translate('child_' . $strChildTable . '.title', $strTitle),
-                        $translator->translate('child_' . $strChildTable . '.description', ($strDescription ?: $strTitle)),
-                    ],
-                    'href' => 'table=' . $strChildTable . '&sourceTable=' . $strTable,
-                    'icon' => 'children.svg'
-                ]
+            $strKey = 'child_' . $strTable;
+            if (in_array($strKey, array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
+                continue;
+            }
+
+            $arrOperation = [];
+            $arrOperation[$strKey] = [
+                'label' => [
+                    Translation::getInstance()->translate('child_' . $strTable . '.title', $strTitle),
+                    Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
+                ],
+                'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
+                'icon' => 'children.svg'
             ];
 
-            Cache::set('sourceTable', $strTable);
-            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$strTable]['list']['operations'], 1, $arrOperation);
+            Cache::set('sourceTable', $this->arrCatalog['table']);
+
+            ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'], 1, $arrOperation);
         }
     }
 
@@ -557,9 +556,7 @@ class VirtualDataContainerArray
             return;
         }
 
-        $strTable = $this->arrCatalog['table'];
-
-        if (($GLOBALS['TL_DCA'][$strTable]['config']['_modified'] ?? false)) {
+        if (($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['_modified'] ?? false)) {
             $this->setPalettes();
             $this->setSubPalettes();
             $this->setFields();
@@ -574,9 +571,9 @@ class VirtualDataContainerArray
             $this->setLabels();
         }
 
-        if (!empty($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && \is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
+        if (isset($GLOBALS['TL_HOOKS']['loadVirtualDataContainer']) && \is_array($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'])) {
             foreach ($GLOBALS['TL_HOOKS']['loadVirtualDataContainer'] as $arrCallback) {
-                System::importStatic($arrCallback[0])->{$arrCallback[1]}($strTable, $this);
+                System::importStatic($arrCallback[0])->{$arrCallback[1]}($this->arrCatalog['table'], $this);
             }
         }
     }

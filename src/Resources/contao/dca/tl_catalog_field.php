@@ -12,6 +12,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'config' => [
         'dataContainer' => DC_Table::class,
         'ptable' => 'tl_catalog',
+        'ctable' => ['tl_catalog_option'],
         'sql' => [
             'keys' => [
                 'id' => 'primary',

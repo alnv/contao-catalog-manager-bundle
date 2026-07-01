@@ -8,7 +8,6 @@ use Contao\DC_Table;
 
 $GLOBALS['TL_DCA']['tl_catalog_option'] = [
     'config' => [
-        'closed' => true,
         'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
         'ptable' => 'tl_catalog_field',
@@ -60,6 +59,7 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
+                'primary' => true,
                 'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
@@ -110,8 +110,9 @@ $GLOBALS['TL_DCA']['tl_catalog_option'] = [
         ]
     ]
 ];
-
+/*
 if (Input::get('dcaWizard')) {
     $GLOBALS['TL_DCA']['tl_catalog_option']['config']['closed'] = false;
     $GLOBALS['TL_DCA']['tl_catalog_option']['list']['sorting']['filter'] = [['pid=?', Input::get('id')]];
 }
+*/
