@@ -471,17 +471,20 @@ class VirtualDataContainerArray
         $GLOBALS['TL_DCA'][$table]['list']['sorting'] = $GLOBALS['TL_DCA'][$table]['list']['sorting'] ?? [];
         $GLOBALS['TL_DCA'][$table]['list']['operations'] = $GLOBALS['TL_DCA'][$table]['list']['operations'] ?? [
             'edit' => [
+                'primary' => true,
                 'label' => $GLOBALS['TL_LANG']['DCA']['edit'] ?? [],
                 'href' => 'act=edit',
                 'icon' => 'edit.svg'
             ],
             'delete' => [
+                'primary' => true,
                 'label' => $GLOBALS['TL_LANG']['DCA']['delete'] ?? [],
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
                 'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'show' => [
+                'primary' => true,
                 'label' => $GLOBALS['TL_LANG']['DCA']['show'] ?? [],
                 'href' => 'act=show',
                 'icon' => 'show.svg'
@@ -527,7 +530,7 @@ class VirtualDataContainerArray
             }
 
             $strKey = 'child_' . $strTable;
-            if (in_array($strKey, array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
+            if (\in_array($strKey, \array_keys(($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['list']['operations'] ?? [])))) {
                 continue;
             }
 
@@ -538,7 +541,8 @@ class VirtualDataContainerArray
                     Translation::getInstance()->translate('child_' . $strTable . '.description', ($strDescription ?: $strTitle)),
                 ],
                 'href' => 'table=' . $strTable . '&sourceTable=' . $this->arrCatalog['table'],
-                'icon' => 'children.svg'
+                'icon' => 'children.svg',
+                'primary' => true
             ];
 
             Cache::set('sourceTable', $this->arrCatalog['table']);

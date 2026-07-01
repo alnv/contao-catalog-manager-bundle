@@ -26,14 +26,14 @@ class DynModel extends Model
         parent::__construct($objResult);
     }
 
-    public static function createDynTable($strTable, $objResult = null): Model
+    public static function createDynTable($strTable, $objResult = null)
     {
         static::$strTable = $strTable;
 
         return new static($objResult);
     }
 
-    public static function findByIdOrAlias($varId, array $arrOptions = []): Collection
+    public static function findByIdOrAlias($varId, array $arrOptions = [])
     {
         $t = static::$strTable;
 

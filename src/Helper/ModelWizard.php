@@ -11,18 +11,8 @@ class ModelWizard
 
     public function __construct(string $table)
     {
-        $strModel = '';
-        try {
-            $strModel = Model::getClassFromTable($table);
-        } catch (\Exception $error) {
-        }
-
-        if (\str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
-            $strModel = '';
-        }
-
-        if ($strModel && $this->modelExist($strModel)) {
-            $this->objModel = new $strModel();
+        if ($model = ($GLOBALS['TL_MODELS'][$table] ?? '')) {
+            $this->objModel = new $model();
             return;
         }
 
@@ -44,10 +34,10 @@ class ModelWizard
 
     protected function modelExist(string $strModel): bool
     {
-        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models')) {
+        if (\str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') || \str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
             return false;
         }
 
-        return class_exists($strModel);
+        return \class_exists($strModel);
     }
 }
