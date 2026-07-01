@@ -6,6 +6,7 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\DcaExtractor;
 use Contao\Model;
+use Contao\Model\Collection;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,25 +15,25 @@ class DynModel extends Model
 
     public static $strTable = '';
 
-    public function __construct($objResult=null)
+    public function __construct($objResult = null)
     {
         if (System::getContainer()
-            ->get('contao.routing.scope_matcher')
-            ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
+                ->get('contao.routing.scope_matcher')
+                ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
             static::$strTable = Toolkit::getTableByDo();
         }
 
         parent::__construct($objResult);
     }
 
-    public static function createDynTable($strTable, $objResult = null)
+    public static function createDynTable($strTable, $objResult = null): Model
     {
         static::$strTable = $strTable;
 
         return new static($objResult);
     }
 
-    public static function findByIdOrAlias($varId, array $arrOptions = [])
+    public static function findByIdOrAlias($varId, array $arrOptions = []): Collection
     {
         $t = static::$strTable;
 
@@ -44,7 +45,7 @@ class DynModel extends Model
             $arrOptions['value'] = [];
         }
 
-        $arrOptions['column'][] = !preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
+        $arrOptions['column'][] = !\preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
         $arrOptions['value'][] = $varId;
         $arrOptions['limit'] = 1;
         $arrOptions['return'] = 'Model';
@@ -69,13 +70,13 @@ class DynModel extends Model
                 POWER(SIN((%F - ABS(%s.%s)) * PI() / 180 / 2), 2) + 
                 COS(%F * PI() / 180) * COS(ABS(%s.%s) * PI() / 180) * POWER(SIN((%F - %s.%s) * PI() / 180 / 2), 2)
             )) AS _distance ",
-                (float) $dist['latCord'],
+                (float)$dist['latCord'],
                 $strTableEscaped,
                 $strLatFieldEscaped,
-                (float) $dist['latCord'],
+                (float)$dist['latCord'],
                 $strTableEscaped,
                 $strLatFieldEscaped,
-                (float) $dist['lngCord'],
+                (float)$dist['lngCord'],
                 $strTableEscaped,
                 $strLngFieldEscaped
             );
@@ -87,7 +88,7 @@ class DynModel extends Model
             $arrJoins = [];
             $arrFields = [Database::quoteIdentifier($strTable) . ".*"];
             $intCount = 0;
-            $isEagerGlobal = (bool) ($arrOptions['eager'] ?? false);
+            $isEagerGlobal = (bool)($arrOptions['eager'] ?? false);
 
             foreach ($objBase->getRelations() as $strKey => $arrConfig) {
                 $isEagerLoad = ($arrConfig['load'] ?? '') === 'eager';
@@ -119,7 +120,7 @@ class DynModel extends Model
         }
 
         if (isset($arrOptions['column'])) {
-            if (is_array($arrOptions['column'])) {
+            if (\is_array($arrOptions['column'])) {
                 $strQuery .= " WHERE " . implode(" AND ", $arrOptions['column']);
             } else {
                 $strQuery .= " WHERE " . Database::quoteIdentifier($strTable) . '.' . Database::quoteIdentifier($arrOptions['column']) . "=?";
@@ -138,7 +139,7 @@ class DynModel extends Model
             $strQuery .= " ORDER BY " . $arrOptions['order'];
         }
 
-        if (isset($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery']) && is_array($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'])) {
+        if (isset($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery']) && \is_array($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'])) {
             foreach ($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'] as $arrCallback) {
                 $strQuery = System::importStatic($arrCallback[0])->{$arrCallback[1]}($strQuery, $arrOptions);
             }

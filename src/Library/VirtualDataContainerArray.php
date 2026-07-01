@@ -45,11 +45,11 @@ class VirtualDataContainerArray
         $GLOBALS['TL_DCA'][$strTable]['config']['ctable'] = Toolkit::extendField(($GLOBALS['TL_DCA'][$strTable]['config']['ctable'] ?? []), ($this->arrCatalog['ctable'] ?? []));
         $GLOBALS['TL_DCA'][$strTable]['config']['dataContainer'] = $GLOBALS['TL_DCA'][$strTable]['config']['dataContainer'] ?? $this->getDataContainerNamespace($this->arrCatalog['dataContainer']);
 
-        if ($this->arrCatalog['ptable']) {
+        if ($this->arrCatalog['ptable'] ?? '') {
             $GLOBALS['TL_DCA'][$strTable]['config']['ptable'] = $this->arrCatalog['ptable'];
         }
 
-        if ($this->arrCatalog['enableGeocoding']) {
+        if ($this->arrCatalog['enableGeocoding'] ?? false) {
             $GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'][] = function (DataContainer $objDataContainer) use ($strTable) {
                 if ($objDataContainer->activeRecord) {
                     Toolkit::saveGeoCoordinates($strTable, Toolkit::getActiveRecordAsArrayFromDc($objDataContainer));
@@ -274,59 +274,58 @@ class VirtualDataContainerArray
         ];
 
         while ($objPalettes->next()) {
-            $strLegend = '';
-            $arrLegends = [];
-            $strName = StringUtil::generateAlias(\strtolower($objPalettes->name));
-            $arrFields = StringUtil::deserialize($objPalettes->fields, true);
-            $arrFieldsets = StringUtil::deserialize($objPalettes->fieldsets, true);
+            $legend = '';
+            $legends = [];
+            $name = StringUtil::generateAlias(\strtolower($objPalettes->name));
+            $fields = StringUtil::deserialize($objPalettes->fields, true);
+            $fieldSets = StringUtil::deserialize($objPalettes->fieldsets, true);
 
-            foreach ($arrFields as $arrField) {
-                if ($arrField['field'] == '__FIELDSET__') {
-                    $arrFieldset = \current($arrFieldsets);
-                    $strLegend = StringUtil::generateAlias($arrFieldset['label']) . '_legend';
-                    $GLOBALS['TL_LANG'][$table][$strLegend] = Translation::getInstance()->translate(($table ? $table . '.' : '') . 'fieldset.' . $strLegend, $arrFieldset['label']);
-                    $strLegend .= ($arrFieldset['hide'] ? ':hide' : '');
-                    \next($arrFieldsets);
+            foreach ($fields as $arrField) {
+                $field = $arrField['field'] ?? '';
+
+                if ($field == '__FIELDSET__') {
+                    $arrFieldset = \current($fieldSets);
+                    $legend = StringUtil::generateAlias($arrFieldset['label'] ?? '') . '_legend';
+                    $GLOBALS['TL_LANG'][$table][$legend] = Translation::getInstance()->translate(($table ? $table . '.' : '') . 'fieldset.' . $legend, $arrFieldset['label'] ?? '');
+                    $legend .= ($arrFieldset['hide'] ? ':hide' : '');
+                    \next($fieldSets);
                     continue;
                 }
 
-                if (!isset($arrLegends[$strLegend])) {
-                    $arrLegends[$strLegend] = [];
+                if (!isset($legends[$legend])) {
+                    $legends[$legend] = [];
                 }
 
-                $strField = $arrField['field'];
-                if (\is_numeric($arrField['field'])) {
-                    $objField = CatalogFieldModel::findByPk($arrField['field']);
-                    if (!$objField) {
-                        continue;
+                if (\is_numeric($field)) {
+                    if ($objField = CatalogFieldModel::findByPk($field)) {
+                        $field = $objField->fieldname;
                     }
-                    $strField = $objField->fieldname;
                 }
 
-                $arrLegends[$strLegend][] = $strField;
+                $legends[$legend][] = $field;
             }
 
-            $strLegendFields = '';
-            foreach ($arrLegends as $strLegend => $arrFields) {
-                if (!$strLegend) {
-                    $strLegendFields .= \implode(',', $arrFields) . ';';
+            $legendFields = '';
+            foreach ($legends as $legend => $arrFields) {
+                if (!$legend) {
+                    $legendFields .= \implode(',', $arrFields) . ';';
                 } else {
-                    $strLegendFields .= '{' . $strLegend . '},' . implode(',', $arrFields) . ';';
+                    $legendFields .= '{' . $legend . '},' . \implode(',', $arrFields) . ';';
                 }
             }
 
             if (empty($arrPalettes['default'])) {
-                $strName = 'default';
+                $name = 'default';
             }
 
             if ($objPalettes->selector_type) {
-                if (!\in_array('type', $GLOBALS['TL_DCA'][$table]['palettes']['__selector__'])) {
+                if (!\in_array('type', ($GLOBALS['TL_DCA'][$table]['palettes']['__selector__'] ?? []))) {
                     $GLOBALS['TL_DCA'][$table]['palettes']['__selector__'][] = 'type';
                 }
-                $strName = $objPalettes->selector_type;
+                $name = $objPalettes->selector_type;
             }
 
-            $GLOBALS['TL_DCA'][$table]['palettes'][$strName] = $strLegendFields;
+            $GLOBALS['TL_DCA'][$table]['palettes'][$name] = $legendFields;
         }
     }
 
@@ -421,17 +420,15 @@ class VirtualDataContainerArray
 
     protected function setLabels(): void
     {
-
         foreach ($this->arrFields as $strFieldname => $arrField) {
             if (isset($GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname])) {
                 continue;
             }
 
-            $strName = isset($arrField['name']) && $arrField['name'] ? $arrField['name'] : '';
-
+            $name = isset($arrField['name']) && $arrField['name'] ? $arrField['name'] : '';
             $GLOBALS['TL_LANG'][$this->arrCatalog['table']][$strFieldname] = [
-                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $strName),
-                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $strName)
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.' . $strFieldname, $name),
+                Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description' . $strFieldname, $name)
             ];
         }
     }

@@ -17,7 +17,7 @@ class ModelWizard
         } catch (\Exception $error) {
         }
 
-        if (str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
+        if (\str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
             $strModel = '';
         }
 

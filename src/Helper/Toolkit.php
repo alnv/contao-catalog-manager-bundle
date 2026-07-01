@@ -1048,24 +1048,24 @@ class Toolkit
         return $arrReturn;
     }
 
-    public static function getTableByDo(string $strDoParam = ''): string
+    public static function getTableByDo(string $doParam = ''): string
     {
         if ($strTable = Input::get('table')) {
-            return (string) $strTable;
+            return (string)$strTable;
         }
 
-        if ($strDoParam === '') {
-            $strDoParam = (string) Input::get('do');
+        if ($doParam === '') {
+            $doParam = (string)Input::get('do');
         }
 
-        if ($strDoParam === '') {
+        if ($doParam === '') {
             return '';
         }
 
-        $objCatalog = new Catalog($strDoParam);
-        $arrCatalog = $objCatalog->getCatalog();
+        $objCatalog = new Catalog($doParam);
+        $catalog = $objCatalog->getCatalog();
 
-        return $arrCatalog['table'] ?? '';
+        return $catalog['table'] ?? '';
     }
 
     public static function getModuleNameByTable($strTable): string
