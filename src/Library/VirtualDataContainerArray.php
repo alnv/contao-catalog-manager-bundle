@@ -201,6 +201,7 @@ class VirtualDataContainerArray
                 'cut' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['cut'] ?? '',
                     'icon' => 'cut.svg',
+                    'primary' => true,
                     'href' => 'act=paste&amp;mode=cut',
                     'attributes' => 'onclick="Backend.getScrollOffset()"'
                 ]
@@ -215,7 +216,8 @@ class VirtualDataContainerArray
                 'copy' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['copy'] ?? '',
                     'href' => 'act=copy',
-                    'icon' => 'copy.svg'
+                    'icon' => 'copy.svg',
+                    'primary' => true
                 ]
             ]);
         }
@@ -226,7 +228,8 @@ class VirtualDataContainerArray
                     'label' => $GLOBALS['TL_LANG']['DCA']['toggle'][0] ?? '',
                     'href' => 'act=toggle&amp;field=published',
                     'icon' => 'visible.svg',
-                    'showInHeader' => true
+                    'showInHeader' => true,
+                    'primary' => true
                 ]
             ]);
         }
@@ -235,7 +238,7 @@ class VirtualDataContainerArray
             ArrayUtil::arrayInsert($GLOBALS['TL_DCA'][$table]['list']['operations'], \count($GLOBALS['TL_DCA'][$table]['list']['operations']), [
                 'preview' => [
                     'label' => $GLOBALS['TL_LANG']['DCA']['preview'][0] ?? '',
-                    'showInHeader' => true,
+                    'primary' => true,
                     'button_callback' => function ($arrRow, $strHref, $strTitle, $_strLabel, $_strIcon, $strHtmlAttributes, $strTable) {
                         $strIcon = Image::getHtml('forward_2.svg');
                         $strUrl = Toolkit::getDetailPageFromEntityByIdAndTable($strTable, $arrRow['id']);
