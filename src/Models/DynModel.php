@@ -6,7 +6,6 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\DcaExtractor;
 use Contao\Model;
-use Contao\Model\Collection;
 use Contao\System;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -20,7 +19,11 @@ class DynModel extends Model
         if (System::getContainer()
                 ->get('contao.routing.scope_matcher')
                 ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
-            static::$strTable = Toolkit::getTableByDo();
+            self::$strTable = Toolkit::getTableByDo();
+        }
+
+        if (($GLOBALS['CM_TEMP_MODEL_TABLE'] && self::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE'])) {
+            self::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
         }
 
         parent::__construct($objResult);
@@ -28,14 +31,14 @@ class DynModel extends Model
 
     public static function createDynTable($strTable, $objResult = null)
     {
-        static::$strTable = $strTable;
+        self::$strTable = $strTable;
 
-        return new static($objResult);
+        return new self($objResult);
     }
 
     public static function findByIdOrAlias($varId, array $arrOptions = [])
     {
-        $t = static::$strTable;
+        $t = self::$strTable;
 
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
             $arrOptions['column'] = [];
@@ -50,7 +53,7 @@ class DynModel extends Model
         $arrOptions['limit'] = 1;
         $arrOptions['return'] = 'Model';
 
-        return static::find($arrOptions);
+        return self::find($arrOptions);
     }
 
     protected static function buildFindQuery(array $arrOptions): string
@@ -138,7 +141,6 @@ class DynModel extends Model
         if (isset($arrOptions['order'])) {
             $strQuery .= " ORDER BY " . $arrOptions['order'];
         }
-
         if (isset($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery']) && \is_array($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'])) {
             foreach ($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'] as $arrCallback) {
                 $strQuery = System::importStatic($arrCallback[0])->{$arrCallback[1]}($strQuery, $arrOptions);

@@ -11,6 +11,9 @@ class ModelWizard
 
     public function __construct(string $table)
     {
+
+        $GLOBALS['CM_TEMP_MODEL_TABLE'] = $table;
+
         if ($model = ($GLOBALS['TL_MODELS'][$table] ?? '')) {
             $this->objModel = new $model();
             return;

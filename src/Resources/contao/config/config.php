@@ -18,7 +18,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "4.0.6";
+const CATALOG_MANAGER_BUNDLE_VERSION = "4.0.7";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
@@ -72,6 +72,7 @@ ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
 
+$GLOBALS['CM_TEMP_MODEL_TABLE'] = null;
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];

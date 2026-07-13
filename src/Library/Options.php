@@ -147,8 +147,8 @@ class Options
             return null;
         }
 
-        $objModel = new ModelWizard($strTable);
-        $objModel = $objModel->getModel();
+        $objModelWizard = new ModelWizard($strTable);
+        $objModel = $objModelWizard->getModel();
         if ($objModel === null) {
             return null;
         }
