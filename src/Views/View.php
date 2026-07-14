@@ -396,7 +396,7 @@ abstract class View extends Controller
             $objList = new Listing($arrRelation['table'], [
                 'column' => [\implode('OR ', $arrColumns)],
                 'value' => $arrValues,
-                'order' => 'FIELD(' . $strField . ', ' . implode(',', $arrValues) . ')' // @exp.
+                'order' => 'FIELD(' . $strField . ', "' . implode('","', $arrValues) . '")'
             ]);
 
             return $objList->parse();

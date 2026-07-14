@@ -79,6 +79,7 @@ $GLOBALS['OPEN_AI_MESSAGE_PARSER']['catalog-manager'] = [
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
 $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
 
+$GLOBALS['CM_TEMP_MODEL_TABLE'] = '';
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
 $GLOBALS['CM_CUSTOM_FIELDS'] = [];

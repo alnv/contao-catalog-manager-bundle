@@ -2,10 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\DcaExtractor;
 use Contao\Model;
 use Contao\System;
+use Symfony\Component\HttpFoundation\Request;
 
 class DynModel extends Model
 {
@@ -14,6 +16,16 @@ class DynModel extends Model
 
     public function __construct($objResult = null)
     {
+
+        if (System::getContainer()
+                ->get('contao.routing.scope_matcher')
+                ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
+            self::$strTable = Toolkit::getTableByDo();
+        }
+
+        if (($GLOBALS['CM_TEMP_MODEL_TABLE'] && self::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE'])) {
+            self::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
+        }
 
         if (!static::$strTable) {
             return null;
@@ -24,19 +36,13 @@ class DynModel extends Model
 
     public function createDynTable($strTable, $objResult = null)
     {
+        self::$strTable = $strTable;
 
-        static::$strTable = $strTable;
-
-        if (isset(static::$arrClassNames)) {
-            static::$arrClassNames[$strTable] = 'Alnv\ContaoCatalogManagerBundle\Models\DynModel';
-        }
-
-        parent::__construct($objResult);
+        return new self($objResult);
     }
 
     public static function findByIdOrAlias($varId, array $arrOptions = [])
     {
-
         $t = static::$strTable;
 
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
@@ -57,57 +63,76 @@ class DynModel extends Model
 
     protected static function buildFindQuery(array $arrOptions)
     {
-
-        $objBase = DcaExtractor::getInstance($arrOptions['table']);
+        $strTable = $arrOptions['table'];
+        $objBase = DcaExtractor::getInstance($strTable);
         $strDistanceSelection = '';
 
         if (isset($arrOptions['distance'])) {
+            $dist = $arrOptions['distance'];
+            $strTableEscaped = Database::quoteIdentifier($strTable);
+            $strLatFieldEscaped = Database::quoteIdentifier($dist['latField']);
+            $strLngFieldEscaped = Database::quoteIdentifier($dist['lngField']);
 
             $strDistanceSelection = sprintf(
-                ",3956 * 1.6 * 2 * ASIN(SQRT(POWER(SIN((%s-abs(%s.`%s`)) * pi()/180 / 2),2) + COS(%s * pi()/180) * COS(abs(%s.`%s`) *  pi()/180) * POWER( SIN( (%s-%s.`%s`) *  pi()/180 / 2 ), 2 ))) AS _distance ",
-                $arrOptions['distance']['latCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['latField'],
-                $arrOptions['distance']['latCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['latField'],
-                $arrOptions['distance']['lngCord'],
-                $arrOptions['table'],
-                $arrOptions['distance']['lngField']
+                ", 6371 * 2 * ASIN(SQRT(
+                POWER(SIN((%F - ABS(%s.%s)) * PI() / 180 / 2), 2) + 
+                COS(%F * PI() / 180) * COS(ABS(%s.%s) * PI() / 180) * POWER(SIN((%F - %s.%s) * PI() / 180 / 2), 2)
+            )) AS _distance ",
+                (float)$dist['latCord'],
+                $strTableEscaped,
+                $strLatFieldEscaped,
+                (float)$dist['latCord'],
+                $strTableEscaped,
+                $strLatFieldEscaped,
+                (float)$dist['lngCord'],
+                $strTableEscaped,
+                $strLngFieldEscaped
             );
         }
 
         if (!$objBase->hasRelations()) {
-            $strQuery = "SELECT *$strDistanceSelection FROM " . $arrOptions['table'];
+            $strQuery = "SELECT *" . $strDistanceSelection . " FROM " . Database::quoteIdentifier($strTable);
         } else {
-
             $arrJoins = [];
-            $arrFields = [$arrOptions['table'] . ".*"];
+            $arrFields = [Database::quoteIdentifier($strTable) . ".*"];
             $intCount = 0;
+            $isEagerGlobal = (bool)($arrOptions['eager'] ?? false);
 
             foreach ($objBase->getRelations() as $strKey => $arrConfig) {
+                $isEagerLoad = ($arrConfig['load'] ?? '') === 'eager';
 
-                if ((isset($arrConfig['load']) && $arrConfig['load'] == 'eager') || (isset($arrOptions['eager']) && $arrOptions['eager'])) {
-
-                    if ($arrConfig['type'] == 'hasOne' || $arrConfig['type'] == 'belongsTo') {
-
+                if ($isEagerLoad || $isEagerGlobal) {
+                    if (in_array($arrConfig['type'], ['hasOne', 'belongsTo'], true)) {
                         ++$intCount;
+                        $strAlias = 'j' . $intCount;
                         $objRelated = DcaExtractor::getInstance($arrConfig['table']);
 
                         foreach (array_keys($objRelated->getFields()) as $strField) {
-                            $arrFields[] = 'j' . $intCount . '.' . Database::quoteIdentifier($strField) . ' AS ' . $strKey . '__' . $strField;
+                            $arrFields[] = $strAlias . '.' . Database::quoteIdentifier($strField) . ' AS ' . Database::quoteIdentifier($strKey . '__' . $strField);
                         }
 
-                        $arrJoins[] = " LEFT JOIN " . $arrConfig['table'] . " j$intCount ON " . $arrOptions['table'] . "." . Database::quoteIdentifier($strKey) . "=j$intCount." . $arrConfig['field'];
+                        $arrJoins[] = sprintf(
+                            " LEFT JOIN %s %s ON %s.%s = %s.%s",
+                            Database::quoteIdentifier($arrConfig['table']),
+                            $strAlias,
+                            Database::quoteIdentifier($strTable),
+                            Database::quoteIdentifier($strKey),
+                            $strAlias,
+                            Database::quoteIdentifier($arrConfig['field'])
+                        );
                     }
                 }
             }
 
-            $strQuery = "SELECT " . implode(', ', $arrFields) . $strDistanceSelection . " FROM " . $arrOptions['table'] . implode("", $arrJoins);
+            $strQuery = "SELECT " . implode(', ', $arrFields) . $strDistanceSelection . " FROM " . Database::quoteIdentifier($strTable) . implode("", $arrJoins);
         }
 
         if (isset($arrOptions['column'])) {
-            $strQuery .= " WHERE " . (is_array($arrOptions['column']) ? implode(" AND ", $arrOptions['column']) : $arrOptions['table'] . '.' . Database::quoteIdentifier($arrOptions['column']) . "=?");
+            if (\is_array($arrOptions['column'])) {
+                $strQuery .= " WHERE " . implode(" AND ", $arrOptions['column']);
+            } else {
+                $strQuery .= " WHERE " . Database::quoteIdentifier($strTable) . '.' . Database::quoteIdentifier($arrOptions['column']) . "=?";
+            }
         }
 
         if (isset($arrOptions['group'])) {
@@ -121,7 +146,6 @@ class DynModel extends Model
         if (isset($arrOptions['order'])) {
             $strQuery .= " ORDER BY " . $arrOptions['order'];
         }
-
         if (isset($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery']) && \is_array($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'])) {
             foreach ($GLOBALS['TL_HOOKS']['dynModelBuildFindQuery'] as $arrCallback) {
                 $strQuery = System::importStatic($arrCallback[0])->{$arrCallback[1]}($strQuery, $arrOptions);
