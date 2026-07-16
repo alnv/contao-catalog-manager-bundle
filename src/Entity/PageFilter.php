@@ -95,7 +95,9 @@ class PageFilter
 
         $strTable = $GLOBALS['TL_DCA'][$arrPageFilter['table']]['config']['_table'] ?? $arrPageFilter['table'];
         $arrColumn = [$strTable . '.' . $arrPageFilter['column'] . ' REGEXP ?'];
-        $arrValue = ['[[:<:]]' . $strActiveUrlFragment . '[[:>:]]'];
+        $arrValue = [
+            '\\b' . \preg_quote($strActiveUrlFragment, '/') . '\\b'
+        ];
 
         $objModel = new ModelWizard($arrPageFilter['table']);
         $objModel = $objModel->getModel();
