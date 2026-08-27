@@ -19,28 +19,13 @@ class ModelWizard
             return;
         }
 
-        $strGlobalModel = $GLOBALS['CM_MODELS'][$table] ?? '';
-        if ($strGlobalModel && $this->modelExist($strGlobalModel)) {
-            $this->objModel = $strGlobalModel::createDynTable($table);
-            $GLOBALS['TL_MODELS'][$table] = $strGlobalModel;
-            return;
-        }
-
-        $this->objModel = (new DynModel())->createDynTable($table);
-        $GLOBALS['TL_MODELS'][$table] = DynModel::class;
+        $strGlobalModel = $GLOBALS['CM_MODELS'][$table] ?? DynModel::class;
+        $this->objModel = (new $strGlobalModel())->createDynTable($table);
+        $GLOBALS['TL_MODELS'][$table] = $strGlobalModel;
     }
 
     public function getModel(): ?Model
     {
         return $this->objModel;
-    }
-
-    protected function modelExist(string $strModel): bool
-    {
-        if (\str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') || \str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
-            return false;
-        }
-
-        return \class_exists($strModel);
     }
 }

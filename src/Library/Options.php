@@ -92,13 +92,10 @@ class Options
                 }
 
                 while ($objEntities->next()) {
-
                     $varValues = self::getValue($objEntities->{$arrField['dbKey']}, $arrField['dbKey'], $arrField['dbTable']);
 
                     foreach ($varValues as $strValue) {
-
                         $strValue = trim($strValue);
-
                         if (in_array($strValue, $arrTemps)) {
                             continue;
                         }
@@ -168,7 +165,6 @@ class Options
 
     protected static function getValue($strValue, $strField, $strTable)
     {
-
         $arrField = $GLOBALS['TL_DCA'][$strTable]['fields'][$strField];
 
         if (isset($arrField['eval']) && is_array($arrField['eval'])) {
@@ -186,11 +182,12 @@ class Options
         $objModel = new ModelWizard(self::$arrField['dbTable']);
         $objModel = $objModel->getModel();
         $arrModelOptions = [];
+
         ArrayUtil::arrayInsert($arrModelOptions, 0, self::setFilter());
 
         if (self::$arrField['dbOrderField']) {
-            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable']; //isset($GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table']) ? $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] : self::$arrField['dbTable'];
-            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? strtoupper(self::$arrField['dbOrder']) : 'ASC');
+            $strTable = $GLOBALS['TL_DCA'][self::$arrField['dbTable']]['config']['_table'] ?? self::$arrField['dbTable'];
+            $arrModelOptions['order'] = $strTable . '.' . self::$arrField['dbOrderField'] . ' ' . (self::$arrField['dbOrder'] ? \strtoupper(self::$arrField['dbOrder']) : 'ASC');
         }
 
         return $objModel->findAll($arrModelOptions);
@@ -198,7 +195,6 @@ class Options
 
     protected static function getCleanLabel($strValue, $strField, $strTable)
     {
-
         if (!$strTable || !$strField) {
             return $strValue;
         }
