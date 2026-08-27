@@ -103,9 +103,11 @@ class GenerateBreadcrumbListener
             $strColumn = $arrFilterPage['column'] ?? '';
             $strColumnTable = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? $strTable;
 
+            $fragment = \preg_replace('/([\\\\.^$|()\\[\\]*+?{}\\-])/', '\\\\$1', $strActiveUrlFragment);
             $arrMasterEntity = (new Listing($strTable, [
                 'column' => [$strColumnTable . '.`' . $strColumn . '` REGEXP ?'],
-                'value' => ['[[:<:]]' . $strActiveUrlFragment . '[[:>:]]'],
+                // 'value' => ['[[:<:]]' . $strActiveUrlFragment . '[[:>:]]'],
+                'value' => ['(^|[^a-zA-Z0-9_])' . $fragment . '([^a-zA-Z0-9_]|$)'],
                 'fastMode' => true,
                 'ignoreVisibility' => true,
                 'limit' => 1,
@@ -118,7 +120,7 @@ class GenerateBreadcrumbListener
             try {
                 $arrPrevUrlFragments[] = $strUrlFragment;
                 $strUrl = $objPage->getFrontendUrl('/' . implode('/', $arrPrevUrlFragments));
-            } catch (\Exception $objError) {
+            } catch (\Exception $e) {
                 continue;
             }
 

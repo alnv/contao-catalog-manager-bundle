@@ -75,6 +75,10 @@ class GetSearchablePagesListener
 
                     if (is_array($varPages) && !empty($varPages)) {
                         foreach ($varPages as $arrUrl) {
+                            if (!isset( $arrUrl['absolute'])) {
+                                continue;
+                            }
+                            
                             if ($strDns) {
                                 if (str_contains($arrUrl['absolute'], $strDns)) {
                                     $arrPages[] = $arrUrl['absolute'];

@@ -141,7 +141,9 @@ class ActiveInsertTag
         }
 
         if ($blnTouch) {
-            $strValue = '[[:<:]]' . $strValue . '[[:>:]]';
+            // $strValue = '[[:<:]]' . $strValue . '[[:>:]]';
+            $fragment = \preg_replace('/([\\\\.^$|()\\[\\]*+?{}\\-])/', '\\\\$1', $strValue);
+            $strValue = '(^|[^a-zA-Z0-9_])' . $fragment . '([^a-zA-Z0-9_]|$)';
         }
 
         return $strValue;
@@ -169,9 +171,12 @@ class ActiveInsertTag
             $strTable = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? $strTable;
             $objModel = new ModelWizard($strTable);
             $objModel = $objModel->getModel();
+
+
+            $fragment = \preg_replace('/([\\\\.^$|()\\[\\]*+?{}\\-])/', '\\\\$1', $strValue);
             $objEntities = $objModel->findAll([
                 'column' => [$strTable . '.' . $strColumn . ' REGEXP ?'],
-                'value' => ['[[:<:]]' . $strValue . '[[:>:]]']
+                'value' => ['(^|[^a-zA-Z0-9_])' . $fragment . '([^a-zA-Z0-9_]|$)']
             ]);
 
             if ($objEntities) {

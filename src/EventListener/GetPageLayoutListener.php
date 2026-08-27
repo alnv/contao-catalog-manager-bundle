@@ -43,7 +43,7 @@ class GetPageLayoutListener
         }
 
         if (!$strAlias) {
-            $strAlias = Input::get('auto_item');
+            $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
         }
 
         $arrMaster = (new Master($strTable, [
