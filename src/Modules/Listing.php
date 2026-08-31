@@ -39,12 +39,14 @@ class Listing extends Hybrid
             return null;
         }
 
-        if ((($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '') && $this->cmMasterModule) {
+
+        if (($_GET['auto_item'] ?? '') && $this->cmMasterModule) {
             return Controller::getFrontendModule($this->cmMasterModule);
         }
 
         $this->strKey = $this->type;
         $this->typePrefix = $this->strTable == 'tl_module' ? 'mod_' : 'ce_';
+
         if ($this->customTpl && Mode::get() == 'FE') {
             $this->strTemplate = $this->customTpl;
         }
