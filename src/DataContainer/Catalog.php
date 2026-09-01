@@ -16,6 +16,7 @@ use Contao\Input;
 use Contao\Message;
 use Contao\StringUtil;
 use Contao\System;
+use Terminal42\DcMultilingualBundle\Driver;
 
 class Catalog
 {
@@ -257,18 +258,21 @@ class Catalog
 
     public function getDbFields(DataContainer $dc): array
     {
-
         $arrReturn = [];
-
-        if ($dc->activeRecord === null || !$dc->activeRecord->dbTable) {
+        if (!$dc->activeRecord || !$dc->activeRecord->dbTable) {
             return $arrReturn;
         }
 
         System::loadLanguageFile($dc->activeRecord->dbTable);
         Controller::loadDataContainer($dc->activeRecord->dbTable);
 
+        $strTable = ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['config']['_table'] ?? '');
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['fields'] as $strField => $arrField) {
-            $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
+            $arrReturn[$strField] = $strTable . '.' . $strField;
+
+            if ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['config']['dataContainer'] == Driver::class && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
+                $arrReturn['translation.' . $strField] =  'translation.' . $strField;
+            }
         }
 
         return $arrReturn;

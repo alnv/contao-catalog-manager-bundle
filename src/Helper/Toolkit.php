@@ -49,6 +49,15 @@ class Toolkit
         return $objCatalogData->save()->row();
     }
 
+    public static function addTableToField($field, $table = '')
+    {
+        if (\str_contains($field, '.')) {
+            return $field;
+        }
+
+        return ($table ? $table . '.' : '') . $field;
+    }
+
     public static function getDetailPageFromEntityByIdAndTable($strTable, $strId, $blnPreview = true): string
     {
 
@@ -800,7 +809,7 @@ class Toolkit
         if (!$arrActiveRecord['id']) {
             return;
         }
-        
+
         $strAlias = Input::post('alias') ?: ''; // $arrActiveRecord['alias'] ?? '';
 
         if (!$strAlias) {
