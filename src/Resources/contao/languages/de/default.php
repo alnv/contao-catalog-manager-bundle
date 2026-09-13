@@ -9,10 +9,12 @@ $GLOBALS['TL_LANG']['MSC']['optionSourceDbFilterValue'] = ['Werte', ''];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbWizardFilterSettings'] = ['Filtereinstellungen', ''];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrderField'] = ['Sortierungsfeld', ''];
 $GLOBALS['TL_LANG']['MSC']['optionSourceDbOrder'] = ['Reihenfolge', ''];
+
 $GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbFilterType'] = [
     'expert' => 'Experte',
     'wizard' => 'Wizard (Klassisch)'
 ];
+
 $GLOBALS['TL_LANG']['MSC']['reference']['optionSourceDbOrder'] = [
     'asc' => 'Aufsteigend',
     'desc' => 'Absteigend'
