@@ -357,10 +357,9 @@ class Toolkit
         }
 
         if ($varPage->type == 'filter') {
-
             $strUrlFragments = [];
+            
             foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
-
                 $strFieldName = $objPageFilter->getAlias();
                 $strFieldValue = $arrEntity['origin'][$strFieldName] ?? '';
 

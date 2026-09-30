@@ -20,7 +20,6 @@ class Image
         $arrUuids = StringUtil::deserialize($strUuid, true);
 
         foreach ($arrUuids as $strUuid) {
-
             if (!Validator::isUuid($strUuid)) {
                 continue;
             }
@@ -108,7 +107,6 @@ class Image
 
     public static function getUuids($strUuid): array
     {
-
         $arrReturn = [];
         $arrUuids = StringUtil::deserialize($strUuid, true);
 

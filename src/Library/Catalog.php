@@ -21,7 +21,6 @@ class Catalog extends CatalogWizard
 
     public function __construct($strIdentifier)
     {
-
         if ($strIdentifier === null) {
             return;
         }
@@ -42,7 +41,6 @@ class Catalog extends CatalogWizard
 
     protected function setAllFields(): void
     {
-
         if (!($this->arrCatalog['table'] ?? '')) {
             return;
         }

@@ -282,7 +282,6 @@ abstract class View extends Controller
 
     protected function parseEntity($arrEntity)
     {
-
         $arrRow = [];
         $arrRow['origin'] = [];
         $arrRow['_table'] = $this->strTable;
@@ -298,6 +297,7 @@ abstract class View extends Controller
                 'stringMode' => $this->arrOptions['stringMode'] ?? false,
                 'ignoreFieldsFromParsing' => $this->arrOptions['ignoreFieldsFromParsing'] ?? []
             ]);
+
             if ($strParsedValue !== $varValue) {
                 if ($this->validOrigin($varValue, $strField)) {
                     if (Validator::isBinaryUuid($varValue)) {
@@ -322,7 +322,6 @@ abstract class View extends Controller
         };
 
         $arrRow['getRelated'] = function ($strField) use ($arrRow) {
-
             if (empty($arrRow[$strField])) {
                 return [];
             }
@@ -340,7 +339,6 @@ abstract class View extends Controller
             $varValues = $arrRow[$strField];
 
             if (isset($arrRow['origin'][$strField])) {
-
                 $varOriginValues = StringUtil::deserialize($arrRow['origin'][$strField]);
                 if (\is_string($varOriginValues)) {
                     $varOriginValues = explode(',', $varOriginValues);
@@ -352,7 +350,6 @@ abstract class View extends Controller
             }
 
             foreach ($varValues as $varValue) {
-
                 if (\is_string($varValue) || \is_numeric($varValue)) {
                     $arrValues[] = $varValue;
                     continue;
@@ -364,7 +361,6 @@ abstract class View extends Controller
                 }
 
                 $varValue = \array_values(($varValue ?? []));
-
                 foreach ($varValue as $strValue) {
 
                     if ($strValue == '' || $strValue == null) {
@@ -466,7 +462,6 @@ abstract class View extends Controller
 
     protected function parseField($varValue, $strField, $arrValues, $arrOptions = [])
     {
-
         $blnFastMode = $arrOptions['fastMode'] ?? false;
         $blnStringMode = $arrOptions['stringMode'] ?? false;
         $arrIgnoreFieldsFromParsing = $arrOptions['ignoreFieldsFromParsing'] ?? [];
