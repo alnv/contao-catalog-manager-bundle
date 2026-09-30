@@ -24,7 +24,6 @@ class GetSearchablePagesListener
 
     public function getSearchablePagesByPagesRoles($arrPages, $intRoot = 0, $blnIsSitemap = false, $language = '')
     {
-
         $objCatalogFields = CatalogFieldModel::findAll([
             'column' => ['tl_catalog_field.role=? OR tl_catalog_field.role=?'],
             'value' => ['pages', 'page']
@@ -40,7 +39,6 @@ class GetSearchablePagesListener
         }
 
         while ($objCatalogFields->next()) {
-
             $strFieldname = $objCatalogFields->fieldname;
             if (!$strFieldname) {
                 continue;
@@ -75,7 +73,7 @@ class GetSearchablePagesListener
 
                     if (is_array($varPages) && !empty($varPages)) {
                         foreach ($varPages as $arrUrl) {
-                            if (!isset( $arrUrl['absolute'])) {
+                            if (!isset($arrUrl['absolute'])) {
                                 continue;
                             }
                             
@@ -132,7 +130,6 @@ class GetSearchablePagesListener
 
 
             if ($blnVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
-
                 Controller::loadDataContainer($strTable);
 
                 if (!isset($arrFilter['column']) || !\is_array($arrFilter['column'])) {
@@ -157,7 +154,6 @@ class GetSearchablePagesListener
             }
 
             while ($objEntities->next()) {
-
                 if (!$objEntities->alias) {
                     continue;
                 }

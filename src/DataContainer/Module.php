@@ -18,7 +18,6 @@ class Module
 
     public function getFields($dc = null): array
     {
-
         $arrReturn = [];
 
         if ($dc === null) {

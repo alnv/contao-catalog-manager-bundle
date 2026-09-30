@@ -34,6 +34,10 @@ class SitemapListener
         $arrPages = \array_values(\array_unique($arrPages));
 
         foreach ($arrPages as $strPage) {
+            if (!$strPage) {
+                continue;
+            }
+
             $objEvent->addUrlToDefaultUrlSet($strPage);
         }
     }

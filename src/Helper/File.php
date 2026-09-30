@@ -18,7 +18,6 @@ class File
 
     public static function sendFileToBrowser($arrFiles, $blnInline = false)
     {
-
         $strFile = Input::get('file');
         if (!$strFile) {
             return null;
@@ -45,7 +44,6 @@ class File
 
     public static function getFile($strUuid, &$arrFiles = [], $arrOrderField = [])
     {
-
         $arrValues = StringUtil::deserialize($strUuid, true);
         $objFiles = FilesModel::findMultipleByUuids($arrValues);
         if ($objFiles === null) {
@@ -56,7 +54,6 @@ class File
         $allowedDownload = StringUtil::trimsplit(',', strtolower(Config::get('allowedDownload')));
 
         while ($objFiles->next()) {
-
             if (isset($arrFiles[$objFiles->path]) || !file_exists(System::getContainer()->getParameter('kernel.project_dir') . '/' . $objFiles->path)) {
                 continue;
             }
@@ -73,14 +70,20 @@ class File
                     $arrMeta['title'] = StringUtil::specialchars($objFiles->basename);
                 }
 
-                $strHref = Environment::get('request');
+                $href = Environment::get('request');
                 if (isset($_GET['file'])) {
-                    $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
+                    $href = \preg_replace('/([?&])file=[^&]*&?/', '$1', $href);
                 }
+
                 if (isset($_GET['cid'])) {
-                    $strHref = preg_replace('/(&(amp;)?|\?)cid=\d+/', '', $strHref);
+                    $href = \preg_replace('/([?&])cid=\d+&?/', '$1', $href);
                 }
-                $strHref .= (strpos($strHref, '?') !== false ? '&amp;' : '?') . 'file=' . System::urlEncode($objFiles->path);
+
+                $href = \preg_replace('/\?&/', '?', $href);
+                $href = \preg_replace('/&&+/', '&', $href);
+                $href = \rtrim($href, '?&');
+                $href .= (\strpos($href, '?') !== false ? '&amp;' : '?')
+                    . 'file=' . System::urlEncode($objFiles->path);
 
                 $arrFiles[$objFiles->path] = [
                     'id' => $objFiles->id,
@@ -89,7 +92,7 @@ class File
                     'title' => StringUtil::specialchars(sprintf($GLOBALS['TL_LANG']['MSC']['download'], $objFile->basename)),
                     'link' => $arrMeta['title'],
                     'caption' => $arrMeta['caption'] ?? '',
-                    'href' => $strHref,
+                    'href' => $href,
                     'icon' => Image::getPath($objFile->icon),
                     'mime' => $objFile->mime,
                     'meta' => $arrMeta,
