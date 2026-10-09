@@ -3,17 +3,18 @@
 namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Contao\CoreBundle\Framework\ContaoFramework;
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Database;
+use Contao\System;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Psr\Log\LogLevel;
 
 class DoctrineSchemaListener
 {
-    public function __construct(
-        private readonly ContaoFramework $framework,
-        private readonly Registry        $doctrine,
-    )
+    public function __construct(private readonly ContaoFramework $framework, private readonly Registry $doctrine)
     {
+        //
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
@@ -23,57 +24,76 @@ class DoctrineSchemaListener
         }
 
         $schema = $event->getSchema();
-        $objCatalogs = Database::getInstance()->prepare('SELECT * FROM tl_catalog ORDER BY `table`')->execute();
+        $catalogs = Database::getInstance()
+            ->prepare('SELECT * FROM tl_catalog ORDER BY `table`')
+            ->execute();
 
-        while ($objCatalogs->next()) {
-
-            if (!$objCatalogs->table) {
+        while ($catalogs->next()) {
+            if (!$catalogs->table) {
                 continue;
             }
 
-            $objTable = $schema->hasTable($objCatalogs->table) ? $schema->getTable($objCatalogs->table) : $schema->createTable($objCatalogs->table);
-            $arrFields = Database::getInstance()->listFields($objCatalogs->table);
+            $table = $schema->hasTable($catalogs->table) ? $schema->getTable($catalogs->table) : $schema->createTable($catalogs->table);
+            $fields = Database::getInstance()->listFields($catalogs->table);
 
-            foreach ($arrFields as $strIndex => $arrField) {
-
-                $strField = $arrField['name'];
-
-                if (in_array($strIndex, ['PRIMARY', 'alias'])) {
+            foreach ($fields as $strIndex => $fieldData) {
+                $field = $fieldData['name'] ?? '';
+                if (\in_array($strIndex, ['PRIMARY', 'alias'])) {
                     continue;
                 }
 
-                $default = $arrField['default'];
-                $unsigned = ($arrField['attributes'] ?? '') == 'unsigned';
-                $notnull = ($arrField['null'] ?? '') == 'NOT NULL';
-                $autoincrement = ($arrField['extra'] ?? '') == 'auto_increment';
+                $unsigned = ($fieldData['attributes'] ?? '') === 'unsigned';
+                $notnull = ($fieldData['null'] ?? '') === 'NOT NULL';
+                $autoincrement = ($fieldData['extra'] ?? '') === 'auto_increment';
 
-                $origin_type = strtok(strtolower($arrField['origtype']), '(), ');
+                $origType = \strtolower($fieldData['origtype'] ?? '');
+
+                $origin_type = $origType;
+                $precision = null;
+                $scale = null;
+
+                if (\preg_match('/^([a-z]+)(?:\((\d+)(?:,\s*(\d+))?\))?/i', $origType, $matches)) {
+                    $origin_type = $matches[1];
+                    $precision = isset($matches[2]) ? (int)$matches[2] : null;
+                    $scale = isset($matches[3]) ? (int)$matches[3] : null;
+                }
+
                 $connection = $this->doctrine->getConnection();
 
                 try {
-
                     $type = $connection->getDatabasePlatform()->getDoctrineTypeMapping($origin_type);
-                    $length = (int)strtok('(), ');
 
-                    $arrOptions = [
-                        'length' => $length,
+                    $options = [
                         'unsigned' => $unsigned,
-                        'fixed' => $origin_type == 'char',
-                        'default' => $default,
+                        'fixed' => $origin_type === 'char',
                         'notnull' => $notnull,
-                        'scale' => null,
-                        'precision' => null,
                         'autoincrement' => $autoincrement,
-                        'comment' => null,
                     ];
 
-                    $objTable->addColumn($strField, $type, $arrOptions);
-
-                    if ($strField == 'id') {
-                        $objTable->setPrimaryKey([$strField]);
+                    if ($type === 'decimal') {
+                        $options['precision'] = $precision ?? 10;
+                        $options['scale'] = $scale ?? 0;
+                    } elseif ($precision !== null && $precision > 0) {
+                        $options['length'] = $precision;
                     }
 
-                } catch (\Exception $objError) {}
+                    if (isset($fieldData['default'])) {
+                        if ($origin_type === 'char' && $precision === 1) {
+                            $options['default'] = \substr((string)$fieldData['default'], 0, 1);
+                        } else {
+                            $options['default'] = $fieldData['default'];
+                        }
+                    }
+
+                    $table->addColumn($field, $type, $options);
+                    if ($field == 'id') {
+                        $table->setPrimaryKey([$field]);
+                    }
+                } catch (\Exception $error) {
+                    System::getContainer()
+                        ->get('monolog.logger.contao')
+                        ->log(LogLevel::ERROR, $error->getMessage(), ['contao' => new ContaoContext(__CLASS__ . '::' . __FUNCTION__)]);
+                }
             }
         }
     }
