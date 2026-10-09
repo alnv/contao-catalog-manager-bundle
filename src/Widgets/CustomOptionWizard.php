@@ -13,11 +13,11 @@ use Contao\Widget;
 class CustomOptionWizard extends Widget
 {
     protected $blnSubmitInput = true;
+    
     protected $strTemplate = 'be_widget';
 
     public function __construct($arrAttributes = null)
     {
-
         parent::__construct($arrAttributes);
 
         $this->preserveTags = true;
@@ -42,17 +42,18 @@ class CustomOptionWizard extends Widget
     {
         $objCombiner = new Combiner();
         $objCombiner->add('bundles/alnvcontaocatalogmanager/js/vue/components/custom-option-wizard-field-component.js');
+
         $GLOBALS['TL_JAVASCRIPT']['custom_options'] = $objCombiner->getCombinedFile();
     }
 
     public function generate(): string
     {
-
         Toolkit::addVueJsScript('TL_JAVASCRIPT');
 
         $this->setResources();
 
         DataContainer::loadDataContainer($this->strTable);
+
         System::loadLanguageFile($this->strTable);
 
         $strFieldName = \str_replace('_' . $this->activeRecord->id, '', $this->strName);
