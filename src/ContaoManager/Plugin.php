@@ -19,7 +19,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
 
     public function getBundles(ParserInterface $parser): array
     {
-
         return [
             BundleConfig::create(AlnvContaoCatalogManagerBundle::class)
                 ->setReplace(['contao-catalog-manager-bundle'])
@@ -34,7 +33,6 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
 
     public function getRouteCollection(LoaderResolverInterface $resolver, KernelInterface $kernel)
     {
-
         return $resolver
             ->resolve(__DIR__ . '/../Resources/config/routing.yml')
             ->load(__DIR__ . '/../Resources/config/routing.yml');

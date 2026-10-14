@@ -17,7 +17,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 
@@ -85,7 +85,7 @@ class VirtualTableDataContainerProvider implements ProviderInterface
             ->withMetadata(['row' => $row]);
     }
 
-    public function isDocumentGranted(TokenInterface $token, Document $document): bool
+    public function isDocumentGranted(UserInterface $user, Document $document): bool
     {
         $document = $this->addCurrentRowToDocumentIfNotAlreadyLoaded($document);
         $row = $document->getMetadata()['row'] ?? null;
