@@ -14,7 +14,7 @@ class ModelWizard
 
         $GLOBALS['CM_TEMP_MODEL_TABLE'] = $table;
 
-        if ($model = ($GLOBALS['TL_MODELS'][$table] ?? '')) {
+        if ($model = $GLOBALS['TL_MODELS'][$table] ?? '') {
             $this->objModel = new $model();
             return;
         }
@@ -37,10 +37,6 @@ class ModelWizard
 
     protected function modelExist(string $strModel): bool
     {
-        if (\str_contains($strModel, 'Alnv\ContaoCatalogManagerBundle\Models') || \str_contains($strModel, 'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models')) {
-            return false;
-        }
-
         return \class_exists($strModel);
     }
 }
