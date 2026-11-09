@@ -16,7 +16,6 @@ class GetSearchablePagesListener
 {
     public function __invoke(array $arrPages, $intRoot = 0, bool $blnIsSitemap = false, string $language = ''): array
     {
-
         $arrPages = $this->getSearchablePages($arrPages, $intRoot, $blnIsSitemap, $language);
 
         return $this->getSearchablePagesByPagesRoles($arrPages, $intRoot, $blnIsSitemap, $language);
@@ -40,7 +39,6 @@ class GetSearchablePagesListener
         }
 
         while ($objCatalogFields->next()) {
-
             $strFieldname = $objCatalogFields->fieldname;
             if (!$strFieldname) {
                 continue;
@@ -56,7 +54,6 @@ class GetSearchablePagesListener
             }
 
             $strTable = $objCatalog->table;
-
             if (!$strTable) {
                 continue;
             }
@@ -73,10 +70,14 @@ class GetSearchablePagesListener
                     $varPages = $arrEntity[$strFieldname] ?? '';
                     $varPages = Toolkit::parseCatalogValue($varPages, Widget::getAttributesFromDca(($GLOBALS['TL_DCA'][$strTable]['fields'][$strFieldname] ?? []), $strFieldname, $varPages, $strFieldname, $strTable), $arrEntity, false);
 
-                    if (is_array($varPages) && !empty($varPages)) {
+                    if (\is_array($varPages) && !empty($varPages)) {
                         foreach ($varPages as $arrUrl) {
+                            if (!($arrUrl['absolute'] ?? null)) {
+                                continue;
+                            }
+
                             if ($strDns) {
-                                if (str_contains($arrUrl['absolute'], $strDns)) {
+                                if (\str_contains($arrUrl['absolute'], $strDns)) {
                                     $arrPages[] = $arrUrl['absolute'];
                                 }
                             } else {
@@ -93,7 +94,6 @@ class GetSearchablePagesListener
 
     public function getSearchablePages($arrPages, $intRoot = 0, $blnIsSitemap = false, $strLanguage = '')
     {
-
         $objModules = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=?')->execute('listing-table', '1');
         if (!$objModules->numRows) {
             return $arrPages;
@@ -175,7 +175,6 @@ class GetSearchablePagesListener
 
     protected function parseFilter($objModules): array
     {
-
         $arrReturn = ['column' => [], 'value' => []];
 
         if ($objModules->cmFilter) {
