@@ -12,6 +12,9 @@ services:
       - '@contao.data_container.dca_url_analyzer'
       - '@translator'
 
+  Alnv\ContaoCatalogManagerBundle\Mcp\McpCommand:
+    public: true
+
   Alnv\ContaoCatalogManagerBundle\Pages\FilterPageController:
     tags: [ contao.page ]
 

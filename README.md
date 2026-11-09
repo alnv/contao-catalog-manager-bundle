@@ -323,4 +323,84 @@ Im Feld rs_dstnc kann der Suchradius definiert werden. Hierbei werden nur Zahlen
     - rs_cntry wird zu country
     - rs_dstnc wird zu radius
 
-### Mehr Infos folgen …
+---
+
+## MCP-Server für den Catalog-Manager v4 (Contao 5.7)
+
+Mit diesem Server kann Claude den Catalog-Manager direkt bearbeiten:
+
+- **Kataloge, Felder, Optionen, Paletten** anlegen, lesen, ändern, löschen
+- **Katalogeinträge** (die Datensätze) verwalten
+- **Frontend-Ausgabe**: Listen-, Detail- und Karten-Module sowie das Inhaltselement „listview“
+- **Templates** (`cm_listing_*`, `cm_master_*` usw.) im Ordner `/templates` erstellen
+
+Alle Änderungen laufen durch dieselbe Logik wie im Contao-Backend. Die `save_callback`, `onsubmit_callback`, `oncreate_callback` und `ondelete_callback` aus den DCA-Dateien werden in derselben Reihenfolge ausgeführt. Legt Claude einen Katalog an, entsteht also auch die Datenbanktabelle. Ein neues Feld bekommt seine Spalte, beim Umbenennen wird die Spalte umbenannt.
+
+Der Server ist ein Konsolen-Befehl (`catalog:mcp`) in deinem Contao-Projekt. Claude Desktop startet ihn per SSH und spricht über stdin/stdout mit ihm. Du brauchst keinen offenen Port und keinen Webserver-Endpunkt.
+
+### 1. Mit Claude Desktop verbinden
+
+Claude Desktop → Einstellungen → Entwickler → Konfiguration bearbeiten (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "contao-catalog": {
+      "command": "ssh",
+      "args": [
+        "-T",
+        "user@dein-server.de",
+        "cd /pfad/zum/contao && php vendor/bin/contao-console catalog:mcp --env=prod"
+      ]
+    }
+  }
+}
+```
+
+Danach Claude Desktop neu starten. Unter den Werkzeugen erscheint „contao-catalog“.
+
+Voraussetzungen für SSH:
+
+- Anmeldung per **SSH-Schlüssel ohne Passwortabfrage**. Claude Desktop kann kein Passwort eintippen.
+- Die Shell auf dem Server darf beim Login **nichts auf stdout ausgeben**, z. B. kein `echo` in `.bashrc`. Sonst stört das das Protokoll.
+
+**Nur lesen:** Zum Ausprobieren `--read-only` anhängen. Dann stehen nur die lesenden Werkzeuge zur Verfügung.
+
+**Claude Code** (Terminal):
+
+```bash
+claude mcp add contao-catalog -- ssh -T user@dein-server.de "cd /pfad/zum/contao && php vendor/bin/contao-console catalog:mcp --env=prod"
+```
+
+### 2. Die Werkzeuge
+
+| Werkzeug | Zweck |
+|---|---|
+| `catalog_overview` | Alle Kataloge mit Tabelle, Feldern, Anzahl Einträge, dazu die Module und Inhaltselemente |
+| `config_describe` | **Konfigurationsmöglichkeiten** einer Tabelle: aktive Felder, Pflichtfelder, erlaubte Optionen. Mit `context` eine andere Palette wählen, z. B. `{"type":"select"}` |
+| `record_list` / `record_get` | Datensätze lesen (Filter, Sortierung, Spaltenauswahl) |
+| `record_create` | Anlegen (mit `pid` für Felder, Optionen, Paletten; mit `pid` + `ptable` für Inhaltselemente) |
+| `record_update` | Felder ändern |
+| `record_delete` | Löschen, ohne `confirm=true` nur Vorschau. Vorher wird eine JSON-Sicherung angelegt |
+| `template_list` / `template_read` | Eigene Templates und Standard-Templates des Bundles |
+| `template_context` | Felder, Rollen und Template-Variablen eines Katalogs, damit Templates passen |
+| `template_write` / `template_delete` | Template schreiben (mit PHP-Syntaxprüfung) bzw. entfernen (mit Sicherung) |
+
+**Freigegebene Tabellen:** `tl_catalog`, `tl_catalog_field`, `tl_catalog_option`, `tl_catalog_palette`, die Datentabellen der Kataloge sowie `tl_module` und `tl_content`. Bei den letzten beiden sind nur die Catalog-Manager-Typen erlaubt (`listing-table`, `master`, `listing-map`, `listview`).
+
+## 3. Beispiele für Anfragen an Claude
+
+- *„Zeig mir alle Kataloge und welche Felder sie haben.“*
+- *„Welche Einstellungen gibt es für ein Auswahlfeld (select)?“*
+- *„Leg einen Katalog ‚Veranstaltungen‘ mit der Tabelle tl_cm_events an, mit den Feldern Titel (Rolle title), Datum, Ort und Kategorie als Auswahl mit den Optionen Konzert, Lesung, Workshop.“*
+- *„Erstelle ein Listen-Modul und ein Detail-Modul für die Veranstaltungen.“*
+- *„Schreib ein Listen-Template cm_listing_events als Karte mit Datum, Titel und Ort und stell es im Listen-Modul ein.“*
+- *„Leg drei Beispiel-Einträge an.“*
+
+## 4. Sicherheit und Grenzen
+
+- **Volle Datenbankrechte:** Der Server läuft mit den Datenbank-Zugangsdaten von Contao, ohne Backend-Benutzer und ohne Rechteprüfung. Wer den SSH-Zugang hat, kann alles, was die Werkzeuge erlauben.
+- **Vorher sichern:** Erst auf einer Staging-Kopie oder mit einem aktuellen Datenbank-Backup ausprobieren.
+- **Keine Versionierung:** Änderungen erzeugen keine Contao-Versionen (`tl_version`) und kein „Wiederherstellen“. Gelöschte Datensätze liegen als JSON in `var/catalog-mcp/backups/`, ersetzte oder gelöschte Templates in `var/catalog-mcp/templates/`.
+- **onload_callbacks:** Sie werden nur für `tl_catalog_palette` ausgeführt, weil dort die Palette vom Datensatz abhängt. Die anderen brauchen einen angemeldeten Backend-Benutzer. Deshalb zeigt `config_describe` bei Katalogen vom Typ „Modifier“ (Erweiterung bestehender Tabellen) evtl. mehr Felder als das Backend.
+- **Templates:** Nur `.html5`-Templates mit Catalog-Manager-Präfix. Erscheint ein neues Template im Backend nicht in der Auswahl, `cache:clear --env=prod` ausführen. Templates in Unterordnern müssen im Theme als Template-Ordner eingetragen sein.
