@@ -10,6 +10,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\DcaExtractor;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Library\ShareButtons;
+use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
 use Contao\Config;
 use Contao\ContentModel;
 use Contao\Controller;
@@ -18,6 +19,7 @@ use Contao\Database;
 use Contao\Date;
 use Contao\FrontendTemplate;
 use Contao\Input;
+use Contao\Model;
 use Contao\PageModel;
 use Contao\Pagination;
 use Contao\StringUtil;
@@ -33,6 +35,7 @@ abstract class View extends Controller
     protected array $arrOptions = [];
     protected array $arrEntities = [];
     protected ?DcaExtractor $dcaExtractor = null;
+    protected array $arrCountCache = [];
 
     public function __construct(string $strTable, array $arrOptions = [])
     {
@@ -118,10 +121,9 @@ abstract class View extends Controller
         $this->arrOptions['limit'] ??= 0;
 
         $objModel = (new ModelWizard($this->strTable))->getModel();
-        $objTotal = $objModel->findAll($arrOptions);
+        $numTotal = $this->countEntities($objModel, $arrOptions);
 
-        if ($objTotal !== null) {
-            $numTotal = $objTotal->count();
+        if ($numTotal > 0) {
             Cache::set('limit_' . $this->arrOptions['id'], $numTotal);
         }
 
@@ -153,6 +155,38 @@ abstract class View extends Controller
 
         $this->arrOptions['offset'] = ($numOffset - 1) * $this->arrOptions['limit'];
         $this->arrOptions['total'] = $numTotal;
+    }
+
+    protected function countEntities(?Model $objModel, array $arrOptions): int
+    {
+        if ($objModel === null) {
+            return 0;
+        }
+
+        unset($arrOptions['limit'], $arrOptions['offset'], $arrOptions['order']);
+        $strKey = md5($this->strTable . serialize($arrOptions));
+
+        if (isset($this->arrCountCache[$strKey])) {
+            return $this->arrCountCache[$strKey];
+        }
+
+        $intCount = null;
+
+        if ($objModel instanceof DynModel) {
+            try {
+                $intCount = $objModel::countWithOptions($arrOptions);
+            } catch (\Throwable) {
+                // Fallback, z. B. wenn ein dynModelBuildFindQuery-Hook die Query für eine Subquery unbrauchbar macht
+                $intCount = null;
+            }
+        }
+
+        if ($intCount === null) {
+            $objCollection = $objModel->findAll($arrOptions);
+            $intCount = $objCollection !== null ? $objCollection->count() : 0;
+        }
+
+        return $this->arrCountCache[$strKey] = $intCount;
     }
 
     protected function initializeDataContainer(): void
@@ -230,6 +264,8 @@ abstract class View extends Controller
 
     protected function parseEntity($arrEntity): array
     {
+        $this->addCacheTags($arrEntity);
+
         $arrRow = [
             'origin' => [],
             '_table' => $this->strTable,
@@ -373,6 +409,38 @@ abstract class View extends Controller
         }
 
         return $arrEntity;
+    }
+
+    /**
+     * Response mit Cache-Tags versehen (contao.db.<tabelle> und contao.db.<tabelle>.<id>).
+     * DC_Table invalidiert genau diese Tags beim Speichern/Löschen im Backend – Seiten mit
+     * Katalogdaten werden dadurch sofort aktualisiert, statt bis zum Ablauf der Shared-Max-Age
+     * veraltet im Reverse-Proxy zu liegen.
+     */
+    protected function addCacheTags(array $arrEntity): void
+    {
+        static $objEntityTags = false;
+
+        if ($objEntityTags === false) {
+            $objContainer = System::getContainer();
+            $objEntityTags = $objContainer->has('contao.cache.entity_tags') ? $objContainer->get('contao.cache.entity_tags') : null;
+        }
+
+        if ($objEntityTags === null || !$this->strTable) {
+            return;
+        }
+
+        $arrTags = ['contao.db.' . $this->strTable];
+
+        if (!empty($arrEntity['id'])) {
+            $arrTags[] = 'contao.db.' . $this->strTable . '.' . $arrEntity['id'];
+        }
+
+        try {
+            $objEntityTags->tagWith($arrTags);
+        } catch (\Throwable) {
+            // Tagging ist optional (z. B. CLI ohne Response-Tagger)
+        }
     }
 
     protected function parseField($varValue, $strField, $arrValues, $arrOptions = [])

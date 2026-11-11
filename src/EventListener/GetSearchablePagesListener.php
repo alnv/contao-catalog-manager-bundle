@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
@@ -44,10 +45,7 @@ class GetSearchablePagesListener
                 continue;
             }
 
-            $objCatalog = CatalogModel::findAll([
-                'column' => ['tl_catalog.id=?'],
-                'value' => [$objCatalogFields->pid]
-            ]);
+            $objCatalog = CatalogModel::findByPk($objCatalogFields->pid);
 
             if ($objCatalog === null) {
                 continue;
@@ -55,15 +53,21 @@ class GetSearchablePagesListener
 
             $strTable = $objCatalog->table;
 
-            if (!$strTable) {
+            if (!$strTable || !CatalogTableGuard::isValidIdentifier($strTable)) {
                 continue;
+            }
+
+            Controller::loadDataContainer($strTable);
+
+            // Nur sichtbare Einträge berücksichtigen (vorher: alle, auch unveröffentlichte)
+            $arrFindOptions = [];
+            if ($objCatalog->enableVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
+                $arrFindOptions['column'] = [$this->getVisibilityColumn(($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable)];
             }
 
             $objModel = new ModelWizard($strTable);
             $objModel = $objModel->getModel();
-            $objEntities = $objModel->findAll();
-
-            Controller::loadDataContainer($strTable);
+            $objEntities = $objModel->findAll($arrFindOptions);
 
             if ($objEntities) {
                 while ($objEntities->next()) {
@@ -120,6 +124,12 @@ class GetSearchablePagesListener
                 continue;
             }
 
+            // Unveröffentlichte, geschützte oder per robots/noSearch ausgeschlossene Detailseiten
+            // gehören nicht in Sitemap/Suchindex
+            if (!$this->isIndexablePage($objPage, $blnIsSitemap)) {
+                continue;
+            }
+
             if ($objPage->language != $strLanguage) {
                 continue;
             }
@@ -136,9 +146,8 @@ class GetSearchablePagesListener
                     $arrFilter['column'] = [];
                 }
 
-                $intTime = Date::floorToMinute();
                 $strTable = ($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable;
-                $arrFilter['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
+                $arrFilter['column'][] = $this->getVisibilityColumn($strTable);
             }
 
             $objModel = new ModelWizard($strTable);
@@ -171,6 +180,39 @@ class GetSearchablePagesListener
         }
 
         return $arrPages;
+    }
+
+    protected function getVisibilityColumn(string $strTable): string
+    {
+        $intTime = Date::floorToMinute();
+        $strQuoted = Database::quoteIdentifier($strTable);
+
+        return sprintf(
+            "(%1\$s.start='' OR %1\$s.start<='%2\$d') AND (%1\$s.stop='' OR %1\$s.stop>'%3\$d') AND %1\$s.published='1'",
+            $strQuoted,
+            $intTime,
+            $intTime + 60
+        );
+    }
+
+    protected function isIndexablePage(PageModel $objPage, bool $blnIsSitemap): bool
+    {
+        $intTime = time();
+
+        if (!$objPage->published || ($objPage->start && $objPage->start > $intTime) || ($objPage->stop && $objPage->stop <= $intTime)) {
+            return false;
+        }
+
+        // Geschützte Seiten (Mitgliederbereich) nicht veröffentlichen – wie Contaos eigener Sitemap-Generator
+        if ($objPage->protected) {
+            return false;
+        }
+
+        if ($blnIsSitemap) {
+            return !\str_starts_with((string)$objPage->robots, 'noindex');
+        }
+
+        return !$objPage->noSearch;
     }
 
     protected function parseFilter($objModules): array

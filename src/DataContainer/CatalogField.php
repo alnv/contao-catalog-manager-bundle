@@ -5,6 +5,7 @@ namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as LDatabase;
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Contao\Config;
@@ -99,6 +100,11 @@ class CatalogField
 
         if (preg_match('/[\'^£$%&*()}{@#~?><>,|=+¬-]/', $strFieldname)) {
             throw new \Exception('special characters are not allowed');
+        }
+
+        // Spaltennamen landen in DDL-Statements → nur Buchstaben, Ziffern, Unterstrich
+        if (!CatalogTableGuard::isValidIdentifier((string)$strFieldname)) {
+            throw new \Exception(sprintf('Invalid field name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strFieldname));
         }
 
         if (in_array($strFieldname, (new Catalog(null))->getDefaultFieldnames())) {

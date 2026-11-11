@@ -23,6 +23,7 @@
     }
   },
   "require": {
+    "php": "^8.3",
     "contao/core-bundle": "~5.7",
     "terminal42/dcawizard": "^3.0",
     "alnv/translation-manager-bundle": "^3.0",
@@ -30,7 +31,13 @@
     "alnv/catalog-manager-multilingual-adapter-bundle": "^4.0",
     "alnv/contao-geocoding": "^3.0",
     "guzzlehttp/guzzle": "^7.10",
-    "php-mcp/server": "^3.3"
+    "symfony/rate-limiter": "^7.4"
+  },
+  "suggest": {
+    "php-mcp/server": "^3.3 – aktiviert den CLI-Befehl catalog:mcp (MCP-Server über stdio) für KI-Assistenten"
+  },
+  "conflict": {
+    "php-mcp/server": "<3.3"
   },
   "extra": {
     "contao-manager-plugin": "Alnv\\ContaoCatalogManagerBundle\\ContaoManager\\Plugin"

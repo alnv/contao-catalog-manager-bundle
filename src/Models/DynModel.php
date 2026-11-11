@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Models;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Contao\Database;
 use Contao\DcaExtractor;
@@ -16,14 +17,16 @@ class DynModel extends Model
 
     public function __construct($objResult = null)
     {
-        if (System::getContainer()
-                ->get('contao.routing.scope_matcher')
-                ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
-            self::$strTable = Toolkit::getTableByDo();
-        }
+        if (static::class === self::class) {
+            if (System::getContainer()
+                    ->get('contao.routing.scope_matcher')
+                    ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
+                self::$strTable = Toolkit::getTableByDo();
+            }
 
-        if (($GLOBALS['CM_TEMP_MODEL_TABLE'] && self::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE'])) {
-            self::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
+            if (($GLOBALS['CM_TEMP_MODEL_TABLE'] ?? null) && self::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE']) {
+                self::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
+            }
         }
 
         parent::__construct($objResult);
@@ -31,14 +34,18 @@ class DynModel extends Model
 
     public static function createDynTable($strTable, $objResult = null)
     {
-        self::$strTable = $strTable;
+        if (static::class !== self::class && static::$strTable === $strTable) {
+            return new static($objResult);
+        }
 
-        return new self($objResult);
+        $strClass = ModelWizard::getModelClassForTable(static::class, (string)$strTable);
+
+        return new $strClass($objResult);
     }
 
     public static function findByIdOrAlias($varId, array $arrOptions = [])
     {
-        $t = self::$strTable;
+        $t = static::$strTable;
 
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
             $arrOptions['column'] = [];
@@ -53,12 +60,33 @@ class DynModel extends Model
         $arrOptions['limit'] = 1;
         $arrOptions['return'] = 'Model';
 
-        return self::find($arrOptions);
+        return static::find($arrOptions);
+    }
+
+    public static function countWithOptions(array $arrOptions = []): int
+    {
+        unset($arrOptions['limit'], $arrOptions['offset'], $arrOptions['order']);
+
+        $arrOptions['table'] = static::$strTable;
+
+        $strQuery = 'SELECT COUNT(*) AS cnt FROM (' . static::buildFindQuery($arrOptions) . ') AS cm_count';
+
+        $arrValues = [];
+        if (isset($arrOptions['value'])) {
+            $arrValues = \is_array($arrOptions['value']) ? array_values($arrOptions['value']) : [$arrOptions['value']];
+        }
+
+        return (int)Database::getInstance()->prepare($strQuery)->execute(...$arrValues)->cnt;
     }
 
     protected static function buildFindQuery(array $arrOptions): string
     {
         $strTable = $arrOptions['table'];
+
+        if (!\is_string($strTable) || !\preg_match('/^[A-Za-z0-9_]{1,64}$/', $strTable)) {
+            throw new \InvalidArgumentException('Invalid table name.');
+        }
+
         $objBase = DcaExtractor::getInstance($strTable);
         $strDistanceSelection = '';
 

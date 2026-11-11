@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
@@ -11,6 +12,7 @@ use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
 use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
 use Contao\BackendTemplate;
 use Contao\Controller;
+use Contao\Database;
 use Contao\Hybrid;
 use Contao\Input;
 use Contao\StringUtil;
@@ -18,12 +20,10 @@ use Contao\System;
 
 class Listing extends Hybrid
 {
-
     protected $objModel = null;
 
     public function generate()
     {
-
         if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
@@ -198,17 +198,74 @@ class Listing extends Hybrid
                 if (!$this->arrOptions['order']) {
                     $this->arrOptions['order'] = '';
                 }
-                if (!empty($arrIds)) {
+                $arrIds = array_values(array_filter(array_map('intval', $arrIds)));
+                if (!empty($arrIds) && CatalogTableGuard::isValidIdentifier((string)$this->cmTable)) {
                     $this->arrOptions['order'] .= ($this->arrOptions['order'] ? ',' : '') . ('FIELD(' . $this->cmTable . '.id,' . implode(',', $arrIds) . ')');
                 }
             }
         }
 
-        $arrInputOrder = Input::get('order') ?? [];
-        if (\is_array($arrInputOrder) && !empty($arrInputOrder)) {
-            if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
-                $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
+        $this->setOrderFromRequest();
+    }
+
+    protected function setOrderFromRequest(): void
+    {
+        $arrInputOrder = Input::get('order');
+
+        if (!\is_array($arrInputOrder) || empty($arrInputOrder)) {
+            return;
+        }
+
+        $strOwnId = (string)$this->id;
+
+        if (isset($arrInputOrder['field'])) {
+            $arrOrders = [$arrInputOrder];
+        } else {
+            $strDefaultId = isset($arrInputOrder['id']) && !\is_array($arrInputOrder['id']) ? (string)$arrInputOrder['id'] : null;
+            $arrOrders = array_map(static function (array $arrOrder) use ($strDefaultId): array {
+                $arrOrder['id'] ??= $strDefaultId;
+                return $arrOrder;
+            }, array_values(array_filter($arrInputOrder, 'is_array')));
+        }
+
+        $arrOrders = array_filter($arrOrders, static fn (array $arrOrder): bool => isset($arrOrder['id']) && !\is_array($arrOrder['id']) && (string)$arrOrder['id'] === $strOwnId);
+
+        if (empty($arrOrders)) {
+            return;
+        }
+
+        $strTable = (string)$this->cmTable;
+        if (!CatalogTableGuard::isValidIdentifier($strTable)) {
+            return;
+        }
+
+        Controller::loadDataContainer($strTable);
+        $strRealTable = (string)(($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable);
+        if (!CatalogTableGuard::isValidIdentifier($strRealTable)) {
+            return;
+        }
+
+        $objConnection = System::getContainer()->get('database_connection');
+        $objDatabase = Database::getInstance();
+        $arrStatements = [];
+
+        foreach ($arrOrders as $arrOrder) {
+            $strField = \is_string($arrOrder['field'] ?? null) ? $arrOrder['field'] : '';
+            $strDirection = \is_string($arrOrder['order'] ?? null) ? strtoupper($arrOrder['order']) : 'ASC';
+
+            if (!\in_array($strDirection, ['ASC', 'DESC'], true) || !CatalogTableGuard::isValidIdentifier($strField)) {
+                continue;
             }
+
+            if (!isset($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]) || !$objDatabase->fieldExists($strField, $strRealTable)) {
+                continue;
+            }
+
+            $arrStatements[] = $objConnection->quoteIdentifier($strRealTable) . '.' . $objConnection->quoteIdentifier($strField) . ' ' . $strDirection;
+        }
+
+        if (!empty($arrStatements)) {
+            $this->arrOptions['order'] = implode(', ', $arrStatements);
         }
     }
 

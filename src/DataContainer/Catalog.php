@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
@@ -195,12 +196,23 @@ class Catalog
             return '';
         }
 
-        if ($strTable == $objDataContainer->activeRecord->table && Database::getInstance()->tableExists($strTable, true)) {
+        // Tabellennamen landen in DDL-Statements → nur Buchstaben, Ziffern, Unterstrich
+        if (!CatalogTableGuard::isValidIdentifier((string)$strTable)) {
+            throw new \Exception(sprintf('Invalid table name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strTable));
+        }
+
+        $strOldTable = (string)$objDataContainer->activeRecord->table;
+        $intCatalogId = (int)$objDataContainer->activeRecord->id;
+
+        if ($strTable == $strOldTable && Database::getInstance()->tableExists($strTable, true)) {
             return $strTable;
         }
 
-        if ($strTable != $objDataContainer->activeRecord->table && $objDataContainer->activeRecord->table) {
-            if (!$objDatabaseBuilder->renameTable($objDataContainer->activeRecord->table, $strTable)) {
+        if ($strTable != $strOldTable && $strOldTable) {
+            if (CatalogTableGuard::isProtectedTable($strOldTable, $intCatalogId)) {
+                // Fremde Tabelle (Core/Erweiterung/anderer Katalog) nie umbenennen – neue Tabelle anlegen
+                Message::addInfo(sprintf('Table "%s" does not belong exclusively to the catalog manager and was not renamed.', $strOldTable));
+            } elseif (!$objDatabaseBuilder->renameTable($strOldTable, $strTable, $intCatalogId)) {
                 throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
             }
         }
@@ -224,16 +236,25 @@ class Catalog
     public function deleteTable(DataContainer $objDataContainer)
     {
 
-        if (!$objDataContainer->activeRecord->table) {
+        $strTable = (string)$objDataContainer->activeRecord->table;
+
+        if (!$strTable) {
             return null;
         }
 
-        if (($GLOBALS['TL_DCA'][$objDataContainer->activeRecord->table]['config']['_modified'] ?? false)) {
+        if (($GLOBALS['TL_DCA'][$strTable]['config']['_modified'] ?? false)) {
+            return;
+        }
+
+        // Zusätzlich unabhängig vom geladenen DCA: Core-/Erweiterungs-/Entity-Tabellen und
+        // Tabellen, die ein anderer Katalog nutzt, werden nie gelöscht.
+        if (CatalogTableGuard::isProtectedTable($strTable, (int)$objDataContainer->activeRecord->id)) {
+            Message::addInfo(sprintf('Table "%s" was not deleted because it does not belong exclusively to this catalog.', $strTable));
             return;
         }
 
         $objDatabaseBuilder = new CatalogDatabase();
-        $objDatabaseBuilder->deleteTable($objDataContainer->activeRecord->table);
+        $objDatabaseBuilder->deleteTable($strTable, (int)$objDataContainer->activeRecord->id);
     }
 
     public function getOrderByStatements(): array

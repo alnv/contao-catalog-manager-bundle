@@ -3,10 +3,8 @@
 namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
-use Contao\ArticleModel;
-use Contao\ContentModel;
-use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\Database;
+use Contao\Date;
 use Contao\Input;
 use Contao\LayoutModel;
 use Contao\PageModel;
@@ -15,6 +13,14 @@ use Contao\System;
 
 class GetPageLayoutListener
 {
+    /**
+     * Bereits aufgelöste Detailansichten pro Request (Seite + Alias), damit Layout-Hook und
+     * AJAX-Controller nicht mehrfach parsen.
+     *
+     * @var array<string, array{table: string, alias: string}|null>
+     */
+    private static array $arrResolved = [];
+
     public function __invoke(PageModel $pageModel, LayoutModel $layout, PageRegular $pageRegular): void
     {
         if (!isset($_GET['auto_item'])) {
@@ -24,10 +30,25 @@ class GetPageLayoutListener
         $this->getMasterByPageId($pageModel->id);
     }
 
-    public function getMasterByPageId($strPageId, $strAlias=null) {
+    public function getMasterByPageId($strPageId, $strAlias = null)
+    {
+        if (!$strAlias) {
+            $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
+        }
+
+        $strKey = (int)$strPageId . '|' . $strAlias;
+
+        if (\array_key_exists($strKey, self::$arrResolved)) {
+            return null;
+        }
+
+        self::$arrResolved[$strKey] = null;
 
         $strMasterPageId = $strPageId;
-        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
+        $objModule = Database::getInstance()
+            ->prepare('SELECT cmTable, cmMasterPage FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')
+            ->limit(1)
+            ->execute('listing', '1', $strPageId);
 
         if (!$objModule->numRows) {
 
@@ -42,10 +63,6 @@ class GetPageLayoutListener
             $strMasterPageId = $objModule->cmMasterPage;
         }
 
-        if (!$strAlias) {
-            $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
-        }
-
         $arrMaster = (new Master($strTable, [
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
@@ -54,6 +71,9 @@ class GetPageLayoutListener
 
         if (!empty($arrMaster)) {
             $GLOBALS['CM_MASTER'] = $arrMaster;
+            // Kontext merken, damit das Detail-Modul (MasterModule) das Ergebnis wiederverwenden kann
+            $GLOBALS['CM_MASTER_CONTEXT'] = ['table' => (string)$strTable, 'alias' => (string)$strAlias];
+            self::$arrResolved[$strKey] = $GLOBALS['CM_MASTER_CONTEXT'];
         }
 
         $this->setMetaInformation($strTable);
@@ -62,14 +82,16 @@ class GetPageLayoutListener
     protected function setMetaInformation($strTable = null)
     {
 
-        if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
+        if (!is_array($GLOBALS['CM_MASTER'] ?? null) || empty($GLOBALS['CM_MASTER'])) {
             return null;
         }
 
         global $objPage;
 
-        $objPage->pageTitle = strip_tags($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaTitle') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('title'));
-        $objPage->description = strip_tags(($GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('metaDescription') ?: $GLOBALS['CM_MASTER']['roleResolver']()->getValueByRole('description')));
+        $objRoleResolver = $GLOBALS['CM_MASTER']['roleResolver']();
+
+        $objPage->pageTitle = strip_tags($objRoleResolver->getValueByRole('metaTitle') ?: $objRoleResolver->getValueByRole('title'));
+        $objPage->description = strip_tags(($objRoleResolver->getValueByRole('metaDescription') ?: $objRoleResolver->getValueByRole('description')));
 
         if (isset($GLOBALS['TL_HOOKS']['setMetaInformation']) && is_array($GLOBALS['TL_HOOKS']['setMetaInformation'])) {
             foreach ($GLOBALS['TL_HOOKS']['setMetaInformation'] as $arrCallback) {
@@ -78,64 +100,44 @@ class GetPageLayoutListener
         }
     }
 
+    /**
+     * Sucht auf der Seite die Katalog-Tabelle der Detailansicht – mit einer einzigen Abfrage
+     * statt einer Abfrage pro Artikel und pro Modul (N+1).
+     *
+     * Reihenfolge wie bisher: zuerst ein Detail-Modul (cmMaster bzw. Typ "master"), danach ein
+     * Inhaltselement "listview". Anders als vorher werden dabei alle Artikel der Seite berücksichtigt
+     * (vorher wurden die listview-Elemente nur im letzten Artikel gesucht).
+     */
     protected function searchTableAndReturnTable($strPageId)
     {
+        $intTime = Date::floorToMinute();
 
-        $objArticles = ArticleModel::findByPid($strPageId);
+        $objElements = Database::getInstance()
+            ->prepare(
+                "SELECT c.type, c.cmTable AS contentTable, m.type AS moduleType, m.cmMaster, m.cmTable AS moduleTable
+                FROM tl_content c
+                INNER JOIN tl_article a ON a.id=c.pid AND c.ptable='tl_article'
+                LEFT JOIN tl_module m ON c.type='module' AND m.id=c.module
+                WHERE a.pid=? AND c.invisible=0
+                    AND (c.start='' OR c.start<=?) AND (c.stop='' OR c.stop>?)
+                    AND (c.type='listview' OR c.type='module')
+                ORDER BY a.sorting, c.sorting"
+            )
+            ->execute((int)$strPageId, $intTime, $intTime + 60);
 
-        if ($objArticles == null) {
-            return null;
-        }
+        $strListviewTable = null;
 
-        while ($objArticles->next()) {
-            if ($strTable = $this->getDetailFrontendModule(ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article'))) {
-                return $strTable;
+        while ($objElements->next()) {
+
+            if ($objElements->type === 'module' && $objElements->moduleTable && ($objElements->cmMaster || $objElements->moduleType === 'master')) {
+                return $objElements->moduleTable;
+            }
+
+            if ($strListviewTable === null && $objElements->type === 'listview' && $objElements->contentTable) {
+                $strListviewTable = $objElements->contentTable;
             }
         }
 
-        $objContent = ContentModel::findPublishedByPidAndTable($objArticles->id, 'tl_article');
-        if ($objContent == null) {
-            return null;
-        }
-
-        while ($objContent->next()) {
-
-            if (!in_array($objContent->type, ['listview'])) {
-                continue;
-            }
-
-            if (!$objContent->cmTable) {
-                continue;
-            }
-
-            return $objContent->cmTable;
-        }
-
-        return null;
-    }
-
-    protected function getDetailFrontendModule($objContent)
-    {
-        if ($objContent == null) {
-            return null;
-        }
-
-        while ($objContent->next()) {
-
-            if ($objContent->type == 'module' && $objContent->module) {
-
-                $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
-
-                if ($objModule == null) {
-                    continue;
-                }
-
-                if ($objModule->cmMaster || $objModule->type == 'master') {
-                    return $objModule->cmTable;
-                }
-            }
-        }
-
-        return null;
+        return $strListviewTable;
     }
 }

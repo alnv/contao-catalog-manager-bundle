@@ -4,6 +4,7 @@ namespace Alnv\ContaoCatalogManagerBundle\Security;
 
 use Contao\Environment;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 
 class Authorization
@@ -13,19 +14,41 @@ class Authorization
 
     private string $strMethod = 'key-license/getLicense';
 
+    /** Sekunden – der Backend-Request soll nicht hängen, wenn der Lizenzserver nicht antwortet */
+    private const CONNECT_TIMEOUT = 3;
+    private const TIMEOUT = 5;
+
     public function isValid($strLicense): bool
     {
 
-        if (!$strLicense) {
+        $strLicense = \trim((string)$strLicense);
+
+        if ($strLicense === '' || \strlen($strLicense) > 255) {
             return false;
         }
 
-        $objClient = new Client();
-        $objRequest = new Request('GET', $this->strUrl . '/' . $this->strMethod . '/' . $strLicense, [], '');
-        $objResponse = $objClient->send($objRequest);
-        $arrOrder = \json_decode($objResponse->getBody()->getContents(), true);
+        try {
+            $objClient = new Client([
+                'connect_timeout' => self::CONNECT_TIMEOUT,
+                'timeout' => self::TIMEOUT,
+                'allow_redirects' => false,
+                'http_errors' => false,
+            ]);
 
-        if ($arrOrder['status'] !== 200) {
+            // Lizenzschlüssel als ein Pfadsegment kodieren (kein Pfad-/Query-Injection über "/", "?", "#")
+            $objRequest = new Request('GET', $this->strUrl . '/' . $this->strMethod . '/' . \rawurlencode($strLicense), ['Accept' => 'application/json']);
+            $objResponse = $objClient->send($objRequest);
+        } catch (GuzzleException) {
+            return false;
+        }
+
+        if ($objResponse->getStatusCode() !== 200) {
+            return false;
+        }
+
+        $arrOrder = \json_decode((string)$objResponse->getBody(), true);
+
+        if (!\is_array($arrOrder) || ($arrOrder['status'] ?? null) !== 200) {
             return false;
         }
 
@@ -34,7 +57,7 @@ class Authorization
 
         foreach ($arrItems as $arrItem) {
 
-            if (!\in_array($arrItem['product_id'], ['2', '3'])) {
+            if (!\in_array($arrItem['product_id'] ?? null, ['2', '3'])) {
                 continue;
             }
 
@@ -43,8 +66,11 @@ class Authorization
                 if (is_string($arrData)) {
                     $arrData = [$arrData];
                 }
+                if (!\is_array($arrData)) {
+                    continue;
+                }
                 foreach ($arrData as $strDomain) {
-                    if ($this->parseDomain($strUrl) === $this->parseDomain($strDomain)) {
+                    if (\is_string($strDomain) && $this->parseDomain($strUrl) === $this->parseDomain($strDomain)) {
                         return true;
                     }
                 }
@@ -59,7 +85,7 @@ class Authorization
 
         $strDomain = \str_replace('www.', '', $strDomain);
 
-        $arrFragments = \parse_url($strDomain) ?? [];
+        $arrFragments = \parse_url($strDomain) ?: [];
         $strHost = $arrFragments['host'] ?? '';
         $strPort = $arrFragments['port'] ?? '';
 

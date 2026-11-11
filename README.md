@@ -157,7 +157,11 @@ Deine Einträge können in eine Merkliste eingetragen werden. Füge dazu das fol
 <?php 
     use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
 ?>
-<?= (new Watchlist())->getForm($this->id, $this->_table, ['useUnits' => true]); ?>
+<?= \Alnv\ContaoCatalogManagerBundle\Library\Watchlist::getForm($this->id, $this->_table, [
+    'useUnits' => true,          // Mengenauswahl anzeigen
+    'title' => $this->title,     // Titel für Screenreader (unterscheidet mehrere Buttons auf einer Seite)
+    // 'disableCss' => true,     // eigenes Styling statt css/watchlist.scss
+]); ?>
 ```
 
 Als erster Parameter muss die ID des Datensatzes eingegeben werden, und als zweiter Parameter die Tabelle.
@@ -337,6 +341,14 @@ Mit diesem Server kann Claude den Catalog-Manager direkt bearbeiten:
 Alle Änderungen laufen durch dieselbe Logik wie im Contao-Backend. Die `save_callback`, `onsubmit_callback`, `oncreate_callback` und `ondelete_callback` aus den DCA-Dateien werden in derselben Reihenfolge ausgeführt. Legt Claude einen Katalog an, entsteht also auch die Datenbanktabelle. Ein neues Feld bekommt seine Spalte, beim Umbenennen wird die Spalte umbenannt.
 
 Der Server ist ein Konsolen-Befehl (`catalog:mcp`) in deinem Contao-Projekt. Claude Desktop startet ihn per SSH und spricht über stdin/stdout mit ihm. Du brauchst keinen offenen Port und keinen Webserver-Endpunkt.
+
+### 0. Paket installieren (optional seit 4.1)
+
+`php-mcp/server` ist keine Pflicht-Abhängigkeit mehr. Ohne das Paket wird der Befehl `catalog:mcp` nicht registriert. Wer den MCP-Server nutzen möchte, installiert es im Projekt:
+
+```bash
+composer require php-mcp/server:^3.3
+```
 
 ### 1. Mit Claude Desktop verbinden
 

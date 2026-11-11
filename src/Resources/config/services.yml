@@ -11,6 +11,7 @@ services:
       - '@event_dispatcher'
       - '@contao.data_container.dca_url_analyzer'
       - '@translator'
+      - '@security.helper'
 
   Alnv\ContaoCatalogManagerBundle\Mcp\McpCommand:
     public: true
@@ -19,6 +20,28 @@ services:
     tags: [ contao.page ]
 
   Alnv\ContaoCatalogManagerBundle\Controller\FrontendController:
+    public: true
+    arguments:
+      $watchlistLimiter: '@catalogmanager.rate_limiter.watchlist'
+
+  # Rate-Limits (gleiches Muster/Storage wie Contaos eigene Limiter)
+  catalogmanager.rate_limiter.watchlist:
+    class: Symfony\Component\RateLimiter\RateLimiterFactory
+    public: true
+    arguments:
+      - { id: catalogmanager_watchlist, policy: sliding_window, limit: 30, interval: '1 minute' }
+      - '@contao.rate_limit.storage'
+      - '@?lock_factory'
+
+  catalogmanager.rate_limiter.reactions:
+    class: Symfony\Component\RateLimiter\RateLimiterFactory
+    public: true
+    arguments:
+      - { id: catalogmanager_reactions, policy: sliding_window, limit: 20, interval: '1 minute' }
+      - '@contao.rate_limit.storage'
+      - '@?lock_factory'
+
+  Alnv\ContaoCatalogManagerBundle\Controller\BackendOptionController:
     public: true
 
   Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag:

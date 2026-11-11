@@ -14,6 +14,9 @@ class Listing extends View
         $objModel = $objModel->getModel();
         $objEntities = $objModel->findAll($this->getModelOptions());
 
+        // Tabellen-Tag auch für leere Listen, damit neu angelegte Einträge die Seite invalidieren
+        $this->addCacheTags([]);
+
         if ($objEntities !== null) {
             while ($objEntities->next()) {
                 $this->parseEntity($objEntities->row());
@@ -26,16 +29,8 @@ class Listing extends View
     public function countRows(): int
     {
 
-        $objModel = new ModelWizard($this->strTable);
-        $objModel = $objModel->getModel();
-        $arrOptions = $this->getModelOptions();
-        unset($arrOptions['limit']);
-        $objEntities = $objModel->findAll($arrOptions);
+        $objModel = (new ModelWizard($this->strTable))->getModel();
 
-        if ($objEntities === null) {
-            return 0;
-        }
-
-        return $objEntities->count();
+        return $this->countEntities($objModel, $this->getModelOptions());
     }
 }

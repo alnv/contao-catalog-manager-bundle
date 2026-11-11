@@ -1,19 +1,21 @@
-<div id="wishlist-<?= $this->id ?>" class="ce_watchlist-component">
+<?php use Contao\StringUtil; ?>
+<?php $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT; ?>
+<div id="wishlist-<?= StringUtil::specialchars($this->id) ?>" class="ce_watchlist-component">
     <watchlist-form
-            data="<?= $this->data ?>"
-            units="<?= $this->units ?>"
+            data="<?= StringUtil::specialchars($this->data) ?>"
+            :units="<?= (int) $this->units ?>"
             :added="<?= $this->added ? 'true' : 'false' ?>"
-            button-add-label="<?= $this->buttonAddLabel ?>"
-            button-remove-label="<?= $this->buttonRemoveLabel ?>"
-            button-units-label="<?= $this->buttonUnitsLabel ?>"
             :use-units="<?= $this->useUnits ? 'true' : 'false' ?>"
+            request-token="<?= StringUtil::specialchars((string) $this->requestToken) ?>"
+            item-title="<?= StringUtil::specialchars(StringUtil::decodeEntities((string) $this->itemTitle)) ?>"
+            button-add-label="<?= StringUtil::specialchars((string) $this->buttonAddLabel) ?>"
+            button-remove-label="<?= StringUtil::specialchars((string) $this->buttonRemoveLabel) ?>"
+            :labels="<?= StringUtil::specialchars(json_encode((object) ($this->labels ?: []), $jsonFlags)) ?>"
     ></watchlist-form>
+    <noscript><p class="cm-watchlist__noscript"><?= StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['cmWatchlist']['noscript'] ?? 'Für die Merkliste wird JavaScript benötigt.') ?></p></noscript>
 </div>
 <script>
     (function () {
-        new Vue({
-            el: '#wishlist-<?= $this->id ?>',
-            data: {}
-        });
+        new Vue({el: <?= json_encode('#wishlist-' . $this->id, $jsonFlags) ?>});
     })();
 </script>

@@ -8,6 +8,7 @@ use Contao\BackendTemplate;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Environment;
+use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\Module;
 use Contao\System;
@@ -44,6 +45,14 @@ class MasterModule extends Module
 
         $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
 
+        // Performance: Der Layout-Hook (GetPageLayoutListener) hat diesen Eintrag bereits geparst.
+        // Ohne Modul-Filter und ohne "Sichtbarkeit ignorieren" ist das Ergebnis identisch →
+        // nur noch das Template rendern statt die Detailansicht ein zweites Mal zu laden und zu parsen.
+        if ($arrMaster = $this->getMasterFromLayout($strAlias)) {
+            $this->Template->entities = $arrMaster;
+            return;
+        }
+
         $arrOptions = [
             'id' => $this->id,
             'alias' => $strAlias,
@@ -68,6 +77,37 @@ class MasterModule extends Module
         }
 
         $this->Template->entities = $arrMaster;
+    }
+
+    protected function getMasterFromLayout(string $strAlias): array
+    {
+        $arrContext = $GLOBALS['CM_MASTER_CONTEXT'] ?? null;
+        $arrRow = $GLOBALS['CM_MASTER'] ?? null;
+
+        if (!\is_array($arrContext) || !\is_array($arrRow) || empty($arrRow)) {
+            return [];
+        }
+
+        if ($this->cmFilter || $this->cmIgnoreVisibility) {
+            return [];
+        }
+
+        if (($arrContext['table'] ?? '') !== (string)$this->cmTable || ($arrContext['alias'] ?? '') !== $strAlias) {
+            return [];
+        }
+
+        // Hooks, die View-Optionen/Entities pro Modul verändern, bekommen weiterhin den vollen Pfad
+        if (!empty($GLOBALS['TL_HOOKS']['initializeView']) || !empty($GLOBALS['TL_HOOKS']['getModelOptions'])) {
+            return [];
+        }
+
+        if ($this->cmTemplate) {
+            $objTemplate = new FrontendTemplate($this->cmTemplate);
+            $objTemplate->setData($arrRow);
+            $arrRow['template'] = $objTemplate->parse();
+        }
+
+        return [$arrRow];
     }
 
     protected function getFilter(): array

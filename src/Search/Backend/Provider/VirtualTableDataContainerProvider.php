@@ -2,7 +2,9 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Search\Backend\Provider;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Library\VirtualDataContainerArray;
+use Contao\Controller;
 use Contao\CoreBundle\DataContainer\DcaUrlAnalyzer;
 use Contao\CoreBundle\Exception\AccessDeniedException;
 use Contao\CoreBundle\Framework\ContaoFramework;
@@ -11,15 +13,17 @@ use Contao\CoreBundle\Search\Backend\Event\FormatTableDataContainerDocumentEvent
 use Contao\CoreBundle\Search\Backend\Hit;
 use Contao\CoreBundle\Search\Backend\Provider\ProviderInterface;
 use Contao\CoreBundle\Search\Backend\ReindexConfig;
+use Contao\CoreBundle\Security\ContaoCorePermissions;
+use Contao\CoreBundle\Security\DataContainer\ReadAction;
 use Contao\Database;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-
 
 class VirtualTableDataContainerProvider implements ProviderInterface
 {
@@ -31,7 +35,8 @@ class VirtualTableDataContainerProvider implements ProviderInterface
         private readonly Connection               $connection,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly DcaUrlAnalyzer           $dcaUrlAnalyzer,
-        private readonly TranslatorInterface      $translator
+        private readonly TranslatorInterface      $translator,
+        private readonly Security                 $security,
     )
     {
     }
@@ -87,15 +92,31 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
     public function isDocumentGranted(UserInterface $user, Document $document): bool
     {
-        $document = $this->addCurrentRowToDocumentIfNotAlreadyLoaded($document);
-        $row = $document->getMetadata()['row'] ?? null;
+        $table = $this->getTableFromDocument($document);
 
-        // Entry does not exist anymore -> no access
-        if (null === $row) {
+        if (!CatalogTableGuard::isCatalogTable($table)) {
             return false;
         }
 
-        return true; // todo
+        $document = $this->addCurrentRowToDocumentIfNotAlreadyLoaded($document);
+        $row = $document->getMetadata()['row'] ?? null;
+
+        if (!\is_array($row)) {
+            $row = $this->loadRow($table, (int)$document->getId());
+        }
+
+        if (!\is_array($row)) {
+            return false;
+        }
+
+        $this->contaoFramework->initialize();
+        Controller::loadDataContainer($table);
+
+        return $this->security->isGrantedForUser(
+            $user,
+            ContaoCorePermissions::DC_PREFIX . $table,
+            new ReadAction($table, $row),
+        );
     }
 
     public function convertTypeToVisibleType(string $type): string

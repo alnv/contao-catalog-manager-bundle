@@ -2,6 +2,7 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
@@ -61,14 +62,14 @@ class WatchlistInsertTag
             }
 
             while ($objWatchlist->next()) {
-                if (!Database::getInstance()->tableExists($objWatchlist->table)) {
+                if (!CatalogTableGuard::isCatalogTable($objWatchlist->table) || !Database::getInstance()->tableExists($objWatchlist->table)) {
                     continue;
                 }
-                $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $objWatchlist->table . ' WHERE id=?')->limit(1)->execute($objWatchlist->identifier);
+                $objEntity = Database::getInstance()->prepare('SELECT id FROM ' . Database::quoteIdentifier($objWatchlist->table) . ' WHERE id=?')->limit(1)->execute((int)$objWatchlist->identifier);
                 if (!$objEntity->numRows) {
                     continue;
                 }
-                if ($arrOptions['total']) {
+                if ($arrOptions['total'] ?? false) {
                     $intCount += (int)$objWatchlist->units;
                 } else {
                     $intCount++;
@@ -92,11 +93,16 @@ class WatchlistInsertTag
                         continue;
                     }
 
+                    // Tabellenname stammt aus tl_watchlist (über den Frontend-Endpunkt befüllbar)
+                    if (!CatalogTableGuard::isCatalogTable($objWatchlist->table) || (int)$objWatchlist->identifier < 1) {
+                        continue;
+                    }
+
                     if (!isset($arrIdentifiers[$objWatchlist->table])) {
                         $arrIdentifiers[$objWatchlist->table] = [];
                     }
 
-                    $arrIdentifiers[$objWatchlist->table][] = $objWatchlist->identifier;
+                    $arrIdentifiers[$objWatchlist->table][] = (int)$objWatchlist->identifier;
                 }
             }
 
@@ -109,7 +115,11 @@ class WatchlistInsertTag
                 DataContainer::loadDataContainer($strTable);
                 System::loadLanguageFile($strTable);
 
-                $strT = $GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?: $strTable;
+                $strT = ($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable;
+                if (!CatalogTableGuard::isValidIdentifier($strT)) {
+                    continue;
+                }
+                $strT = Database::quoteIdentifier($strT);
 
                 $arrValue = [];
                 $arrColumn = [];
@@ -187,8 +197,9 @@ class WatchlistInsertTag
             if (!empty($arrOptions['tables']) && !in_array($objWatchlist->table, $arrOptions['tables'])) {
                 continue;
             }
-            if (!in_array($objWatchlist->identifier, $arrIds)) {
-                $arrIds[] = $objWatchlist->identifier;
+            $intId = (int)$objWatchlist->identifier;
+            if ($intId > 0 && !in_array($intId, $arrIds, true)) {
+                $arrIds[] = $intId;
             }
         }
 
