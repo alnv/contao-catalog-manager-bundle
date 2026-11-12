@@ -1,0 +1,29 @@
+<?php
+use Contao\StringUtil;
+
+/**
+ * Frontend-Verwaltung des Catalog Managers.
+ *
+ * Die eigentliche Ansicht (Liste, Formular, Löschbestätigung) steht in cm_frontend_manager_view,
+ * damit sie bei AJAX-Anfragen ohne Seitenrahmen gerendert werden kann.
+ * Alle Schaltflächen sind Bedienhilfen – berechtigt wird ausschließlich serverseitig.
+ */
+$e = static fn ($value): string => StringUtil::specialchars((string) $value);
+$messages = $this->messages ?: [];
+$confirm = array_filter($messages, static fn ($m) => 'error' !== $m['type']);
+$errors = array_filter($messages, static fn ($m) => 'error' === $m['type']);
+?>
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+<div class="cm-fm" data-cm-fm="<?= (int) $this->moduleId ?>" data-cm-fm-config="<?= $e(json_encode($this->clientConfig, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE)) ?>">
+
+    <?php /* Live-Regionen: müssen beim Laden existieren, damit spätere Meldungen angesagt werden */ ?>
+    <div class="cm-fm__messages" role="status" aria-live="polite" data-cm-fm-status><?php foreach ($confirm as $message): ?><p class="cm-fm__message cm-fm__message--<?= $e($message['type']) ?>"><?= $e($message['text']) ?></p><?php endforeach; ?></div>
+    <div class="cm-fm__messages" role="alert" data-cm-fm-alert><?php foreach ($errors as $message): ?><p class="cm-fm__message cm-fm__message--error"><?= $e($message['text']) ?></p><?php endforeach; ?></div>
+
+    <div class="cm-fm__view" data-cm-fm-view tabindex="-1">
+        <?php $this->insert('cm_frontend_manager_view', $this->getData()); ?>
+    </div>
+</div>
+<?php $this->endblock(); ?>
