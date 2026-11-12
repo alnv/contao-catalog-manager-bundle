@@ -60,6 +60,11 @@ class CustomOptionWizard extends Widget
         $arrAttributes = $this->getAttributesFromDca($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strFieldName], $this->strName, null, $this->strName, $this->strTable, null);
         $arrAttributes['_table'] = $this->strTable;
 
+        $objContainer = System::getContainer();
+        $arrAttributes['_addUrl'] = $objContainer->get('router')->generate('catalog_manager_backend_option_add');
+        $arrAttributes['_deleteUrl'] = $objContainer->get('router')->generate('catalog_manager_backend_option_delete');
+        $arrAttributes['_requestToken'] = $objContainer->get('contao.csrf.token_manager')->getDefaultTokenValue();
+
         if (empty($this->varValue)) {
             $this->varValue = [];
         }

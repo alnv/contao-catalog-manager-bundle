@@ -210,12 +210,38 @@ class Listing extends Hybrid
             }
         }
 
-        $arrInputOrder = Input::get('order') ?? [];
-        if (\is_array($arrInputOrder) && !empty($arrInputOrder)) {
-            if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
-                $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
+        // Sortierung aus dem Request (?order[id]=<modul>&order[field]=<feld>&order[order]=ASC|DESC).
+        // Nur sortierbare DCA-Felder der Katalogtabelle und nur ASC/DESC – niemals Rohwerte ins ORDER BY.
+        $arrInputOrder = Input::get('order');
+        if (\is_array($arrInputOrder) && (string)($arrInputOrder['id'] ?? '') === (string)$this->id) {
+            if ($strOrder = $this->getRequestOrder($arrInputOrder)) {
+                $this->arrOptions['order'] = $strOrder;
             }
         }
+    }
+
+    protected function getRequestOrder(array $arrInputOrder): string
+    {
+        $strField = $arrInputOrder['field'] ?? '';
+        $strDirection = \strtoupper((string)($arrInputOrder['order'] ?? 'ASC'));
+
+        if (!\is_string($strField) || !\preg_match('/^[A-Za-z0-9_]{1,64}$/', $strField) || !\in_array($strDirection, ['ASC', 'DESC'], true)) {
+            return '';
+        }
+
+        Controller::loadDataContainer($this->cmTable);
+
+        $arrField = $GLOBALS['TL_DCA'][$this->cmTable]['fields'][$strField] ?? null;
+        if (!\is_array($arrField) || empty($arrField['sorting'])) {
+            return '';
+        }
+
+        $strTable = ($GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] ?? '') ?: $this->cmTable;
+        if (!\preg_match('/^[A-Za-z0-9_]{1,64}$/', $strTable)) {
+            return '';
+        }
+
+        return '`' . $strTable . '`.`' . $strField . '` ' . $strDirection;
     }
 
     protected function setPagination(): void

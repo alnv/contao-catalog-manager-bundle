@@ -7,6 +7,13 @@ Vue.component('custom-option-wizard-field', {
         }
     },
     methods: {
+        toText: function (value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            var doc = new DOMParser().parseFromString('<!doctype html><body>' + String(value), 'text/html');
+            return (doc.body.textContent || '').trim();
+        },
         checked: function (strValue) {
             if (Array.isArray(this.value)) {
                 return this.value.indexOf(strValue) !== -1;
@@ -31,10 +38,11 @@ Vue.component('custom-option-wizard-field', {
                 return null;
             }
             if (this.newValue && this.newFormVisible) {
-                this.$http.post('/catalog-manager/addOption', {
+                this.$http.post(this.eval['_addUrl'], {
                     table: this.eval['_table'],
                     option: this.newValue,
-                    name: this.name
+                    name: this.name,
+                    REQUEST_TOKEN: this.eval['_requestToken']
                 }, {
                     emulateJSON: true,
                     'Content-Type': 'application/x-www-form-urlencoded'
@@ -55,11 +63,12 @@ Vue.component('custom-option-wizard-field', {
         deleteOption: function (option) {
             for (let i = this.options.length - 1; i > -1; i--) {
                 if (this.options[i] === option) {
-                    this.$http.post('/catalog-manager/deleteOption', {
+                    this.$http.post(this.eval['_deleteUrl'], {
                         table: this.eval['_table'],
                         option: this.options[i]['value'],
                         name: this.name,
-                        index: i
+                        index: i,
+                        REQUEST_TOKEN: this.eval['_requestToken']
                     }, {
                         emulateJSON: true,
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -118,7 +127,7 @@ Vue.component('custom-option-wizard-field', {
                 '<p v-if="!noLabel" class="label" v-html="eval.label"></p>' +
                 '<div v-for="(option, index) in options" class="checkbox-container" v-bind:class="{\'checked\': checked(option.value)}">' +
                     '<input type="checkbox" v-model="value" :value="option.value" :id="idPrefix + \'id_\' + name + \'_\' + index">' +
-                    '<label :for="idPrefix + \'id_\' + name + \'_\' + index" v-html="option.label"></label>' +
+                    '<label :for="idPrefix + \'id_\' + name + \'_\' + index" v-text="toText(option.label)"></label>' +
                     '<form class="form-delete">' +
                         '<button class="delete button" v-if="option.delete" @click.prevent="deleteOption(option)"><i class="delete"></i></button>' +
                     '</form>' +

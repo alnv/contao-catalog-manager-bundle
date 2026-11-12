@@ -428,17 +428,35 @@ class Toolkit
     public static function getOrderByStatementFromArray($arrOrders): string
     {
 
+        if (!\is_array($arrOrders)) {
+            return '';
+        }
+
         if (isset($arrOrders['field']) && isset($arrOrders['order'])) {
-            return $arrOrders['field'] . ' ' . $arrOrders['order'];
+            return static::buildOrderByPart($arrOrders['field'], $arrOrders['order']);
         }
 
         return \implode(',', \array_filter(\array_map(function ($arrOrder) {
-            if (!isset($arrOrder['field']) || !$arrOrder['field']) {
+            if (!\is_array($arrOrder) || !isset($arrOrder['field']) || !$arrOrder['field']) {
                 return '';
             }
-            $arrOrder['order'] = $arrOrder['order'] ?? 'ASC';
-            return $arrOrder['field'] . ' ' . $arrOrder['order'];
+            return static::buildOrderByPart($arrOrder['field'], $arrOrder['order'] ?? 'ASC');
         }, $arrOrders)));
+    }
+
+    public static function buildOrderByPart($varField, $varDirection = 'ASC'): string
+    {
+
+        if (!\is_string($varField) || !\preg_match('/^[A-Za-z0-9_]{1,64}(\.[A-Za-z0-9_]{1,64})?$/', $varField)) {
+            return '';
+        }
+
+        $strDirection = \strtoupper(\is_string($varDirection) && $varDirection !== '' ? $varDirection : 'ASC');
+        if (!\in_array($strDirection, ['ASC', 'DESC'], true)) {
+            return '';
+        }
+
+        return '`' . \implode('`.`', \explode('.', $varField)) . '` ' . $strDirection;
     }
 
     public static function renderRow($arrRow, $arrLabelFields, $arrCatalog, $arrFields)

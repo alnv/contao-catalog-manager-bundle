@@ -7,14 +7,10 @@ use Alnv\ContaoCatalogManagerBundle\Helper\Cache;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
 use Alnv\ContaoCatalogManagerBundle\Library\Watchlist;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
 use Alnv\ContaoCatalogManagerBundle\Views\Listing;
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
 use Contao\Controller;
 use Contao\CoreBundle\Controller\AbstractController;
-use Contao\Database;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Module;
@@ -149,94 +145,5 @@ class FrontendController extends AbstractController
                 'Content-Disposition' => 'attachment;filename="' . $arrMaster['roleResolver']()->getValueByRole('alias') . '.ics"'
             ]
         );
-    }
-
-    #[Route(path: '/addOption', methods: ["POST"])]
-    public function addOption(): JsonResponse
-    {
-
-        $this->container->get('contao.framework')->initialize();
-
-        $objCatalog = CatalogModel::findByTableOrModule(Input::post('table'));
-        if ($objCatalog === null) {
-            return new JsonResponse([], 500);
-        }
-
-        $objField = CatalogFieldModel::findByFieldnameAndPid(Input::post('name'), $objCatalog->id);
-        if ($objField === null) {
-            return new JsonResponse([], 500);
-        }
-
-        $strLabel = StringUtil::decodeEntities(Input::post('option'));
-        $strValue = '';
-
-        switch ($objField->optionsSource) {
-            case 'options':
-                $objOption = new CatalogOptionModel();
-                $objOption->value = Toolkit::generateAlias(Input::post('option'), 'value', 'tl_catalog_option');
-                $objOption->label = $strLabel;
-                $objOption->pid = $objField->id;
-                $objOption->tstamp = time();
-                $objOption->save();
-
-                $strValue = $objOption->value;
-                break;
-            case 'dbOptions':
-                $arrSet = [
-                    'tstamp' => time(),
-                    'alias' => Toolkit::generateAlias(Input::post('option'), 'alias', $objField->dbTable),
-                ];
-
-                $arrSet[$objField->dbLabel] = $strLabel;
-                if ($objField->dbKey != 'id') {
-                    $arrSet[$objField->dbKey] = $strValue;
-                }
-
-                $objInsert = Database::getInstance()->prepare('INSERT INTO ' . $objField->dbTable . ' %s')->set($arrSet)->execute();
-                if ($objField->dbKey == 'id') {
-                    $strValue = $objInsert->insertId;
-                }
-
-                break;
-        }
-
-        return new JsonResponse([
-            'value' => $strValue,
-            'label' => $strLabel
-        ]);
-    }
-
-    #[Route(path: '/deleteOption', methods: ["POST"])]
-    public function deleteOption(): JsonResponse
-    {
-
-        $this->container->get('contao.framework')->initialize();
-
-        $objCatalog = CatalogModel::findByTableOrModule(Input::post('table'));
-        if ($objCatalog === null) {
-            return new JsonResponse([], 500);
-        }
-
-        $objField = CatalogFieldModel::findByFieldnameAndPid(Input::post('name'), $objCatalog->id);
-        if ($objField === null) {
-            return new JsonResponse([], 500);
-        }
-
-        switch ($objField->optionsSource) {
-            case 'options':
-                $objOption = CatalogOptionModel::findByValueAndPid(Input::post('option'), $objField->id);
-                if ($objOption) {
-                    $objOption->delete();
-                }
-                break;
-            case 'dbOptions':
-                Database::getInstance()->prepare('DELETE FROM ' . $objField->dbTable . ' WHERE `' . $objField->dbKey . '`=?')->execute(Input::post('option'));
-                break;
-        }
-
-        return new JsonResponse([
-            'index' => Input::post('index'),
-            'value' => Input::post('option')
-        ]);
     }
 }
