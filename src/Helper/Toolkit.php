@@ -57,6 +57,11 @@ class Toolkit
             return '';
         }
 
+        $strTable = (string)($objCatalog->table ?: $strTable);
+        if (!CatalogTableGuard::isValidIdentifier($strTable)) {
+            return '';
+        }
+
         Controller::loadDataContainer($strTable);
 
         $objModel = new ModelWizard($strTable);
@@ -196,7 +201,7 @@ class Toolkit
 
         if (is_array($varValue)) {
             $arrValues = array_map(function ($arrValue) use ($strField) {
-                return is_array($arrValue) ? $arrValue[$strField] : $arrValue;
+                return is_array($arrValue) ? ($arrValue[$strField] ?? '') : $arrValue;
             }, $varValue);
             return implode($strDelimiter, $arrValues);
         }

@@ -43,9 +43,14 @@ final class DcaRecordManager
 
     private array $pristineDca = [];
 
+    /**
+     * @param list<string>|null $restrictToTables Wenn gesetzt, sind ausschließlich diese Tabellen erlaubt
+     *                                            (z. B. die eine Tabelle einer Frontend-Verwaltung).
+     */
     public function __construct(
         private readonly string $projectDir,
         private readonly string $language = 'de',
+        private readonly ?array $restrictToTables = null,
     )
     {
     }
@@ -232,7 +237,11 @@ final class DcaRecordManager
     // Schreiben
     // ------------------------------------------------------------------
 
-    public function create(string $table, array $values, ?int $pid = null, ?string $ptable = null): array
+    /**
+     * @param list<string> $extraFields Felder, die zusätzlich außerhalb der aktiven Palette gesetzt werden
+     *                                  dürfen (z. B. Besitzer- oder Sichtbarkeitsfeld einer Frontend-Verwaltung)
+     */
+    public function create(string $table, array $values, ?int $pid = null, ?string $ptable = null, array $extraFields = []): array
     {
         $this->assertTable($table);
         $dca = $this->loadDca($table);
@@ -291,7 +300,7 @@ final class DcaRecordManager
 
         // Feldnamen und Palette prüfen, bevor etwas in die Datenbank geschrieben wird
         // (Tabellen mit datensatzabhängigen Paletten werden nach dem Anlegen geprüft)
-        $this->checkValues($table, $values, $set, !\in_array($table, self::ONLOAD_TABLES, true));
+        $this->checkValues($table, $values, $set, !\in_array($table, self::ONLOAD_TABLES, true), $extraFields);
 
         $id = (int)$db->prepare('INSERT INTO ' . $table . ' %s')->set($set)->execute()->insertId;
 
@@ -303,7 +312,7 @@ final class DcaRecordManager
                 $this->call($callback, [$table, $id, $set, $dc]);
             }
 
-            $changed = $this->applyValues($table, $id, $values, true);
+            $changed = $this->applyValues($table, $id, $values, true, $extraFields);
         } catch (\Throwable $e) {
             $db->prepare('DELETE FROM ' . $table . ' WHERE id=?')->execute($id);
 
@@ -318,7 +327,10 @@ final class DcaRecordManager
         ];
     }
 
-    public function update(string $table, int $id, array $values): array
+    /**
+     * @param list<string> $extraFields siehe create()
+     */
+    public function update(string $table, int $id, array $values, array $extraFields = []): array
     {
         $this->assertTable($table);
         $this->loadDca($table);
@@ -331,7 +343,7 @@ final class DcaRecordManager
             $this->assertOutputType($table, $values['type'], true);
         }
 
-        $changed = $this->applyValues($table, $id, $values, false);
+        $changed = $this->applyValues($table, $id, $values, false, $extraFields);
 
         return [
             'updated' => true,
@@ -386,7 +398,7 @@ final class DcaRecordManager
      *
      * @return list<string> geänderte Felder
      */
-    private function applyValues(string $table, int $id, array $values, bool $isNew): array
+    private function applyValues(string $table, int $id, array $values, bool $isNew, array $extraFields = []): array
     {
         $record = new RecordStub($this->fetchRow($table, $id));
         $dca = $this->runOnload($table, $id, $record);
@@ -395,7 +407,7 @@ final class DcaRecordManager
 
         $dc = new HeadlessDataContainer($table, $id, $record);
 
-        [$dbValues, $active] = $this->checkValues($table, $values, $record->row());
+        [$dbValues, $active] = $this->checkValues($table, $values, $record->row(), true, $extraFields);
         $dc->setPalette($active['palette']);
 
         // Selektoren zuerst setzen, damit Callbacks den neuen Typ kennen (wie im Backend nach dem Typwechsel)
@@ -411,8 +423,17 @@ final class DcaRecordManager
             $submit[$field] = $dbValues[$field];
         }
 
-        foreach ($active['fields'] as $field) {
+        $extraFields = array_values(array_intersect($extraFields, array_keys($fieldsCfg)));
+
+        foreach (array_values(array_unique(array_merge($active['fields'], $extraFields))) as $field) {
             $cfg = $fieldsCfg[$field] ?? null;
+
+            // Zusatzfelder ohne Widget (z. B. ein Besitzerfeld) werden unverändert übernommen
+            if (\is_array($cfg) && !isset($cfg['inputType']) && \in_array($field, $extraFields, true) && \array_key_exists($field, $dbValues)) {
+                $submit[$field] = $dbValues[$field];
+                $record->{$field} = StringUtil::deserialize($dbValues[$field]);
+                continue;
+            }
 
             if (!\is_array($cfg) || !isset($cfg['inputType'])) {
                 continue;
@@ -501,7 +522,7 @@ final class DcaRecordManager
      *
      * @return array{0: array, 1: array} Werte im DB-Format und aktive Palette
      */
-    private function checkValues(string $table, array $values, array $baseRow, bool $checkPalette = true): array
+    private function checkValues(string $table, array $values, array $baseRow, bool $checkPalette = true, array $extraFields = []): array
     {
         $dca = $GLOBALS['TL_DCA'][$table];
         $fieldsCfg = $dca['fields'] ?? [];
@@ -524,7 +545,7 @@ final class DcaRecordManager
         $merged = array_merge($baseRow, array_map(static fn($v) => StringUtil::deserialize($v), $dbValues));
         $active = PaletteResolver::resolve($dca, $merged);
 
-        $outside = $checkPalette ? array_diff(array_keys($values), $active['fields'], self::SYSTEM_FIELDS) : [];
+        $outside = $checkPalette ? array_diff(array_keys($values), $active['fields'], self::SYSTEM_FIELDS, $extraFields) : [];
         if ($outside) {
             throw new \InvalidArgumentException(sprintf(
                 'Die Felder %s gehören nicht zur aktiven Palette "%s". Aktive Felder: %s',
@@ -906,6 +927,14 @@ final class DcaRecordManager
     private function assertTable(string $table): string
     {
         $this->resetCaches();
+
+        if (null !== $this->restrictToTables) {
+            if (\in_array($table, $this->restrictToTables, true) && preg_match('/^[a-z0-9_]{1,64}$/i', $table)) {
+                return 'data';
+            }
+
+            throw new \InvalidArgumentException(sprintf('Tabelle "%s" ist nicht freigegeben.', $table));
+        }
 
         if (\in_array($table, self::CONFIG_TABLES, true)) {
             return 'config';

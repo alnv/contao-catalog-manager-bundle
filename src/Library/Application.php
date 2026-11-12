@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\CoreBundle\Controller\BackendCsvImportController;
@@ -91,17 +92,18 @@ class Application
     public function initializeDataContainerArrayByTable(string $table): void
     {
         if ($table === 'catalog-manager') {
-            $action = Input::get('act');
-            $key = Input::get('key');
+            // Input::get() liefert null, wenn der Parameter fehlt (nicht '')
+            $action = (string)Input::get('act');
+            $key = (string)Input::get('key');
 
             if (($action === '' && $key === '') || $action === 'select') {
                 return;
             }
 
-            $table = Input::get('id') ?: $table;
+            $table = (string)(Input::get('id') ?: $table);
         }
 
-        if (isset($this->initializedTables[$table])) {
+        if ('' === $table || isset($this->initializedTables[$table])) {
             return;
         }
 
@@ -117,6 +119,8 @@ class Application
             }
         }
 
-        new ModelWizard($table);
+        if (CatalogTableGuard::isValidIdentifier($table)) {
+            new ModelWizard($table);
+        }
     }
 }

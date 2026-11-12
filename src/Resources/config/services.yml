@@ -1,3 +1,11 @@
+parameters:
+  # Frontend-Verwaltung: globale Upload-Standardwerte (Fallback, wenn das Feld in der DCA nichts festlegt).
+  # Im Projekt überschreibbar (config/parameters.yaml bzw. parameters.yml). Pfade relativ zum Projekt,
+  # müssen innerhalb von %contao.upload_path% liegen.
+  catalog_manager.frontend_manager.upload_folder: '%contao.upload_path%/catalog-manager/uploads'
+  catalog_manager.frontend_manager.home_folder: '%contao.upload_path%/catalog-manager/members'
+  catalog_manager.frontend_manager.create_folders: true
+
 services:
   _defaults:
     autowire: true

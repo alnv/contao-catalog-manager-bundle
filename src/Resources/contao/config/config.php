@@ -14,6 +14,7 @@ use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
 use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
 use Alnv\ContaoCatalogManagerBundle\Widgets\CustomOptionWizard;
+use \Alnv\ContaoCatalogManagerBundle\Modules\FrontendManagerModule;
 use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
@@ -65,7 +66,8 @@ ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
         'listing-map' => MapModule::class,
         'listing-table' => ListingModule::class,
-        'master' => MasterModule::class
+        'master' => MasterModule::class,
+        'catalog-frontend-manager' => FrontendManagerModule::class,
     ]
 ]);
 

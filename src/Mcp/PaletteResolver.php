@@ -44,6 +44,62 @@ final class PaletteResolver
     }
 
     /**
+     * Wie resolve(), liefert die Felder aber gruppiert nach Palettengruppen (Legenden).
+     * Subpaletten werden direkt hinter ihrem Selektor in derselben Gruppe eingefügt –
+     * so wie Contao sie im Backend-Formular darstellt.
+     *
+     * @return array{key: string, groups: list<array{legend: string, hide: bool, fields: list<string>}>}
+     */
+    public static function resolveGroups(array $dca, array $values): array
+    {
+        $resolved = self::resolve($dca, $values);
+        $groups = [];
+
+        foreach (self::parseGroups($resolved['palette']) as $group) {
+            $fields = array_values(array_unique(self::expand($group['fields'], $dca, $values, 0)));
+
+            if ([] === $fields) {
+                continue;
+            }
+
+            $groups[] = ['legend' => $group['legend'], 'hide' => $group['hide'], 'fields' => $fields];
+        }
+
+        return ['key' => $resolved['key'], 'groups' => $groups];
+    }
+
+    /**
+     * Zerlegt eine Palette in Gruppen: "{title_legend},a,b;{meta_legend:hide},c".
+     *
+     * @return list<array{legend: string, hide: bool, fields: list<string>}>
+     */
+    public static function parseGroups(string $palette): array
+    {
+        $groups = [];
+
+        foreach (explode(';', $palette) as $chunk) {
+            $legend = '';
+            $hide = false;
+
+            if (preg_match('/\{([^}]*)\}/', $chunk, $match)) {
+                $parts = explode(':', $match[1]);
+                $legend = preg_match('/^[a-zA-Z0-9_-]+$/', $parts[0]) ? $parts[0] : '';
+                $hide = \in_array('hide', \array_slice($parts, 1), true);
+            }
+
+            $fields = self::parse($chunk);
+
+            if ([] === $fields && '' === $legend) {
+                continue;
+            }
+
+            $groups[] = ['legend' => $legend, 'hide' => $hide, 'fields' => $fields];
+        }
+
+        return $groups;
+    }
+
+    /**
      * Alle Palettenschlüssel außer __selector__ (z. B. die Feldtypen).
      *
      * @return list<string>

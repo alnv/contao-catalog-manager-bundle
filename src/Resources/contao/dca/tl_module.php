@@ -248,3 +248,103 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreFieldsFromParsing'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => "blob NULL"
 ];
+// ---------------------------------------------------------------------------
+// Frontend-Verwaltung (Modultyp catalog-frontend-manager)
+// Wiederverwendet: cmTable (Tabelle), cmFilter/cmFilterType/cmWizardFilterSettings/cmColumn/cmValue
+// (Datensatzbeschränkung, gleiche Syntax wie bei den Listen-Modulen), cmOrder, cmLimit.
+// ---------------------------------------------------------------------------
+
+use Alnv\ContaoCatalogManagerBundle\DataContainer\FrontendManager;
+
+$GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = [FrontendManager::class, 'onLoad'];
+$GLOBALS['TL_DCA']['tl_module']['config']['onsubmit_callback'][] = [FrontendManager::class, 'onSubmit'];
+
+$GLOBALS['TL_DCA']['tl_module']['palettes']['catalog-frontend-manager'] = '{title_legend},name,headline,type;'
+    . '{cm_fm_table_legend},cmTable;'
+    . '{cm_fm_fields_legend},cmFmListFields,cmFmFormFields,cmFmReadonlyFields,cmFmFilterFields;'
+    . '{cm_fm_list_legend},cmFmSortable,cmOrder,cmLimit;'
+    . '{cm_fm_operations_legend},cmFmOperations,cmFmToggleField,cmFmToggleReverse;'
+    . '{cm_fm_permission_legend},cmFmOwnerField,cmFilter,cmFmInternalValues;'
+    . '{cm_fm_upload_legend:hide},cmFmUseHomeDir;'
+    . '{template_legend:hide},customTpl;{expert_legend:hide},cssID,space';
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmListFields'] = [
+    'inputType' => 'checkboxWizard',
+    'options_callback' => [FrontendManager::class, 'getListFields'],
+    'save_callback' => [[FrontendManager::class, 'saveListFields']],
+    'eval' => ['multiple' => true, 'tl_class' => 'w50 clr'],
+    'sql' => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmFormFields'] = [
+    'inputType' => 'checkbox',
+    'options_callback' => [FrontendManager::class, 'getFormFields'],
+    'save_callback' => [[FrontendManager::class, 'saveFormFields']],
+    'eval' => ['multiple' => true, 'tl_class' => 'w50'],
+    'sql' => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmReadonlyFields'] = [
+    'inputType' => 'checkbox',
+    'options_callback' => [FrontendManager::class, 'getFormFields'],
+    'save_callback' => [[FrontendManager::class, 'saveFormFields']],
+    'eval' => ['multiple' => true, 'tl_class' => 'w50 clr'],
+    'sql' => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmFilterFields'] = [
+    'inputType' => 'checkbox',
+    'options_callback' => [FrontendManager::class, 'getFilterFields'],
+    'save_callback' => [[FrontendManager::class, 'saveFilterFields']],
+    'eval' => ['multiple' => true, 'tl_class' => 'w50'],
+    'sql' => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmSortable'] = [
+    'inputType' => 'checkbox',
+    'eval' => ['tl_class' => 'w50 m12 clr'],
+    'sql' => "char(1) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmOperations'] = [
+    'inputType' => 'checkbox',
+    'options_callback' => [FrontendManager::class, 'getOperations'],
+    'reference' => &$GLOBALS['TL_LANG']['tl_module']['cmFmOperationsReference'],
+    'eval' => ['multiple' => true, 'tl_class' => 'clr'],
+    'sql' => 'blob NULL',
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmToggleField'] = [
+    'inputType' => 'select',
+    'options_callback' => [FrontendManager::class, 'getToggleFields'],
+    'eval' => ['includeBlankOption' => true, 'chosen' => true, 'maxlength' => 64, 'tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmToggleReverse'] = [
+    'inputType' => 'checkbox',
+    'eval' => ['tl_class' => 'w50 m12'],
+    'sql' => "char(1) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmOwnerField'] = [
+    'inputType' => 'select',
+    'options_callback' => [FrontendManager::class, 'getOwnerFields'],
+    'eval' => ['includeBlankOption' => true, 'chosen' => true, 'maxlength' => 64, 'tl_class' => 'w50'],
+    'sql' => "varchar(64) NOT NULL default ''",
+];
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmInternalValues'] = [
+    'inputType' => 'keyValueWizard',
+    'save_callback' => [[FrontendManager::class, 'saveInternalValues']],
+    'eval' => ['tl_class' => 'clr'],
+    'sql' => 'blob NULL',
+];
+
+// Upload-Ordner, Dateitypen und Maximalgröße kommen aus der DCA des Feldes bzw. global (localconfig,
+// Parameter catalog_manager.frontend_manager.*) – hier nur die Wahl des Home-Verzeichnisses.
+$GLOBALS['TL_DCA']['tl_module']['fields']['cmFmUseHomeDir'] = [
+    'inputType' => 'checkbox',
+    'eval' => ['tl_class' => 'w50 m12'],
+    'sql' => "char(1) NOT NULL default ''",
+];

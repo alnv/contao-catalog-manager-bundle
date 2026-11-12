@@ -111,7 +111,6 @@ class Catalog extends CatalogWizard
 
     protected function setDefaultFields(): void
     {
-        // Performance-Fix: Methode nur 1x aufrufen statt in jedem Schleifendurchlauf
         $defaultFields = $this->getDefaultFields();
 
         foreach ($defaultFields as $strAlias => $arrField) {

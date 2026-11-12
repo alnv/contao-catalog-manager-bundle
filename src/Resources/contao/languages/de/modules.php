@@ -14,3 +14,4 @@ $GLOBALS['TL_LANG']['CTE']['catalog-manager-bundle'] = ['Catalog Manager', ''];
 $GLOBALS['TL_LANG']['FMD']['listing-map'] = ['Kartenansicht', ''];
 $GLOBALS['TL_LANG']['FMD']['listing-table'] = ['Listenansicht', ''];
 $GLOBALS['TL_LANG']['FMD']['master'] = ['Detailansicht', ''];
+$GLOBALS['TL_LANG']['FMD']['catalog-frontend-manager'] = ['Frontend-Verwaltung', 'Datensätze im Frontend auflisten, bearbeiten, duplizieren, löschen und ein-/ausblenden.'];

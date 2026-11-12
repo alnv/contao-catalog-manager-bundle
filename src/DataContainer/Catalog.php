@@ -43,12 +43,12 @@ class Catalog
 
     public function getCatalogTypes(): array
     {
-        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type']);
+        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] ?? []);
     }
 
     public function getSortingTypes(): array
     {
-        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType']);
+        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] ?? []);
     }
 
     public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes): string
@@ -196,7 +196,6 @@ class Catalog
             return '';
         }
 
-        // Tabellennamen landen in DDL-Statements → nur Buchstaben, Ziffern, Unterstrich
         if (!CatalogTableGuard::isValidIdentifier((string)$strTable)) {
             throw new \Exception(sprintf('Invalid table name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strTable));
         }
@@ -210,7 +209,6 @@ class Catalog
 
         if ($strTable != $strOldTable && $strOldTable) {
             if (CatalogTableGuard::isProtectedTable($strOldTable, $intCatalogId)) {
-                // Fremde Tabelle (Core/Erweiterung/anderer Katalog) nie umbenennen – neue Tabelle anlegen
                 Message::addInfo(sprintf('Table "%s" does not belong exclusively to the catalog manager and was not renamed.', $strOldTable));
             } elseif (!$objDatabaseBuilder->renameTable($strOldTable, $strTable, $intCatalogId)) {
                 throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
@@ -224,7 +222,6 @@ class Catalog
 
     public function createCustomFields(DataContainer $objDataContainer)
     {
-
         if (!$objDataContainer->activeRecord->table) {
             return null;
         }
@@ -246,8 +243,6 @@ class Catalog
             return;
         }
 
-        // Zusätzlich unabhängig vom geladenen DCA: Core-/Erweiterungs-/Entity-Tabellen und
-        // Tabellen, die ein anderer Katalog nutzt, werden nie gelöscht.
         if (CatalogTableGuard::isProtectedTable($strTable, (int)$objDataContainer->activeRecord->id)) {
             Message::addInfo(sprintf('Table "%s" was not deleted because it does not belong exclusively to this catalog.', $strTable));
             return;
@@ -277,12 +272,14 @@ class Catalog
         System::loadLanguageFile($dc->activeRecord->dbTable);
         Controller::loadDataContainer($dc->activeRecord->dbTable);
 
-        $strTable = ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['config']['_table'] ?? '');
+        $arrDca = $GLOBALS['TL_DCA'][$dc->activeRecord->dbTable] ?? [];
+        $strTable = ($arrDca['config']['_table'] ?? '');
+        $blnMultilingual = ($arrDca['config']['dataContainer'] ?? null) == Driver::class;
 
-        foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['fields'] as $strField => $arrField) {
+        foreach (($arrDca['fields'] ?? []) as $strField => $arrField) {
             $arrReturn[$strField] = $strTable . '.' . $strField;
 
-            if ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['config']['dataContainer'] == Driver::class && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
+            if ($blnMultilingual && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
                 $arrReturn['translation.' . $strField] =  'translation.' . $strField;
             }
         }
