@@ -18,6 +18,6 @@ class PlaceholderDataContainer extends DC_Table
 
     public function getPalette()
     {
-        //
+        return '';
     }
 }

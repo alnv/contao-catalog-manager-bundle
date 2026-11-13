@@ -22,7 +22,7 @@ class ContentListView extends Listing
 
         if (Mode::get() == 'BE') {
             $objTemplate = new BackendTemplate('be_wildcard');
-            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['CTE']['listview'][0]) . ' ###';
+            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['CTE']['listview'][0] ?? '') . ' ###';
             $objTemplate->id = $this->id;
 
             return $objTemplate->parse();

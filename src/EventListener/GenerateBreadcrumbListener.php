@@ -64,7 +64,7 @@ class GenerateBreadcrumbListener
 
         if (($objPage = PageModel::findByPk($strPageId)) && !$blnRequireItem) {
             try {
-                $arrItem['href'] = $objPage->getFrontendUrl();
+                $arrItem['href'] = Toolkit::generatePageUrl($objPage);
                 $arrItem['title'] = $objPage->pageTitle;
                 $arrItem['isRoot'] = false;
             } catch (\Exception $objError) {
@@ -119,7 +119,7 @@ class GenerateBreadcrumbListener
 
             try {
                 $arrPrevUrlFragments[] = $strUrlFragment;
-                $strUrl = $objPage->getFrontendUrl('/' . implode('/', $arrPrevUrlFragments));
+                $strUrl = Toolkit::generatePageUrl($objPage, '/' . implode('/', $arrPrevUrlFragments));
             } catch (\Exception $e) {
                 continue;
             }

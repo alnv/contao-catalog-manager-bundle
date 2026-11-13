@@ -6,6 +6,7 @@ use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
 use Alnv\ContaoCatalogManagerBundle\Library\Database as LDatabase;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
+use Alnv\ContaoCatalogManagerBundle\Helper\MultilingualHelper;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Contao\Config;
@@ -48,7 +49,6 @@ class CatalogField
 
     public function getRoles(DataContainer $dc): array
     {
-
         $arrRoles = (new Roles())->get();
         $arrRoleNames = array_keys($arrRoles);
         $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($dc);
@@ -75,7 +75,6 @@ class CatalogField
 
     public function watchFieldname($strFieldname, DataContainer $objDataContainer)
     {
-
         $objDatabase = Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
         $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
@@ -102,7 +101,6 @@ class CatalogField
             throw new \Exception('special characters are not allowed');
         }
 
-        // Spaltennamen landen in DDL-Statements → nur Buchstaben, Ziffern, Unterstrich
         if (!CatalogTableGuard::isValidIdentifier((string)$strFieldname)) {
             throw new \Exception(sprintf('Invalid field name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strFieldname));
         }
@@ -166,5 +164,14 @@ class CatalogField
         }
 
         return $return;
+    }
+
+    public function getLanguages(): array
+    {
+        $arrLanguages = MultilingualHelper::getLanguages()['languages'];
+
+        \array_unshift($arrLanguages, '*');
+
+        return $arrLanguages;
     }
 }

@@ -26,6 +26,7 @@ Du kannst eine kostenfreie und uneingeschränkte Testversion installieren und er
    - [Kind-Kataloge](#kind-kataloge)
    - [Felder und Rollen](#felder-und-rollen)
    - [Fieldsets und Paletten](#fieldsets-und-paletten)
+   - [Mehrsprachige Kataloge](#mehrsprachige-kataloge)
 4. [Ausgabe im Frontend](#4-ausgabe-im-frontend)
    - [Listen (Modul und Inhaltselement)](#listen-modul-und-inhaltselement)
    - [Detailseite](#detailseite)
@@ -86,7 +87,7 @@ Du kannst eine kostenfreie und uneingeschränkte Testversion installieren und er
 - **Suchen und Filtern:** Daten über URL-Parameter, Formulare oder Filterseiten einschränken.
 - **Produktverwaltung:** Produkte mit Bildern, Preisen und Kategorien.
 - **Merklisten und Wunschlisten:** Besucher speichern Favoriten.
-- **Mehrsprachigkeit:** über `alnv/catalog-manager-multilingual-adapter-bundle`.
+- **Mehrsprachigkeit:** integriert über `terminal42/dc_multilingual`, siehe [Mehrsprachige Kataloge](#mehrsprachige-kataloge).
 
 ### Funktionen auf einen Blick
 
@@ -160,7 +161,7 @@ contao-catalog-manager-bundle/
     │   └── Watchlist.php, Reactions.php, ShareButtons.php, ICalendar.php …
     ├── Maps/                      Kartenansicht
     ├── Mcp/                       MCP-Server: Befehl, Werkzeuge, DcaRecordManager, TemplateManager
-    ├── Models/                    Models inkl. DynModel für beliebige Katalogtabellen
+    ├── Models/                    Models inkl. DynModel/MultilingualDynModel für beliebige Katalogtabellen
     ├── Modules/                   Frontend-Module (Liste, Detail, Karte, Frontend-Verwaltung)
     ├── Pages/                     Seitentyp „Filter“
     ├── Search/                    Anbindung an die Contao-Backend-Suche
@@ -191,7 +192,8 @@ Diese Pakete werden automatisch mitinstalliert (`composer.json`):
 | `terminal42/dcawizard` | Assistenten im Backend (z. B. Optionen) |
 | `alnv/translation-manager-bundle` | Übersetzungen |
 | `alnv/widget-collection-bundle` | Backend-Widgets |
-| `alnv/catalog-manager-multilingual-adapter-bundle` | Mehrsprachige Kataloge |
+| `terminal42/dc_multilingual` | Mehrsprachige Kataloge (DataContainer „Multilingual“) |
+| `terminal42/contao-changelanguage` | Sprachwechsel auf Detailseiten mehrsprachiger Kataloge |
 | `alnv/contao-geocoding` | Geocoding für Umkreissuche und Karten |
 | `guzzlehttp/guzzle` (`^7.10 \|\| ^8.3`) | HTTP-Anfrage der Lizenzprüfung. Kompatibel mit Guzzle 7 und 8; welche Version installiert wird, bestimmen die übrigen Pakete (Contao 5.7 lässt derzeit nur Guzzle 7 zu). |
 | `symfony/rate-limiter` | Begrenzung für Merkliste und Reaktionen |
@@ -336,6 +338,23 @@ Einen Katalog kannst du über **Paletten bearbeiten** (grünes Symbol, drittes v
 ![](https://catalog-manager.org/files/docs/screenshot-pal-2.png)
 
 Die Palette bestimmt die Reihenfolge und Gruppierung der Felder im Backend. Die Frontend-Verwaltung übernimmt sie einschließlich der Subpaletten.
+
+### Mehrsprachige Kataloge
+
+Mehrsprachigkeit ist Teil des Bundles (früher `alnv/catalog-manager-multilingual-adapter-bundle`). Sie baut auf `terminal42/dc_multilingual` auf: Übersetzungen liegen als eigene Datensätze in derselben Tabelle und verweisen auf den Datensatz der Fallback-Sprache.
+
+1. Im Katalog als **DataContainer** „Multilingual“ wählen. Die Tabelle erhält die Spalten `lid` (ID des Fallback-Datensatzes) und `language` (Sprache der Übersetzung).
+2. In jedem Feld, das übersetzt werden soll, unter **Mehrsprachige-Einstellungen → Übersetzbar für** die Sprachen wählen; `*` steht für alle Sprachen. Zur Auswahl stehen die Sprachen der Startpunkte.
+3. Die Fallback-Sprache ist die Sprache des Startpunkts mit „Sprachen-Fallback“. Sind mehrere Startpunkte als Fallback markiert, wird keine Fallback-Sprache gesetzt.
+
+Was danach automatisch passiert:
+
+- Das Backend nutzt den Treiber von dc_multilingual (`Terminal42\DcMultilingualBundle\Driver`) mit `langPid = lid`, `langColumnName = language` und mehrsprachigen Aliasen.
+- Listen, Detailseiten, Insert-Tags und Zählungen lesen über `MultilingualDynModel`: Felder der aktuellen Sprache, sonst Fallback. Detailseiten finden einen Eintrag über den Alias der Fallback-Sprache oder der aktuellen Sprache.
+- Im Filter-Wizard stehen übersetzbare Felder zusätzlich als `translation.<feld>` zur Verfügung.
+- Mit `terminal42/contao-changelanguage` verlinkt der Sprachwechsel auf Detailseiten den Alias des Eintrags in der Zielsprache.
+
+> **Umstieg vom Adapter-Bundle:** `alnv/catalog-manager-multilingual-adapter-bundle` aus der `composer.json` des Projekts entfernen und `composer update` ausführen. Das Paket wird per `replace` ersetzt; Datenbank und Katalogeinstellungen bleiben unverändert. Eigener Code, der `Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models\MultilingualDynModel` verwendet, muss auf `Alnv\ContaoCatalogManagerBundle\Models\MultilingualDynModel` umgestellt werden. Die Service-IDs `catalogmanagermultilingualadapter.*` gibt es nicht mehr.
 
 ---
 
@@ -1396,7 +1415,7 @@ $GLOBALS['TL_HOOKS']['parseEntity'][] = [\App\EventListener\CatalogListener::cla
 | `loadVirtualDataContainer` | `$strTable, $vdca` | Nach dem Erzeugen des virtuellen DCA |
 | `initializeView` | `$strTable, $arrOptions, $view` | Vor dem Lesen einer Liste bzw. Detailansicht |
 | `getModelOptions` | `$arrOptions, $strTable, $arrViewOptions` → Rückgabe Optionen | Abfrage-Optionen ändern |
-| `dynModelBuildFindQuery` | `$strQuery, $arrOptions` → Rückgabe SQL | SQL der Abfrage ändern |
+| `dynModelBuildFindQuery` | `$strQuery, $arrOptions` → Rückgabe SQL | SQL der Abfrage ändern (nicht bei mehrsprachigen Katalogen, deren Abfrage baut dc_multilingual) |
 | `parseFieldValue` | `$varValue, $strField, $arrValues, $strTable, $blnFastMode, $view` | Aufbereitung eines Feldwertes |
 | `parseEntity` | `&$arrRow, $strTable, $arrOptions, $view` | Eintrag vor der Ausgabe ergänzen |
 | `parseViewEntities` | `&$arrEntities, $view` | Alle Einträge einer Ausgabe |
@@ -1525,6 +1544,18 @@ Technische Details zu Fehlern stehen in `var/logs/prod-<datum>.log`.
   - `rs_cntry` → `country`
   - `rs_dstnc` → `radius`
 - Backend-CSS-Klassen, SQL-Typen und reguläre Ausdrücke werden über [Rollen](#felder-und-rollen) festgelegt.
+
+### Update von v2
+
+- Das Frontend-Modul „Listenansicht“ hieß in v2 `listing` (kollidierte mit dem Listing-Modul von Contao) und heißt seit v3 `listing-table`; das Hüllen-Template `mod_listing` heißt jetzt `mod_listing_table`. Die Migration `ListingModuleTypeMigration` stellt bestehende Module automatisch um:
+
+  ```bash
+  php vendor/bin/contao-console contao:migrate --migrations-only --dry-run   # anstehende Migrationen anzeigen
+  php vendor/bin/contao-console contao:migrate --migrations-only
+  ```
+
+  Umgestellt werden nur Module mit Katalog-Tabelle (`cmTable`); Module des Contao-Listing-Moduls bleiben unberührt. Überschreibt das Projekt `mod_listing.html5`, wird es weiterverwendet (Hinweis in der Ausgabe: am besten in `mod_listing_table_*.html5` umbenennen).
+- Insert-Tags in Großbuchstaben (`{{ACTIVE::…}}` usw.) in den Filtereinstellungen schreibt `InsertTagCaseMigration` klein.
 
 ---
 

@@ -86,10 +86,6 @@ class CatalogPalette
 
         foreach (($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) as $strField => $arrField) {
 
-            if (isset($arrReturn[$strField])) {
-                continue;
-            }
-
             if (!isset($arrField['inputType'])) {
                 continue;
             }

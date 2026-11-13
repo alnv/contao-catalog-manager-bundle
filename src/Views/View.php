@@ -11,8 +11,8 @@ use Alnv\ContaoCatalogManagerBundle\Library\ICalendar;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
 use Alnv\ContaoCatalogManagerBundle\Library\ShareButtons;
 use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
-use Contao\Config;
 use Contao\ContentModel;
+use Contao\Config;
 use Contao\Controller;
 use Alnv\ContaoCatalogManagerBundle\Library\PlaceholderDataContainer;
 use Contao\Database;
@@ -411,33 +411,26 @@ abstract class View extends Controller
         return $arrEntity;
     }
 
-    /**
-     * Response mit Cache-Tags versehen (contao.db.<tabelle> und contao.db.<tabelle>.<id>).
-     * DC_Table invalidiert genau diese Tags beim Speichern/Löschen im Backend – Seiten mit
-     * Katalogdaten werden dadurch sofort aktualisiert, statt bis zum Ablauf der Shared-Max-Age
-     * veraltet im Reverse-Proxy zu liegen.
-     */
     protected function addCacheTags(array $arrEntity): void
     {
-        static $objEntityTags = false;
+        static $objCacheTagManager = false;
 
-        if ($objEntityTags === false) {
+        if ($objCacheTagManager === false) {
             $objContainer = System::getContainer();
-            $objEntityTags = $objContainer->has('contao.cache.entity_tags') ? $objContainer->get('contao.cache.entity_tags') : null;
+            $objCacheTagManager = $objContainer->has('contao.cache.tag_manager') ? $objContainer->get('contao.cache.tag_manager') : null;
         }
 
-        if ($objEntityTags === null || !$this->strTable) {
+        if ($objCacheTagManager === null || !$this->strTable) {
             return;
         }
 
         $arrTags = ['contao.db.' . $this->strTable];
-
         if (!empty($arrEntity['id'])) {
             $arrTags[] = 'contao.db.' . $this->strTable . '.' . $arrEntity['id'];
         }
 
         try {
-            $objEntityTags->tagWith($arrTags);
+            $objCacheTagManager->tagWith($arrTags);
         } catch (\Throwable) {
             // Tagging ist optional (z. B. CLI ohne Response-Tagger)
         }
@@ -485,6 +478,8 @@ abstract class View extends Controller
             return '';
         }
 
+        // TODO Contao 6: auf contao.pagination.factory umstellen. Contao\Pagination und maxPaginationLinks bleiben
+        // vorerst, weil die neue Pagination ein Twig-Template rendert und eigene "pagination"-Templates umgeht.
         $objPagination = new Pagination(($this->arrOptions['total'] ?? 0), ($this->arrOptions['limit'] ?? 0), Config::get('maxPaginationLinks'), 'page_e' . ($this->arrOptions['id'] ?? 0));
         return $objPagination->generate("\n  ");
     }

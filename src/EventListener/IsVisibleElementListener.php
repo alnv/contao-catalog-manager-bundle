@@ -24,7 +24,7 @@ class IsVisibleElementListener
             return $blnIsVisible;
         }
 
-        if ($objRequest->get('_scope') == 'frontend') {
+        if ($objRequest->attributes->get('_scope') == 'frontend') {
             $strAutoItem = $_GET['auto_item'] ?? '';
 
             if (!$objElement->cmHide) {

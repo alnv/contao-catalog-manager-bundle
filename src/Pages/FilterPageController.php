@@ -4,15 +4,19 @@ namespace Alnv\ContaoCatalogManagerBundle\Pages;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\Getters;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\CoreBundle\Controller\Page\AbstractPageController;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Environment;
-use Contao\FrontendIndex;
 use Contao\Input;
 use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FilterPageController
+/**
+ * Seitentyp "filter": wertet die URL-Fragmente als Filter aus und rendert die Seite danach wie eine
+ * reguläre Seite (AbstractPageController::renderPage(), wie Contaos RegularPageController).
+ */
+class FilterPageController extends AbstractPageController
 {
 
     public function __invoke(Request $request, PageModel $pageModel): Response
@@ -20,7 +24,11 @@ class FilterPageController
 
         $GLOBALS['TL_LANGUAGE'] = $pageModel->language ?: $GLOBALS['TL_LANGUAGE'];
 
-        Input::resetUnusedGet();
+        // Die Fragmente werden hier ausgewertet, nicht über Input::get(); sonst würde Contao die Seite wegen
+        // "nicht verwendeter Routen-Parameter" mit 404 beantworten (ersetzt das veraltete Input::resetUnusedGet())
+        foreach (Input::getUnusedRouteParameters() as $strParameter) {
+            Input::get($strParameter);
+        }
 
         $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
         $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias, $pageModel->language);
@@ -45,6 +53,6 @@ class FilterPageController
             Input::setGet('auto_item', $strAutoItem);
         }
 
-        return (new FrontendIndex())->renderPage($pageModel);
+        return $this->renderPage($pageModel);
     }
 }

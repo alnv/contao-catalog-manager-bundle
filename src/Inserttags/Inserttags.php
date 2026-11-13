@@ -30,7 +30,6 @@ class Inserttags
                     return '';
                 }
                 $strField = (string)($arrFragments[1] ?? '');
-                // Keine sensiblen Spalten ausgeben (Passwort-Hash, 2FA-Geheimnisse, Session-/Login-Daten)
                 if (!$this->isAllowedMemberField($strField)) {
                     return '';
                 }

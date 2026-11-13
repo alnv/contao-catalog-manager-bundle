@@ -4,12 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Event\FrontendManager;
 
 use Alnv\ContaoCatalogManagerBundle\Library\FrontendManager\MemberContext;
 
-/**
- * Ein Datensatz wurde über das Formular gespeichert ("Bearbeiten").
- *
- * Ausgelöst bei jedem erfolgreichen Speichern, auch wenn sich kein Wert geändert hat – mit
- * hasChanges() bzw. getChangedFields() lassen sich solche Fälle herausfiltern.
- */
 final class RecordUpdatedEvent extends AbstractRecordEvent
 {
     /** Felder, die bei jeder Speicherung automatisch wechseln und nicht als Änderung zählen. */

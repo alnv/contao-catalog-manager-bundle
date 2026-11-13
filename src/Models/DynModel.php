@@ -17,16 +17,8 @@ class DynModel extends Model
 
     public function __construct($objResult = null)
     {
-        if (static::class === self::class) {
-            if (System::getContainer()
-                    ->get('contao.routing.scope_matcher')
-                    ->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create('')) && !static::$strTable) {
-                self::$strTable = Toolkit::getTableByDo();
-            }
-
-            if (($GLOBALS['CM_TEMP_MODEL_TABLE'] ?? null) && self::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE']) {
-                self::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
-            }
+        if (static::isBaseModel()) {
+            static::resolveBaseModelTable();
         }
 
         parent::__construct($objResult);
@@ -34,7 +26,7 @@ class DynModel extends Model
 
     public static function createDynTable($strTable, $objResult = null)
     {
-        if (static::class !== self::class && static::$strTable === $strTable) {
+        if (!static::isBaseModel() && static::$strTable === $strTable) {
             return new static($objResult);
         }
 
@@ -45,8 +37,6 @@ class DynModel extends Model
 
     public static function findByIdOrAlias($varId, array $arrOptions = [])
     {
-        $t = static::$strTable;
-
         if (!isset($arrOptions['column']) || !is_array($arrOptions['column'])) {
             $arrOptions['column'] = [];
         }
@@ -55,8 +45,10 @@ class DynModel extends Model
             $arrOptions['value'] = [];
         }
 
-        $arrOptions['column'][] = !\preg_match('/^[1-9]\d*$/', $varId) ? "$t.alias=?" : "$t.id=?";
-        $arrOptions['value'][] = $varId;
+        [$strCondition, $arrValues] = static::buildIdOrAliasCondition(!\preg_match('/^[1-9]\d*$/', (string)$varId) ? 'alias' : 'id', $varId);
+
+        $arrOptions['column'][] = $strCondition;
+        \array_push($arrOptions['value'], ...$arrValues);
         $arrOptions['limit'] = 1;
         $arrOptions['return'] = 'Model';
 
@@ -79,38 +71,75 @@ class DynModel extends Model
         return (int)Database::getInstance()->prepare($strQuery)->execute(...$arrValues)->cnt;
     }
 
-    protected static function buildFindQuery(array $arrOptions): string
+    protected static function isBaseModel(): bool
     {
-        $strTable = $arrOptions['table'];
+        return static::class === self::class;
+    }
 
+    protected static function resolveBaseModelTable(): void
+    {
+        if (!static::$strTable && System::getContainer()->get('contao.routing.scope_matcher')->isBackendRequest(System::getContainer()->get('request_stack')->getCurrentRequest() ?? Request::create(''))) {
+            static::$strTable = Toolkit::getTableByDo();
+        }
+
+        if (($GLOBALS['CM_TEMP_MODEL_TABLE'] ?? null) && static::$strTable !== $GLOBALS['CM_TEMP_MODEL_TABLE']) {
+            static::$strTable = $GLOBALS['CM_TEMP_MODEL_TABLE'];
+        }
+    }
+
+    protected static function buildIdOrAliasCondition(string $strColumn, $varId): array
+    {
+        $t = static::$strTable;
+
+        return ["$t.$strColumn=?", [$varId]];
+    }
+
+    protected static function assertValidTable($strTable): void
+    {
         if (!\is_string($strTable) || !\preg_match('/^[A-Za-z0-9_]{1,64}$/', $strTable)) {
             throw new \InvalidArgumentException('Invalid table name.');
         }
+    }
 
-        $objBase = DcaExtractor::getInstance($strTable);
-        $strDistanceSelection = '';
+    protected static function buildDistanceSelection(array $arrOptions, string $strTable): string
+    {
+        if (!isset($arrOptions['distance'])) {
+            return '';
+        }
 
-        if (isset($arrOptions['distance'])) {
-            $dist = $arrOptions['distance'];
-            $strTableEscaped = Database::quoteIdentifier($strTable);
-            $strLatFieldEscaped = Database::quoteIdentifier($dist['latField']);
-            $strLngFieldEscaped = Database::quoteIdentifier($dist['lngField']);
+        $dist = $arrOptions['distance'];
+        $strTableEscaped = Database::quoteIdentifier($strTable);
+        $strLatFieldEscaped = Database::quoteIdentifier($dist['latField']);
+        $strLngFieldEscaped = Database::quoteIdentifier($dist['lngField']);
 
-            $strDistanceSelection = sprintf(
-                ", 6371 * 2 * ASIN(SQRT(
+        return sprintf(
+            "6371 * 2 * ASIN(SQRT(
                 POWER(SIN((%F - ABS(%s.%s)) * PI() / 180 / 2), 2) + 
                 COS(%F * PI() / 180) * COS(ABS(%s.%s) * PI() / 180) * POWER(SIN((%F - %s.%s) * PI() / 180 / 2), 2)
-            )) AS _distance ",
-                (float)$dist['latCord'],
-                $strTableEscaped,
-                $strLatFieldEscaped,
-                (float)$dist['latCord'],
-                $strTableEscaped,
-                $strLatFieldEscaped,
-                (float)$dist['lngCord'],
-                $strTableEscaped,
-                $strLngFieldEscaped
-            );
+            )) AS _distance",
+            (float)$dist['latCord'],
+            $strTableEscaped,
+            $strLatFieldEscaped,
+            (float)$dist['latCord'],
+            $strTableEscaped,
+            $strLatFieldEscaped,
+            (float)$dist['lngCord'],
+            $strTableEscaped,
+            $strLngFieldEscaped
+        );
+    }
+
+    protected static function buildFindQuery(array $arrOptions)
+    {
+        $strTable = $arrOptions['table'];
+
+        static::assertValidTable($strTable);
+
+        $objBase = DcaExtractor::getInstance($strTable);
+        $strDistanceSelection = static::buildDistanceSelection($arrOptions, $strTable);
+
+        if ($strDistanceSelection !== '') {
+            $strDistanceSelection = ', ' . $strDistanceSelection . ' ';
         }
 
         if (!$objBase->hasRelations()) {

@@ -1,6 +1,9 @@
 <?php
 
 use Alnv\ContaoCatalogManagerBundle\Elements\ContentListView;
+use Alnv\ContaoCatalogManagerBundle\EventListener\ChangelanguageNavigationListener;
+use Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualCatalogListener;
+use Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualDataContainerListener;
 use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
@@ -77,9 +80,24 @@ $GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::clas
 $GLOBALS['CM_TEMP_MODEL_TABLE'] = null;
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
-$GLOBALS['CM_CUSTOM_FIELDS'] = [];
-$GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
+$GLOBALS['CM_CUSTOM_FIELDS'] = [
+    'lid' => [
+        'index' => true,
+        'sql' => "int(10) unsigned NOT NULL default '0'"
+    ],
+    'language' => [
+        'index' => true,
+        'sql' => "varchar(6) NOT NULL default ''"
+    ]
+];
+$GLOBALS['CM_DATA_CONTAINERS'] = ['Table', 'Multilingual'];
 $GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'] = ['Table' => DC_Table::class];
+
+$GLOBALS['TL_HOOKS']['changelanguageNavigation'][] = [ChangelanguageNavigationListener::class, '__invoke'];
+$GLOBALS['TL_HOOKS']['loadVirtualDataContainer'][] = [MultilingualDataContainerListener::class, 'onLoadVirtualDataContainer'];
+$GLOBALS['TL_HOOKS']['loadDataContainer'][] = [MultilingualDataContainerListener::class, 'onLoadDataContainer'];
+$GLOBALS['TL_HOOKS']['parseCatalogField'][] = [MultilingualCatalogListener::class, 'onParseCatalogField'];
+$GLOBALS['TL_HOOKS']['parseCatalog'][] = [MultilingualCatalogListener::class, 'onParseCatalog'];
 $GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'customOptionWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
 
 $GLOBALS['BE_FFL']['customOptionWizard'] = CustomOptionWizard::class;

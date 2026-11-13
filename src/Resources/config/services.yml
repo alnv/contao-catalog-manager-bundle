@@ -24,6 +24,14 @@ services:
   Alnv\ContaoCatalogManagerBundle\Mcp\McpCommand:
     public: true
 
+  Alnv\ContaoCatalogManagerBundle\Migration\InsertTagCaseMigration:
+    tags: [ contao.migration ]
+
+  Alnv\ContaoCatalogManagerBundle\Migration\ListingModuleTypeMigration:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
+    tags: [ contao.migration ]
+
   Alnv\ContaoCatalogManagerBundle\Pages\FilterPageController:
     tags: [ contao.page ]
 
@@ -52,19 +60,12 @@ services:
   Alnv\ContaoCatalogManagerBundle\Controller\BackendOptionController:
     public: true
 
-  Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag:
-    tags:
-      - { name: contao.hook, hook: replaceInsertTags }
+  # Insert-Tags active, active_page, master, watchlist, timestamp (#[AsInsertTag], per autoconfigure)
+  Alnv\ContaoCatalogManagerBundle\Inserttags\CatalogInsertTagResolver: ~
 
-  Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag:
-    tags:
-      - { name: contao.hook, hook: replaceInsertTags }
-
+  # Tags mit Bindestrich sind als Parser-Namen nicht erlaubt und bleiben beim Hook:
+  # watchlist-table, watchlist-reset, watchlist-count bzw. cm-user, last-added-master-view-ids
   Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags:
-    tags:
-      - { name: contao.hook, hook: replaceInsertTags }
-
-  Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag:
     tags:
       - { name: contao.hook, hook: replaceInsertTags }
 
@@ -83,10 +84,6 @@ services:
   Alnv\ContaoCatalogManagerBundle\EventListener\GetSearchablePagesListener:
     tags:
       - { name: contao.hook, hook: getSearchablePages }
-
-  Alnv\ContaoCatalogManagerBundle\EventListener\ReplaceInsertTagsListener:
-    tags:
-      - { name: contao.hook, hook: replaceInsertTags }
 
   Alnv\ContaoCatalogManagerBundle\EventListener\LoadDataContainerListener:
     tags:
@@ -122,6 +119,15 @@ services:
   Alnv\ContaoCatalogManagerBundle\EventListener\LoadFormFieldListener:
     tags:
       - { name: contao.hook, hook: loadFormField }
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualDataContainerListener:
+    public: true
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualCatalogListener:
+    public: true
+
+  Alnv\ContaoCatalogManagerBundle\EventListener\ChangelanguageNavigationListener:
+    public: true
 
   catalogmanager.datacontainer.catalog:
     class: Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog

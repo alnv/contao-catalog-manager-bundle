@@ -55,3 +55,6 @@ $GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'] = [
     'dbOptions' => 'Table de base de données',
     'dbActiveOptions' => 'Table de base de données (assignée)'
 ];
+
+$GLOBALS['TL_LANG']['tl_catalog_field']['multilingual_legend'] = 'Paramètres multilingues';
+$GLOBALS['TL_LANG']['tl_catalog_field']['translatableFor'] = ['Traduisible pour', ''];

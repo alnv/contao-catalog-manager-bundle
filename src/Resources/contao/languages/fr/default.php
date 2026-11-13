@@ -63,3 +63,7 @@ $GLOBALS['TL_LANG']['MSC']['cmWatchlist']['invalidToken'] = 'Votre session a exp
 $GLOBALS['TL_LANG']['MSC']['cmWatchlist']['full'] = 'La liste de souhaits est pleine.';
 $GLOBALS['TL_LANG']['MSC']['cmWatchlist']['error'] = 'La liste de souhaits n\'a pas pu être enregistrée. Veuillez réessayer.';
 $GLOBALS['TL_LANG']['MSC']['cmWatchlist']['noscript'] = 'JavaScript est nécessaire pour la liste de souhaits.';
+
+// Multilingue
+$GLOBALS['TL_LANG']['MSC']['lid'] = ['ID de langue', ''];
+$GLOBALS['TL_LANG']['MSC']['language'] = ['Langue', ''];

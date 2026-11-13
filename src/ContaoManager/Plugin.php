@@ -13,6 +13,7 @@ use Contao\ManagerPlugin\Routing\RoutingPluginInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Terminal42\DcawizardBundle\Terminal42DcawizardBundle;
+use Terminal42\DcMultilingualBundle\Terminal42DcMultilingualBundle;
 
 class Plugin implements BundlePluginInterface, RoutingPluginInterface
 {
@@ -21,10 +22,11 @@ class Plugin implements BundlePluginInterface, RoutingPluginInterface
     {
         return [
             BundleConfig::create(AlnvContaoCatalogManagerBundle::class)
-                ->setReplace(['contao-catalog-manager-bundle'])
+                ->setReplace(['contao-catalog-manager-bundle', 'contao-catalog-manager-multilingual-adapter-bundle'])
                 ->setLoadAfter([
                     ContaoCoreBundle::class,
                     Terminal42DcawizardBundle::class,
+                    Terminal42DcMultilingualBundle::class,
                     AlnvContaoWidgetCollectionBundle::class,
                     AlnvContaoTranslationManagerBundle::class
                 ])

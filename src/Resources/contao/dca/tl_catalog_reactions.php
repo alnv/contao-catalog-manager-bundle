@@ -1,6 +1,7 @@
 <?php
 
 use Contao\Config;
+use Contao\Controller;
 use Contao\DC_Table;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 
@@ -119,8 +120,8 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
                 'mandatory' => true,
                 'tl_class' => 'w50 clr'
             ],
-            'options_callback' => function () {
-                return $this->getTemplateGroup('reactions_');
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('reactions_');
             },
             'sql' => "varchar(64) NOT NULL default ''"
         ]

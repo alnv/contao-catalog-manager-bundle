@@ -14,6 +14,7 @@ use Ausi\SlugGenerator\SlugGenerator;
 use Ausi\SlugGenerator\SlugOptions;
 use Contao\Controller;
 use Contao\Database;
+use Contao\Environment;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\FilesModel;
@@ -25,9 +26,36 @@ use Contao\StringUtil;
 use Contao\System;
 use Contao\Validator;
 use Contao\Widget;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Toolkit
 {
+    public static function generatePageUrl(PageModel $objPage, ?string $strParams = null, bool $blnAbsolute = false): string
+    {
+        $objPage->loadDetails();
+        $objContainer = System::getContainer();
+
+        try {
+            return $objContainer->get('contao.routing.content_url_generator')->generate(
+                $objPage,
+                ['parameters' => $strParams],
+                $blnAbsolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+            );
+        } catch (RouteNotFoundException $objException) {
+            if (!$objContainer->get('contao.routing.page_registry')->isRoutable($objPage)) {
+                throw new ResourceNotFoundException(\sprintf('Page ID %s is not routable', $objPage->id), 0, $objException);
+            }
+
+            throw $objException;
+        }
+    }
+
+    public static function getRelativeRequest(): string
+    {
+        return (string)\preg_replace('/^' . \preg_quote((string)Environment::get('path'), '/') . '\/?/', '', (string)Environment::get('requestUri'));
+    }
 
     public static function addToCatalogData($strType, $strTable, $strIdentifier): array
     {
@@ -372,10 +400,10 @@ class Toolkit
             $strUrlFragments[] = $strAlias;
             $strUrl = (empty($strUrlFragments) ? '' : implode('/', $strUrlFragments));
 
-            return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strUrl ? '/' . $strUrl : '')) : ($blnPreview ? 'preview.php/' : '') . $varPage->getFrontendUrl(($strUrl ? '/' . $strUrl : ''));
+            return ($blnPreview && !$blnUseAbsolute ? 'preview.php/' : '') . static::generatePageUrl($varPage, ($strUrl ? '/' . $strUrl : ''), $blnUseAbsolute);
         }
 
-        return $blnUseAbsolute ? $varPage->getAbsoluteUrl(($strAlias ? '/' . $strAlias : '')) : ($blnPreview ? 'preview.php/' : '') . $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+        return ($blnPreview && !$blnUseAbsolute ? 'preview.php/' : '') . static::generatePageUrl($varPage, ($strAlias ? '/' . $strAlias : ''), $blnUseAbsolute);
     }
 
     public static function parseImage($varImage): string

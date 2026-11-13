@@ -120,3 +120,7 @@ $GLOBALS['TL_LANG']['MSC']['cmFrontendManager']['fileRemove'] = 'entfernen';
 $GLOBALS['TL_LANG']['MSC']['cmFrontendManager']['uploadHint'] = 'Erlaubte Dateitypen: %s. Maximale Dateigröße: %s.';
 $GLOBALS['TL_LANG']['MSC']['cmFrontendManager']['uploadUnavailable'] = 'Datei-Uploads sind derzeit nicht möglich.';
 $GLOBALS['TL_LANG']['MSC']['cmFrontendManager']['uploadInvalidImage'] = 'Die Datei „%s“ ist kein gültiges Bild.';
+
+// Mehrsprachigkeit
+$GLOBALS['TL_LANG']['MSC']['lid'] = [ 'LID', '' ];
+$GLOBALS['TL_LANG']['MSC']['language'] = [ 'Sprache', '' ];

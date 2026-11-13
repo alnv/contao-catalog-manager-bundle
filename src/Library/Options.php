@@ -133,7 +133,7 @@ class Options
 
         if (isset($arrField['eval']) && is_array($arrField['eval'])) {
             if (isset($arrField['eval']['csv']) && $arrField['eval']['csv']) {
-                return explode($arrField['eval']['csv'], $strValue);
+                return explode($arrField['eval']['csv'], (string)$strValue);
             }
         }
 

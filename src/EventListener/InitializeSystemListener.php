@@ -22,11 +22,11 @@ class InitializeSystemListener
             return;
         }
 
-        if ($objRequest->get('_route') == 'contao_install') {
+        if ($objRequest->attributes->get('_route') == 'contao_install') {
             return;
         }
 
-        if ($objRequest->get('_scope') == 'backend') {
+        if ($objRequest->attributes->get('_scope') == 'backend') {
             $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeBackendModules();
         }
@@ -41,11 +41,11 @@ class InitializeSystemListener
             return;
         }
 
-        if ($objRequest->get('_route') == 'contao_install') {
+        if ($objRequest->attributes->get('_route') == 'contao_install') {
             return;
         }
 
-        if ($objRequest->get('_scope') == 'backend') {
+        if ($objRequest->attributes->get('_scope') == 'backend') {
             $objVirtualDataContainerArray = new Application();
             $objVirtualDataContainerArray->initializeDataContainerArrays();
         }

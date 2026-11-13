@@ -111,7 +111,7 @@ abstract class CatalogWizard
         }
 
         $blnMultiple = (bool)$arrField['multiple'];
-        $arrField['description'] = \trim(\strip_tags($arrField['description']));
+        $arrField['description'] = \trim(\strip_tags((string)($arrField['description'] ?? '')));
         $strTable = $arrCatalog['table'] ?? '';
 
         $translator = Translation::getInstance();

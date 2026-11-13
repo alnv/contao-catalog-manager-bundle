@@ -4,9 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Event\FrontendManager;
 
 use Alnv\ContaoCatalogManagerBundle\Library\FrontendManager\MemberContext;
 
-/**
- * Ein Datensatz wurde angelegt (Operator "Neu anlegen" oder "Duplizieren").
- */
 final class RecordCreatedEvent extends AbstractRecordEvent
 {
     public function __construct(

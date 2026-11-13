@@ -4,7 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Contao\Config;
 use Contao\Controller;
-use Contao\Environment;
 use Contao\File as ContaoFile;
 use Contao\FilesModel;
 use Contao\Frontend;
@@ -70,7 +69,7 @@ class File
                     $arrMeta['title'] = StringUtil::specialchars($objFiles->basename);
                 }
 
-                $href = Environment::get('request');
+                $href = Toolkit::getRelativeRequest();
                 if (isset($_GET['file'])) {
                     $href = \preg_replace('/([?&])file=[^&]*&?/', '$1', $href);
                 }
@@ -123,7 +122,7 @@ class File
                         $arrMeta['title'] = StringUtil::specialchars($objFile->basename);
                     }
 
-                    $strHref = Environment::get('request');
+                    $strHref = Toolkit::getRelativeRequest();
                     if (preg_match('/(&(amp;)?|\?)file=/', $strHref)) {
                         $strHref = preg_replace('/(&(amp;)?|\?)file=[^&]+/', '', $strHref);
                     }
@@ -158,10 +157,6 @@ class File
                     $arrOrder[$arrValue['uuid']] = $arrValue;
                     unset($arrFiles[$strKey]);
                 }
-            }
-
-            if (!empty($arrImages)) {
-                $arrOrder = \array_merge($arrOrder, \array_values($arrImages));
             }
 
             $arrFiles = \array_values(array_filter($arrOrder));

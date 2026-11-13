@@ -3,6 +3,7 @@
 use Contao\Controller;
 use Contao\DataContainer;
 use Contao\Database;
+use Alnv\ContaoCatalogManagerBundle\DataContainer\FrontendManager;
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['id']['search'] = true;
 
@@ -248,13 +249,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmIgnoreFieldsFromParsing'] = [
     'options_callback' => ['catalogmanager.datacontainer.module', 'getFields'],
     'sql' => "blob NULL"
 ];
-// ---------------------------------------------------------------------------
-// Frontend-Verwaltung (Modultyp catalog-frontend-manager)
-// Wiederverwendet: cmTable (Tabelle), cmFilter/cmFilterType/cmWizardFilterSettings/cmColumn/cmValue
-// (Datensatzbeschränkung, gleiche Syntax wie bei den Listen-Modulen), cmOrder, cmLimit.
-// ---------------------------------------------------------------------------
-
-use Alnv\ContaoCatalogManagerBundle\DataContainer\FrontendManager;
 
 $GLOBALS['TL_DCA']['tl_module']['config']['onload_callback'][] = [FrontendManager::class, 'onLoad'];
 $GLOBALS['TL_DCA']['tl_module']['config']['onsubmit_callback'][] = [FrontendManager::class, 'onSubmit'];
@@ -341,8 +335,6 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['cmFmInternalValues'] = [
     'sql' => 'blob NULL',
 ];
 
-// Upload-Ordner, Dateitypen und Maximalgröße kommen aus der DCA des Feldes bzw. global (localconfig,
-// Parameter catalog_manager.frontend_manager.*) – hier nur die Wahl des Home-Verzeichnisses.
 $GLOBALS['TL_DCA']['tl_module']['fields']['cmFmUseHomeDir'] = [
     'inputType' => 'checkbox',
     'eval' => ['tl_class' => 'w50 m12'],

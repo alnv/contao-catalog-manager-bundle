@@ -4,11 +4,6 @@ namespace Alnv\ContaoCatalogManagerBundle\Event\FrontendManager;
 
 use Alnv\ContaoCatalogManagerBundle\Library\FrontendManager\MemberContext;
 
-/**
- * Die Sichtbarkeit eines Datensatzes wurde umgeschaltet (Operator "Sichtbarkeit").
- * Berücksichtigt die "umgekehrte Logik" (z. B. Feld invisible): isVisible() ist immer die
- * tatsächliche Sichtbarkeit, nicht der gespeicherte Feldwert.
- */
 final class RecordVisibilityChangedEvent extends AbstractRecordEvent
 {
     public function __construct(

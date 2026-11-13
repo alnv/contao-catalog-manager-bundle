@@ -16,6 +16,7 @@ use Contao\CoreBundle\Search\Backend\ReindexConfig;
 use Contao\CoreBundle\Security\ContaoCorePermissions;
 use Contao\CoreBundle\Security\DataContainer\ReadAction;
 use Contao\Database;
+use Contao\DcaExtractor;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
@@ -184,6 +185,9 @@ class VirtualTableDataContainerProvider implements ProviderInterface
 
         $fields = ['id', ...array_keys($searchableFields)];
         $select = [];
+        // Virtuelle Felder (z. B. in einer JSON-Spalte gespeichert) auf ihre Speicher-Spalte abbilden – wie im
+        // TableDataContainerProvider von Contao; vorher war $virtualFields nicht definiert
+        $virtualFields = $this->contaoFramework->createInstance(DcaExtractor::class, [$table])->getVirtualFields();
 
         foreach ($fields as $field) {
             $value = $virtualFields[$field] ?? $field;

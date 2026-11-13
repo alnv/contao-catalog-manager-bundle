@@ -21,7 +21,7 @@ class MasterModule extends Module
     public function generate(): string
     {
 
-        if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
+        if (System::getContainer()->get('request_stack')->getCurrentRequest()?->attributes->get('_scope') == 'backend') {
 
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
@@ -43,7 +43,8 @@ class MasterModule extends Module
     protected function compile(): void
     {
 
-        $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
+        // Input::get() liefert null, wenn auto_item nur in $_GET steht, aber kein Routen-Parameter ist
+        $strAlias = ($_GET['auto_item'] ?? '') ? (string)(Input::get('auto_item') ?? '') : '';
 
         // Performance: Der Layout-Hook (GetPageLayoutListener) hat diesen Eintrag bereits geparst.
         // Ohne Modul-Filter und ohne "Sichtbarkeit ignorieren" ist das Ergebnis identisch →
