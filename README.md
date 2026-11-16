@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 **Wichtig: Diese Erweiterung nicht mit Catalog-Manager v1 installieren!**
 
 ## Catalog Manager (v3) - Die Enterprise-Erweiterung für Contao CMS
