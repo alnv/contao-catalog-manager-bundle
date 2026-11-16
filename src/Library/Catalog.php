@@ -3,45 +3,81 @@
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\ArrayUtil;
+use Contao\Controller;
+use Contao\StringUtil;
+use Contao\System;
 
 class Catalog extends CatalogWizard
 {
+    protected static array $runtimeCache = [];
 
-    protected $arrFields = [];
-    protected $arrCatalog = [];
-    protected $strIdentifier = null;
+    protected array $arrFields = [];
+    protected array $arrCatalog = [];
+    protected string|null $strIdentifier = null;
 
-    public function __construct($strIdentifier)
+    public function __construct(?string $strIdentifier)
     {
-
         if ($strIdentifier === null) {
-            return null;
+            return;
         }
 
         $this->strIdentifier = $strIdentifier;
+
+        if (isset(self::$runtimeCache[$strIdentifier])) {
+            $this->arrCatalog = self::$runtimeCache[$strIdentifier]['catalog'];
+            $this->arrFields = self::$runtimeCache[$strIdentifier]['fields'];
+            return;
+        }
+
         $objCatalog = CatalogModel::findByTableOrModule($this->strIdentifier);
 
         if ($objCatalog === null) {
-            return null;
+            return;
         }
 
-        $this->setCustomFields();
         $this->arrCatalog = $this->parseCatalog($objCatalog->row());
+
+        $this->setCustomFields();
+        $this->setAllFields();
+        $this->setDefaultFields();
+
+        self::$runtimeCache[$strIdentifier] = [
+            'catalog' => $this->arrCatalog,
+            'fields' => $this->arrFields
+        ];
+    }
+
+    protected function setAllFields(): void
+    {
+        $strTable = $this->arrCatalog['table'] ?? '';
+        if (!$strTable) {
+            return;
+        }
+
+        Controller::loadDataContainer($strTable);
+        Controller::loadLanguageFile($strTable);
+
+        foreach ($GLOBALS['TL_DCA'][$strTable]['fields'] ?? [] as $strField => $arrField) {
+            $arrField['label'] = $arrField['label'] ?? [$strField, ''];
+            $this->arrFields[$strField] = $arrField;
+        }
+
         $objFields = CatalogFieldModel::findAll([
             'column' => ['pid=?', 'published=?'],
             'value' => [$this->arrCatalog['id'], '1'],
             'order' => 'sorting ASC'
         ]);
 
-        if ($objFields === null) {
-            return null;
+        if (!$objFields) {
+            return;
         }
 
         while ($objFields->next()) {
-
             $arrField = $this->parseField($objFields->row(), $this->arrCatalog);
 
             if ($arrField === null) {
@@ -50,38 +86,34 @@ class Catalog extends CatalogWizard
 
             $this->arrFields[$objFields->fieldname] = $arrField;
         }
-
-        $this->setDefaultFields();
-        return parent::__construct();
     }
 
-    public function getCatalog()
+    public function getCatalog(): array
     {
-
         return $this->arrCatalog;
     }
 
-    public function getFields()
+    public function getFields(): array
     {
-
         return $this->arrFields;
     }
 
-    public function getNaturalFields($blnLabelOnly = true)
+    public function getNaturalFields($blnLabelOnly = true): array
     {
-
         $arrReturn = [];
 
         foreach ($this->arrFields as $strFieldname => $arrField) {
-            $arrReturn[$strFieldname] = $blnLabelOnly ? \StringUtil::decodeEntities($arrField['label'][0]) : $strFieldname;
+            $arrReturn[$strFieldname] = $blnLabelOnly ? StringUtil::decodeEntities($arrField['label'][0] ?? '') : $strFieldname;
         }
 
         return $arrReturn;
     }
 
-    protected function setDefaultFields()
+    protected function setDefaultFields(): void
     {
-        foreach ($this->getDefaultFields() as $strAlias => $arrField) {
+        $defaultFields = $this->getDefaultFields();
+
+        foreach ($defaultFields as $strAlias => $arrField) {
             if (isset($this->arrFields[$strAlias])) {
                 continue;
             }
@@ -89,77 +121,78 @@ class Catalog extends CatalogWizard
         }
     }
 
-    protected function setCustomFields()
+    protected function setCustomFields(): void
     {
-
-        if (!is_array($GLOBALS['CM_CUSTOM_FIELDS']) || empty($GLOBALS['CM_CUSTOM_FIELDS'])) {
-
-            return null;
+        if (empty($GLOBALS['CM_CUSTOM_FIELDS']) || !is_array($GLOBALS['CM_CUSTOM_FIELDS'])) {
+            return;
         }
 
         $arrFields = [];
+        $strTable = $this->arrCatalog['table'] ?? '';
+        $translator = Translation::getInstance(); // 1x holen statt in der Schleife
 
         foreach ($GLOBALS['CM_CUSTOM_FIELDS'] as $strFieldname => $arrField) {
-            if (isset($arrField['table']) && $this->arrCatalog['table'] != $arrField['table']) {
+            if (isset($arrField['table']) && $strTable !== $arrField['table']) {
                 continue;
             }
 
-            $strTable = $this->arrCatalog['table'] ?? '';
             $arrLangSets = $GLOBALS['TL_LANG']['MSC'][$strFieldname] ?? [];
-
             unset($arrField['index']);
 
             if (!isset($arrField['label'])) {
                 $arrField['label'] = [
-                    Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . 'field.title.' . $strFieldname, $arrLangSets[0] ?? ''),
-                    Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . 'field.description.' . $strFieldname, $arrLangSets[1] ?? '')
+                    $translator->translate(($strTable ? $strTable . '.' : '') . 'field.title.' . $strFieldname, $arrLangSets[0] ?? ''),
+                    $translator->translate(($strTable ? $strTable . '.' : '') . 'field.description.' . $strFieldname, $arrLangSets[1] ?? '')
                 ];
             }
 
             $arrFields[$strFieldname] = $arrField;
         }
 
-        array_insert($this->arrFields, 0, $arrFields);
+        ArrayUtil::arrayInsert($this->arrFields, 0, $arrFields);
     }
 
-    public function getDefaultFieldnames()
+    public function getDefaultFieldnames(): array
     {
-
         return array_keys($this->getDefaultFields());
     }
 
-    public function getDefaultFields()
+    public function getDefaultFields(): array
     {
+        System::loadLanguageFile('default');
 
-        \System::loadLanguageFile('default');
+        $strTable = $this->arrCatalog['table'] ?? '';
+        $strKeyName = ($strTable ? $strTable . '.' : '');
+        $translator = Translation::getInstance();
 
         $arrReturn = [
             'id' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.id', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('id')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.id', '')
+                    $translator->translate($strKeyName . 'field.title.id', Toolkit::getLabel('id')),
+                    $translator->translate($strKeyName . 'field.description.id', '')
                 ],
                 'search' => true,
                 'sql' => "int(10) unsigned NOT NULL auto_increment"
             ],
             'pid' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.pid', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('pid')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.pid', '')
+                    $translator->translate($strKeyName . 'field.title.pid', Toolkit::getLabel('pid')),
+                    $translator->translate($strKeyName . 'field.description.pid', '')
                 ],
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'sorting' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.sorting', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('sorting')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.sorting', '')
+                    $translator->translate($strKeyName . 'field.title.sorting', Toolkit::getLabel('sorting')),
+                    $translator->translate($strKeyName . 'field.description.sorting', '')
                 ],
+                'flag' => 11,
                 'sql' => "int(10) unsigned NOT NULL default '0'"
             ],
             'tstamp' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.tstamp', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('tstamp')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.tstamp', '')
+                    $translator->translate($strKeyName . 'field.title.tstamp', Toolkit::getLabel('tstamp')),
+                    $translator->translate($strKeyName . 'field.description.tstamp', '')
                 ],
                 'eval' => [
                     'rgxp' => 'datim',
@@ -172,8 +205,8 @@ class Catalog extends CatalogWizard
             ],
             'published' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.published', '')
+                    $translator->translate($strKeyName . 'field.title.published', Toolkit::getLabel('published')),
+                    $translator->translate($strKeyName . 'field.description.published', '')
                 ],
                 'inputType' => 'checkbox',
                 'eval' => [
@@ -181,13 +214,14 @@ class Catalog extends CatalogWizard
                     'doNotCopy' => true,
                     'tl_class' => 'clr'
                 ],
+                'toggle' => true,
                 'filter' => true,
-                'sql' => "char(1) NOT NULL default ''"
+                'sql' => ['type' => 'boolean', 'default' => false]
             ],
             'start' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.start', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('start')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.start', '')
+                    $translator->translate($strKeyName . 'field.title.start', Toolkit::getLabel('start')),
+                    $translator->translate($strKeyName . 'field.description.start', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -196,12 +230,12 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'sql' => "varchar(10) NOT NULL default ''"
+                'sql' => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
             ],
             'stop' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.stop', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('stop')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.stop', '')
+                    $translator->translate($strKeyName . 'field.title.stop', Toolkit::getLabel('stop')),
+                    $translator->translate($strKeyName . 'field.description.stop', '')
                 ],
                 'inputType' => 'text',
                 'eval' => [
@@ -210,12 +244,12 @@ class Catalog extends CatalogWizard
                     'tl_class' => 'w50 wizard'
                 ],
                 'flag' => 6,
-                'sql' => "varchar(10) NOT NULL default ''"
+                'sql' => "varchar(10) COLLATE ascii_bin NOT NULL default ''"
             ],
             'alias' => [
                 'label' => [
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.title.alias', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('alias')),
-                    Translation::getInstance()->translate($this->arrCatalog['table'] . '.field.description.alias', '')
+                    $translator->translate($strKeyName . 'field.title.alias', Toolkit::getLabel('alias')),
+                    $translator->translate($strKeyName . 'field.description.alias', '')
                 ],
                 'eval' => [
                     'doNotCopy' => true,
@@ -223,14 +257,15 @@ class Catalog extends CatalogWizard
                     'role' => 'alias'
                 ],
                 'search' => true,
-                'sql' => "varchar(128) NOT NULL default ''"
+                'sql' => "varchar(255) BINARY NOT NULL default ''"
             ]
         ];
-        if (isset($GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) && $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable']) {
+
+        if ($strTable && isset($GLOBALS['TL_DCA'][$strTable]['config']['ptable']) && $GLOBALS['TL_DCA'][$strTable]['config']['ptable']) {
             $arrReturn['pid']['relation'] = [
                 'load' => 'lazy',
                 'field' => 'id',
-                'table' => $GLOBALS['TL_DCA'][$this->arrCatalog['table']]['config']['ptable'],
+                'table' => $GLOBALS['TL_DCA'][$strTable]['config']['ptable'],
                 'type' => 'belongsTo'
             ];
         }

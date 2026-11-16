@@ -3,51 +3,75 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Alnv\ContaoCatalogManagerBundle\Models\DynModel;
+use Contao\Model;
 
-class ModelWizard {
+class ModelWizard
+{
+    public const GENERATED_NAMESPACE = 'Alnv\\ContaoCatalogManagerBundle\\Models\\Generated';
 
-    protected $objModel = null;
+    protected ?Model $objModel = null;
 
-    public function __construct($strTable) {
+    public function __construct(string $table)
+    {
+        $GLOBALS['CM_TEMP_MODEL_TABLE'] = $table;
 
-        $strModel = \Model::getClassFromTable($strTable);
-
-        if (strpos($strModel,'Alnv\ContaoCatalogManagerMultilingualAdapterBundle\Models') !== false) {
-            $strModel = '';
+        if ($model = $GLOBALS['TL_MODELS'][$table] ?? '') {
+            $this->objModel = new $model();
+            return;
         }
 
-        if ($strModel && $this->modelExist($strModel)) {
-            $this->objModel = new $strModel();
-            return null;
+        $strBaseModel = DynModel::class;
+        $strGlobalModel = $GLOBALS['CM_MODELS'][$table] ?? '';
+
+        if ($strGlobalModel && $this->modelExist($strGlobalModel)) {
+            $strBaseModel = $strGlobalModel;
         }
 
-        if (isset($GLOBALS['CM_MODELS'][$strTable]) && $this->modelExist($GLOBALS['CM_MODELS'][$strTable])) {
-            $objMultilingualDynModel = new $GLOBALS['CM_MODELS'][ $strTable ]();
-            $objMultilingualDynModel->createDynTable( $strTable );
-            $this->objModel = $objMultilingualDynModel;
-            return null;
-        }
+        $strClass = self::getModelClassForTable($strBaseModel, $table);
 
-        $objDynModel = new DynModel();
-        $objDynModel->createDynTable($strTable);
-        $this->objModel = $objDynModel;
+        $this->objModel = new $strClass();
+        $GLOBALS['TL_MODELS'][$table] = $strClass;
     }
 
-    public function getModel() {
+    public static function getModelClassForTable(string $strBaseModel, string $strTable): string
+    {
+        if (!CatalogTableGuard::isValidIdentifier($strTable)) {
+            throw new \InvalidArgumentException(sprintf('Invalid table name "%s".', $strTable));
+        }
 
+        if (!\class_exists($strBaseModel) || !\is_subclass_of($strBaseModel, Model::class)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not a Contao model.', $strBaseModel));
+        }
+
+        $objReflection = new \ReflectionClass($strBaseModel);
+        if ($objReflection->isFinal()) {
+            throw new \InvalidArgumentException(sprintf('Model "%s" must not be final.', $strBaseModel));
+        }
+
+        $strShortName = 'T_' . \substr(\md5($strBaseModel), 0, 8) . '_' . $strTable;
+        $strClass = self::GENERATED_NAMESPACE . '\\' . $strShortName;
+
+        if (!\class_exists($strClass, false)) {
+            // Nur validierte Identifier ([A-Za-z0-9_]) und ein existierender Klassenname werden eingesetzt
+            eval(\sprintf(
+                'namespace %s; class %s extends \\%s { public static $strTable = %s; }',
+                self::GENERATED_NAMESPACE,
+                $strShortName,
+                \ltrim($strBaseModel, '\\'),
+                \var_export($strTable, true)
+            ));
+        }
+
+        return $strClass;
+    }
+
+    public function getModel(): ?Model
+    {
         return $this->objModel;
     }
 
-    protected function modelExist($strModel) {
-
-        if (strpos($strModel,'Alnv\ContaoCatalogManagerBundle\Models') !== false) {
-            return false;
-        }
-
-        if (!class_exists($strModel)) {
-            return false;
-        }
-
-        return true;
+    protected function modelExist(string $strModel): bool
+    {
+        return \class_exists($strModel);
     }
 }

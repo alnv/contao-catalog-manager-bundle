@@ -2,22 +2,36 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog as LibraryCatalog;
+use Alnv\ContaoCatalogManagerBundle\Library\Database as CatalogDatabase;
+use Contao\Backend;
 use Contao\Config;
+use Contao\Controller;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Image;
+use Contao\Input;
 use Contao\Message;
+use Contao\StringUtil;
+use Contao\System;
+use Terminal42\DcMultilingualBundle\Driver;
 
 class Catalog
 {
 
-    public function addIcon($arrRow, $strLabel, \DataContainer $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false)
+    public function addIcon($arrRow, $strLabel, DataContainer|null $objDataContainer = null, $strAttributes = '', $blnReturnImage = false, $blnProtected = false): string
     {
 
-        $strIcon = 'bundles/alnvcontaoassetsmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
+        $strIcon = 'bundles/alnvcontaocatalogmanager/icons/' . ($arrRow['pid'] ? 'sub' : '') . 'module-icon.svg';
         $strAttributes .= 'class="resize-image"';
-        return \Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
+
+        return Image::getHtml($strIcon, $strLabel, $strAttributes) . ' ' . $strLabel . '<span style="color:#999;padding-left:3px">[' . $arrRow['table'] . ']</span>';
     }
 
-    public function checkLicense()
+    public function checkLicense(): void
     {
         $strInfo = "Sie verwenden aktuell die uneingeschränkte Testversion. Sobald Ihr Projekt abgeschlossen ist, können Sie unter https://shop.catalog-manager.org/ eine Lizenz erwerben. Mit dem Kauf einer Lizenz unterstützen Sie das Projekt und helfen dabei, dessen Weiterentwicklung zu fördern.";
         $strLicense = Config::get('cmLicense') ?: '';
@@ -27,40 +41,39 @@ class Catalog
         }
     }
 
-    public function getCatalogTypes()
+    public function getCatalogTypes(): array
     {
-        return array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type']);
+        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['type'] ?? []);
     }
 
-    public function getSortingTypes()
+    public function getSortingTypes(): array
     {
-        return array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType']);
+        return \array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['sortingType'] ?? []);
     }
 
-    public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes)
+    public function getCutOperationButton($arrRow, $href, $strLabel, $strTitle, $strIcon, $attributes): string
     {
 
         if (!$arrRow['table']) {
             return '';
         }
 
-        $objEntities = \Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'])->limit(1)->execute();
-        $objPid = \Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=? AND fieldname=? AND published=?')->limit(1)->execute($arrRow['id'], 'pid', '1');
+        $objEntities = Database::getInstance()->prepare('SELECT * FROM ' . $arrRow['table'])->limit(1)->execute();
+        $objPid = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE `pid`=? AND `fieldname`=? AND `published`=?')->limit(1)->execute($arrRow['id'], 'pid', '1');
 
         if ($objEntities->numRows && !$objPid->numRows) {
-            return '<a title="' . \StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) . '">' . \Image::getHtml(preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';
+            return '<a title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['tl_catalog']['cutEmptyHint']) . '">' . Image::getHtml(\preg_replace('/\.svg$/i', '_.svg', $strIcon)) . '</a>';
         }
 
-        return '<a href="' . \Backend::addToUrl($href . '&amp;id=' . $arrRow['id']) . '" title="' . \StringUtil::specialchars($strTitle) . '"' . $attributes . '>' . \Image::getHtml($strIcon, $strLabel) . '</a> ';
+        return '<a href="' . Backend::addToUrl($href . '&amp;id=' . $arrRow['id']) . '" title="' . StringUtil::specialchars($strTitle) . '"' . $attributes . '>' . Image::getHtml($strIcon, $strLabel) . '</a> ';
     }
 
-    public function getDataContainers()
+    public function getDataContainers(): array
     {
-
         return $GLOBALS['CM_DATA_CONTAINERS'];
     }
 
-    public function getModes(\DataContainer $objDataContainer)
+    public function getModes(DataContainer $objDataContainer): array
     {
 
         $arrModes = array_keys($GLOBALS['TL_LANG']['tl_catalog']['reference']['mode']);
@@ -81,25 +94,24 @@ class Catalog
         return array_values($arrModes);
     }
 
-    public function getFlags()
+    public function getFlags(): array
     {
-
-        return ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     }
 
-    public function getParentFields(\DataContainer $objDataContainer)
+    public function getParentFields(DataContainer $objDataContainer): array
     {
 
         if (!$objDataContainer->activeRecord->pid) {
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->pid);
+        $objCatalog = new LibraryCatalog($objDataContainer->activeRecord->pid);
 
         return $objCatalog->getNaturalFields();
     }
 
-    public function getFields($objDataContainer = null)
+    public function getFields($objDataContainer = null): array
     {
 
         if ($objDataContainer === null) {
@@ -110,243 +122,173 @@ class Catalog
             return [];
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog($objDataContainer->activeRecord->table);
+        $objCatalog = new LibraryCatalog($objDataContainer->activeRecord->table);
 
         return $objCatalog->getNaturalFields();
     }
 
-    public function generateModulename(\DataContainer $objDataContainer)
+    public function setPalette(): void
+    {
+        if ((Input::get('act') == '' && Input::get('key') == '') || 'select' === Input::get('act')) {
+            return;
+        }
+
+        $intId = (int)Input::get('id');
+        $objActiveRecord = Database::getInstance()->prepare('SELECT * FROM tl_catalog WHERE id=?')->limit(1)->execute($intId);
+
+        if (!$objActiveRecord->numRows) {
+            return;
+        }
+
+        if (!($GLOBALS['TL_DCA'][$objActiveRecord->table]['config']['_modified'] ?? false)) {
+            return;
+        }
+
+        PaletteManipulator::create()->removeField('enablePreview')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('validAliasCharacters')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('dataContainer')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('description')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('name')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('mode')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableCopy')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableVisibility')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enablePanel')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableContentElements')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('navigation')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('position')->applyToPalette('catalog', 'tl_catalog');
+        PaletteManipulator::create()->removeField('enableGeocoding')->applyToPalette('catalog', 'tl_catalog');
+    }
+
+    public function generateModulename(DataContainer $objDataContainer)
     {
 
-        if ($objDataContainer->activeRecord->type !== 'catalog' || !$objDataContainer->activeRecord->table) {
+        if (!$objDataContainer->activeRecord->table) {
             return null;
         }
 
-        $objDatabase = \Database::getInstance();
-        $strModulename = 'module_' . strtolower($objDataContainer->activeRecord->table);
-        $objDatabase->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModulename])->execute($objDataContainer->id);
+        $strModule = Toolkit::getModuleNameByTable($objDataContainer->activeRecord->table) ?: 'module_' . strtolower($objDataContainer->activeRecord->table);
+
+        Database::getInstance()->prepare('UPDATE ' . $objDataContainer->table . ' %s WHERE id=?')->set(['tstamp' => time(), 'module' => $strModule])->execute($objDataContainer->id);
     }
 
-    public function getNavigation()
+    public function getNavigation(): array
     {
 
         $arrReturn = [];
-
         if (!is_array($GLOBALS['BE_MOD']) || empty($GLOBALS['BE_MOD'])) {
-
             return $arrReturn;
         }
 
         foreach ($GLOBALS['BE_MOD'] as $strModulename => $arrModules) {
-
-            $strModuleLabel = $GLOBALS['TL_LANG']['MOD'][$strModulename] ?: $strModulename;
-
+            $strModuleLabel = ($GLOBALS['TL_LANG']['MOD'][$strModulename] ?? '') ?: $strModulename;
             $arrReturn[$strModulename] = $strModuleLabel;
         }
 
         return $arrReturn;
     }
 
-    public function watchTable($strTable, \DataContainer $objDataContainer)
+    public function watchTable($strTable, DataContainer $objDataContainer)
     {
 
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
-        $objDatabase = \Database::getInstance();
+        $objDatabaseBuilder = new CatalogDatabase();
 
         if (!$strTable) {
-
             return '';
         }
 
-        if ($strTable == $objDataContainer->activeRecord->table && $objDatabase->tableExists($strTable, true)) {
+        if (!CatalogTableGuard::isValidIdentifier((string)$strTable)) {
+            throw new \Exception(sprintf('Invalid table name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strTable));
+        }
 
+        $strOldTable = (string)$objDataContainer->activeRecord->table;
+        $intCatalogId = (int)$objDataContainer->activeRecord->id;
+
+        if ($strTable == $strOldTable && Database::getInstance()->tableExists($strTable, true)) {
             return $strTable;
         }
 
-        if ($strTable != $objDataContainer->activeRecord->table && $objDataContainer->activeRecord->table) {
-
-            if (!$objDatabaseBuilder->renameTable($objDataContainer->activeRecord->table, $strTable)) {
-
+        if ($strTable != $strOldTable && $strOldTable) {
+            if (CatalogTableGuard::isProtectedTable($strOldTable, $intCatalogId)) {
+                Message::addInfo(sprintf('Table "%s" does not belong exclusively to the catalog manager and was not renamed.', $strOldTable));
+            } elseif (!$objDatabaseBuilder->renameTable($strOldTable, $strTable, $intCatalogId)) {
                 throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
             }
         }
 
-        if (!$objDatabaseBuilder->createTableIfNotExist($strTable)) {
-
-            throw new \Exception(sprintf('table "%s" already exists in catalog manager.', $strTable));
-        }
+        $objDatabaseBuilder->createTableIfNotExist($strTable);
 
         return $strTable;
     }
 
-    public function createCustomFields(\DataContainer $objDataContainer)
+    public function createCustomFields(DataContainer $objDataContainer)
     {
-
         if (!$objDataContainer->activeRecord->table) {
-
             return null;
         }
 
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new CatalogDatabase();
         $objDatabaseBuilder->createCustomFieldsIfNotExists($objDataContainer->activeRecord->table);
     }
 
-    public function deleteTable(\DataContainer $objDataContainer)
+    public function deleteTable(DataContainer $objDataContainer)
     {
 
-        if (!$objDataContainer->activeRecord->table) {
-
-            return null;
-        }
-
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
-        $objDatabaseBuilder->deleteTable($objDataContainer->activeRecord->table);
-    }
-
-    public function getOrderByStatements()
-    {
-
-        return [
-            'ASC',
-            'DESC'
-        ];
-    }
-
-    public function toggleIcon($arrRow, $strHref, $strLabel, $strTitle, $strIcon, $strAttributes)
-    {
-
-        if (\Input::get('tid')) {
-
-            $this->toggleVisibility(\Input::get('tid'), (\Input::get('state') == 1), (@func_get_arg(12) ?: null));
-
-            \Controller::redirect(\Controller::getReferer());
-        }
-
-        $strHref .= '&amp;tid=' . $arrRow['id'] . '&amp;state=' . ($arrRow['published'] ? '' : 1);
-
-        if (!$arrRow['published']) {
-
-            $strIcon = 'invisible.svg';
-        }
-
-        return '<a href="' . \Backend::addToUrl($strHref) . '" title="' . \StringUtil::specialchars($strTitle) . '"' . $strAttributes . '>' . \Image::getHtml($strIcon, $strLabel, 'data-state="' . ($arrRow['published'] ? 1 : 0) . '"') . '</a> ';
-    }
-
-    protected function toggleVisibility($intId, $blnVisible, \DataContainer $objDataContainer = null)
-    {
-
-        \Input::setGet('id', $intId);
-        \Input::setGet('act', 'toggle');
-
-        $strTable = Toolkit::getTableByDo();
+        $strTable = (string)$objDataContainer->activeRecord->table;
 
         if (!$strTable) {
-
             return null;
         }
 
-        if ($objDataContainer) {
-
-            $objDataContainer->id = $intId;
+        if (($GLOBALS['TL_DCA'][$strTable]['config']['_modified'] ?? false)) {
+            return;
         }
 
-        if (isset($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback']) && is_array($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'])) {
-            foreach ($GLOBALS['TL_DCA']['tl_article']['config']['onload_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}($objDataContainer);
-                } elseif (is_callable($callback)) {
-                    $callback($objDataContainer);
-                }
-            }
+        if (CatalogTableGuard::isProtectedTable($strTable, (int)$objDataContainer->activeRecord->id)) {
+            Message::addInfo(sprintf('Table "%s" was not deleted because it does not belong exclusively to this catalog.', $strTable));
+            return;
         }
 
-        if ($objDataContainer) {
-
-            $objRow = \Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE id=?')->limit(1)->execute($intId);
-
-            if ($objRow->numRows) {
-
-                $objDataContainer->activeRecord = $objRow;
-            }
-        }
-
-        $objVersions = new \Versions($strTable, $intId);
-        $objVersions->initialize();
-
-        if (isset($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback']) && is_array($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$strTable]['fields']['published']['save_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}($blnVisible, $objDataContainer);
-                } elseif (is_callable($callback)) {
-                    $callback($blnVisible, $objDataContainer);
-                }
-            }
-        }
-
-        $intTime = time();
-
-        \Database::getInstance()->prepare('UPDATE ' . $strTable . ' %s WHERE id=?')->set([
-            'tstamp' => time(),
-            'published' => ($blnVisible ? '1' : '')
-        ])->execute($intId);
-
-        if ($objDataContainer) {
-
-            $objDataContainer->activeRecord->tstamp = $intTime;
-            $objDataContainer->activeRecord->published = ($blnVisible ? '1' : '');
-        }
-
-        if (is_array($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$strTable]['config']['onsubmit_callback'] as $callback) {
-                if (is_array($callback)) {
-                    $this->import($callback[0]);
-                    $this->{$callback[0]}->{$callback[1]}($objDataContainer);
-                } elseif (is_callable($callback)) {
-                    $callback($objDataContainer);
-                }
-            }
-        }
-
-        $objVersions->create();
+        $objDatabaseBuilder = new CatalogDatabase();
+        $objDatabaseBuilder->deleteTable($strTable, (int)$objDataContainer->activeRecord->id);
     }
 
-    public function getTables()
+    public function getOrderByStatements(): array
     {
-
-        return \Database::getInstance()->listTables();
+        return ['ASC', 'DESC'];
     }
 
-    public function getDbFields(\DataContainer $dc)
+    public function getTables(): array
     {
+        return Database::getInstance()->listTables();
+    }
 
+    public function getDbFields(DataContainer $dc): array
+    {
         $arrReturn = [];
-
-        if ($dc === null) {
-
+        if (!$dc->activeRecord || !$dc->activeRecord->dbTable) {
             return $arrReturn;
         }
 
-        if ($dc->activeRecord === null || !$dc->activeRecord->dbTable) {
+        System::loadLanguageFile($dc->activeRecord->dbTable);
+        Controller::loadDataContainer($dc->activeRecord->dbTable);
 
-            return $arrReturn;
-        }
+        $arrDca = $GLOBALS['TL_DCA'][$dc->activeRecord->dbTable] ?? [];
+        $strTable = ($arrDca['config']['_table'] ?? '');
+        $blnMultilingual = ($arrDca['config']['dataContainer'] ?? null) == Driver::class;
 
-        \System::loadLanguageFile($dc->activeRecord->dbTable);
-        \Controller::loadDataContainer($dc->activeRecord->dbTable);
+        foreach (($arrDca['fields'] ?? []) as $strField => $arrField) {
+            $arrReturn[$strField] = $strTable . '.' . $strField;
 
-        foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->dbTable]['fields'] as $strField => $arrField) {
-
-            $arrReturn[$strField] = (is_array($arrField['label']) && isset($arrField['label'][0])) ? $arrField['label'][0] : $strField;
+            if ($blnMultilingual && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
+                $arrReturn['translation.' . $strField] =  'translation.' . $strField;
+            }
         }
 
         return $arrReturn;
     }
 
-    public function getOperators()
+    public function getOperators(): array
     {
-
-        return array_keys($GLOBALS['CM_OPERATORS']);
+        return \array_keys($GLOBALS['CM_OPERATORS']);
     }
 }

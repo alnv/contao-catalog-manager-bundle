@@ -2,56 +2,65 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
+use Alnv\ContaoCatalogManagerBundle\Entity\Roles;
+use Alnv\ContaoCatalogManagerBundle\Library\Database as LDatabase;
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
+use Alnv\ContaoCatalogManagerBundle\Helper\MultilingualHelper;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Contao\Config;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\Input;
+use Contao\StringUtil;
 
 class CatalogField
 {
-
-    public function checkExtensions($varValue, \DataContainer $dc)
+    public function checkExtensions($value, DataContainer $dc): string
     {
-
-        $varValue = strtolower($varValue);
-        $arrExtensions = \StringUtil::trimsplit(',', $varValue);
-        $arrUploadTypes = \StringUtil::trimsplit(',', strtolower(\Config::get('uploadTypes')));
+        $value = strtolower($value);
+        $arrExtensions = StringUtil::trimsplit(',', $value);
+        $arrUploadTypes = StringUtil::trimsplit(',', strtolower(Config::get('uploadTypes')));
         $arrNotAllowed = array_diff($arrExtensions, $arrUploadTypes);
 
         if (0 !== count($arrNotAllowed)) {
             throw new \Exception(sprintf($GLOBALS['TL_LANG']['ERR']['forbiddenExtensions'], implode(', ', $arrNotAllowed)));
         }
 
-        return $varValue;
+        return $value;
     }
 
-    public function listFields($arrRow)
+    public function listFields($arrRow): string
     {
-
         return $arrRow['name'] . '<span style="color:#999;padding-left:3px">[' . $arrRow['fieldname'] . ']</span>';
     }
 
-    public function getFieldTypes()
+    public function getFieldTypes(): array
     {
-
         $arrReturn = [];
+
         foreach ($GLOBALS['CM_FIELDS'] as $strType) {
             $arrReturn[$strType] = $strType;
         }
+
         return $arrReturn;
     }
 
-    public function getRoles(\DataContainer $dc)
+    public function getRoles(DataContainer $dc): array
     {
+        $arrRoles = (new Roles())->get();
+        $arrRoleNames = array_keys($arrRoles);
+        $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($dc);
 
-        $arrRoles = array_keys($GLOBALS['CM_ROLES']);
-
-        if (!$dc->activeRecord->type) {
-            return $arrRoles;
+        if (!($arrActiveRecord['type'] ?? '')) {
+            return $arrRoleNames;
         }
 
-        switch ($dc->activeRecord->type) {
+        switch ($arrActiveRecord['type']) {
             case 'date':
                 $arrDateRoles = [];
-                foreach ($GLOBALS['CM_ROLES'] as $strRole => $arrRole) {
+                foreach ($arrRoles as $strRole => $arrRole) {
                     if ($arrRole['group'] == 'date') {
                         $arrDateRoles[] = $strRole;
                     }
@@ -61,51 +70,64 @@ class CatalogField
                 return ['miscellaneous'];
         }
 
-        return $arrRoles;
+        return $arrRoleNames;
     }
 
-    public function watchFieldname($strFieldname, \DataContainer $objDataContainer)
+    public function watchFieldname($strFieldname, DataContainer $objDataContainer)
     {
-
-        $objDatabase = \Database::getInstance();
+        $objDatabase = Database::getInstance();
         $strType = $objDataContainer->activeRecord->type;
-        $arrActiveRecord = $objDataContainer->activeRecord->row();
-        if (\Input::post('role')) {
-            $arrActiveRecord['role'] = \Input::post('role');
+        $arrActiveRecord = Toolkit::getActiveRecordAsArrayFromDc($objDataContainer);
+
+        if (Input::post('role')) {
+            $arrActiveRecord['role'] = Input::post('role');
         }
+
         $strSql = Toolkit::getSql($strType, $arrActiveRecord);
         $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
-        $objDatabaseBuilder = new \Alnv\ContaoCatalogManagerBundle\Library\Database();
+        $objDatabaseBuilder = new LDatabase();
 
-        if (!$strFieldname || $objCatalog == null) {
-            throw new \Exception(sprintf('something went wrong'));
+        $objCatalogField = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE fieldname=? AND id!=? AND pid=?')->execute($strFieldname, $objDataContainer->activeRecord->id, $objDataContainer->activeRecord->pid);
+
+        if ($objCatalogField->numRows) {
+            throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
         }
 
-        if (in_array($strFieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
+        if (!$strFieldname || !$objCatalog) {
+            throw new \Exception('something went wrong');
+        }
+
+        if (preg_match('/[\'^£$%&*()}{@#~?><>,|=+¬-]/', $strFieldname)) {
+            throw new \Exception('special characters are not allowed');
+        }
+
+        if (!CatalogTableGuard::isValidIdentifier((string)$strFieldname)) {
+            throw new \Exception(sprintf('Invalid field name "%s". Allowed are letters, digits and underscores (max. 64 characters).', $strFieldname));
+        }
+
+        if (in_array($strFieldname, (new Catalog(null))->getDefaultFieldnames())) {
             return $strFieldname;
         }
 
-        $strTable = $objCatalog->table;
-
-        if ($strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists($strFieldname, $strTable, true)) {
+        if ($strFieldname == $objDataContainer->activeRecord->fieldname && $objDatabase->fieldExists($strFieldname, $objCatalog->table, true)) {
             return $strFieldname;
         }
 
         if ($objDataContainer->activeRecord->fieldname && $strFieldname != $objDataContainer->activeRecord->fieldname) {
-            if (!$objDatabaseBuilder->renameFieldname($objDataContainer->activeRecord->fieldname, $strFieldname, $strTable, $strSql)) {
-                throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
+            if (!$objDatabaseBuilder->renameFieldname($objDataContainer->activeRecord->fieldname, $strFieldname, $objCatalog->table, $strSql)) {
+                throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
             }
             return $strFieldname;
         }
 
-        if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $strTable, $strSql) && !$objDataContainer->activeRecord->fieldname) {
-            throw new \Exception(sprintf('fieldname "%s" already exists in %s.', $strFieldname, $strTable));
+        if (!$objDatabaseBuilder->createFieldIfNotExist($strFieldname, $objCatalog->table, $strSql) && !$objDataContainer->activeRecord->fieldname) {
+            // throw new \Exception(sprintf('field name "%s" already exists in %s.', $strFieldname, $objCatalog->table));
         }
 
         return $strFieldname;
     }
 
-    public function changeFieldType($strValue, \DataContainer $objDataContainer)
+    public function changeFieldType($strValue, DataContainer $objDataContainer)
     {
 
         if (!$objDataContainer->activeRecord->type || !$objDataContainer->activeRecord->fieldname) {
@@ -117,31 +139,39 @@ class CatalogField
             return $strValue;
         }
 
-        if (in_array($objDataContainer->activeRecord->fieldname, (new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(null))->getDefaultFieldnames())) {
+        if (in_array($objDataContainer->activeRecord->fieldname, (new Catalog(null))->getDefaultFieldnames())) {
             return $strValue;
         }
 
-        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, $objDataContainer->activeRecord->row());
-        (new \Alnv\ContaoCatalogManagerBundle\Library\Database())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
+        $strSql = Toolkit::getSql($objDataContainer->activeRecord->type, Toolkit::getActiveRecordAsArrayFromDc($objDataContainer));
+
+        (new LDatabase())->changeFieldType($objDataContainer->activeRecord->fieldname, $objCatalog->table, $strSql);
 
         return $strValue;
     }
 
-    public function getImageSizes()
+    public function getImageSizes(): array
     {
+        $return = [];
+        $imagesSize = Database::getInstance()->prepare('SELECT * FROM tl_image_size')->execute();
 
-        $arrReturn = [];
-        $objDatabase = \Database::getInstance();
-        $objImagesSize = $objDatabase->prepare('SELECT * FROM tl_image_size')->execute();
-
-        if (!$objImagesSize->numRows) {
-            return $arrReturn;
+        if (!$imagesSize->numRows) {
+            return $return;
         }
 
-        while ($objImagesSize->next()) {
-            $arrReturn[$objImagesSize->id] = $objImagesSize->name;
+        while ($imagesSize->next()) {
+            $return[$imagesSize->id] = $imagesSize->name;
         }
 
-        return $arrReturn;
+        return $return;
+    }
+
+    public function getLanguages(): array
+    {
+        $arrLanguages = MultilingualHelper::getLanguages()['languages'];
+
+        \array_unshift($arrLanguages, '*');
+
+        return $arrLanguages;
     }
 }

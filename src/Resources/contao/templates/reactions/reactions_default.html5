@@ -1,60 +1,96 @@
+<?php
+use Contao\StringUtil;
+
+/**
+ * Reaktionen werden per POST abgeschickt (CSRF-Token, kein Zustandswechsel per GET).
+ * Ohne JavaScript funktioniert das Formular normal (Post/Redirect/Get),
+ * mit JavaScript wird nur der Reaktionsbereich ausgetauscht.
+ */
+$renderButton = function (array $arrReaction, bool $blnPrimary) {
+    $strName = StringUtil::specialchars($arrReaction['name'] ?? '');
+    $strLabel = sprintf('%s (%d)', $arrReaction['name'] ?? $arrReaction['key'], (int) $arrReaction['count']);
+    ?>
+    <button type="submit" name="reaction" value="<?= StringUtil::specialchars($arrReaction['key']) ?>"
+            id="<?= StringUtil::specialchars($arrReaction['id']) ?>"
+            class="reaction-link<?= $blnPrimary ? ' primary-reaction' : '' ?><?= !empty($arrReaction['active']) ? ' active' : '' ?>"
+            aria-pressed="<?= !empty($arrReaction['active']) ? 'true' : 'false' ?>"
+            aria-label="<?= StringUtil::specialchars($strLabel) ?>"
+            title="<?= $strName ?>">
+        <?php if (!empty($arrReaction['icon'])): ?>
+            <img src="<?= StringUtil::specialchars($arrReaction['icon']) ?>" alt="">
+        <?php endif; ?>
+        <span class="count"><?= (int) $arrReaction['count'] ?></span>
+    </button>
+    <?php
+};
+?>
 <?php if (!empty($this->reaction)): ?>
-<div class="ce_reactions" id="<?= $this->id ?>">
-    <div class="reaction">
-        <a href="<?= $this->reaction['href'] ?>" id="<?= $this->reaction['id'] ?>" class="primary-reaction reaction-link<?= $this->reaction['active']?' active':'' ?>">
-            <?php if ($this->reaction['icon']): ?>
-                <img src="<?= $this->reaction['icon'] ?>" alt="<?= $this->reaction['name'] ?>">
-            <?php endif; ?>
-            <span class="count"><?= $this->reaction['count'] ?></span>
-        </a>
+<div class="ce_reactions" id="<?= StringUtil::specialchars($this->id) ?>">
+    <form class="reaction" method="post" action="<?= StringUtil::specialchars($this->action) ?>">
+        <input type="hidden" name="FORM_SUBMIT" value="<?= StringUtil::specialchars($this->formId) ?>">
+        <input type="hidden" name="REQUEST_TOKEN" value="<?= StringUtil::specialchars($this->requestToken) ?>">
+        <input type="hidden" name="identifier" value="<?= StringUtil::specialchars($this->identifier) ?>">
+
+        <?php $renderButton($this->reaction, true); ?>
+
         <?php if (!empty($this->reactions)): ?>
             <ul class="list">
                 <?php foreach ($this->reactions as $arrReaction): ?>
-                    <li>
-                        <a href="<?= $arrReaction['href'] ?>" id="<?= $arrReaction['id'] ?>" title="<?= $arrReaction['name'] ?>" class="reaction-link">
-                            <?php if ($arrReaction['icon']): ?>
-                                <img src="<?= $arrReaction['icon'] ?>" alt="<?= $arrReaction['name'] ?>">
-                            <?php endif; ?>
-                            <span class="count"><?= $arrReaction['count'] ?></span>
-                        </a>
-                    </li>
+                    <li><?php $renderButton($arrReaction, false); ?></li>
                 <?php endforeach; ?>
             </ul>
         <?php endif; ?>
-    </div>
+    </form>
 </div>
 <script>
     (function () {
-        function setReactions() {
-            let objReaction = document.querySelector('#<?= $this->id ?>');
-            if (objReaction) {
-                let arrLinks = objReaction.querySelectorAll('a');
-                for (let i=0;i<arrLinks.length;i++) {
-                    let objLink = arrLinks[i];
-                    if (!objLink) {
-                        continue;
-                    }
-                    objLink.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        objReaction.classList.add('loading');
-                        let strUrl = this.href;
-                        let objXHttp = new XMLHttpRequest();
-                        objXHttp.onreadystatechange = function() {
-                            if (this.readyState === 4 && this.status === 200) {
-                                let objEmpty = document.createElement('div');
-                                objEmpty.innerHTML = objXHttp.responseText;
-                                objReaction.innerHTML = objEmpty.querySelector('#<?= $this->id ?>').innerHTML;
-                                objReaction.classList.remove('loading');
-                                setReactions();
-                            }
-                        };
-                        objXHttp.open("GET", strUrl, true);
-                        objXHttp.send();
-                    });
-                }
+        var rootId = <?= json_encode($this->id, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+
+        function bind() {
+            var root = document.getElementById(rootId);
+            var form = root && root.querySelector('form');
+
+            if (!form || !window.fetch || !window.FormData) {
+                return;
             }
+
+            form.addEventListener('submit', function (e) {
+                var submitter = e.submitter;
+                if (!submitter) {
+                    return; // ältere Browser: normal absenden
+                }
+
+                e.preventDefault();
+
+                var data = new FormData(form);
+                data.append(submitter.name, submitter.value);
+
+                root.classList.add('loading');
+                root.setAttribute('aria-busy', 'true');
+
+                fetch(form.action, {method: 'POST', body: data, credentials: 'same-origin'})
+                    .then(function (response) { return response.text(); })
+                    .then(function (html) {
+                        var doc = new DOMParser().parseFromString(html, 'text/html');
+                        var fresh = doc.getElementById(rootId);
+                        if (fresh) {
+                            root.innerHTML = fresh.innerHTML;
+                            bind();
+                            var active = root.querySelector('[aria-pressed="true"]') || root.querySelector('button');
+                            if (active) {
+                                active.focus();
+                            }
+                        }
+                    })
+                    .catch(function () { form.submit(); })
+                    .then(function () {
+                        root.classList.remove('loading');
+                        root.removeAttribute('aria-busy');
+                    });
+            }, {once: true});
         }
-        setReactions();
+
+        bind();
     })();
 </script>
 <?php endif; ?>

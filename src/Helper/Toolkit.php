@@ -2,24 +2,74 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Image as CatalogImage;
+use Alnv\ContaoCatalogManagerBundle\Library\Catalog;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
+use Ausi\SlugGenerator\SlugGenerator;
+use Ausi\SlugGenerator\SlugOptions;
+use Contao\Controller;
+use Contao\Database;
+use Contao\Environment;
+use Contao\DataContainer;
+use Contao\Date;
+use Contao\FilesModel;
+use Contao\FrontendUser;
+use Contao\Image;
+use Contao\Input;
+use Contao\PageModel;
+use Contao\StringUtil;
+use Contao\System;
+use Contao\Validator;
+use Contao\Widget;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Toolkit
 {
+    public static function generatePageUrl(PageModel $objPage, ?string $strParams = null, bool $blnAbsolute = false): string
+    {
+        $objPage->loadDetails();
+        $objContainer = System::getContainer();
 
-    public static function addToCatalogData($strType, $strTable, $strIdentifier)
+        try {
+            return $objContainer->get('contao.routing.content_url_generator')->generate(
+                $objPage,
+                ['parameters' => $strParams],
+                $blnAbsolute ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH
+            );
+        } catch (RouteNotFoundException $objException) {
+            if (!$objContainer->get('contao.routing.page_registry')->isRoutable($objPage)) {
+                throw new ResourceNotFoundException(\sprintf('Page ID %s is not routable', $objPage->id), 0, $objException);
+            }
+
+            throw $objException;
+        }
+    }
+
+    public static function getRelativeRequest(): string
+    {
+        return (string)\preg_replace('/^' . \preg_quote((string)Environment::get('path'), '/') . '\/?/', '', (string)Environment::get('requestUri'));
+    }
+
+    public static function addToCatalogData($strType, $strTable, $strIdentifier): array
     {
 
-        $objCatalogData = \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableAndIdentifier($strType, $strTable, $strIdentifier);
+        $objCatalogData = CatalogDataModel::getByTypeAndTableAndIdentifier($strType, $strTable, $strIdentifier);
 
         if (!$objCatalogData) {
-            $objCatalogData = new \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel();
+            $objCatalogData = new CatalogDataModel();
             $objCatalogData->created_at = time();
             $objCatalogData->type = $strType;
             $objCatalogData->table = $strTable;
             $objCatalogData->identifier = $strIdentifier;
             $objCatalogData->session = self::getSessionId();
-            $objCatalogData->member = (\FrontendUser::getInstance()->id ?: 0);
+            $objCatalogData->member = (FrontendUser::getInstance()->id ?: 0);
         }
 
         $objCatalogData->tstamp = time();
@@ -27,23 +77,85 @@ class Toolkit
         return $objCatalogData->save()->row();
     }
 
-    public static function addCount($strType, $strTable, $strIdentifier)
+    public static function getDetailPageFromEntityByIdAndTable($strTable, $strId, $blnPreview = true): string
     {
 
-        $intDay = (new \Date())->dayBegin;
-        $intMonth = (new \Date())->monthBegin;
-        $intYear = (new \Date())->yearBegin;
+        $objCatalog = CatalogModel::findByTableOrModule($strTable);
+        if (!$objCatalog) {
+            return '';
+        }
+
+        $strTable = (string)($objCatalog->table ?: $strTable);
+        if (!CatalogTableGuard::isValidIdentifier($strTable)) {
+            return '';
+        }
+
+        Controller::loadDataContainer($strTable);
+
+        $objModel = new ModelWizard($strTable);
+        $objModel = $objModel->getModel();
+        $objEntity = $objModel->findByPk($strId);
+
+        if (!$objEntity) {
+            return '';
+        }
+
+        $arrMasterPages = [];
+        $objCeElements = Database::getInstance()->prepare('SELECT * FROM tl_content WHERE type=? AND cmMaster=? AND cmTable=?')->limit(1)->execute('listview', '1', $strTable);
+        if ($objCeElements->cmMasterPage) {
+            $arrMasterPages[] = $objCeElements->cmMasterPage;
+        }
+
+        $objModules = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE type=? AND cmMaster=? AND cmTable=?')->limit(1)->execute('listing-table', '1', $strTable);
+        if ($objModules->cmMasterPage) {
+            $arrMasterPages[] = $objModules->cmMasterPage;
+        }
+
+        $arrMasterPages = array_unique($arrMasterPages);
+        $arrMasterPages = array_filter($arrMasterPages);
+
+        if ($strPageID = ($arrMasterPages[0] ?? 0)) {
+            return static::parseDetailLink($strPageID, $objEntity->alias, $objEntity->row(), false, $blnPreview);
+        }
+
+        $objCatalogFields = CatalogFieldModel::findAll([
+            'column' => ['tl_catalog_field.pid=?', 'tl_catalog_field.role=? OR tl_catalog_field.role=?'],
+            'value' => [$objCatalog->id, 'pages', 'page'],
+            'limit' => 1
+        ]);
+
+        if ($objCatalogFields) {
+            $strField = $objCatalogFields->row()['fieldname'] ?? '';
+            $varPages = ($objEntity->{$strField} ?? '');
+            $varPages = static::parseCatalogValue($varPages, Widget::getAttributesFromDca(($GLOBALS['TL_DCA'][$strTable]['fields'][$strField] ?? []), $strField, $varPages, $strField, $strTable), $objEntity->row(), false);
+
+            if (is_array($varPages) && !empty($varPages)) {
+                foreach ($varPages as $varPage) {
+                    return $varPage['absolute'] ?? '';
+                }
+            }
+        }
+
+        return '';
+    }
+
+    public static function addCount($strType, $strTable, $strIdentifier): void
+    {
+
+        $intDay = (new Date())->dayBegin;
+        $intMonth = (new Date())->monthBegin;
+        $intYear = (new Date())->yearBegin;
 
         $arrAssigns = [
-            'day' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndDayPeriod($strType, $strTable, $strIdentifier, $intDay),
-            'month' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndMonthPeriod($strType, $strTable, $strIdentifier, $intMonth),
-            'year' => \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getByTypeAndTableIdentifierAndYearPeriod($strType, $strTable, $strIdentifier, $intYear)
+            'day' => CatalogDataModel::getByTypeAndTableIdentifierAndDayPeriod($strType, $strTable, $strIdentifier, $intDay),
+            'month' => CatalogDataModel::getByTypeAndTableIdentifierAndMonthPeriod($strType, $strTable, $strIdentifier, $intMonth),
+            'year' => CatalogDataModel::getByTypeAndTableIdentifierAndYearPeriod($strType, $strTable, $strIdentifier, $intYear)
         ];
 
         foreach ($arrAssigns as $strPeriod => $objEntity) {
 
             if (!$objEntity) {
-                $objEntity = new \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel();
+                $objEntity = new CatalogDataModel();
                 $objEntity->created_at = time();
                 $objEntity->type = $strType;
                 $objEntity->table = $strTable;
@@ -69,27 +181,29 @@ class Toolkit
         }
     }
 
-    public static function getLastAddedByTypeAndTable($strType, $strTable)
+    public static function getLastAddedByTypeAndTable($strType, $strTable): array
     {
 
         $arrIds = [];
-        $objData = \Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel::getLastAddedByType('view-master');
+        $objData = CatalogDataModel::getLastAddedByType('view-master');
         if (!$objData) {
             return $arrIds;
         }
+
         while ($objData->next()) {
             if ($objData->table != $strTable) {
                 continue;
             }
             $arrIds[] = $objData->identifier;
         }
+
         return array_filter($arrIds);
     }
 
     public static function getSessionId()
     {
 
-        $objSession = \System::getContainer()->get('session');
+        $objSession = System::getContainer()->get('request_stack')->getSession();
         $strSessionId = $objSession->get('catalog-session-id');
 
         if (!$strSessionId) {
@@ -115,7 +229,7 @@ class Toolkit
 
         if (is_array($varValue)) {
             $arrValues = array_map(function ($arrValue) use ($strField) {
-                return is_array($arrValue) ? $arrValue[$strField] : $arrValue;
+                return is_array($arrValue) ? ($arrValue[$strField] ?? '') : $arrValue;
             }, $varValue);
             return implode($strDelimiter, $arrValues);
         }
@@ -123,7 +237,7 @@ class Toolkit
         return $varValue;
     }
 
-    public static function compress($strTemplate)
+    public static function compress($strTemplate): string
     {
 
         $strTemplate = str_replace(["\r\n", "\r"], "\n", $strTemplate);
@@ -132,20 +246,46 @@ class Toolkit
 
         foreach ($arrLines as $strLine) {
             if (!empty($strLine))
-                $arrNewLines[] = trim($strLine);
+                $arrNewLines[] = \trim($strLine);
         }
 
-        return implode('', $arrNewLines);
+        return \implode('', $arrNewLines);
+    }
+
+    public static function getCurrentPathInfo($strAlias = '', $strLanguage = ''): array
+    {
+
+        $arrFragments = [];
+        $strPathInfo = System::getContainer()->get('request_stack')->getCurrentRequest()->getPathInfo();
+
+        $arrFirstFragments = \explode('/', $strPathInfo);
+        $arrFirstFragments = \array_filter($arrFirstFragments);
+        $arrFirstFragments = \array_values($arrFirstFragments);
+        $strFirstFragment = $arrFirstFragments[0] ?? '';
+
+        if ($strAlias) {
+            $strPathInfo = \str_replace('/' . $strAlias, '', $strPathInfo);
+        }
+
+        if ($strLanguage && $strLanguage == $strFirstFragment) {
+            $strPathInfo = \preg_replace('/' . \preg_quote('/' . $strLanguage, '/') . '/', '', $strPathInfo, 1);
+        }
+
+        foreach (\array_filter(\explode('/', $strPathInfo)) as $strFragment) {
+            $arrFragments[] = $strFragment;
+        }
+
+        return $arrFragments;
     }
 
     public static function getFilterValue($strField)
     {
 
         $arrActiveRecord = [];
-        if (\Cache::has('activeRecord')) {
-            $arrActiveRecord = \Cache::get('activeRecord') ?: [];
+        if (Cache::has('activeRecord')) {
+            $arrActiveRecord = Cache::get('activeRecord') ?: [];
         }
-        $varValue = \Input::get($strField) ?: \Input::post($strField);
+        $varValue = Input::get($strField) ?: Input::post($strField);
 
         if (!$varValue && !empty($arrActiveRecord)) {
             $varValue = $arrActiveRecord[$strField];
@@ -158,7 +298,7 @@ class Toolkit
         return $varValue;
     }
 
-    public static function getSqlTypes()
+    public static function getSqlTypes(): array
     {
 
         return [
@@ -177,21 +317,32 @@ class Toolkit
     public static function getRgxp($strType, $arrOptions = [])
     {
 
-        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
+        $objRoleResolver = RoleResolver::getInstance(null);
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['rgxp']) && $arrRole['rgxp']) {
-
             return $arrRole['rgxp'];
         }
 
         return '';
     }
 
-    public static function getSql($strType, $arrOptions = [])
+    public static function replaceInsertTags($strBuffer, $blnCache = true)
     {
 
-        $objRoleResolver = \Alnv\ContaoCatalogManagerBundle\Library\RoleResolver::getInstance(null);
+        $parser = System::getContainer()->get('contao.insert_tag.parser');
+
+        if ($blnCache) {
+            return $parser->replace((string)$strBuffer);
+        }
+
+        return $parser->replaceInline((string)$strBuffer);
+    }
+
+    public static function getSql($strType, $arrOptions = []): string
+    {
+
+        $objRoleResolver = RoleResolver::getInstance(null);
         $arrRole = $objRoleResolver->getRole($arrOptions['role']);
 
         if (isset($arrRole['sql']) && $arrRole['sql']) {
@@ -214,34 +365,51 @@ class Toolkit
         }
     }
 
-    public static function parseDetailLink($varPage, $strAlias)
+    public static function parseDetailLink($varPage, $strAlias, array $arrEntity = [], bool $blnUseAbsolute = false, $blnPreview = false): string
     {
 
-        if (is_numeric($varPage) && $varPage) {
-            $objPage = \PageModel::findByPk($varPage);
-            if ($objPage !== null) {
-                return $objPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
-            }
+        if (is_numeric($varPage)) {
+            $varPage = PageModel::findByPk($varPage);
         }
 
         if (is_array($varPage) && isset($varPage['id'])) {
-            $objPage = \PageModel::findByPk($varPage['id']);
-            if ($objPage !== null) {
-                return $objPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
+            $varPage = PageModel::findByPk($varPage['id']);
+        }
+
+        if (!$varPage) {
+            return '';
+        }
+
+        if ($varPage->type == 'filter') {
+
+            $strUrlFragments = [];
+            foreach (Getters::getPageFiltersByPageId($varPage->id) as $objPageFilter) {
+
+                $strFieldName = $objPageFilter->getAlias();
+                $strFieldValue = $arrEntity['origin'][$strFieldName] ?? '';
+
+                if (!$strFieldValue) {
+                    $strFieldValue = static::parse($arrEntity[$strFieldName] ?? '');
+                }
+
+                if ($strFragment = $objPageFilter->parseActiveUrlFragment($strFieldValue)) {
+                    $strUrlFragments[] = $strFragment;
+                }
             }
+
+            $strUrlFragments[] = $strAlias;
+            $strUrl = (empty($strUrlFragments) ? '' : implode('/', $strUrlFragments));
+
+            return ($blnPreview && !$blnUseAbsolute ? 'preview.php/' : '') . static::generatePageUrl($varPage, ($strUrl ? '/' . $strUrl : ''), $blnUseAbsolute);
         }
 
-        if ($varPage instanceof \PageModel) {
-            return $varPage->getFrontendUrl(($strAlias ? '/' . $strAlias : ''));
-        }
-
-        return '';
+        return ($blnPreview && !$blnUseAbsolute ? 'preview.php/' : '') . static::generatePageUrl($varPage, ($strAlias ? '/' . $strAlias : ''), $blnUseAbsolute);
     }
 
-    public static function parseImage($varImage)
+    public static function parseImage($varImage): string
     {
-        if (!is_array($varImage) && (\Validator::isBinaryUuid($varImage) || \Validator::isUuid($varImage))) {
-            $objFile = \FilesModel::findByUuid($varImage);
+        if (!is_array($varImage) && (Validator::isBinaryUuid($varImage) || Validator::isUuid($varImage))) {
+            $objFile = FilesModel::findByUuid($varImage);
             if ($objFile !== null) {
                 return $objFile->path;
             }
@@ -258,19 +426,18 @@ class Toolkit
         return $varImage[0]['img']['src'] ?? '';
     }
 
-    public static function parseParametersFromString($strParameter)
+    public static function parseParametersFromString($strParameter): array
     {
 
         $arrChunks = explode('?', urldecode($strParameter), 2);
-        $strSource = \StringUtil::decodeEntities($arrChunks[1]);
+        $strSource = StringUtil::decodeEntities($arrChunks[1]);
         $strSource = str_replace('[&]', '&', $strSource);
 
         return explode('&', $strSource);
     }
 
-    public static function getValueFromUrl($arrValue)
+    public static function getValueFromUrl($arrValue): string
     {
-
         if ($arrValue === '' || $arrValue === null) {
             return '';
         }
@@ -282,14 +449,13 @@ class Toolkit
         return $arrValue;
     }
 
-    public static function getOrderByStatementFromArray($arrOrders)
+    public static function getOrderByStatementFromArray($arrOrders): string
     {
-
         if (isset($arrOrders['field']) && isset($arrOrders['order'])) {
             return $arrOrders['field'] . ' ' . $arrOrders['order'];
         }
 
-        return implode(',', array_filter(array_map(function ($arrOrder) {
+        return \implode(',', \array_filter(\array_map(function ($arrOrder) {
             if (!isset($arrOrder['field']) || !$arrOrder['field']) {
                 return '';
             }
@@ -303,47 +469,46 @@ class Toolkit
 
         $arrColumns = [];
 
-        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField'] && $arrCatalog['showColumns']) {
+        if (isset($arrCatalog['flagField']) && $arrCatalog['flagField'] && !empty($arrCatalog['showColumns'])) {
             if (!in_array($arrCatalog['flagField'], $arrColumns)) {
                 $arrLabelFields[] = $arrCatalog['sortingType'] !== 'none' ? $arrCatalog['flagField'] : '-';
             }
         }
 
         foreach ($arrLabelFields as $strField) {
-
             if (!isset($arrRow[$strField])) {
                 $arrColumns[$strField] = '';
                 continue;
             }
 
-            $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
-            if (isset($arrFields[$strField]['eval']['role']) && $arrFields[$strField]['eval']['role']) {
-                switch ($arrFields[$strField]['eval']['role']) {
-                    case 'redirects':
-                    case 'pages':
-                    case 'page':
-                        if (!is_array($arrColumns[$strField])) {
-                            break;
-                        }
-                        $arrPages = [];
-                        $arrPageIds = array_keys($arrColumns[$strField]);
-                        foreach ($arrPageIds as $strPageId) {
-                            if ($objPage = \PageModel::findByPk($strPageId)) {
-                                $arrPages[] = $objPage->pageTitle ?: $objPage->title;
-                            }
-                        }
-                        $arrColumns[$strField] = implode(', ', $arrPages);
+            $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
+
+            switch ($arrFields[$strField]['eval']['role'] ?? '') {
+                case 'redirects':
+                case 'pages':
+                case 'page':
+                    if (!\is_array($arrColumns[$strField])) {
                         break;
-                }
+                    }
+                    $arrPages = [];
+                    $arrPageIds = \array_keys($arrColumns[$strField]);
+                    foreach ($arrPageIds as $strPageId) {
+                        if ($objPage = PageModel::findByPk($strPageId)) {
+                            $arrPages[] = $objPage->title ?: $objPage->pageTitle;
+                        }
+                    }
+                    $arrColumns[$strField] = \implode(', ', $arrPages);
+                    break;
             }
         }
 
-        if (count($arrColumns) < 2 && $arrCatalog['showColumns']) {
-            return array_values($arrColumns)[0];
+
+        if (\count($arrColumns ?? []) < 2) {
+            return \array_values($arrColumns)[0];
         }
 
         if ($arrCatalog['showColumns'] && $arrCatalog['mode'] == 'list') {
-            return $arrColumns;
+            return \array_values($arrColumns);
         }
 
         $intIndex = -1;
@@ -354,7 +519,7 @@ class Toolkit
             if ($strValue === '' || $strValue === null) {
                 continue;
             }
-            if (in_array($strField, ['sorting'])) {
+            if ($strField === 'sorting') {
                 continue;
             }
             $intIndex += 1;
@@ -365,8 +530,8 @@ class Toolkit
             $arrLabels[] = $strValue;
         }
 
-        if (is_array($arrLabels) && !empty($arrLabels)) {
-            $strTemplate .= '<span style="color:#999;padding-left:3px">(' . implode(' - ', $arrLabels) . ')</span>' . '</div>';
+        if (\is_array($arrLabels) && !empty($arrLabels)) {
+            $strTemplate .= '<span style="color:#999;padding-left:3px">(' . \implode(' - ', $arrLabels) . ')</span>' . '</div>';
         }
 
         return $strTemplate;
@@ -381,7 +546,7 @@ class Toolkit
         $strImage = 'articles';
 
         foreach ($arrLabelFields as $strField) {
-            $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], \Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
+            $arrColumns[$strField] = static::parseCatalogValue($arrRow[$strField], Widget::getAttributesFromDca($arrFields[$strField], $strField, $arrRow[$strField], $strField, $arrCatalog['table']), $arrRow, true);
         }
 
         if (count($arrColumns) < 2) {
@@ -393,7 +558,47 @@ class Toolkit
             $intIndex += 1;
         }
 
-        return \Image::getHtml($strImage . '.svg', '', '') . ' ' . $strTemplate;
+        return Image::getHtml($strImage . '.svg', '', '') . ' ' . $strTemplate;
+    }
+
+    public static function findUnknownValues($varValue, $strTable, $strField): array
+    {
+        if (empty($varValue) || !$strTable || !$strField) {
+            return [];
+        }
+
+        $objField = Database::getInstance()->prepare('SELECT * FROM tl_catalog_field WHERE pid=(SELECT id FROM tl_catalog WHERE `table`=? LIMIT 1) AND fieldname=?')->limit(1)->execute($strTable, $strField);
+        if (!$objField->numRows) {
+            return [];
+        }
+
+        $arrValues = [];
+        if (is_array($varValue)) {
+            $arrValues = $varValue;
+        }
+
+        if (is_string($varValue)) {
+            $arrValues = explode(',', $varValue);
+        }
+
+        $arrReturn = [];
+        switch ($objField->optionsSource) {
+            case 'dbOptions':
+            case 'dbActiveOptions':
+                foreach ($arrValues as $strValue) {
+                    if (Database::getInstance()->fieldExists('lid', $objField->dbTable) && \is_numeric($strValue)) {
+                        $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $objField->dbTable . ' WHERE lid=? AND `language`=?')->limit(1)->execute($strValue, ($GLOBALS['TL_LANGUAGE'] ?? ''));
+                        if (!$objEntity->numRows) {
+                            continue;
+                        }
+                        $arrReturn[] = $objEntity->id;
+                    }
+                }
+
+                break;
+        }
+
+        return $arrReturn;
     }
 
     public static function parseCatalogValue($varValue, $arrField, $arrCatalog = [], $blnStringFormat = false, $blnFastMode = false, $blnIsForm = false)
@@ -402,99 +607,148 @@ class Toolkit
         if ($varValue === '' || $varValue === null) {
             return $varValue;
         }
-        if (!isset($arrField['type']) && !$arrField['value']) {
+
+        if (!isset($arrField['type']) && !($arrField['value'] ?? '')) {
             return $varValue;
         }
+
         switch ($arrField['type']) {
+
             case 'text':
-                return $arrField['value'];
+                return $arrField['value'] ?? '';
+
             case 'checkboxWizard':
             case 'checkbox':
             case 'select':
             case 'radio':
-                if (isset($arrField['csv']) && $arrField['csv'] && is_string($arrField['value'])) {
-                    $arrField['value'] = explode($arrField['csv'], $arrField['value']);
+                $mixValue = $arrField['value'] ?? '';
+
+                if (($arrField['csv'] ?? false) && is_string($mixValue)) {
+                    $mixValue = explode($arrField['csv'], $mixValue);
                 }
-                $varValue = !is_array($arrField['value']) ? \StringUtil::deserialize($arrField['value'], true) : $arrField['value'];
-                $arrOptionValues = static::getSelectedOptions($varValue, ($arrField['options']??[]));
+
+                $varValue = !is_array($mixValue) ? StringUtil::deserialize($mixValue, true) : $mixValue;
+                $arrOptionValues = static::getSelectedOptions($varValue, ($arrField['options'] ?? []));
+
+                if (empty($arrOptionValues) && ($arrField['unknownOption'] ?? false) && is_array($arrField['unknownOption'])) {
+                    $arrOptionValues = static::getSelectedOptions(
+                        static::findUnknownValues($varValue, ($arrField['strTable'] ?? ''), ($arrField['strField'] ?? '')),
+                        ($arrField['options'] ?? [])
+                    );
+                }
+
                 if ($blnStringFormat) {
                     return static::parse($arrOptionValues);
                 }
-                if ($blnIsForm && $arrField['type'] == 'checkbox' && $arrField['multiple'] == false) {
-                    return $arrField['value'];
+
+                if ($blnIsForm && $arrField['type'] === 'checkbox' && !($arrField['multiple'] ?? false)) {
+                    return $arrField['value'] ?? '';
                 }
+
                 return $arrOptionValues;
+
             case 'fileTree':
-                $strSizeId = null;
-                $arrOrderField = [];
-                if (isset($arrField['orderField']) && $arrField['orderField'] && $arrCatalog[$arrField['orderField']]) {
-                    $arrOrderField = Image::getUuids($arrCatalog[$arrField['orderField']]);
-                }
-                if (isset($arrField['imageSize']) && $arrField['imageSize']) {
-                    $strSizeId = $arrField['imageSize'];
-                }
                 if ($blnFastMode) {
-                    return Image::getUuids($varValue);
+                    return CatalogImage::getUuids($varValue);
                 }
-                if ((isset($arrField['isImage']) && $arrField['isImage']) || (isset($arrField['isGallery']) && $arrField['isGallery'])) {
 
+                $strSizeId = $arrField['imageSize'] ?? null;
+                $arrOrderField = [];
+
+                if (($arrField['orderField'] ?? false) && isset($arrCatalog[$arrField['orderField']])) {
+                    $arrOrderField = CatalogImage::getUuids($arrCatalog[$arrField['orderField']]);
+                }
+
+                if (($arrField['isImage'] ?? false) || ($arrField['isGallery'] ?? false)) {
                     $arrImages = [];
-                    return Image::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
+                    return CatalogImage::getImage($varValue, $strSizeId, $arrImages, $arrOrderField);
                 }
 
-                if ($arrField['isFile'] ?? '') {
+                if ($arrField['isFile'] ?? false) {
                     $arrFiles = [];
                     return File::getFile($varValue, $arrFiles, $arrOrderField);
                 }
+
                 return [];
-            case 'multiColumnWizard':
+
+            case 'rowWizard':
                 $arrReturn = [];
-                $varEntities = \StringUtil::deserialize($varValue, true);
+                $varEntities = StringUtil::deserialize($varValue, true);
+
                 foreach ($varEntities as $arrEntity) {
+                    if (!is_array($arrEntity)) {
+                        continue;
+                    }
+
                     $arrRow = [];
                     foreach ($arrEntity as $strField => $strValue) {
-                        $arrRow[$strField] = static::parseCatalogValue($strValue, \Widget::getAttributesFromDca($arrField['columnFields'][$strField], $strField, $strValue, $strField, null), $arrCatalog, true, true);;
+                        $arrSubField = $arrField['fields'][$strField] ?? [];
+                        $arrAttributes = Widget::getAttributesFromDca($arrSubField, $strField, $strValue, $strField, null);
+
+                        $arrRow[$strField] = static::parseCatalogValue($strValue, $arrAttributes, $arrCatalog, true, true);
                     }
                     $arrReturn[] = $arrRow;
                 }
+
                 return $arrReturn;
+
             case 'pageTree':
                 if (!$varValue) {
                     return '';
                 }
+
                 $arrValues = [];
-                $varValue = explode(',', $varValue);
-                foreach ($varValue as $strPageId) {
-                    $objPage = \PageModel::findByPk($strPageId);
+                $arrPageIds = is_array($varValue) ? $varValue : explode(',', $varValue);
+
+                foreach ($arrPageIds as $strPageId) {
+                    $strPageId = trim($strPageId);
+                    if ($strPageId === '') {
+                        continue;
+                    }
+
+                    $objPage = PageModel::findByPk($strPageId);
                     if ($objPage === null) {
                         continue;
                     }
+
                     if ($blnStringFormat) {
-                        $arrValues[] = $objPage->pageTitle ?: $objPage->title;
-                    } else {
-                        $strUrl = '';
-                        try {
-                            $strUrl = $objPage->getFrontendUrl();
-                        } catch (\Exception $objException) {}
-                        $arrValues[$strPageId] = [
-                            'url' => $strUrl,
-                            'master' => $objPage->getFrontendUrl((($arrCatalog['alias'] ?? '') ? '/' . $arrCatalog['alias'] : '')),
-                            'absolute' => $objPage->getAbsoluteUrl((($arrCatalog['alias'] ?? '') ? '/' . $arrCatalog['alias'] : ''))
-                        ];
+                        $arrValues[] = $objPage->title ?: $objPage->pageTitle;
+                        continue;
                     }
+
+                    $strUrl = '';
+                    $strMaster = '';
+                    $strAbsolute = '';
+                    $strAlias = $arrCatalog['alias'] ?? '';
+
+                    try {
+                        $arrPage = $objPage->row();
+                        $strUrl = static::parseDetailLink($arrPage, '', $arrCatalog);
+                        $strMaster = static::parseDetailLink($arrPage, $strAlias, $arrCatalog);
+                        $strAbsolute = static::parseDetailLink($arrPage, $strAlias, $arrCatalog, true);
+                    } catch (\Exception $objException) {
+
+                    }
+
+                    $arrValues[$strPageId] = [
+                        'url' => $strUrl,
+                        'master' => $strMaster,
+                        'absolute' => $strAbsolute
+                    ];
                 }
+
                 if ($blnStringFormat) {
                     return implode(', ', $arrValues);
                 }
+
                 return $arrValues;
         }
 
-        return $arrField['value'];
+        return $arrField['value'] ?? '';
     }
 
-    public static function getSelectedOptions($arrValues, $arrOptions)
+    public static function getSelectedOptions($arrValues, $arrOptions): array
     {
-
         $arrReturn = [];
         if (!is_array($arrOptions) || !is_array($arrValues)) {
             return $arrReturn;
@@ -502,13 +756,13 @@ class Toolkit
 
         $arrTemp = [];
         foreach ($arrOptions as $arrValue) {
-            if (in_array(($arrValue['value'] ?? ''), $arrValues)) {
+            if (\in_array(($arrValue['value'] ?? ''), $arrValues)) {
                 $arrTemp[$arrValue['value']] = $arrValue;
             }
         }
 
         foreach ($arrValues as $strValue) {
-            if (!isset($arrTemp[$strValue])) {
+            if (!(is_numeric($strValue) || is_string($strValue)) || !isset($arrTemp[$strValue])) {
                 continue;
             }
             $arrReturn[] = $arrTemp[$strValue];
@@ -519,12 +773,15 @@ class Toolkit
 
     public function cmp($a, $b)
     {
+
         $strKey = 'value';
+
         if ($a[$strKey] < $b[$strKey]) {
             return 1;
         } else if ($a[$strKey] > $b[$strKey]) {
             return -1;
         }
+
         return 0;
     }
 
@@ -533,18 +790,22 @@ class Toolkit
 
         $arrEntity = [];
         if (!$arrActiveRecord['id']) {
-            return null;
+            return;
         }
 
         foreach ($arrActiveRecord as $strField => $strValue) {
-            $arrEntity[$strField] = static::parseCatalogValue($strValue, \Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$strTable]['fields'][$strField], $strField, $strValue, $strField, $strTable), $arrActiveRecord, true);
+            $arrEntity[$strField] = static::parseCatalogValue($strValue, Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$strTable]['fields'][$strField], $strField, $strValue, $strField, $strTable), $arrActiveRecord, true);
         }
 
         $objRoleResolver = RoleResolver::getInstance($strTable, $arrEntity);
         $arrGeoFields = $objRoleResolver->getGeoCodingFields();
         $strAddress = $objRoleResolver->getGeoCodingAddress();
-        $objDatabase = \Database::getInstance();
-        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+
+        if (!$strAddress) {
+            return;
+        }
+
+        $objGeoCoding = new GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
         if (static::isEmpty($arrEntity[$arrGeoFields['longitude']]) && $arrEntity[$arrGeoFields['latitude']]) {
@@ -552,106 +813,104 @@ class Toolkit
         }
 
         if ($arrGeoCoding !== null && !empty($arrGeoFields)) {
+
             $arrSet = [];
             $arrSet['tstamp'] = time();
             $arrSet[$arrGeoFields['longitude']] = $arrGeoCoding['longitude'];
             $arrSet[$arrGeoFields['latitude']] = $arrGeoCoding['latitude'];
-            $objDatabase->prepare('UPDATE ' . $strTable . ' %s WHERE id = ?')->set($arrSet)->execute($arrEntity['id']);
+            Database::getInstance()->prepare('UPDATE ' . $strTable . ' %s WHERE id = ?')->set($arrSet)->execute($arrEntity['id']);
         }
     }
 
-    public static function isEmpty($varValue)
+    public static function isEmpty($varValue): bool
     {
         if ($varValue === null) {
             return true;
         }
+
         if ($varValue === '') {
             return true;
         }
+
         return false;
     }
 
-    public static function saveAlias($arrActiveRecord, $arrFields, $arrCatalog)
+    public static function saveAlias($arrActiveRecord, $arrFields, $arrCatalog): void
     {
 
         if (!$arrActiveRecord['id']) {
-            return null;
+            return;
         }
 
-        $arrValues = [];
-        $objDatabase = \Database::getInstance();
+        $strAlias = Input::post('alias') ?: ''; // $arrActiveRecord['alias'] ?? '';
 
-        foreach ($arrFields as $strFieldname => $arrField) {
+        if (!$strAlias) {
 
-            if (!isset($arrField['eval'])) {
-                continue;
+            $arrValues = [];
+            foreach ($arrFields as $strFieldname => $arrField) {
+
+                if (!isset($arrField['eval'])) {
+                    continue;
+                }
+
+                if (!isset($arrField['eval']['useAsAlias']) || !$arrField['eval']['useAsAlias']) {
+                    continue;
+                }
+
+                if (isset($arrActiveRecord[$strFieldname]) && $arrActiveRecord[$strFieldname] !== '') {
+                    $arrValues[] = $arrActiveRecord[$strFieldname];
+                }
             }
-
-            if (!isset($arrField['eval']['useAsAlias']) || !$arrField['eval']['useAsAlias']) {
-                continue;
+            if (empty($arrValues)) {
+                $strAlias = \md5(\time() . '/' . $arrActiveRecord['id']);
+            } else {
+                $strAlias = \implode('-', $arrValues);
             }
-
-            if (isset($arrActiveRecord[$strFieldname]) && $arrActiveRecord[$strFieldname] !== '' && $arrActiveRecord[$strFieldname] !== null) {
-                $arrValues[] = $arrActiveRecord[$strFieldname];
-            }
-        }
-
-        if (empty($arrValues)) {
-            $strAlias = md5(time() . '/' . $arrActiveRecord['id']);
-        } else {
-            $strAlias = implode('-', $arrValues);
         }
 
         $arrSet = [];
-        $arrSet['tstamp'] = time();
-        $arrSet['alias'] = self::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), 'a-zA-Z0-9', ($arrActiveRecord['lid'] ?: null));
-        $objDatabase->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
+        $arrSet['tstamp'] = \time();
+        $arrSet['alias'] = static::generateAlias($strAlias, 'alias', $arrCatalog['table'], $arrActiveRecord['id'], ($arrActiveRecord['pid'] ?: null), ($arrCatalog['validAliasCharacters'] ?? 'a-zA-Z0-9'), ($arrActiveRecord['lid'] ?: null));
+
+        Database::getInstance()->prepare('UPDATE ' . $arrCatalog['table'] . ' %s WHERE id = ?')->set($arrSet)->execute($arrActiveRecord['id']);
     }
 
-    public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9', $strLid = null)
+    public static function generateAlias($strValue, $strAliasField = 'alias', $strTable = null, $strId = null, $strPid = null, $strValidChars = 'a-zA-Z0-9', $strLid = null): string
     {
 
-        $strLanguage = '';
         $strLanguageColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langColumnName'] ?? '';
         $strLangPidColumn = $GLOBALS['TL_DCA'][$strTable]['config']['langPid'] ?? '';
+        $blnAliasFieldExist = $strTable && Database::getInstance()->fieldExists($strAliasField, $strTable);
 
-        $blnAliasFieldExist = $strTable && \Database::getInstance()->fieldExists($strAliasField, $strTable);
-
-        if ($strId && $blnAliasFieldExist) {
-            $objEntity = \Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `id`=?')->limit(1)->execute($strId);
+        if ($strId && $blnAliasFieldExist && !$strValue) {
+            $objEntity = Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `id`=?')->limit(1)->execute($strId);
             if ($objEntity->numRows) {
-                if ($strLanguageColumn) {
-                    $strLanguage = $objEntity->{$strLanguageColumn} ?: '';
-                }
                 $strValue = $objEntity->{$strAliasField} ?: $strValue;
             }
         }
 
         if (!$strValue) {
-            return md5(time());
+            return \md5(\time());
         }
 
-        $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByTableOrModule($strTable);
+        $objCatalog = CatalogModel::findByTableOrModule($strTable);
         if ($objCatalog !== null) {
             if ($objCatalog->validAliasCharacters) {
                 $strValidChars = $objCatalog->validAliasCharacters;
             }
         }
 
-        $objSlugGenerator = new \Ausi\SlugGenerator\SlugGenerator((new \Ausi\SlugGenerator\SlugOptions)
-            ->setValidChars($strValidChars)
-            ->setLocale('de')
-            ->setDelimiter('-'));
+        $objSlugGenerator = new SlugGenerator((new SlugOptions)->setValidChars($strValidChars)->setLocale('de')->setDelimiter('-'));
         $strValue = $objSlugGenerator->generate($strValue);
 
-        if (strlen($strValue) > 120) {
-            $strValue = substr($strValue, 0, 120);
+        if (\strlen($strValue) > 120) {
+            $strValue = \substr($strValue, 0, 120);
         }
 
         if ($blnAliasFieldExist && $strId) {
 
             $arrQueries = [];
-            $arrValues = [$strValue, $strId];
+            $arrValues = [$strId, $strValue];
 
             if ($strPid !== null) {
                 $arrQueries[] = ' AND `pid`=?';
@@ -659,12 +918,14 @@ class Toolkit
             }
 
             if ($strLanguageColumn && $strLangPidColumn) {
-                $arrQueries[] = ' AND `'.$strLangPidColumn.'`!=? AND id!=?';
-                $arrValues[] = ($strLid?:$strId);
+                $arrQueries[] = ' AND `' . $strLangPidColumn . '`!=? AND id!=?';
+                $arrValues[] = ($strLid ?: $strId);
                 $arrValues[] = $strLid;
             }
 
-            if (\Database::getInstance()->prepare('SELECT * FROM ' . $strTable . ' WHERE `' . $strAliasField . '`=? AND `id`!=?' . implode('', $arrQueries))->limit(1)->execute($arrValues)->numRows) {
+            $objExists = Database::getInstance()->prepare("SELECT * FROM $strTable WHERE id!=? AND `$strAliasField`=?" . implode('', $arrQueries))->limit(1)->execute(...$arrValues);
+
+            if ($objExists->numRows) {
                 $strValue = $strValue . '-' . $strId;
             }
         }
@@ -672,7 +933,52 @@ class Toolkit
         return $strValue;
     }
 
-    public static function convertComboWizardToModelValues($strValue, $strTable = '')
+    public static function convertExpertQueries($strColumn, $strValue): array
+    {
+
+        $arrReturn = [];
+        $strValue = Toolkit::replaceInsertTags($strValue);
+        $strColumn = Toolkit::replaceInsertTags($strColumn);
+
+        $arrReturn['column'] = \explode(';', StringUtil::decodeEntities($strColumn));
+        $arrReturn['value'] = \explode(';', StringUtil::decodeEntities($strValue));
+        $arrReturn['value'] = \array_filter($arrReturn['value']);
+
+        if ((\is_array($arrReturn['value']) && !empty($arrReturn['value']))) {
+            $intIndex = -1;
+            $arrReturn['value'] = \array_filter($arrReturn['value'], function ($strValue) use (&$intIndex, &$arrReturn) {
+                $intIndex = $intIndex + 1;
+                if ($strValue === '' || $strValue === null) {
+                    unset($arrReturn['column'][$intIndex]);
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        if (empty($arrReturn['column'])) {
+            unset($arrReturn['column']);
+        }
+        if (empty($arrReturn['value'])) {
+            unset($arrReturn['value']);
+        }
+
+        return $arrReturn;
+    }
+
+    public static function pluckTableFromField($strField, $strDefault = '', $blnDot = false): string
+    {
+
+        $arrFragments = \explode('.', $strField);
+
+        if (\count($arrFragments) > 1) {
+            return ($arrFragments[0] ?? '') ? '' : ($strDefault ? $strDefault . ($blnDot ? '.' : '') : '');
+        }
+
+        return ($strDefault ? $strDefault . ($blnDot ? '.' : '') : '');
+    }
+
+    public static function convertComboWizardToModelValues($strValue, $strTable = ''): array
     {
 
         $arrReturn = [];
@@ -681,24 +987,24 @@ class Toolkit
         $strName = 'group0';
         $blnInitialGroup = true;
 
-        if (is_string($strValue)) {
-            $strValue = \StringUtil::decodeEntities($strValue);
+        if (\is_string($strValue)) {
+            $strValue = StringUtil::decodeEntities($strValue);
         }
 
-        $arrJson = \Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($strValue, [
+        $arrJson = WidgetToolkit::decodeJson($strValue, [
             'option' => 'field',
             'option2' => 'operator',
             'option3' => 'value',
             'option4' => 'group'
         ]);
 
-        if (!is_array($arrJson) || empty($arrJson)) {
+        if (empty($arrJson)) {
             return $arrReturn;
         }
 
         foreach ($arrJson as $intIndex => $arrQuery) {
 
-            if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
+            if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token']) {
 
                 if ((isset($arrQuery['group']) && $arrQuery['group']) || $blnInitialGroup) {
                     $strName = 'group' . $intIndex;
@@ -708,32 +1014,33 @@ class Toolkit
                     $arrQueries[$strName] = [];
                 }
 
-                $varValue = $arrQuery['value'];
+                $varValue = ($arrQuery['value'] ?? null);
 
-                if ($varValue !== '' || $varValue !== null) {
-                    $objIt = new \InsertTags();
-                    $varValue = $objIt->replace($varValue, true);
+                if ($varValue !== null) {
+                    $varValue = static::replaceInsertTags($varValue, true);
                 }
 
                 $arrColumns = [];
-                $varValue = is_array($varValue) ? $varValue : \StringUtil::deserialize($varValue, true);
+                $varValue = \is_array($varValue) ? $varValue : StringUtil::deserialize($varValue, true);
+
                 foreach ($varValue as $strIndex => $strValue) {
 
-                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
+                    if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber'] > 1) {
                         if ($strIndex % $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['valueNumber']) {
-                            $arrColumns[] = \StringUtil::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
-                                'field' => ($strTable ? $strTable . '.' : '') . $arrQuery['field'],
+                            $arrColumns[] = static::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
+                                'field' => static::pluckTableFromField($arrQuery['field'], $strTable, true) . $arrQuery['field'],
                                 'value' => '?'
                             ]);
                         }
                     } else {
-                        $arrColumns[] = \StringUtil::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
-                            'field' => ($strTable ? $strTable . '.' : '') . $arrQuery['field'],
+
+                        $arrColumns[] = static::parseSimpleTokens($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['token'], [
+                            'field' => static::pluckTableFromField($arrQuery['field'], $strTable, true) . $arrQuery['field'],
                             'value' => '?'
                         ]);
                     }
 
-                    if (isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && is_bool($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] == true) {
+                    if (isset($arrQuery['operator']) && isset($GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty']) && $GLOBALS['CM_OPERATORS'][$arrQuery['operator']]['empty'] === true) {
                         continue;
                     }
 
@@ -741,8 +1048,8 @@ class Toolkit
                 }
 
                 if (!empty($arrColumns)) {
-                    if (count($arrColumns) > 1) {
-                        $strColumn = '(' . implode(' OR ', $arrColumns) . ')';
+                    if (\count($arrColumns) > 1) {
+                        $strColumn = '(' . \implode(' OR ', $arrColumns) . ')';
                     } else {
                         $strColumn = $arrColumns[0];
                     }
@@ -763,7 +1070,8 @@ class Toolkit
             if (empty($arrQuery)) {
                 continue;
             }
-            if (count($arrQuery) > 1) {
+
+            if (\count($arrQuery) > 1) {
                 $arrReturn['column'][] = '(' . implode(' OR ', $arrQuery) . ')';
             } else {
                 $arrReturn['column'][] = $arrQuery[0];
@@ -773,24 +1081,72 @@ class Toolkit
         return $arrReturn;
     }
 
-    public static function getTableByDo()
+    public static function getTableByDo(string $doParam = ''): string
     {
-
-        if (!\Input::get('do')) {
-            return null;
+        if ($strTable = Input::get('table')) {
+            return (string)$strTable;
         }
 
-        if (\Input::get('do') && \Input::get('table')) {
-            return \Input::get('table');
+        if ($doParam === '') {
+            $doParam = (string)Input::get('do');
         }
 
-        $objCatalog = new \Alnv\ContaoCatalogManagerBundle\Library\Catalog(\Input::get('do'));
-        return $objCatalog->getCatalog()['table'];
+        if ($doParam === '') {
+            return '';
+        }
+
+        $objCatalog = new Catalog($doParam);
+        $catalog = $objCatalog->getCatalog();
+
+        return $catalog['table'] ?? '';
     }
 
-    public static function convertArrayItemsToPlaceholders($arrArray, $strPlaceholder = '?')
+    public static function getModuleNameByTable($strTable): string
+    {
+        if (!is_array($GLOBALS['BE_MOD']) || empty($GLOBALS['BE_MOD'])) {
+            return '';
+        }
+
+        foreach ($GLOBALS['BE_MOD'] as $arrModules) {
+            foreach ($arrModules as $strModule => $arrModule) {
+                foreach (($arrModule['tables'] ?? []) as $strModuleTable) {
+                    if ($strTable === $strModuleTable) {
+                        return $strModule;
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    public static function extendField(array $base, array $extend): array
+    {
+        return array_merge($base, $extend);
+    }
+
+    public static function convertArrayItemsToPlaceholders($arrArray, $strPlaceholder = '?'): string
+    {
+        return implode(",", array_fill(0, count($arrArray), $strPlaceholder));
+    }
+
+    public static function parseSimpleTokens($strString, $arrData, $blnAllowHtml = true)
+    {
+        return System::getContainer()->get('contao.string.simple_token_parser')->parse($strString, $arrData, $blnAllowHtml);
+    }
+
+    public static function getActiveRecordAsArrayFromDc(DataContainer $objDataContainer): array
     {
 
-        return implode(",", array_fill(0, count($arrArray), $strPlaceholder));
+        if (method_exists(($objDataContainer->activeRecord ?: ''), 'row')) {
+            return $objDataContainer->activeRecord->row();
+        }
+
+        if (method_exists(($objDataContainer), 'getCurrentRecord')) {
+            return (array)$objDataContainer->getCurrentRecord();
+
+        }
+
+        return [];
     }
 }

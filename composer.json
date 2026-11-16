@@ -2,8 +2,8 @@
   "name": "alnv/catalog-manager-bundle",
   "type": "contao-bundle",
   "license": "proprietary",
-  "description": "Catalog Manager v2 for Contao CMS",
-  "keywords": ["contao", "catalog", "filter", "taxonomy", "frontend editing", "radius search"],
+  "description": "Catalog Manager for Contao CMS",
+  "keywords": ["contao", "catalog", "filter", "umkreissuche", "merkliste", "wunschliste", "immobilien", "jobs", "stellenbörse", "produkte", "pim", "mediathek", "events", "news", "blog"],
   "homepage": "https://catalog-manager.org",
   "authors": [
     {
@@ -20,18 +20,10 @@
   "autoload": {
     "psr-4": {
       "Alnv\\ContaoCatalogManagerBundle\\": "src/"
-    },
-    "classmap": [
-      "src/Resources/contao/"
-    ],
-    "exclude-from-classmap": [
-      "src/Resources/contao/dca/",
-      "src/Resources/contao/config/",
-      "src/Resources/contao/languages/",
-      "src/Resources/contao/templates/"
-    ]
+    }
   },
   "require": {
+<<<<<<< HEAD
     "contao/core-bundle":"~4.13",
     "terminal42/dcawizard": "^3.0",
     "menatwork/contao-multicolumnwizard-bundle": "^3.6",
@@ -41,19 +33,29 @@
     "alnv/widget-collection-bundle": "^2.0",
     "alnv/catalog-manager-multilingual-adapter-bundle": "^2.1",
     "alnv/contao-geocoding": "^2.1"
+=======
+    "php": "^8.3",
+    "contao/core-bundle": "~5.7",
+    "terminal42/dcawizard": "^4.0 || ^5.0",
+    "alnv/translation-manager-bundle": "^3.0",
+    "alnv/widget-collection-bundle": "^3.0",
+    "terminal42/dc_multilingual": "~4.7",
+    "terminal42/contao-changelanguage": "^3.7",
+    "alnv/contao-geocoding": "^3.0",
+    "guzzlehttp/guzzle": "^7.10 || ^8.3",
+    "symfony/rate-limiter": "^7.4"
+  },
+  "replace": {
+    "alnv/catalog-manager-multilingual-adapter-bundle": "*"
+  },
+  "suggest": {
+    "php-mcp/server": "^3.3 – aktiviert den CLI-Befehl catalog:mcp (MCP-Server über stdio) für KI-Assistenten"
+>>>>>>> contao513
   },
   "conflict": {
-    "alnv/catalog-manager": "*"
-  },
-  "config": {
-    "preferred-install": "dist"
+    "php-mcp/server": "<3.3"
   },
   "extra": {
-    "contao": {
-      "sources": {
-        "": "system/modules/contao-catalog-manager-bundle"
-      }
-    },
     "contao-manager-plugin": "Alnv\\ContaoCatalogManagerBundle\\ContaoManager\\Plugin"
   }
 }

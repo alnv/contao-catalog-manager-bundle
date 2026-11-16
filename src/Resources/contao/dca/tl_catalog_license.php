@@ -7,6 +7,7 @@ use Alnv\ContaoCatalogManagerBundle\Security\Authorization;
 $GLOBALS['TL_DCA']['tl_catalog_license'] = [
     'config' => [
         'dataContainer' => DC_File::class,
+        'backendSearchIgnore' => true,
         'closed' => true
     ],
     'palettes' => [

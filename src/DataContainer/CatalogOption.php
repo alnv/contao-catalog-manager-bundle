@@ -2,17 +2,24 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-class CatalogOption {
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
 
-    public function getFieldLabels() {
-        $objFields = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findAll();
+class CatalogOption
+{
+
+    public function getFieldLabels(): array
+    {
+
+        $objFields = CatalogFieldModel::findAll();
         if ($objFields === null) {
             return [];
         }
+
         $arrOptions = [];
         while ($objFields->next()) {
             $arrOptions[$objFields->id] = $objFields->name;
         }
+
         return $arrOptions;
     }
 }

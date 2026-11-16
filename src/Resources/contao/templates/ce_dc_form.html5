@@ -1,0 +1,81 @@
+<?php
+use Contao\StringUtil;
+
+/**
+ * Formular der Frontend-Verwaltung (erzeugt vom DcFormBuilder).
+ * Felder: $this->form['groups'][]['fields'][] mit name, label, html (Contao-Widget), files, readonly, selector.
+ */
+$e = static fn ($value): string => StringUtil::specialchars((string) $value);
+$t = $this->text ?? [];
+$form = $this->form;
+?>
+<section class="cm-fm__form-section" aria-labelledby="<?= $e($form['id']) ?>_headline">
+    <h2 id="<?= $e($form['id']) ?>_headline" tabindex="-1" data-cm-fm-heading><?= $e($form['headline']) ?></h2>
+
+    <?php if (!empty($form['errors']) || $form['formError']): ?>
+        <div class="cm-fm__error-summary" role="alert" tabindex="-1" data-cm-fm-error-summary>
+            <p><?= $e($form['formError'] ?: ($t['formErrors'] ?? 'Please correct the marked fields.')) ?></p>
+            <?php if (!empty($form['errors'])): ?>
+                <ul>
+                    <?php foreach ($form['errors'] as $field => $messages): ?>
+                        <li><a href="#ctrl_<?= $e($form['id'] . '_' . $field) ?>"><?= $e(implode(' ', $messages)) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <form id="<?= $e($form['id']) ?>" class="cm-fm__form" data-cm-fm-form method="post" action="<?= $e($form['action']) ?>" enctype="multipart/form-data" novalidate>
+        <input type="hidden" name="FORM_SUBMIT" value="<?= $e($form['id']) ?>">
+        <input type="hidden" name="REQUEST_TOKEN" value="<?= $e($this->requestToken) ?>">
+        <input type="hidden" name="_cmfm_action" value="save">
+        <input type="hidden" name="_cmfm_id" value="<?= (int) $form['recordId'] ?>">
+        <?php /* Standard-Schaltfläche für die Eingabetaste (sonst würde "Formular aktualisieren" ausgelöst) */ ?>
+        <button type="submit" class="cm-fm__sr" tabindex="-1" aria-hidden="true"><?= $e($t['save'] ?? 'Save') ?></button>
+
+        <?php foreach ($form['groups'] as $group): ?>
+            <fieldset class="cm-fm__group<?= $group['legend'] ? ' cm-fm__group--' . $e($group['legend']) : '' ?>">
+                <?php if ($group['label']): ?>
+                    <legend><?= $e($group['label']) ?></legend>
+                <?php endif; ?>
+
+                <?php foreach ($group['fields'] as $field): ?>
+                    <div class="cm-fm__field cm-fm__field--<?= $e($field['type']) ?><?= $field['readonly'] ? ' cm-fm__field--readonly' : '' ?><?= !empty($field['errors']) ? ' cm-fm__field--error' : '' ?>">
+                        <?= $field['html'] /* von Contao-Widgets erzeugt und escaped */ ?>
+
+                        <?php if (!empty($field['files'])): ?>
+                            <ul class="cm-fm__files" aria-label="<?= $e(sprintf($t['currentFiles'] ?? 'Current files: %s', $field['label'])) ?>">
+                                <?php foreach ($field['files'] as $index => $file): ?>
+                                    <li>
+                                        <span class="cm-fm__file-name"><?= $e($file['name']) ?></span>
+                                        <?php if ($file['pending']): ?>
+                                            <input type="hidden" name="_cmfm_pending_<?= $e($field['name']) ?>[]" value="<?= $e($file['uuid']) ?>">
+                                            <span class="cm-fm__file-hint">(<?= $e($t['filePending'] ?? 'uploaded, will be saved') ?>)</span>
+                                        <?php elseif (!$field['readonly']): ?>
+                                            <label class="cm-fm__file-remove">
+                                                <input type="checkbox" name="_cmfm_remove_<?= $e($field['name']) ?>[]" value="<?= $e($file['uuid']) ?>">
+                                                <?= $e($t['fileRemove'] ?? 'remove') ?>
+                                            </label>
+                                        <?php endif; ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+
+                        <?php if ($field['selector']): ?>
+                            <button type="submit" name="<?= $e($form['reloadField']) ?>" value="1" class="cm-fm__button cm-fm__button--link cm-fm__reload" formnovalidate>
+                                <?= $e($t['reload'] ?? 'Update form') ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </fieldset>
+        <?php endforeach; ?>
+
+        <div class="cm-fm__form-actions">
+            <button type="submit" class="cm-fm__button cm-fm__button--primary" data-cm-fm-focus="save"><?= $e($t['save'] ?? 'Save') ?></button>
+            <button type="submit" name="_cmfm_close" value="1" class="cm-fm__button" data-cm-fm-focus="save-close"><?= $e($t['saveClose'] ?? 'Save and close') ?></button>
+            <a class="cm-fm__button cm-fm__button--link" href="<?= $e($form['cancelUrl']) ?>" data-cm-fm-focus="cancel"><?= $e($t['cancel'] ?? 'Cancel') ?></a>
+        </div>
+    </form>
+</section>

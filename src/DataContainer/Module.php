@@ -2,41 +2,50 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
-class Module {
+use Contao\Controller;
+use Contao\DataContainer;
+use Contao\Input;
+use Terminal42\DcMultilingualBundle\Driver;
+use Contao\System;
 
-    public function getTables() {
+class Module
+{
 
-        return (new \Alnv\ContaoCatalogManagerBundle\DataContainer\Catalog())->getTables();
+    public function getTables(): array
+    {
+        return (new Catalog())->getTables();
     }
 
-    public function getFields($dc = null) {
-
+    public function getFields($dc = null): array
+    {
         $arrReturn = [];
 
-        if ( $dc === null ) {
+        if ($dc === null) {
             return $arrReturn;
         }
 
-        if ( $dc->activeRecord === null || !$dc->activeRecord->cmTable ) {
+        if ($dc->activeRecord === null || !$dc->activeRecord->cmTable) {
             return $arrReturn;
         }
 
-        \System::loadLanguageFile($dc->activeRecord->cmTable, \Input::post('language'));
-        \Controller::loadDataContainer($dc->activeRecord->cmTable);
+        System::loadLanguageFile($dc->activeRecord->cmTable, Input::post('language'));
+        Controller::loadDataContainer($dc->activeRecord->cmTable);
+
+        $strTable = ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['_table'] ?? '');
 
         foreach ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['fields'] as $strField => $arrField) {
+            $arrReturn[$strField] = $strTable . '.' . $strField;
 
-            $strValue = is_array($arrField['label']) ? $arrField['label'][0] : $strField;
-            $arrReturn[$strField] = \StringUtil::decodeEntities($strValue);
+            if ($GLOBALS['TL_DCA'][$dc->activeRecord->cmTable]['config']['dataContainer'] == Driver::class && (!empty($arrField['eval']['translatableFor']) || \in_array($strField, ['lid', 'language']))) {
+                $arrReturn['translation.' . $strField] =  'translation.' . $strField;
+            }
         }
+
         return $arrReturn;
     }
 
-    public function getListTemplates(\DataContainer $dc) {
-
-        if ($dc == null) {
-            return [];
-        }
+    public function getListTemplates(DataContainer $dc): array
+    {
 
         if (!$dc->activeRecord->type) {
             return [];
@@ -46,24 +55,27 @@ class Module {
             case 'listing-map':
                 $strType = 'map_view';
                 break;
+            case 'listing-table':
+                $strType = 'listing';
+                break;
             default:
                 $strType = $dc->activeRecord->type;
                 break;
         }
 
-        return \Controller::getTemplateGroup('cm_' . $strType . '_');
+        return Controller::getTemplateGroup('cm_' . $strType . '_');
     }
 
-    public function getOrderByStatements() {
-
+    public function getOrderByStatements(): array
+    {
         return [
             'ASC',
             'DESC'
         ];
     }
 
-    public function getOperators() {
-
-        return array_keys( $GLOBALS['CM_OPERATORS'] );
+    public function getOperators(): array
+    {
+        return \array_keys($GLOBALS['CM_OPERATORS']);
     }
 }

@@ -1,69 +1,107 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Contao\Controller;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Contao\CoreBundle\DataContainer\PaletteManipulator;
+use Contao\Database;
+use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\StringUtil;
+use Contao\Widget;
+
 $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
+        'backendSearchIgnore' => true,
         'ptable' => 'tl_catalog',
         'onload_callback' => [
-            function (\DataContainer $objDataContainer) {
+            function (DataContainer $objDataContainer) {
 
-                $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
+                $objCurrent = CatalogPaletteModel::findByPk($objDataContainer->id);
                 if (!$objCurrent) {
                     return null;
                 }
 
                 if ($objCurrent->type == 'subpalette' && $objCurrent->selector) {
-                    $arrOptions = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objCurrent->selector);
+                    $arrOptions = (new CatalogPalette())->getFieldOptions($objCurrent->selector);
                     if (!empty($arrOptions)) {
-                        \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
+                        PaletteManipulator::create()
                             ->addField('selector_option', 'selector')
                             ->applyToPalette('subpalette', 'tl_catalog_palette');
                         $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_option']['options'] = $arrOptions;
                     }
                 }
 
-                if ($objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByFieldnameAndPid('type', $objCurrent->pid)) {
-                    \Contao\CoreBundle\DataContainer\PaletteManipulator::create()
-                        ->addField('selector_type', 'name')
-                        ->applyToPalette('palette', 'tl_catalog_palette');
-                    $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldOptions($objField->id);
+                $objCatalog = CatalogModel::findByPk($objCurrent->pid);
+
+                if ($objCatalog) {
+
+                    $strTable = $objCatalog->table;
+
+                    Controller::loadDataContainer($strTable);
+
+                    if (!empty($GLOBALS['TL_DCA'][$strTable]['fields']['type'])) {
+
+                        $arrTypeAttributes = Widget::getAttributesFromDca($GLOBALS['TL_DCA'][$strTable]['fields']['type'], 'type', '', 'type', $strTable, $objDataContainer);
+                        $arrOptions = [];
+                        foreach (($arrTypeAttributes['options'] ?? []) as $arrOption) {
+                            if (!$arrOption['value']) {
+                                continue;
+                            }
+                            $arrOptions[$arrOption['value']] = $arrOption['label'] ?? '-';
+                        }
+
+                        PaletteManipulator::create()
+                            ->addField('selector_type', 'name')
+                            ->applyToPalette('palette', 'tl_catalog_palette');
+
+                        $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['selector_type']['options'] = $arrOptions;
+                    }
                 }
 
-                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['eval']['columnFields']['field']['options'] = (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
+                $GLOBALS['TL_DCA']['tl_catalog_palette']['fields']['fields']['fields']['field']['options'] = (new CatalogPalette())->getFieldsByCatalogId($objCurrent->pid, $objCurrent->type);
             }
         ],
         'onsubmit_callback' => [
-            function (\DataContainer $objDataContainer) {
+            function (DataContainer $objDataContainer) {
 
                 $arrFields = [];
                 $intPosition = 0;
-                $arrFieldsets = \StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
+                $arrFieldSets = StringUtil::deserialize($objDataContainer->activeRecord->fieldsets, true);
 
-                foreach (\StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
+                foreach (StringUtil::deserialize($objDataContainer->activeRecord->fields, true) as $arrField) {
                     if ($arrField['field'] === '__FIELDSET__') {
                         $intPosition++;
                         $arrFields[] = 'Fieldset ' . $intPosition;
                     }
                 }
 
-                $objCurrent = \Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel::findByPk($objDataContainer->id);
-                if (count($arrFieldsets) != count($arrFields)) {
+                if (\count($arrFieldSets) != \count($arrFields)) {
                     $arrNewSets = [];
                     foreach ($arrFields as $strIndex => $strField) {
                         $strLabel = $strField;
-                        if (isset($arrFieldsets[$strIndex])) {
-                            $strLabel = $arrFieldsets[$strIndex]['label'] ?: $strField;
+                        if (isset($arrFieldSets[$strIndex])) {
+                            $strLabel = $arrFieldSets[$strIndex]['label'] ?: $strField;
                         }
                         $arrNewSets[] = [
                             'label' => $strLabel,
-                            'hide' => $arrFieldsets[$strIndex]['hide'] ? '1' : ''
+                            'hide' => $arrFieldSets[$strIndex]['hide'] ? '1' : ''
                         ];
                     }
-                    $objCurrent->fieldsets = serialize($arrNewSets);
-                }
 
-                $objCurrent->save();
+                    Database::getInstance()
+                        ->prepare('UPDATE tl_catalog_palette %s WHERE id=?')
+                        ->set([
+                            'tstamp' => \time(),
+                            'fieldsets' => \serialize($arrNewSets)
+                        ])
+                        ->limit(1)
+                        ->execute($objDataContainer->id);
+                }
             }
         ],
         'sql' => [
@@ -78,16 +116,17 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'mode' => 4,
             'fields' => ['sorting'],
             'headerFields' => ['name', 'table'],
-            'child_record_callback' => function($arrRow) {
+            'child_record_callback' => function ($arrRow) {
                 $arrTypes = $GLOBALS['TL_LANG']['tl_catalog_palette']['reference']['type'] ?: [];
                 return $arrRow['name'] .
-                    (isset($arrTypes[$arrRow['type']]) ? ' <span style="background:#f0c674;color:#fff;border-radius:5px;padding:3px;font-size:12px;">'.$arrTypes[$arrRow['type']].'</span>' : '');
+                    (isset($arrTypes[$arrRow['type']]) ? ' <span style="background:#f0c674;color:#fff;border-radius:5px;padding:3px;font-size:12px;">' . $arrTypes[$arrRow['type']] . '</span>' : '');
             }
         ],
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'copy' => [
                 'href' => 'act=paste&amp;mode=copy',
@@ -96,12 +135,12 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
+                'href' => 'act=toggle&amp;field=published',
                 'icon' => 'visible.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
+                'showInHeader' => true
             ],
             'show' => [
                 'href' => 'act=show',
@@ -129,13 +168,13 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
             'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'sorting' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'tstamp' => [
             'sql' => ['type' => 'integer', 'notnull' => false, 'unsigned' => true, 'default' => 0]
         ],
         'pid' => [
-            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0 ]
+            'sql' => ['type' => 'integer', 'notnull' => true, 'unsigned' => true, 'default' => 0]
         ],
         'type' => [
             'inputType' => 'select',
@@ -182,7 +221,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options_callback'=> ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
+            'options_callback' => ['catalogmanager.datacontainer.catalogpalette', 'getFields'],
             'filter' => true,
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
@@ -195,54 +234,69 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'mandatory' => true,
                 'doNotCopy' => true,
                 'submitOnChange' => true,
-                'includeBlankOption' => true
+                'includeBlankOption' => true,
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
             ],
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'fields' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'decodeEntities' => true,
                 'submitOnChange' => true,
                 'tl_class' => 'clr w50',
-                'columnFields' => [
-                    'field' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['field'],
-                        'inputType' => 'select',
-                        'eval' => [
-                            'chosen' => true,
-                            'style' => 'width:100%;max-width:375px',
-                            'includeBlankOption' => true
-                        ]
+            ],
+            'fields' => [
+                'field' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['field'],
+                    'inputType' => 'select',
+                    'eval' => [
+                        'chosen' => true,
+                        'style' => 'width: 100%;max-width: 375px',
+                        'includeBlankOption' => true
                     ]
                 ]
             ],
-            'sql' => 'blob NULL',
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'fieldsets' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'tl_class' => 'clr w50',
                 'decodeEntities' => true,
-                'buttons' => ['new' => false, 'copy' => false, 'delete' => false, 'up' => false, 'down' => false, 'move' => false],
-                'columnFields' => [
-                    'label' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['label'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:100%;max-width:400px'
-                        ]
-                    ],
-                    'hide' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['hide'],
-                        'inputType' => 'checkbox',
-                        'eval' => [
-                            'multiple' => false
-                        ]
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
+            ],
+            'fields' => [
+                'label' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['label'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:100%;max-width:400px'
+                    ]
+                ],
+                'hide' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_palette']['hide'],
+                    'inputType' => 'checkbox',
+                    'eval' => [
+                        'multiple' => false
                     ]
                 ]
             ],
-            'sql' => 'blob NULL'
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'published' => [
             'inputType' => 'checkbox',
@@ -251,6 +305,7 @@ $GLOBALS['TL_DCA']['tl_catalog_palette'] = [
                 'doNotCopy' => true
             ],
             'filter' => true,
+            'toggle' => true,
             'sql' => "char(1) NOT NULL default ''"
         ]
     ]

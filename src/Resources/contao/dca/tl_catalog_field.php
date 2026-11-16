@@ -1,9 +1,18 @@
 <?php
 
+use Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField;
+use Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette;
+use Contao\ArrayUtil;
+use Contao\Config;
+use Contao\DataContainer;
+use Contao\DC_Table;
+use Contao\Input;
+
 $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'ptable' => 'tl_catalog',
+        'ctable' => ['tl_catalog_option'],
         'sql' => [
             'keys' => [
                 'id' => 'primary',
@@ -11,8 +20,8 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ]
         ],
         'onsubmit_callback' => [
-            function(\DataContainer $dataContainer) {
-                (new \Alnv\ContaoCatalogManagerBundle\DataContainer\CatalogField())->changeFieldType($dataContainer->activeRecord->type, $dataContainer);
+            function (DataContainer $dataContainer) {
+                (new CatalogField())->changeFieldType($dataContainer->activeRecord->type, $dataContainer);
             }
         ]
     ],
@@ -22,7 +31,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'fields' => ['sorting'],
             'panelLayout' => 'filter;search,limit',
             'headerFields' => ['type', 'name', 'table'],
-            'child_record_callback'  => ['catalogmanager.datacontainer.catalogfield', 'listFields']
+            'child_record_callback' => ['catalogmanager.datacontainer.catalogfield', 'listFields']
         ],
         'label' => [
             'fields' => ['name', 'fieldname', 'type'],
@@ -31,21 +40,23 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'copy' => [
-               'href' => 'act=paste&amp;mode=copy',
+                'href' => 'act=paste&amp;mode=copy',
                 'icon' => 'copy.svg'
             ],
             'delete' => [
                 'href' => 'act=delete',
                 'icon' => 'delete.svg',
-                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm']??'') . '\'))return false;Backend.getScrollOffset()"'
+                'attributes' => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '') . '\'))return false;Backend.getScrollOffset()"'
             ],
             'toggle' => [
+                'href' => 'act=toggle&amp;field=published',
                 'icon' => 'visible.svg',
-                'attributes' => 'onclick="Backend.getScrollOffset();return AjaxRequest.toggleVisibility(this,%s)"',
-                'button_callback' => ['catalogmanager.datacontainer.catalog', 'toggleIcon']
+                'showInHeader' => true,
+                'primary' => true
             ],
             'show' => [
                 'href' => 'act=show',
@@ -64,19 +75,20 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
     'palettes' => [
         '__selector__' => ['type', 'optionsSource', 'includeBlankOption', 'dbFilterType', 'dbFilter', 'rte'],
         'default' => '{general_settings},name,type',
-        'explanation' => '{general_settings},name,type,fieldname,text;{published_legend},published',
-        'empty' => '{general_settings},name,type,fieldname,role,useAsAlias,{published_legend},published',
-        'text' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,size;{published_legend},published',
-        'date' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{published_legend},published',
-        'color' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{published_legend},published',
-        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,rte;{published_legend},published',
-        'select' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,submitOnChange,csv,size;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,submitOnChange;{options_legend},optionsSource,includeBlankOption;{published_legend},published',
-        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,csv;{options_legend},optionsSource;{published_legend},published',
-        'checkboxWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,csv;{options_legend},optionsSource;{published_legend},published',
-        'pagepicker' => '{general_settings},name,type;fieldname,role,mandatory,multiple,{published_legend},published',
-        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{published_legend},published',
-        'listWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory;{published_legend},published',
+        'explanation' => '{general_settings},name,type,fieldname,text;{multilingual_legend},translatableFor;{published_legend},published',
+        'empty' => '{general_settings},name,type,fieldname,role,useAsAlias{multilingual_legend},translatableFor;{published_legend},published',
+        'text' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,size;{multilingual_legend},translatableFor;{published_legend},published',
+        'date' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{multilingual_legend},translatableFor;{published_legend},published',
+        'color' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory;{multilingual_legend},translatableFor;{published_legend},published',
+        'textarea' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,rte;{multilingual_legend},translatableFor;{published_legend},published',
+        'select' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,submitOnChange,csv,size;{options_legend},optionsSource,includeBlankOption;{multilingual_legend},translatableFor;{published_legend},published',
+        'radio' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,submitOnChange;{options_legend},optionsSource,includeBlankOption;{multilingual_legend},translatableFor;{published_legend},published',
+        'checkbox' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,multiple,csv;{options_legend},optionsSource;{multilingual_legend},translatableFor;{published_legend},published',
+        'checkboxWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,useAsAlias,mandatory,csv;{options_legend},optionsSource;{multilingual_legend},translatableFor;{published_legend},published',
+        'pagepicker' => '{general_settings},name,type;fieldname,role,mandatory,multiple;{multilingual_legend},translatableFor;{published_legend},published',
+        'upload' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory,imageSize;{frontend_legend},extensions,imageWidth,imageHeight,uploadFolder,useHomeDir,doNotOverwrite;{multilingual_legend},translatableFor;{published_legend},published',
+        'listWizard' => '{general_settings},name,type;{field_settings},fieldname,role,description,mandatory;{multilingual_legend},translatableFor;{published_legend},published',
+        'customOptionWizard' => '{general_settings},name,type;{field_settings},fieldname,role,mandatory;{options_legend},optionsSource;{multilingual_legend},translatableFor;{published_legend},published'
     ],
     'subpalettes' => [
         'rte' => 'rteType',
@@ -85,11 +97,12 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
         'dbFilterType_wizard' => 'dbWizardFilterSettings',
         'includeBlankOption' => 'blankOptionLabel',
         'optionsSource_options' => 'optionsDcaWizard',
-        'optionsSource_dbOptions' => \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getPalette()
+        'optionsSource_dbOptions' => OptionSourcePalette::getPalette(),
+        'optionsSource_dbActiveOptions' => OptionSourcePalette::getActivePalette()
     ],
     'fields' => [
         'id' => [
-            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true ]
+            'sql' => ['type' => 'integer', 'autoincrement' => true, 'notnull' => true, 'unsigned' => true]
         ],
         'pid' => [
             'foreignKey' => 'tl_catalog.id',
@@ -116,7 +129,6 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getFieldTypes'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['type'],
-            // 'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'changeFieldType']],
             'filter' => true,
             'sorting' => true,
             'sql' => ['type' => 'string', 'length' => 32, 'default' => '']
@@ -138,6 +150,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'rte' => 'tinyMCE',
                 'allowHtml' => true
             ],
+            'search' => true,
             'sql' => "text NULL"
         ],
         'useAsAlias' => [
@@ -184,6 +197,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'mandatory' => true,
                 'tl_class' => 'clr'
             ],
+            'search' => true,
             'sql' => 'text NULL'
         ],
         'optionsSource' => [
@@ -194,7 +208,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'submitOnChange' => true,
                 'includeBlankOption' => true
             ],
-            'options' => [ 'options', 'dbOptions' ],
+            'options' => ['options', 'dbOptions', 'dbActiveOptions'],
             'reference' => &$GLOBALS['TL_LANG']['tl_catalog_field']['reference']['optionsSource'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
@@ -203,13 +217,13 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             'foreignTable' => 'tl_catalog_option',
             'foreignField' => 'pid',
             'params' => [
-                'dcaWizard'=> \Input::get('id')
+                'dcaWizard' => Input::get('id')
             ],
             'eval' => [
                 'showOperations' => true,
                 'orderField' => 'sorting ASC',
-                'operations' => ['edit','delete'],
-                'fields' => ['id','label','value']
+                'operations' => ['edit', 'delete'],
+                'fields' => ['id', 'label', 'value']
             ]
         ],
         'multiple' => [
@@ -235,7 +249,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'blankOptionLabel' => '-',
                 'includeBlankOption' => true
             ],
-            'options_callback' => [ 'catalogmanager.datacontainer.catalogfield', 'getImageSizes' ],
+            'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getImageSizes'],
             'sql' => ['type' => 'string', 'length' => 64, 'default' => '']
         ],
         'mandatory' => [
@@ -272,6 +286,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'doNotCopy' => true
             ],
             'filter' => true,
+            'toggle' => true,
             'sql' => "char(1) NOT NULL default ''"
         ],
         'includeBlankOption' => [
@@ -301,12 +316,12 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'tl_class' => 'long clr'
             ],
             'save_callback' => [['catalogmanager.datacontainer.catalogfield', 'checkExtensions']],
-            'sql' => "varchar(255) NOT NULL default 'jpg,jpeg,gif,png,pdf,doc,docx,xls,xlsx,ppt,pptx'"
+            'sql' => "varchar(255) NOT NULL default 'jpg,jpeg,gif,png,pdf,svg,doc,docx,xls,xlsx,ppt,pptx'"
         ],
         'uploadFolder' => [
             'inputType' => 'fileTree',
             'eval' => [
-                'mandatory' => true,
+                'mandatory' => false,
                 'fieldType' => 'radio',
                 'tl_class' => 'clr'
             ],
@@ -332,7 +347,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'nospace' => true,
                 'rgxp' => 'natural',
                 'tl_class' => 'w50',
-                'maxval' => \Config::get('imageWidth') > 0 ? \Config::get('imageWidth') : null
+                'maxval' => Config::get('imageWidth') > 0 ? Config::get('imageWidth') : null
             ],
             'sql' => "int(10) unsigned NULL"
         ],
@@ -342,7 +357,7 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
                 'nospace' => true,
                 'rgxp' => 'natural',
                 'tl_class' => 'w50',
-                'maxval' => \Config::get('imageHeight') > 0 ? \Config::get('imageHeight') : null
+                'maxval' => Config::get('imageHeight') > 0 ? Config::get('imageHeight') : null
             ],
             'sql' => "int(10) unsigned NULL"
         ],
@@ -360,8 +375,20 @@ $GLOBALS['TL_DCA']['tl_catalog_field'] = [
             ],
             'filter' => true,
             'sql' => "char(1) NOT NULL default ''"
+        ],
+        'translatableFor' => [
+            'inputType' => 'checkbox',
+            'eval' => [
+                'chosen' => true,
+                'maxlength' => 255,
+                'multiple' => true,
+                'tl_class' => 'clr'
+            ],
+            'options_callback' => ['catalogmanager.datacontainer.catalogfield', 'getLanguages'],
+            'search' => true,
+            'sql' => ['type' => 'string', 'length' => 255, 'default' => '']
         ]
     ]
 ];
 
-array_insert($GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, \Alnv\ContaoCatalogManagerBundle\Helper\OptionSourcePalette::getFields());
+ArrayUtil::arrayInsert($GLOBALS['TL_DCA']['tl_catalog_field']['fields'], 0, OptionSourcePalette::getFields());

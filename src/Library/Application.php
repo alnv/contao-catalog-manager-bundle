@@ -1,86 +1,126 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
+use Alnv\ContaoCatalogManagerBundle\Helper\ModelWizard;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
 use Contao\CoreBundle\Controller\BackendCsvImportController;
+use Contao\ArrayUtil;
+use Contao\Input;
 
 class Application
 {
+    private array $initializedTables = [];
 
-    public function initializeBackendModules()
+    public function initializeBackendModules(): void
     {
+        $catalogCollection = new CatalogCollection();
+        $catalogs = $catalogCollection->getCatalogs('catalog');
 
-        $objCatalogCollection = new CatalogCollection();
-        $arrCatalogs = $objCatalogCollection->getCatalogs('catalog');
+        if (empty($catalogs)) {
+            return;
+        }
 
-        foreach ($arrCatalogs as $arrCatalog) {
-            if (!$arrCatalog['navigation']) {
+        foreach ($catalogs as $catalog) {
+            if (empty($catalog['navigation'])) {
                 continue;
             }
-            $arrModule = [];
-            $arrModule[$arrCatalog['module']] = $this->generateBeModConfig($arrCatalog);
-            array_insert($GLOBALS['BE_MOD'][$arrCatalog['navigation']], $arrCatalog['position'], $arrModule);
+
+            $moduleKey = $catalog['module'];
+            $moduleConfig = [$moduleKey => $this->generateBeModConfig($catalog)];
+            $position = (int)($catalog['position'] ?? 0);
+
+            ArrayUtil::arrayInsert($GLOBALS['BE_MOD'][$catalog['navigation']], $position, $moduleConfig);
         }
     }
 
-    public function generateBeModConfig($arrCatalog)
+    public function generateBeModConfig(array $catalog): array
     {
+        $tables = [$catalog['table']];
 
-        $arrTables = [$arrCatalog['table']];
-
-        if (is_array($arrCatalog['related']) && !empty($arrCatalog['related'])) {
-            foreach ($arrCatalog['related'] as $strTable) {
-                $arrTables[] = $strTable;
+        if (isset($catalog['related']) && \is_array($catalog['related'])) {
+            foreach ($catalog['related'] as $strTable) {
+                if (\is_string($strTable) && $strTable !== '') {
+                    $tables[] = $strTable;
+                }
             }
         }
 
-        if (!isset($GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']])) {
-            $GLOBALS['TL_LANG']['MOD'][$arrCatalog['module']] = [
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'], $arrCatalog['name']),
-                \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate($arrCatalog['module'] . '.' . 'description', $arrCatalog['description']),
+        $translator = Translation::getInstance();
+
+        if (!isset($GLOBALS['TL_LANG']['MOD'][$catalog['module']])) {
+            $GLOBALS['TL_LANG']['MOD'][$catalog['module']] = [
+                $translator->translate($catalog['module'], $catalog['name'] ?? ''),
+                $translator->translate($catalog['module'] . '.description', $catalog['description'] ?? ''),
             ];
         }
 
-        $arrBEModule = [
+        if (isset($catalog['table'])) {
+            $GLOBALS['TL_LANG'][$catalog['table']]['tableLabel'] = $translator->translate(
+                $catalog['table'] . '.tableLabel',
+                $catalog['name'] ?? ''
+            );
+        }
 
-            'name' => $arrCatalog['module'],
-            'tables' => $arrTables
+        $beModule = [
+            'name'   => $catalog['module'],
+            'tables' => $tables,
         ];
 
-        if (in_array('tl_content', $arrTables)) {
-
-            $arrBEModule['table'] = [BackendCsvImportController::class, 'importTableWizardAction'];
-            $arrBEModule['list'] = [BackendCsvImportController::class, 'importListWizardAction'];
+        if (\in_array('tl_content', $tables, true)) {
+            $beModule['table'] = [BackendCsvImportController::class, 'importTableWizardAction'];
+            $beModule['list']  = [BackendCsvImportController::class, 'importListWizardAction'];
         }
 
-        return $arrBEModule;
+        return $beModule;
     }
 
-    public function initializeDataContainerArrays()
+    public function initializeDataContainerArrays(): void
     {
-
-        $strModule = \Input::get('do');
-
-        if (!$strModule) {
-            return null;
+        $module = Input::get('do');
+        if (!$module) {
+            return;
         }
 
-        $this->initializeDataContainerArrayByTable($strModule);
+        $this->initializedTables = [];
+        $this->initializeDataContainerArrayByTable($module);
     }
 
-    public function initializeDataContainerArrayByTable($strTable)
+    public function initializeDataContainerArrayByTable(string $table): void
     {
+        if ($table === 'catalog-manager') {
+            // Input::get() liefert null, wenn der Parameter fehlt (nicht '')
+            $action = (string)Input::get('act');
+            $key = (string)Input::get('key');
 
-        $objVDataContainerArray = new VirtualDataContainerArray($strTable);
-        $objVDataContainerArray->generate();
-        $arrRelatedTables = $objVDataContainerArray->getRelatedTables();
-
-        if (is_array($arrRelatedTables) && !empty($arrRelatedTables)) {
-
-            foreach ($arrRelatedTables as $strTable) {
-
-                $this->initializeDataContainerArrayByTable($strTable);
+            if (($action === '' && $key === '') || $action === 'select') {
+                return;
             }
+
+            $table = (string)(Input::get('id') ?: $table);
+        }
+
+        if ('' === $table || isset($this->initializedTables[$table])) {
+            return;
+        }
+
+        $this->initializedTables[$table] = true;
+
+        $vDataContainerArray = new VirtualDataContainerArray($table);
+        $vDataContainerArray->generate();
+        $relatedTables = $vDataContainerArray->getRelatedTables();
+
+        foreach ($relatedTables as $relatedTable) {
+            if (\is_string($relatedTable) && $relatedTable !== '') {
+                $this->initializeDataContainerArrayByTable($relatedTable);
+            }
+        }
+
+        if (CatalogTableGuard::isValidIdentifier($table)) {
+            new ModelWizard($table);
         }
     }
 }

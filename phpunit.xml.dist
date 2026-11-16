@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Unit-Tests ohne Datenbank und ohne Kernel.
+  Ausführen im Projekt (die Bundle-Klassen werden über das Projekt-vendor geladen):
+    php phpunit.phar -c _packages/contao-catalog-manager-bundle/phpunit.xml.dist
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true">
+    <testsuites>
+        <testsuite name="catalog-manager">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

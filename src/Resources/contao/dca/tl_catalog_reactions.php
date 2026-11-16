@@ -1,10 +1,15 @@
 <?php
 
+use Contao\Config;
+use Contao\Controller;
+use Contao\DC_Table;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 
 $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
         'enableVersioning' => true,
+        'backendSearchIgnore' => true,
         'sql' => [
             'keys' => [
                 'id' => 'primary'
@@ -21,7 +26,8 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
         'operations' => [
             'edit' => [
                 'href' => 'act=edit',
-                'icon' => 'header.svg'
+                'icon' => 'edit.svg',
+                'primary' => true
             ],
             'delete' => [
                 'href' => 'act=delete',
@@ -35,7 +41,6 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
         ],
         'global_operations' => [
             'all' => [
-                'label' => &$GLOBALS['TL_LANG']['MSC']['all'],
                 'href' => 'act=select',
                 'class' => 'header_edit_all',
                 'attributes' => 'onclick="Backend.getScrollOffset()" accesskey="e"'
@@ -66,40 +71,48 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
             'sql' => ['type' => 'string', 'length' => 128, 'default' => '']
         ],
         'reactions' => [
-            'inputType' => 'multiColumnWizard',
+            'inputType' => 'rowWizard',
             'eval' => [
                 'tl_class' => 'clr w50',
-                'columnFields' => [
-                    'name' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['name'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:150px',
-                            'mandatory' => true
-                        ]
-                    ],
-                    'key' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['key'],
-                        'inputType' => 'text',
-                        'eval' => [
-                            'style' => 'width:150px',
-                            'mandatory' => true,
-                            'rgxp' => 'alias'
-                        ]
-                    ],
-                    'icon' => [
-                        'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['icon'],
-                        'inputType' => 'fileTree',
-                        'eval' => [
-                            'filesOnly' => true,
-                            'fieldType' => 'radio',
-                            'extensions' => \Config::get('validImageTypes'),
-                            'tl_class' => 'clr'
-                        ]
+                'actions' => [
+                    'copy',
+                    'delete'
+                ]
+            ],
+            'fields' => [
+                'name' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['name'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:150px',
+                        'mandatory' => true
+                    ]
+                ],
+                'key' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['key'],
+                    'inputType' => 'text',
+                    'eval' => [
+                        'style' => 'width:150px',
+                        'mandatory' => true,
+                        'rgxp' => 'alias'
+                    ]
+                ],
+                'icon' => [
+                    'label' => &$GLOBALS['TL_LANG']['tl_catalog_reactions']['icon'],
+                    'inputType' => 'fileTree',
+                    'eval' => [
+                        'filesOnly' => true,
+                        'fieldType' => 'radio',
+                        'extensions' => Config::get('validImageTypes'),
+                        'tl_class' => 'clr'
                     ]
                 ]
             ],
-            'sql' => 'blob NULL'
+            'sql' => [
+                'type' => 'blob',
+                'length' => AbstractMySQLPlatform::LENGTH_LIMIT_BLOB,
+                'notnull' => false,
+            ]
         ],
         'template' => [
             'inputType' => 'select',
@@ -107,8 +120,8 @@ $GLOBALS['TL_DCA']['tl_catalog_reactions'] = [
                 'mandatory' => true,
                 'tl_class' => 'w50 clr'
             ],
-            'options_callback' => function() {
-                return $this->getTemplateGroup('reactions_');
+            'options_callback' => static function () {
+                return Controller::getTemplateGroup('reactions_');
             },
             'sql' => "varchar(64) NOT NULL default ''"
         ]

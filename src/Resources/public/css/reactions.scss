@@ -1,42 +1,59 @@
 .ce_reactions {
   display: inline-block;
+
   .reaction {
     display: flex;
-    &:active,
-    &:hover {
-      .list {
-        // max-width: 10000px;
-        // opacity: 1;
-      }
-    }
   }
+
   .list {
     transition: all 200ms ease-in;
-    // max-width: 0;
-    // opacity: 0;
     display: flex;
     list-style: none;
     padding-left: 0;
     margin-top: 0;
     margin-bottom: 0;
+
     li {
       margin: 0;
     }
   }
-  a {
+
+  a,
+  .reaction-link {
     font-size: 14px;
     text-decoration: none;
+
     img {
       width: auto;
       height: 50px;
     }
+
     span {
       display: block;
     }
   }
+
+  /* Reaktionen sind Buttons (POST-Formular) – Browser-Standardstil zurücksetzen */
+  button.reaction-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
+  }
+
   &.loading {
     .reaction {
       position: relative;
+
       &:after {
         content: '';
         display: block;

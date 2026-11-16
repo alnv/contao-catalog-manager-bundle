@@ -1,24 +1,32 @@
-<?php if ( is_array( $this->locations ) && !empty( $this->locations ) ): ?>
+<?php
+use Contao\Config;
+use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+?>
+<?php if (is_array($this->locations) && !empty($this->locations)): ?>
     <?php $strUniqueId = 'map_' . uniqid(); ?>
     <div id="<?= $strUniqueId ?>" class="map-view gmap" style="height:400px;width:100%">
-        <button><?= \Alnv\ContaoTranslationManagerBundle\Library\Translation::getInstance()->translate('map.button.dsgvo', 'Datenschutzbestimmungen zustimmen') ?></button>
+        <button type="button"><?= \Contao\StringUtil::specialchars(Translation::getInstance()->translate('map.button.dsgvo', 'Datenschutzbestimmungen zustimmen')) ?></button>
     </div>
     <script defer>
         let getInfoCallback = function (map, content) {
-            var objInfoBox = new google.maps.InfoWindow({content: content});
-            return function() {
+            let objInfoBox = new google.maps.InfoWindow({content: content});
+            return function () {
                 objInfoBox.setContent(content);
                 objInfoBox.open(map, this);
             };
         };
-        var initMap = function () {
+        var initMap = initMap || function () {
             let arrLocations = <?= $this->varLocations ?>;
-            let objMap = new google.maps.Map(document.getElementById("<?= $strUniqueId ?>"), {});
+            let objMapOptions = {};
+            if (arrLocations.length<2) {
+                objMapOptions.maxZoom = 13;
+            }
+            let objMap = new google.maps.Map(document.getElementById(<?= json_encode($strUniqueId) ?>), objMapOptions);
             let objBounds = new google.maps.LatLngBounds();
             if (typeof arrLocations === 'undefined' || !arrLocations.length) {
                 return null;
             }
-            for (let i=0;i<arrLocations.length;i++) {
+            for (let i = 0; i < arrLocations.length; i++) {
                 if (!arrLocations[i]['map']['latitude'] || !arrLocations[i]['map']['longitude']) {
                     continue;
                 }
@@ -35,16 +43,15 @@
             objMap.fitBounds(objBounds);
         };
         (function () {
-            let objMapDocument = document.getElementById("<?= $strUniqueId ?>");
+            let objMapDocument = document.getElementById(<?= json_encode($strUniqueId) ?>);
             let loadGMap = function () {
                 if (typeof google !== 'undefined') {
                     initMap();
                     return null;
                 }
                 let objScript = document.createElement('script');
-                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=<?= \Config::get('googleMapsApiKey') ?>&callback=initMap';
-                objScript.id = "script_<?= $strUniqueId ?>";
-                objScript.defer = true;
+                objScript.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(<?= json_encode((string) Config::get('googleMapsApiKey'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>) + '&callback=initMap';
+                objScript.id = <?= json_encode('script_' . $strUniqueId) ?>;
                 document.body.appendChild(objScript);
             };
             let objDataProtectionButton = objMapDocument.querySelector('button');
@@ -52,7 +59,7 @@
                 objDataProtectionButton.addEventListener('click', function () {
                     loadGMap();
                     localStorage.setItem('data-protection-gmap-accepted', '1')
-                },false);
+                }, false);
             } else {
                 loadGMap();
             }

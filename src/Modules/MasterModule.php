@@ -8,33 +8,33 @@ use Contao\BackendTemplate;
 use Contao\Controller;
 use Contao\CoreBundle\Exception\PageNotFoundException;
 use Contao\Environment;
+use Contao\FrontendTemplate;
 use Contao\Input;
 use Contao\Module;
 use Contao\System;
-use Contao\StringUtil;
 
 class MasterModule extends Module
 {
 
     protected $strTemplate = 'mod_master';
 
-    public function generate()
+    public function generate(): string
     {
 
-        if (System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
+        if (System::getContainer()->get('request_stack')->getCurrentRequest()?->attributes->get('_scope') == 'backend') {
 
             $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['FMD']['master'][0]) . ' ###';
+            $objTemplate->href = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->wildcard = '### ' . \strtoupper($GLOBALS['TL_LANG']['FMD']['master'][0] ?? '') . ' ###';
 
             return $objTemplate->parse();
         }
 
         if (!$this->cmTable) {
-            return null;
+            return '';
         }
 
         return parent::generate();
@@ -43,7 +43,16 @@ class MasterModule extends Module
     protected function compile(): void
     {
 
-        $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
+        // Input::get() liefert null, wenn auto_item nur in $_GET steht, aber kein Routen-Parameter ist
+        $strAlias = ($_GET['auto_item'] ?? '') ? (string)(Input::get('auto_item') ?? '') : '';
+
+        // Performance: Der Layout-Hook (GetPageLayoutListener) hat diesen Eintrag bereits geparst.
+        // Ohne Modul-Filter und ohne "Sichtbarkeit ignorieren" ist das Ergebnis identisch →
+        // nur noch das Template rendern statt die Detailansicht ein zweites Mal zu laden und zu parsen.
+        if ($arrMaster = $this->getMasterFromLayout($strAlias)) {
+            $this->Template->entities = $arrMaster;
+            return;
+        }
 
         $arrOptions = [
             'id' => $this->id,
@@ -52,7 +61,14 @@ class MasterModule extends Module
             'ignoreVisibility' => (bool)$this->cmIgnoreVisibility
         ];
 
-        $this->setFilter($arrOptions);
+        foreach ($this->getFilter() as $strKey => $arrFilter) {
+
+            if (empty($arrFilter)) {
+                continue;
+            }
+
+            $arrOptions[$strKey] = $arrFilter;
+        }
 
         $objMaster = new Master($this->cmTable, $arrOptions);
         $arrMaster = $objMaster->parse();
@@ -64,49 +80,60 @@ class MasterModule extends Module
         $this->Template->entities = $arrMaster;
     }
 
-    protected function setFilter(&$arrOptions)
+    protected function getMasterFromLayout(string $strAlias): array
+    {
+        $arrContext = $GLOBALS['CM_MASTER_CONTEXT'] ?? null;
+        $arrRow = $GLOBALS['CM_MASTER'] ?? null;
+
+        if (!\is_array($arrContext) || !\is_array($arrRow) || empty($arrRow)) {
+            return [];
+        }
+
+        if ($this->cmFilter || $this->cmIgnoreVisibility) {
+            return [];
+        }
+
+        if (($arrContext['table'] ?? '') !== (string)$this->cmTable || ($arrContext['alias'] ?? '') !== $strAlias) {
+            return [];
+        }
+
+        // Hooks, die View-Optionen/Entities pro Modul verändern, bekommen weiterhin den vollen Pfad
+        if (!empty($GLOBALS['TL_HOOKS']['initializeView']) || !empty($GLOBALS['TL_HOOKS']['getModelOptions'])) {
+            return [];
+        }
+
+        if ($this->cmTemplate) {
+            $objTemplate = new FrontendTemplate($this->cmTemplate);
+            $objTemplate->setData($arrRow);
+            $arrRow['template'] = $objTemplate->parse();
+        }
+
+        return [$arrRow];
+    }
+
+    protected function getFilter(): array
     {
 
+        $arrFilterOptions = [];
+
         if (!$this->cmFilter) {
-            return null;
+            return $arrFilterOptions;
         }
 
         switch ($this->cmFilterType) {
             case 'wizard':
-
                 Controller::loadDataContainer($this->cmTable);
-
-                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
-
-                if (!empty($arrQueries) && !empty($arrQueries['column'])) {
-                    $arrOptions['column'] = $arrQueries['column'];
-                    $arrOptions['value'] = $arrQueries['value'];
-                }
-
+                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, ($GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] ?? ''));
+                $arrFilterOptions['column'] = $arrQueries['column'];
+                $arrFilterOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-
-                $this->cmValue = Controller::replaceInsertTags($this->cmValue);
-
-                $arrOptions['column'] = explode(';', StringUtil::decodeEntities($this->cmColumn));
-                $arrOptions['value'] = explode(';', StringUtil::decodeEntities($this->cmValue));
-
-                if ((is_array($arrOptions['value']) && !empty($arrOptions['value']))) {
-                    $intIndex = -1;
-                    $arrOptions['value'] = array_filter($arrOptions['value'], function ($strValue) use (&$intIndex) {
-                        $intIndex = $intIndex + 1;
-                        if ($strValue === '' || $strValue === null) {
-                            return false;
-                        }
-                        return true;
-                    });
-                    if (empty($arrOptions['value'])) {
-                        unset($arrOptions['value']);
-                        unset($arrOptions['column']);
-                    }
+                foreach (Toolkit::convertExpertQueries(($this->cmColumn ?: ''), ($this->cmValue ?: '')) as $strKey => $strValue) {
+                    $arrFilterOptions[$strKey] = $strValue;
                 }
-
                 break;
         }
+
+        return $arrFilterOptions;
     }
 }

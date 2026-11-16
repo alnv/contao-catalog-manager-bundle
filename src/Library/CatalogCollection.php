@@ -2,52 +2,67 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
-use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoCatalogManagerBundle\Helper\CatalogWizard;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 
-class CatalogCollection extends CatalogWizard {
+class CatalogCollection extends CatalogWizard
+{
+    protected static ?array $runtimeCache = null;
 
-    protected $arrCatalogs = [];
-    protected $arrTypes = [];
+    protected array $arrCatalogs = [];
 
-    public function __construct() {
+    protected array $arrTypes = [];
+
+    public function __construct()
+    {
+        if (self::$runtimeCache !== null) {
+            $this->arrCatalogs = self::$runtimeCache['catalogs'];
+            $this->arrTypes    = self::$runtimeCache['types'];
+            return;
+        }
 
         $objCatalogs = CatalogModel::findAll([
-            'order' => 'sorting ASC'
+            'order' => '`sorting` ASC'
         ]);
 
-        if ( $objCatalogs === null ) {
-            return null;
+        if ($objCatalogs === null) {
+            return;
         }
 
         while ($objCatalogs->next()) {
-            if ( !$objCatalogs->table ) {
+            if (!$objCatalogs->table) {
                 continue;
             }
+
             if (!isset($this->arrTypes[$objCatalogs->type])) {
                 $this->arrTypes[$objCatalogs->type] = [];
             }
+
             $this->arrTypes[$objCatalogs->type][] = $objCatalogs->table;
             $this->arrCatalogs[$objCatalogs->table] = $this->parseCatalog($objCatalogs->row());
         }
 
-       parent::__construct();
+        self::$runtimeCache = [
+            'catalogs' => $this->arrCatalogs,
+            'types'    => $this->arrTypes
+        ];
     }
 
-
-    public function getCatalogs($strType = '') {
-
+    public function getCatalogs($strType = ''): array
+    {
         if (!$strType) {
             return $this->arrCatalogs;
         }
 
-        $arrReturn = [];
+        if (!isset($this->arrTypes[$strType])) {
+            return [];
+        }
 
-        foreach ($this->arrCatalogs as $strTable => $arrCatalog) {
-            if ($arrCatalog['type'] != $strType) {
-                continue;
+        $arrReturn = [];
+        foreach ($this->arrTypes[$strType] as $strTable) {
+            if (isset($this->arrCatalogs[$strTable])) {
+                $arrReturn[$strTable] = $this->arrCatalogs[$strTable];
             }
-            $arrReturn[$strTable] = $arrCatalog;
         }
 
         return $arrReturn;

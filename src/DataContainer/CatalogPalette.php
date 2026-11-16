@@ -2,14 +2,22 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\DataContainer;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\Options;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
 use Alnv\ContaoTranslationManagerBundle\Library\Translation;
+use Contao\Controller;
+use Contao\DataContainer;
+use Contao\System;
 
-class CatalogPalette {
+class CatalogPalette
+{
 
-    public function getFieldOptions($strFieldId) {
+    public function getFieldOptions($strFieldId): array
+    {
 
-        $objField = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByPk($strFieldId);
+        $objField = CatalogFieldModel::findByPk($strFieldId);
         if (!$objField) {
             return [];
         }
@@ -20,11 +28,12 @@ class CatalogPalette {
         return $objOptions::getOptions();
     }
 
-    public function getFieldsByCatalogId($strCatalogId, $strType) {
+    public function getFieldsByCatalogId($strCatalogId, $strType): array
+    {
 
         $arrReturn = [];
-        $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByPk($strCatalogId);
-        $objFields = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByParent($strCatalogId);
+        $objCatalog = CatalogModel::findByPk($strCatalogId);
+        $objFields = CatalogFieldModel::findByParent($strCatalogId);
 
         if (!$objFields || !$objCatalog) {
             return [];
@@ -35,23 +44,24 @@ class CatalogPalette {
         }
 
         while ($objFields->next()) {
-            $arrReturn[$objFields->id] = $objFields->name;
+            $arrReturn[($objFields->fieldname?:$objFields->id)] = $objFields->name;
         }
 
         if ($objCatalog->enableVisibility) {
-            $arrReturn['published'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published'));
-            $arrReturn['stop'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.stop', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('stop'));
-            $arrReturn['start'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.start', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('start'));
+            $arrReturn['published'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.published', Toolkit::getLabel('published'));
+            $arrReturn['stop'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.stop', Toolkit::getLabel('stop'));
+            $arrReturn['start'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.start', Toolkit::getLabel('start'));
         }
 
-        return $arrReturn;
+        return $this->extendWithDcaFields($objCatalog->table, $arrReturn);
     }
 
-    public function getFields(\DataContainer $objDataContainer) {
+    public function getFields(DataContainer $objDataContainer): array
+    {
 
         $arrReturn = [];
-        $objCatalog = \Alnv\ContaoCatalogManagerBundle\Models\CatalogModel::findByPk($objDataContainer->activeRecord->pid);
-        $objFields = \Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel::findByParent($objDataContainer->activeRecord->pid);
+        $objCatalog = CatalogModel::findByPk($objDataContainer->activeRecord->pid);
+        $objFields = CatalogFieldModel::findByParent($objDataContainer->activeRecord->pid);
 
         if (!$objFields || !$objCatalog) {
             return [];
@@ -62,9 +72,27 @@ class CatalogPalette {
         }
 
         if ($objCatalog->enableVisibility) {
-            $arrReturn['published'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.published', \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLabel('published'));
+            $arrReturn['published'] = Translation::getInstance()->translate($objCatalog->table . '.field.title.published', Toolkit::getLabel('published'));
         }
 
         return $arrReturn;
+    }
+
+    protected function extendWithDcaFields($strTable, $arrFields): array
+    {
+
+        Controller::loadDataContainer($strTable);
+        System::loadLanguageFile($strTable);
+
+        foreach (($GLOBALS['TL_DCA'][$strTable]['fields'] ?? []) as $strField => $arrField) {
+
+            if (!isset($arrField['inputType'])) {
+                continue;
+            }
+
+            $arrFields[$strField] = ($GLOBALS['TL_LANG'][$strTable][$strField][0] ?? '') ?: (($arrFields[$strField] ?? '') ?: $strField);
+        }
+
+        return $arrFields;
     }
 }

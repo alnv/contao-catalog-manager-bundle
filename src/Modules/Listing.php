@@ -2,24 +2,36 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Modules;
 
+use Alnv\ContaoCatalogManagerBundle\Helper\CatalogTableGuard;
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
 use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
 use Alnv\ContaoCatalogManagerBundle\Library\RoleResolver;
+use Alnv\ContaoCatalogManagerBundle\Views\Listing as ViewListing;
+use Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder;
+use Alnv\ContaoGeoCodingBundle\Library\GeoCoding;
+use Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit as WidgetToolkit;
+use Contao\BackendTemplate;
+use Contao\Controller;
+use Contao\Database;
+use Contao\Hybrid;
+use Contao\Input;
+use Contao\StringUtil;
+use Contao\System;
 
-class Listing extends \Hybrid
+class Listing extends Hybrid
 {
-
     protected $objModel = null;
 
     public function generate()
     {
-
-        if (\System::getContainer()->get('request_stack')->getCurrentRequest()->get('_scope') == 'backend') {
-            $objTemplate = new \BackendTemplate('be_wildcard');
+        if (System::getContainer()->get('request_stack')->getCurrentRequest()?->attributes->get('_scope') == 'backend') {
+            $objTemplate = new BackendTemplate('be_wildcard');
             $objTemplate->id = $this->id;
             $objTemplate->link = $this->name;
             $objTemplate->title = $this->headline;
-            $objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
-            $objTemplate->wildcard = '### ' . strtoupper($GLOBALS['TL_LANG']['FMD'][$this->type][0]) . ' ###';
+            $objTemplate->href = 'contao?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+            $objTemplate->wildcard = '### ' . \strtoupper(($GLOBALS['TL_LANG']['FMD'][$this->type][0] ?? '')) . ' ###';
+
             return $objTemplate->parse();
         }
 
@@ -27,22 +39,37 @@ class Listing extends \Hybrid
             return null;
         }
 
-        if (\Input::get('auto_item') && $this->cmMasterModule) {
-            return \Controller::getFrontendModule($this->cmMasterModule);
+        if ((($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '') && $this->cmMasterModule) {
+            return Controller::getFrontendModule($this->cmMasterModule);
         }
 
         $this->strKey = $this->type;
         $this->typePrefix = $this->strTable == 'tl_module' ? 'mod_' : 'ce_';
-        if ($this->customTpl && TL_MODE == 'FE') {
+        if ($this->customTpl && Mode::get() == 'FE') {
             $this->strTemplate = $this->customTpl;
         }
 
         return parent::generate();
     }
 
-    public function setOptions()
+    protected function compile(): void
     {
+        $this->arrOptions = [
+            'template' => $this->cmTemplate,
+            'id' => $this->id
+        ];
 
+        $this->setOptions();
+
+        $listing = new ViewListing($this->cmTable, $this->arrOptions);
+
+        $this->Template->rows = $listing->countRows();
+        $this->Template->entities = $listing->parse();
+        $this->Template->pagination = $listing->getPagination();
+    }
+
+    public function setOptions(): void
+    {
         $this->setOrder();
         $this->setGroup();
         $this->setFilter();
@@ -50,53 +77,38 @@ class Listing extends \Hybrid
         $this->setDistance();
         $this->setMasterPage();
         $this->setPagination();
+        $this->setLanguage();
         $this->setIgnoreVisibility();
         $this->setIgnoreFieldsFromParsing();
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
-
         return $this->arrOptions;
     }
 
-    public function getTable()
+    public function getTable(): string
     {
-
         return $this->cmTable;
     }
 
-    protected function compile()
+    public function setLanguage()
     {
-
-        $this->arrOptions = [
-            'template' => $this->cmTemplate,
-            'id' => $this->id
-        ];
-
-        $this->setOptions();
-        $objListing = new \Alnv\ContaoCatalogManagerBundle\Views\Listing($this->cmTable, $this->arrOptions);
-
-        $this->Template->rows = $objListing->countRows();
-        $this->Template->entities = $objListing->parse();
-        $this->Template->pagination = $objListing->getPagination();
+        $this->arrOptions['language'] = System::getContainer()->get('request_stack')->getCurrentRequest()->getLocale();
     }
 
-    protected function setIgnoreVisibility()
+    protected function setIgnoreVisibility(): void
     {
-
         $this->arrOptions['ignoreVisibility'] = (bool)$this->cmIgnoreVisibility;
     }
 
-    protected function setIgnoreFieldsFromParsing()
+    protected function setIgnoreFieldsFromParsing(): void
     {
-
-        $this->arrOptions['ignoreFieldsFromParsing'] = \StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
+        $this->arrOptions['ignoreFieldsFromParsing'] = StringUtil::deserialize($this->cmIgnoreFieldsFromParsing, true);
     }
 
-    protected function setDistance()
+    protected function setDistance(): bool
     {
-
         if (!$this->cmRadiusSearch) {
             return false;
         }
@@ -109,22 +121,22 @@ class Listing extends \Hybrid
         }
 
         $arrAddress = [
-            'street' => Toolkit::getValueFromUrl(\Input::get('street')),
-            'streetNumber' => Toolkit::getValueFromUrl(\Input::get('streetNumber')),
-            'zip' => Toolkit::getValueFromUrl(\Input::get('zip') ?: \Input::get('postal')),
-            'city' => Toolkit::getValueFromUrl(\Input::get('city')),
+            'street' => Toolkit::getValueFromUrl(Input::get('street')),
+            'streetNumber' => Toolkit::getValueFromUrl(Input::get('streetNumber')),
+            'zip' => Toolkit::getValueFromUrl(Input::get('zip') ?: Input::get('postal')),
+            'city' => Toolkit::getValueFromUrl(Input::get('city')),
         ];
 
-        if (empty(array_filter($arrAddress))) {
+        if (empty(\array_filter($arrAddress))) {
             return false;
         }
 
-        $arrAddress['state'] = Toolkit::getValueFromUrl(\Input::get('state'));
-        $arrAddress['country'] = Toolkit::getValueFromUrl(\Input::get('country'));
-        $objAddressBuilder = new \Alnv\ContaoGeoCodingBundle\Helpers\AddressBuilder($arrAddress);
+        $arrAddress['state'] = Toolkit::getValueFromUrl(Input::get('state'));
+        $arrAddress['country'] = Toolkit::getValueFromUrl(Input::get('country'));
+        $objAddressBuilder = new AddressBuilder($arrAddress);
         $strAddress = $objAddressBuilder->getAddress();
-        $strRadius = Toolkit::getValueFromUrl(\Input::get('radius')) ?: 15;
-        $objGeoCoding = new \Alnv\ContaoGeoCodingBundle\Library\GeoCoding();
+        $strRadius = Toolkit::getValueFromUrl(Input::get('radius')) ?: 15;
+        $objGeoCoding = new GeoCoding();
         $arrGeoCoding = $objGeoCoding->getGeoCodingByAddress('google-geocoding', $strAddress);
 
         if ($arrGeoCoding !== null) {
@@ -145,51 +157,35 @@ class Listing extends \Hybrid
         return false;
     }
 
-    protected function setFilter()
+    protected function setFilter(): void
     {
-
         if (!$this->cmFilter) {
-            return null;
+            return;
         }
 
         switch ($this->cmFilterType) {
             case 'wizard':
-                \Controller::loadDataContainer($this->cmTable);
-                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, $GLOBALS['TL_DCA'][$this->cmTable]['config']['_table']);
+                Controller::loadDataContainer($this->cmTable);
+                $arrQueries = Toolkit::convertComboWizardToModelValues($this->cmWizardFilterSettings, ($GLOBALS['TL_DCA'][$this->cmTable]['config']['_table'] ?? ''));
                 $this->arrOptions['column'] = $arrQueries['column'];
                 $this->arrOptions['value'] = $arrQueries['value'];
                 break;
             case 'expert':
-                $this->cmValue = \Controller::replaceInsertTags($this->cmValue);
-                $this->arrOptions['column'] = explode(';', \StringUtil::decodeEntities($this->cmColumn));
-                $this->arrOptions['value'] = explode(';', \StringUtil::decodeEntities($this->cmValue));
-                if ((is_array($this->arrOptions['value']) && !empty($this->arrOptions['value']))) {
-                    $intIndex = -1;
-                    $this->arrOptions['value'] = array_filter($this->arrOptions['value'], function ($strValue) use (&$intIndex) {
-                        $intIndex = $intIndex + 1;
-                        if ($strValue === '' || $strValue === null) {
-                            unset($this->arrOptions['column'][$intIndex]);
-                            return false;
-                        }
-                        return true;
-                    });
-                    if (empty($this->arrOptions['value'])) {
-                        unset($this->arrOptions['value']);
-                        unset($this->arrOptions['column']);
-                    }
+                foreach (Toolkit::convertExpertQueries(($this->cmColumn ?: ''), ($this->cmValue ?: '')) as $strKey => $strValue) {
+                    $this->arrOptions[$strKey] = $strValue;
                 }
                 break;
         }
     }
 
-    protected function setOrder()
+    protected function setOrder(): void
     {
-
         if ($this->cmOrder) {
-            $strOrder = Toolkit::getOrderByStatementFromArray(\Alnv\ContaoWidgetCollectionBundle\Helpers\Toolkit::decodeJson($this->cmOrder, [
+            $strOrder = Toolkit::getOrderByStatementFromArray(WidgetToolkit::decodeJson($this->cmOrder, [
                 'option' => 'field',
                 'option2' => 'order'
             ]));
+
             if ($strOrder) {
                 $this->arrOptions['order'] = $strOrder;
             }
@@ -197,30 +193,86 @@ class Listing extends \Hybrid
 
         if ($this->cmFilter && ($this->cmWizardFilterSettings || $this->cmValue)) {
             $strFilterValues = $this->cmWizardFilterSettings ?: $this->cmValue;
-            if (strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
-                $arrIds = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
+            if (\strpos($strFilterValues, 'LAST-ADDED-MASTER-VIEW-IDS') !== false) {
+                $arrIds = Toolkit::getLastAddedByTypeAndTable('view-master', $this->cmTable);
                 if (!$this->arrOptions['order']) {
                     $this->arrOptions['order'] = '';
                 }
-                if (!empty($arrIds)) {
+                $arrIds = array_values(array_filter(array_map('intval', $arrIds)));
+                if (!empty($arrIds) && CatalogTableGuard::isValidIdentifier((string)$this->cmTable)) {
                     $this->arrOptions['order'] .= ($this->arrOptions['order'] ? ',' : '') . ('FIELD(' . $this->cmTable . '.id,' . implode(',', $arrIds) . ')');
                 }
             }
         }
 
-        $arrInputOrder = \Input::get('order') ?? [];
-        if (is_array($arrInputOrder) && !empty($arrInputOrder)) {
-            if (isset($arrInputOrder['id']) && $arrInputOrder['id'] == $this->id) {
-                $this->arrOptions['order'] = Toolkit::getOrderByStatementFromArray($arrInputOrder);
+        $this->setOrderFromRequest();
+    }
+
+    protected function setOrderFromRequest(): void
+    {
+        $arrInputOrder = Input::get('order');
+
+        if (!\is_array($arrInputOrder) || empty($arrInputOrder)) {
+            return;
+        }
+
+        $strOwnId = (string)$this->id;
+
+        if (isset($arrInputOrder['field'])) {
+            $arrOrders = [$arrInputOrder];
+        } else {
+            $strDefaultId = isset($arrInputOrder['id']) && !\is_array($arrInputOrder['id']) ? (string)$arrInputOrder['id'] : null;
+            $arrOrders = array_map(static function (array $arrOrder) use ($strDefaultId): array {
+                $arrOrder['id'] ??= $strDefaultId;
+                return $arrOrder;
+            }, array_values(array_filter($arrInputOrder, 'is_array')));
+        }
+
+        $arrOrders = array_filter($arrOrders, static fn (array $arrOrder): bool => isset($arrOrder['id']) && !\is_array($arrOrder['id']) && (string)$arrOrder['id'] === $strOwnId);
+
+        if (empty($arrOrders)) {
+            return;
+        }
+
+        $strTable = (string)$this->cmTable;
+        if (!CatalogTableGuard::isValidIdentifier($strTable)) {
+            return;
+        }
+
+        Controller::loadDataContainer($strTable);
+        $strRealTable = (string)(($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable);
+        if (!CatalogTableGuard::isValidIdentifier($strRealTable)) {
+            return;
+        }
+
+        $objConnection = System::getContainer()->get('database_connection');
+        $objDatabase = Database::getInstance();
+        $arrStatements = [];
+
+        foreach ($arrOrders as $arrOrder) {
+            $strField = \is_string($arrOrder['field'] ?? null) ? $arrOrder['field'] : '';
+            $strDirection = \is_string($arrOrder['order'] ?? null) ? strtoupper($arrOrder['order']) : 'ASC';
+
+            if (!\in_array($strDirection, ['ASC', 'DESC'], true) || !CatalogTableGuard::isValidIdentifier($strField)) {
+                continue;
             }
+
+            if (!isset($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]) || !$objDatabase->fieldExists($strField, $strRealTable)) {
+                continue;
+            }
+
+            $arrStatements[] = $objConnection->quoteIdentifier($strRealTable) . '.' . $objConnection->quoteIdentifier($strField) . ' ' . $strDirection;
+        }
+
+        if (!empty($arrStatements)) {
+            $this->arrOptions['order'] = implode(', ', $arrStatements);
         }
     }
 
-    protected function setPagination()
+    protected function setPagination(): void
     {
-
         if ($this->cmPagination) {
-            $this->arrOptions['pagination'] = $this->cmPagination ? true : false;
+            $this->arrOptions['pagination'] = (bool)$this->cmPagination;
         }
 
         if ($this->cmLimit) {
@@ -232,9 +284,8 @@ class Listing extends \Hybrid
         }
     }
 
-    protected function setGroup()
+    protected function setGroup(): void
     {
-
         if ($this->cmGroupBy) {
             $this->arrOptions['groupBy'] = $this->cmGroupBy;
         }
@@ -244,11 +295,10 @@ class Listing extends \Hybrid
         }
     }
 
-    protected function setMasterPage()
+    protected function setMasterPage(): void
     {
-
         if (!$this->cmMaster) {
-            return null;
+            return;
         }
         if (!$this->cmMasterPage) {
             global $objPage;
@@ -258,11 +308,10 @@ class Listing extends \Hybrid
         $this->arrOptions['masterPage'] = $this->cmMasterPage;
     }
 
-    protected function setFormPage()
+    protected function setFormPage(): void
     {
-
         if (!$this->cmForm || !$this->cmFormPage) {
-            return null;
+            return;
         }
 
         $this->arrOptions['formPage'] = $this->cmFormPage;

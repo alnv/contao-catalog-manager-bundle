@@ -1,8 +1,11 @@
 <?php
 
+use Contao\DC_Table;
+
 $GLOBALS['TL_DCA']['tl_catalog_data'] = [
     'config' => [
-        'dataContainer' => 'Table',
+        'dataContainer' => DC_Table::class,
+        'backendSearchIgnore' => true,
         'sql' => [
             'keys' => [
                 'id' => 'primary',

@@ -1,8 +1,30 @@
 <?php
 
-define("CATALOG_MANAGER_BUNDLE_VERSION", "2.3.1");
+use Alnv\ContaoCatalogManagerBundle\Elements\ContentListView;
+use Alnv\ContaoCatalogManagerBundle\EventListener\ChangelanguageNavigationListener;
+use Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualCatalogListener;
+use Alnv\ContaoCatalogManagerBundle\EventListener\MultilingualDataContainerListener;
+use Alnv\ContaoCatalogManagerBundle\Helper\Mode;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel;
+use Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel;
+use Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel;
+use Alnv\ContaoCatalogManagerBundle\Modules\ListingModule;
+use Alnv\ContaoCatalogManagerBundle\Modules\MapModule;
+use Alnv\ContaoCatalogManagerBundle\Modules\MasterModule;
+use Alnv\ContaoCatalogManagerBundle\Widgets\CustomOptionWizard;
+use \Alnv\ContaoCatalogManagerBundle\Modules\FrontendManagerModule;
+use Contao\ArrayUtil;
+use Contao\Combiner;
+use Contao\DC_Table;
 
-array_insert( $GLOBALS['BE_MOD'], 2, [
+const CATALOG_MANAGER_BUNDLE_VERSION = "4.1.0";
+
+ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
         'catalog-manager' => [
             'name' => 'catalog-manager-bundle',
@@ -12,6 +34,12 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
                 'tl_catalog_option',
                 'tl_catalog_palette',
                 'tl_catalog_license'
+            ]
+        ],
+        'roles' => [
+            'name' => 'roles',
+            'tables' => [
+                'tl_catalog_roles'
             ]
         ],
         'reactions' => [
@@ -25,54 +53,54 @@ array_insert( $GLOBALS['BE_MOD'], 2, [
             'tables' => [
                 'tl_watchlist'
             ]
-        ],
-        'catalog-element' => [
-            'name' => 'catalog-element-bundle',
-            'tables' => [
-                'tl_catalog_element',
-                'tl_content'
-            ]
         ]
     ]
 ]);
 
-array_insert( $GLOBALS['FE_MOD'], 2, [
+foreach ($GLOBALS['BE_MOD'] as $strType => $arrModules) {
+    foreach ($arrModules as $strModule => $arrModule) {
+        if (\in_array('tl_page', ($arrModule['tables'] ?? []))) {
+            $GLOBALS['BE_MOD'][$strType][$strModule]['tables'][] = 'tl_page_filter';
+        }
+    }
+}
+
+ArrayUtil::arrayInsert($GLOBALS['FE_MOD'], 2, [
     'catalog-manager-bundle' => [
-        'listing-map' => 'Alnv\ContaoCatalogManagerBundle\Modules\MapModule',
-        'listing' => 'Alnv\ContaoCatalogManagerBundle\Modules\ListingModule',
-        'master' => 'Alnv\ContaoCatalogManagerBundle\Modules\MasterModule'
+        'listing-map' => MapModule::class,
+        'listing-table' => ListingModule::class,
+        'master' => MasterModule::class,
+        'catalog-frontend-manager' => FrontendManagerModule::class,
     ]
 ]);
 
 $GLOBALS['TL_CTE']['catalog-manager-bundle'] = [];
-$GLOBALS['TL_CTE']['catalog-manager-bundle']['component'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentComponent';
-$GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = 'Alnv\ContaoCatalogManagerBundle\Elements\ContentListView';
+$GLOBALS['TL_CTE']['catalog-manager-bundle']['listview'] = ContentListView::class;
 
-$GLOBALS['TL_HOOKS']['compileArticle'][] = ['catalogmanager.hooks.article', 'compileArticle'];
-$GLOBALS['TL_HOOKS']['getPageLayout'][] = ['catalogmanager.hooks.pageLayout', 'generateMaster'];
-$GLOBALS['TL_HOOKS']['isVisibleElement'][] = ['catalogmanager.hooks.element', 'isVisibleElement'];
-$GLOBALS['TL_HOOKS']['compileFormField'][] = ['catalogmanager.hooks.widget','getAttributesFromDca'];
-$GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePages'];
-$GLOBALS['TL_HOOKS']['getSearchablePages'][] = ['catalogmanager.hooks.search', 'getSearchablePagesByPagesRoles'];
-$GLOBALS['TL_HOOKS']['generateBreadcrumb'][] = ['catalogmanager.hooks.breadcrumb', 'generateDetailPage'];
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'initializeBackendModules'];
-$GLOBALS['TL_HOOKS']['initializeSystem'][] = ['catalogmanager.hooks.initialize', 'generateDataContainerArray'];
-$GLOBALS['TL_HOOKS']['loadDataContainer'][] = ['catalogmanager.hooks.datacontainer', 'generateDataContainerArray'];
-$GLOBALS['TL_HOOKS']['compileFormFields'][] = ['catalogmanager.hooks.formfields', 'compileFormFields'];
-$GLOBALS['TL_HOOKS']['loadFormField'][] = ['catalogmanager.hooks.formfields', 'loadFormField'];
-$GLOBALS['TL_HOOKS']['sqlCompileCommands'][] = ['catalogmanager.hooks.sqlcompilecommands', 'execute'];
-
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\PageInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\ActiveInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\WatchlistInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\MasterInsertTag', 'replace'];
-$GLOBALS['TL_HOOKS']['replaceInsertTags'][] = ['Alnv\ContaoCatalogManagerBundle\Inserttags\Inserttags', 'replace'];
-
+$GLOBALS['CM_TEMP_MODEL_TABLE'] = null;
 $GLOBALS['CM_MASTER'] = [];
 $GLOBALS['CM_MODELS'] = [];
-$GLOBALS['CM_CUSTOM_FIELDS'] = [];
-$GLOBALS['CM_DATA_CONTAINERS'] = ['Table'];
-$GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
+$GLOBALS['CM_CUSTOM_FIELDS'] = [
+    'lid' => [
+        'index' => true,
+        'sql' => "int(10) unsigned NOT NULL default '0'"
+    ],
+    'language' => [
+        'index' => true,
+        'sql' => "varchar(6) NOT NULL default ''"
+    ]
+];
+$GLOBALS['CM_DATA_CONTAINERS'] = ['Table', 'Multilingual'];
+$GLOBALS['CM_DATA_CONTAINERS_NAMESPACE'] = ['Table' => DC_Table::class];
+
+$GLOBALS['TL_HOOKS']['changelanguageNavigation'][] = [ChangelanguageNavigationListener::class, '__invoke'];
+$GLOBALS['TL_HOOKS']['loadVirtualDataContainer'][] = [MultilingualDataContainerListener::class, 'onLoadVirtualDataContainer'];
+$GLOBALS['TL_HOOKS']['loadDataContainer'][] = [MultilingualDataContainerListener::class, 'onLoadDataContainer'];
+$GLOBALS['TL_HOOKS']['parseCatalogField'][] = [MultilingualCatalogListener::class, 'onParseCatalogField'];
+$GLOBALS['TL_HOOKS']['parseCatalog'][] = [MultilingualCatalogListener::class, 'onParseCatalog'];
+$GLOBALS['CM_FIELDS'] = ['text', 'color', 'date', 'textarea', 'select', 'radio', 'checkbox', 'checkboxWizard', 'customOptionWizard', 'pagepicker', 'upload', 'explanation', 'empty', 'listWizard'];
+
+$GLOBALS['BE_FFL']['customOptionWizard'] = CustomOptionWizard::class;
 
 $GLOBALS['CM_OPERATORS'] = [
     'equal' => [
@@ -136,19 +164,42 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'title' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
+    'metaTitle' => [
+        'group' => 'meta',
+        'eval' => [
+            'maxlength' => 255
+        ],
+        'sql' => "varchar(255) NOT NULL default '%s'"
+    ],
+    'metaDescription' => [
+        'group' => 'meta',
+        'eval' => [],
+        'sql' => "text NULL"
     ],
     'headline' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'textfield' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'page' => [
         'group' => 'article',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NOT NULL default '0'"
     ],
     'pages' => [
@@ -161,7 +212,9 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'member' => [
         'group' => 'member',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NULL"
     ],
     'members' => [
@@ -173,7 +226,9 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'group' => [
         'group' => 'member',
-        'rgxp' => 'natural',
+        'eval' => [
+            'csv' => 'natural'
+        ],
         'sql' => "int(10) unsigned NULL"
     ],
     'groups' => [
@@ -182,21 +237,36 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'subtitle' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'tags' => [
         'group' => 'article',
-        'sql' => "blob NULL",
+        'sql' => "blob NULL"
+    ],
+    'comma-separated-list' => [
+        'group' => 'article',
+        'eval' => [
+            'csv' => ','
+        ],
+        'sql' => "text NULL"
     ],
     'alias' => [
-        'rgxp' => 'alias',
         'group' => 'article',
+        'eval' => [
+            'rgxp' => 'alias',
+            'doNotCopy' => true,
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'type' => [
         'group' => 'article',
         'eval' => [
-            'submitOnChange' => true
+            'submitOnChange' => true,
+            'maxlength' => 128
         ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
@@ -210,7 +280,7 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'content' => [
         'group' => 'article',
-        'sql' => "longtext NULL"
+        'sql' => "text NULL"
     ],
     'description' => [
         'group' => 'article',
@@ -247,112 +317,198 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'duration' => [
         'group' => 'article',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'price' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'vpe' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'ean' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'package' => [
         'group' => 'shop',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'category' => [
         'group' => 'article',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'author' => [
         'group' => 'article',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'location' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'street' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'streetNumber' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 16
+        ],
         'sql' => "varchar(16) NOT NULL default '%s'"
     ],
     'city' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'zip' => [
         'group' => 'address',
-        'rgxp' => 'alnum',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 12
+        ],
+        'sql' => "varchar(12) NOT NULL default '%s'"
+    ],
+    'postal' => [
+        'group' => 'address',
+        'eval' => [
+            'rgxp' => 'alnum',
+            'maxlength' => 12
+        ],
         'sql' => "varchar(12) NOT NULL default '%s'"
     ],
     'state' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'country' => [
         'group' => 'address',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
+    ],
+    'address' => [
+        'group' => 'address',
+        'eval' => [
+            'maxlength' => 255
+        ],
+        'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'fullname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'firstname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'lastname' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'email' => [
         'group' => 'contact',
-        'rgxp' => 'email',
+        'eval' => [
+            'rgxp' => 'email',
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'emails' => [
         'group' => 'contact',
-        'rgxp' => 'emails',
+        'eval' => [
+            'rgxp' => 'emails'
+        ],
         'sql' => "text NULL"
     ],
     'url' => [
         'group' => 'contact',
-        'rgxp' => 'url',
+        'eval' => [
+            'rgxp' => 'url',
+            'maxlength' => 255
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'website' => [
         'group' => 'contact',
-        'rgxp' => 'url',
+        'eval' => [
+            'maxlength' => 255,
+            'rgxp' => 'url'
+        ],
         'sql' => "varchar(255) NOT NULL default '%s'"
     ],
     'phone' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'fax' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'mobile' => [
         'group' => 'contact',
-        'rgxp' => 'phone',
+        'eval' => [
+            'maxlength' => 32,
+            'rgxp' => 'phone'
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'avatar' => [
@@ -362,41 +518,58 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'company' => [
         'group' => 'contact',
+        'eval' => [
+            'maxlength' => 128
+        ],
         'sql' => "varchar(128) NOT NULL default '%s'"
     ],
     'startDate' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'startTime' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'endDate' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'endTime' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'date' => [
         'group' => 'date',
-        'rgxp' => 'date',
+        'eval' => [
+            'rgxp' => 'date'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'datim' => [
         'group' => 'date',
-        'rgxp' => 'datim',
+        'eval' => [
+            'rgxp' => 'datim'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'time' => [
         'group' => 'date',
-        'rgxp' => 'time',
+        'eval' => [
+            'rgxp' => 'time'
+        ],
         'sql' => "int(11) signed NULL"
     ],
     'hasone' => [
@@ -409,44 +582,73 @@ $GLOBALS['CM_ROLES'] = [
     ],
     'latitude' => [
         'group' => 'geo',
-        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
+        'eval' => [
+            'maxlength' => 32
+        ],
+        'sql' => "varchar(32) NOT NULL default '0.000000'"
     ],
-    'longitude'=> [
+    'longitude' => [
         'group' => 'geo',
-        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
+        'eval' => [
+            'maxlength' => 32
+        ],
+        'sql' => "varchar(32) NOT NULL default '0.000000'"
     ],
     'gender' => [
         'group' => 'person',
+        'eval' => [
+            'maxlength' => 64
+        ],
         'sql' => "varchar(64) NOT NULL default '%s'"
     ],
     'sku' => [
         'group' => 'product',
+        'eval' => [
+            'maxlength' => 32
+        ],
         'sql' => "varchar(32) NOT NULL default '%s'"
     ],
     'decimal' => [
         'group' => 'number',
-        'sql' => "decimal(10,8) NOT NULL default '0.000000'"
+        'eval' => [
+            'rgxp' => 'digit'
+        ],
+        'sql' => "DECIMAL(10,8) NOT NULL default '0.00000000'"
+    ],
+    'decimal_2' => [
+        'group' => 'number',
+        'eval' => [
+            'rgxp' => 'digit'
+        ],
+        'sql' => "DECIMAL(10,2) NOT NULL default '0.00'"
     ],
     'integer' => [
         'group' => 'number',
-        'rgxp' => 'natural',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
         'sql' => "int(10) unsigned NOT NULL default '0'"
+    ],
+    'signed' => [
+        'group' => 'number',
+        'eval' => [
+            'rgxp' => 'natural'
+        ],
+        'sql' => "int(11) signed NULL"
     ]
 ];
 
-$GLOBALS['TL_MODELS']['tl_catalog'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogModel';
-$GLOBALS['TL_MODELS']['tl_watchlist'] = 'Alnv\ContaoCatalogManagerBundle\Models\WatchlistModel';
-$GLOBALS['TL_MODELS']['tl_catalog_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogDataModel';
-$GLOBALS['TL_MODELS']['tl_catalog_field'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogFieldModel';
-$GLOBALS['TL_MODELS']['tl_catalog_option'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogOptionModel';
-$GLOBALS['TL_MODELS']['tl_catalog_palette'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogPaletteModel';
-$GLOBALS['TL_MODELS']['tl_catalog_reactions'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsModel';
-$GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = 'Alnv\ContaoCatalogManagerBundle\Models\CatalogReactionsDataModel';
+$GLOBALS['TL_MODELS']['tl_catalog'] = CatalogModel::class;
+$GLOBALS['TL_MODELS']['tl_watchlist'] = WatchlistModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_data'] = CatalogDataModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_field'] = CatalogFieldModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_option'] = CatalogOptionModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_palette'] = CatalogPaletteModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_reactions'] = CatalogReactionsModel::class;
+$GLOBALS['TL_MODELS']['tl_catalog_reactions_data'] = CatalogReactionsDataModel::class;
 
-if (class_exists('Alnv\ContaoAssetsManagerBundle\Library\AssetsManager')) {
-    $objCatalogAssetsManager = \Alnv\ContaoAssetsManagerBundle\Library\AssetsManager::getInstance();
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/watchlist-form-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-listing-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/async-image-component.js');
-    $objCatalogAssetsManager->addIfNotExist('bundles/alnvcontaocatalogmanager/js/vue/components/view-gmap-component.js');
+if (Mode::get() == 'BE') {
+    $objCombiner = new Combiner();
+    $objCombiner->add('/bundles/alnvcontaocatalogmanager/css/backend.scss');
+    $GLOBALS['TL_CSS']['catalog-manager-backend-css'] = $objCombiner->getCombinedFile();
 }

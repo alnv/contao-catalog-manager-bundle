@@ -2,49 +2,90 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Inserttags;
 
-class Inserttags {
+use Alnv\ContaoCatalogManagerBundle\Helper\Toolkit;
+use Contao\Controller;
+use Contao\Database;
+use Contao\Date;
+use Contao\Config;
+use Contao\FrontendUser;
+use Contao\StringUtil;
 
-    public function replace($strFragments) {
+class Inserttags
+{
+
+    public function replace($strFragments)
+    {
 
         $arrFragments = explode('::', $strFragments);
+
         if (!isset($arrFragments[0])) {
             return false;
         }
 
-        switch ($arrFragments[0]) {
-            case 'cmUser':
-                if (!FE_USER_LOGGED_IN) {
+        $strType = strtoupper($arrFragments[0]);
+
+        switch ($strType) {
+            case 'CM-USER':
+                if (!FrontendUser::getInstance()->id) {
                     return '';
                 }
-                $objUser = \FrontendUser::getInstance();
-                $objDbUser = \Database::getInstance()->prepare('SELECT * FROM tl_member WHERE id=?')->limit(1)->execute($objUser->id);
-                $strField = $arrFragments[1] ?: '';
-                if (!$strField) {
+                $strField = (string)($arrFragments[1] ?? '');
+                if (!$this->isAllowedMemberField($strField)) {
                     return '';
                 }
-                return $objDbUser->{$strField};
+                $objUser = FrontendUser::getInstance();
+                $objDbUser = Database::getInstance()->prepare('SELECT * FROM tl_member WHERE id=?')->limit(1)->execute($objUser->id);
+                $varValue = $objDbUser->{$strField};
+                return \is_scalar($varValue) ? StringUtil::specialchars((string)$varValue) : '';
             case 'TIMESTAMP':
-            case 'timestamp':
-                $strMethod = $arrFragments[1] ?: 'tstamp';
-                $strStrToTimeParameter = $arrFragments[2] ?: '';
+                $strMethod = $arrFragments[1] ?? 'tstamp';
+                $strStrToTimeParameter = $arrFragments[2] ?? '';
+                $strCurrentTstamp = \time();
                 if ($strStrToTimeParameter) {
-                    return strtotime($strStrToTimeParameter, (new \Date())->{$strMethod});
-                } else {
-                    return (new \Date())->{$strMethod};
+                    $strCurrentTstamp = \strtotime($strStrToTimeParameter, $strCurrentTstamp);
                 }
+                $strDate = \date(Config::get('datimFormat'), $strCurrentTstamp);
+                return (new Date($strDate, Config::get('datimFormat')))->{$strMethod};
             case 'LAST-ADDED-MASTER-VIEW-IDS':
-                $strTable = $arrFragments[1] ?: '';
+                $strTable = $arrFragments[1] ?? '';
                 if (!$strTable) {
                     return '0';
                 }
-                $arrIds = \Alnv\ContaoCatalogManagerBundle\Helper\Toolkit::getLastAddedByTypeAndTable('view-master', $strTable);
+                $arrIds = Toolkit::getLastAddedByTypeAndTable('view-master', $strTable);
                 if (empty($arrIds)) {
                     return '0';
                 }
                 return serialize($arrIds);
-
         }
 
         return false;
+    }
+
+    /** Spalten von tl_member, die nie per {{cm-user::*}} ausgegeben werden */
+    private const DENIED_MEMBER_FIELDS = [
+        'password', 'secret', 'backupCodes', 'trustedTokenVersion', 'session', 'activation',
+        'loginAttempts', 'locked', 'lastLogin', 'currentLogin', 'useTwoFactor', 'groups', 'autologin',
+    ];
+
+    private function isAllowedMemberField(string $strField): bool
+    {
+        if (!\preg_match('/^[A-Za-z0-9_]{1,64}$/', $strField)) {
+            return false;
+        }
+
+        if (\in_array(\strtolower($strField), \array_map('strtolower', self::DENIED_MEMBER_FIELDS), true)) {
+            return false;
+        }
+
+        // Felder, die im DCA als sensibel markiert sind (z. B. inputType password), ebenfalls sperren
+        Controller::loadDataContainer('tl_member');
+        $arrField = $GLOBALS['TL_DCA']['tl_member']['fields'][$strField] ?? null;
+
+        return !\is_array($arrField) || ($arrField['inputType'] ?? '') !== 'password';
+    }
+
+    public function __invoke($insertTag)
+    {
+        return $this->replace($insertTag);
     }
 }

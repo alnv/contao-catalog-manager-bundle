@@ -2,25 +2,30 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Maps;
 
-class GMap extends MapView {
+use Contao\FrontendTemplate;
 
-    public function render() {
+class GMap extends MapView
+{
+    public const JSON_FLAGS = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE;
 
+    public function render()
+    {
         global $objPage;
 
         $arrLocations = $this->getLocations();
 
-        if ($objPage->ajaxContext) {
-            return json_encode($arrLocations, 512);
-        }
-        
-        $objTemplate = new \FrontendTemplate($this->arrOptions['template']);
-        $arrJson = array_map(function($arrLocation) {
+        $arrJson = \array_values(\array_map(static function ($arrLocation) {
             return ['map' => $arrLocation['map']];
-        }, $arrLocations);
+        }, $arrLocations));
+
+        if ($objPage->ajaxContext) {
+            return \json_encode($arrJson, self::JSON_FLAGS);
+        }
+
+        $objTemplate = new FrontendTemplate($this->arrOptions['template']);
         $objTemplate->setData([
             'locations' => $arrLocations,
-            'varLocations' => json_encode($arrJson, 512)
+            'varLocations' => \json_encode($arrJson, self::JSON_FLAGS) ?: '[]'
         ]);
 
         return $objTemplate->parse();

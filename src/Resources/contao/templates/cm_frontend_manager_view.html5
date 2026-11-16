@@ -1,0 +1,145 @@
+<?php
+use Contao\StringUtil;
+
+/**
+ * Ansicht der Frontend-Verwaltung (Liste, Formular, Löschbestätigung, kein Zugriff).
+ * Wird beim Seitenaufruf in mod_catalog_frontend_manager eingebunden und bei AJAX-Anfragen allein
+ * gerendert. Links und Formulare funktionieren ohne JavaScript; frontend-manager.js fängt sie ab.
+ *
+ * data-cm-fm-focus: Schlüssel, über den das Skript nach dem Neuladen der Ansicht den Fokus
+ * wieder auf dasselbe Bedienelement setzt.
+ */
+$e = static fn ($value): string => StringUtil::specialchars((string) $value);
+$t = $this->text;
+$id = (int) $this->moduleId;
+?>
+<?php if ('denied' === $this->view): ?>
+    <p class="cm-fm__denied"><?= $e($this->deniedMessage) ?></p>
+
+<?php elseif ('form' === $this->view): ?>
+    <?php $this->insert('ce_dc_form', ['form' => $this->form, 'formId' => $this->formId, 'requestToken' => $this->requestToken, 'text' => $t]); ?>
+
+<?php elseif ('delete' === $this->view): ?>
+    <section class="cm-fm__confirm" aria-labelledby="cm-fm-<?= $id ?>-confirm">
+        <h2 id="cm-fm-<?= $id ?>-confirm" tabindex="-1" data-cm-fm-heading><?= $e($t['deleteHeadline'] ?? 'Delete record') ?></h2>
+        <p><?= $e(sprintf($t['deleteConfirm'] ?? 'Do you really want to delete "%s"?', $this->record['title'])) ?></p>
+        <form method="post" action="<?= $e($this->record['actionUrl']) ?>" class="cm-fm__inline-form">
+            <input type="hidden" name="FORM_SUBMIT" value="<?= $e($this->formId) ?>">
+            <input type="hidden" name="REQUEST_TOKEN" value="<?= $e($this->requestToken) ?>">
+            <input type="hidden" name="_cmfm_action" value="delete">
+            <input type="hidden" name="_cmfm_id" value="<?= (int) $this->record['id'] ?>">
+            <button type="submit" class="cm-fm__button cm-fm__button--danger"><?= $e($t['deleteSubmit'] ?? 'Delete') ?></button>
+            <a class="cm-fm__button" href="<?= $e($this->record['cancelUrl']) ?>" data-cm-fm-focus="cancel"><?= $e($t['cancel'] ?? 'Cancel') ?></a>
+        </form>
+    </section>
+
+<?php else: ?>
+    <div class="cm-fm__toolbar">
+        <?php if ($this->can['create']): ?>
+            <a class="cm-fm__button cm-fm__button--primary" href="<?= $e($this->createUrl) ?>" data-cm-fm-focus="create"><?= $e($t['create'] ?? 'New record') ?></a>
+        <?php endif; ?>
+    </div>
+
+    <?php if (!empty($this->filters)): ?>
+        <form method="get" action="<?= $e($this->actionUrl) ?>" class="cm-fm__filter" role="search" data-cm-fm-filter>
+            <fieldset>
+                <legend><?= $e($t['filter'] ?? 'Filter') ?></legend>
+                <?php foreach ($this->filters as $filter): ?>
+                    <div class="cm-fm__filter-field">
+                        <label for="<?= $e($filter['id']) ?>"><?= $e($filter['label']) ?></label>
+                        <?php if ('select' === $filter['type']): ?>
+                            <select id="<?= $e($filter['id']) ?>" name="<?= $e($filter['inputName']) ?>">
+                                <option value=""><?= $e($t['filterAll'] ?? 'All') ?></option>
+                                <?php foreach ($filter['options'] as $option): ?>
+                                    <option value="<?= $e($option['value']) ?>"<?= (string) $filter['value'] === (string) $option['value'] ? ' selected' : '' ?>><?= $e($option['label']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php elseif ('boolean' === $filter['type']): ?>
+                            <select id="<?= $e($filter['id']) ?>" name="<?= $e($filter['inputName']) ?>">
+                                <option value=""><?= $e($t['filterAll'] ?? 'All') ?></option>
+                                <option value="1"<?= '1' === $filter['value'] ? ' selected' : '' ?>><?= $e($t['yes'] ?? 'Yes') ?></option>
+                                <option value="0"<?= '0' === $filter['value'] ? ' selected' : '' ?>><?= $e($t['no'] ?? 'No') ?></option>
+                            </select>
+                        <?php else: ?>
+                            <input type="search" id="<?= $e($filter['id']) ?>" name="<?= $e($filter['inputName']) ?>" value="<?= $e($filter['value']) ?>" maxlength="255">
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+                <div class="cm-fm__filter-actions">
+                    <button type="submit" class="cm-fm__button" data-cm-fm-focus="filter-apply"><?= $e($t['filterApply'] ?? 'Apply filter') ?></button>
+                    <a class="cm-fm__button cm-fm__button--link" href="<?= $e($this->filterResetUrl) ?>" data-cm-fm-focus="filter-reset"><?= $e($t['filterReset'] ?? 'Reset') ?></a>
+                </div>
+            </fieldset>
+        </form>
+    <?php endif; ?>
+
+    <?php if (empty($this->rows)): ?>
+        <p class="cm-fm__empty"><?= $e($this->emptyText) ?></p>
+    <?php else: ?>
+        <div class="cm-fm__table-wrapper">
+            <table class="cm-fm__table">
+                <caption class="cm-fm__sr"><?= $e(sprintf($t['caption'] ?? '%d records', (int) $this->total)) ?></caption>
+                <thead>
+                <tr>
+                    <?php foreach ($this->columns as $column): ?>
+                        <th scope="col"<?= $column['sorted'] ? ' aria-sort="' . ('desc' === $column['sorted'] ? 'descending' : 'ascending') . '"' : '' ?>>
+                            <?php if ($column['sortable']): ?>
+                                <a href="<?= $e($column['sortUrl']) ?>" data-cm-fm-focus="sort-<?= $e($column['name']) ?>"><?= $e($column['label']) ?><span class="cm-fm__sort-indicator" aria-hidden="true"><?= 'asc' === $column['sorted'] ? ' ▲' : ('desc' === $column['sorted'] ? ' ▼' : '') ?></span></a>
+                            <?php else: ?>
+                                <?= $e($column['label']) ?>
+                            <?php endif; ?>
+                        </th>
+                    <?php endforeach; ?>
+                    <?php if (null !== ($this->rows[0]['visible'] ?? null) && $this->can['toggle']): ?>
+                        <th scope="col"><?= $e($t['visibility'] ?? 'Visibility') ?></th>
+                    <?php endif; ?>
+                    <th scope="col"><span class="cm-fm__sr"><?= $e($t['actions'] ?? 'Actions') ?></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($this->rows as $row): ?>
+                    <tr data-cm-fm-record="<?= (int) $row['id'] ?>">
+                        <?php foreach ($this->columns as $column): ?>
+                            <td data-label="<?= $e($column['label']) ?>"><?= $e($row['cells'][$column['name']] ?? '') ?></td>
+                        <?php endforeach; ?>
+
+                        <?php if (null !== $row['visible'] && $this->can['toggle']): ?>
+                            <td data-label="<?= $e($t['visibility'] ?? 'Visibility') ?>">
+                                <form method="post" action="<?= $e($this->actionUrl) ?>" class="cm-fm__inline-form">
+                                    <input type="hidden" name="FORM_SUBMIT" value="<?= $e($this->formId) ?>">
+                                    <input type="hidden" name="REQUEST_TOKEN" value="<?= $e($this->requestToken) ?>">
+                                    <input type="hidden" name="_cmfm_action" value="toggle">
+                                    <input type="hidden" name="_cmfm_id" value="<?= (int) $row['id'] ?>">
+                                    <?php /* Zustand steht im sichtbaren Text (kein aria-pressed, kein abweichendes aria-label) */ ?>
+                                    <button type="submit" class="cm-fm__toggle cm-fm__toggle--<?= $row['visible'] ? 'on' : 'off' ?>" data-cm-fm-focus="toggle-<?= (int) $row['id'] ?>">
+                                        <?= $e($row['visible'] ? ($t['visible'] ?? 'visible') : ($t['hidden'] ?? 'hidden')) ?><span class="cm-fm__sr"> – <?= $e(sprintf($t['toggleHint'] ?? 'toggle visibility of %s', $row['title'])) ?></span>
+                                    </button>
+                                </form>
+                            </td>
+                        <?php endif; ?>
+
+                        <td class="cm-fm__actions">
+                            <?php if ($this->can['edit']): ?>
+                                <a class="cm-fm__button" href="<?= $e($row['editUrl']) ?>" data-cm-fm-focus="edit-<?= (int) $row['id'] ?>"><?= $e($t['edit'] ?? 'Edit') ?><span class="cm-fm__sr"> <?= $e($row['title']) ?></span></a>
+                            <?php endif; ?>
+                            <?php if ($this->can['copy']): ?>
+                                <form method="post" action="<?= $e($this->actionUrl) ?>" class="cm-fm__inline-form">
+                                    <input type="hidden" name="FORM_SUBMIT" value="<?= $e($this->formId) ?>">
+                                    <input type="hidden" name="REQUEST_TOKEN" value="<?= $e($this->requestToken) ?>">
+                                    <input type="hidden" name="_cmfm_action" value="copy">
+                                    <input type="hidden" name="_cmfm_id" value="<?= (int) $row['id'] ?>">
+                                    <button type="submit" class="cm-fm__button" data-cm-fm-focus="copy-<?= (int) $row['id'] ?>"><?= $e($t['copy'] ?? 'Duplicate') ?><span class="cm-fm__sr"> <?= $e($row['title']) ?></span></button>
+                                </form>
+                            <?php endif; ?>
+                            <?php if ($this->can['delete']): ?>
+                                <a class="cm-fm__button cm-fm__button--danger" href="<?= $e($row['deleteUrl']) ?>" data-cm-fm-focus="delete-<?= (int) $row['id'] ?>"><?= $e($t['delete'] ?? 'Delete') ?><span class="cm-fm__sr"> <?= $e($row['title']) ?></span></a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <div class="cm-fm__pagination" data-cm-fm-pagination><?= $this->pagination ?></div>
+    <?php endif; ?>
+<?php endif; ?>

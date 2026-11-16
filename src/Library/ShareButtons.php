@@ -2,11 +2,12 @@
 
 namespace Alnv\ContaoCatalogManagerBundle\Library;
 
+use Contao\FrontendTemplate;
+
 class ShareButtons
 {
 
-    protected $arrShareButtons = [
-
+    protected array $arrShareButtons = [
         'twitter',
         'facebook',
         'linkedin',
@@ -14,7 +15,7 @@ class ShareButtons
         'email',
     ];
 
-    protected $arrEntity = [];
+    protected array $arrEntity = [];
 
     public function __construct($arrEntity)
     {
@@ -22,19 +23,19 @@ class ShareButtons
         $this->arrEntity = $arrEntity;
     }
 
-    public function getShareButtons($arrButtons = [])
+    public function getShareButtons($arrButtons = []): string
     {
 
         $strTemplate = '';
 
-        if (!empty($arrButtons) && is_array($arrButtons)) {
+        if (!empty($arrButtons) && \is_array($arrButtons)) {
 
             $this->arrShareButtons = $arrButtons;
         }
 
         foreach ($this->arrShareButtons as $strButton) {
 
-            $objTemplate = new \FrontendTemplate('cm_share_button_' . $strButton);
+            $objTemplate = new FrontendTemplate('cm_share_button_' . $strButton);
             $objTemplate->setData($this->arrEntity);
             $strTemplate .= $objTemplate->parse();
         }
