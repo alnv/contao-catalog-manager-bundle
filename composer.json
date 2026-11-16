@@ -23,17 +23,6 @@
     }
   },
   "require": {
-<<<<<<< HEAD
-    "contao/core-bundle":"~4.13",
-    "terminal42/dcawizard": "^3.0",
-    "menatwork/contao-multicolumnwizard-bundle": "^3.6",
-    "alnv/assets-manager-bundle": "^2.0",
-    "alnv/form-manager-bundle": "^2.0",
-    "alnv/translation-manager-bundle": "^2.0",
-    "alnv/widget-collection-bundle": "^2.0",
-    "alnv/catalog-manager-multilingual-adapter-bundle": "^2.1",
-    "alnv/contao-geocoding": "^2.1"
-=======
     "php": "^8.3",
     "contao/core-bundle": "~5.7",
     "terminal42/dcawizard": "^4.0 || ^5.0",
@@ -50,7 +39,6 @@
   },
   "suggest": {
     "php-mcp/server": "^3.3 – aktiviert den CLI-Befehl catalog:mcp (MCP-Server über stdio) für KI-Assistenten"
->>>>>>> contao513
   },
   "conflict": {
     "php-mcp/server": "<3.3"
