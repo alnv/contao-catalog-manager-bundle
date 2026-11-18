@@ -2,7 +2,7 @@
 
 > **Wichtig:** Diese Erweiterung nicht zusammen mit dem Catalog Manager v1 installieren!
 
-Der Catalog Manager (`alnv/catalog-manager-bundle`, Version 4.1) ist eine Erweiterung für Contao CMS 5.7. Mit ihm legst du eigene Datenstrukturen („Kataloge“) im Backend an, ohne PHP- oder DCA-Code zu schreiben, und gibst die Daten im Frontend als Listen, Detailseiten oder Karten aus. Er hat sich bereits in über 100 Contao-Projekten bewährt.
+Der Catalog Manager (`alnv/catalog-manager-bundle`) ist eine Erweiterung für Contao CMS 5. Mit ihm legst du eigene Datenstrukturen („Kataloge“) im Backend an, ohne PHP- oder DCA-Code zu schreiben, und gibst die Daten im Frontend als Listen, Detailseiten oder Karten aus. Er hat sich bereits in über 100 Contao-Projekten bewährt.
 
 Du kannst eine kostenfreie und uneingeschränkte Testversion installieren und erst dann eine Lizenz kaufen, wenn dein Projekt fertig ist. Bis dahin unterstützen wir dich mit Beratung und Hilfe.
 

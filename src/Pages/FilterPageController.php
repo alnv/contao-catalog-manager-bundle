@@ -12,20 +12,12 @@ use Contao\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Seitentyp "filter": wertet die URL-Fragmente als Filter aus und rendert die Seite danach wie eine
- * reguläre Seite (AbstractPageController::renderPage(), wie Contaos RegularPageController).
- */
 class FilterPageController extends AbstractPageController
 {
 
     public function __invoke(Request $request, PageModel $pageModel): Response
     {
-
         $GLOBALS['TL_LANGUAGE'] = $pageModel->language ?: $GLOBALS['TL_LANGUAGE'];
-
-        // Die Fragmente werden hier ausgewertet, nicht über Input::get(); sonst würde Contao die Seite wegen
-        // "nicht verwendeter Routen-Parameter" mit 404 beantworten (ersetzt das veraltete Input::resetUnusedGet())
         foreach (Input::getUnusedRouteParameters() as $strParameter) {
             Input::get($strParameter);
         }
@@ -38,7 +30,6 @@ class FilterPageController extends AbstractPageController
         }
 
         foreach ($arrPageFilters as $intIndex => $objPageFilter) {
-
             $objPageFilter->setActiveUrlFragment(($arrFragments[$intIndex] ?? ''));
 
             if (($arrFragments[$intIndex] ?? '') && !$objPageFilter->activeUrlFragmentExists()) {
@@ -46,6 +37,10 @@ class FilterPageController extends AbstractPageController
             }
 
             unset($arrFragments[$intIndex]);
+        }
+
+        if (\count($arrFragments) > 1) {
+            throw new PageNotFoundException('Page not found: ' . Environment::get('url'));
         }
 
         if (!empty($arrFragments)) {
