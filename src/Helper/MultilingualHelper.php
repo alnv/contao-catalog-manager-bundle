@@ -3,6 +3,7 @@
 namespace Alnv\ContaoCatalogManagerBundle\Helper;
 
 use Contao\Database;
+use Contao\Date;
 
 class MultilingualHelper
 {
@@ -15,9 +16,11 @@ class MultilingualHelper
         }
 
         $arrLanguages = ['languages' => [], 'fallback' => '', 'fallbacks' => []];
+
+        $intTime = Date::floorToMinute();
         $objPages = Database::getInstance()
-            ->prepare('SELECT fallback,`language` FROM tl_page WHERE `type`=?')
-            ->execute('root');
+            ->prepare("SELECT fallback,`language` FROM tl_page WHERE `type`=? AND published=? AND (`start`='' OR `start`<=?) AND (`stop`='' OR `stop`>?) ORDER BY sorting")
+            ->execute('root', 1, $intTime, $intTime);
 
         while ($objPages->next()) {
             if ($objPages->fallback) {
