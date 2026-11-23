@@ -11,15 +11,12 @@ class SitemapListener
 {
     public function __invoke(SitemapEvent $objEvent): void
     {
-
         if (!\method_exists($objEvent, 'addUrlToDefaultUrlSet')) {
             return;
         }
 
         $arrPages = [];
-
         foreach ($objEvent->getRootPageIds() as $strRootId) {
-
             $objPage = PageModel::findByPk($strRootId);
 
             foreach ((new GetSearchablePagesListener())->getSearchablePagesByPagesRoles([], $strRootId, true, $objPage->language) as $strPage) {

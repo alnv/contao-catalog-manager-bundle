@@ -55,12 +55,12 @@ class GetPageLayoutListener
         }
 
         $GLOBALS['CM_MASTER'] = $arrMaster;
+
         $this->setMetaInformation($strTable);
     }
 
     protected function setMetaInformation($strTable = null): void
     {
-
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return;
         }
@@ -79,7 +79,6 @@ class GetPageLayoutListener
 
     protected function searchTableAndReturnTable($strPageId)
     {
-
         $objArticles = ArticleModel::findByPid($strPageId);
 
         if ($objArticles == null) {
@@ -120,9 +119,7 @@ class GetPageLayoutListener
         }
 
         while ($objContent->next()) {
-
             if ($objContent->type == 'module' && $objContent->module) {
-
                 $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE id=?')->execute($objContent->module);
 
                 if ($objModule == null) {
