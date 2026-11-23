@@ -19,8 +19,9 @@ class FilterPageController
     {
 
         $GLOBALS['TL_LANGUAGE'] = $pageModel->language ?: $GLOBALS['TL_LANGUAGE'];
-
-        Input::resetUnusedGet();
+        foreach (Input::getUnusedRouteParameters() as $strParameter) {
+            Input::get($strParameter);
+        }
 
         $arrPageFilters = Getters::getPageFiltersByPageId($pageModel->id);
         $arrFragments = Toolkit::getCurrentPathInfo($pageModel->alias, $pageModel->language);
@@ -30,7 +31,6 @@ class FilterPageController
         }
 
         foreach ($arrPageFilters as $intIndex => $objPageFilter) {
-
             $objPageFilter->setActiveUrlFragment(($arrFragments[$intIndex] ?? ''));
 
             if (($arrFragments[$intIndex] ?? '') && !$objPageFilter->activeUrlFragmentExists()) {
@@ -38,6 +38,10 @@ class FilterPageController
             }
 
             unset($arrFragments[$intIndex]);
+        }
+
+        if (\count($arrFragments) > 1) {
+            throw new PageNotFoundException('Page not found: ' . Environment::get('url'));
         }
 
         if (!empty($arrFragments)) {

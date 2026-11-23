@@ -58,9 +58,27 @@ class GetSearchablePagesListener
                 continue;
             }
 
+            $arrFilter = [];
+            $blnVisibility = (bool)$objCatalog->enableVisibility;
+
+            if ($blnVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
+                Controller::loadDataContainer($strTable);
+
+                if (!isset($arrFilter['column']) || !\is_array($arrFilter['column'])) {
+                    $arrFilter['column'] = [];
+                }
+
+                $intTime = Date::floorToMinute();
+                $strTable = ($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable;
+                $arrFilter['column'][] = "($strTable.start='' OR $strTable.start<='$intTime') AND ($strTable.stop='' OR $strTable.stop>'" . ($intTime + 60) . "') AND $strTable.published='1'";
+            }
+
             $objModel = new ModelWizard($strTable);
             $objModel = $objModel->getModel();
-            $objEntities = $objModel->findAll();
+            $objEntities = $objModel->findAll([
+                'column' => $arrFilter['column'] ?? null,
+                'value' => $arrFilter['value'] ?? null
+            ]);
 
             Controller::loadDataContainer($strTable);
 
@@ -126,9 +144,7 @@ class GetSearchablePagesListener
             $blnVisibility = (bool)$objCatalog?->enableVisibility;
             $arrFilter = $this->parseFilter($objModules);
 
-
             if ($blnVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
-
                 Controller::loadDataContainer($strTable);
 
                 if (!isset($arrFilter['column']) || !\is_array($arrFilter['column'])) {
@@ -153,7 +169,6 @@ class GetSearchablePagesListener
             }
 
             while ($objEntities->next()) {
-
                 if (!$objEntities->alias) {
                     continue;
                 }

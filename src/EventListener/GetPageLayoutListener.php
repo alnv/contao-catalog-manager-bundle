@@ -5,7 +5,6 @@ namespace Alnv\ContaoCatalogManagerBundle\EventListener;
 use Alnv\ContaoCatalogManagerBundle\Views\Master;
 use Contao\ArticleModel;
 use Contao\ContentModel;
-use Contao\CoreBundle\Routing\ResponseContext\HtmlHeadBag\HtmlHeadBag;
 use Contao\Database;
 use Contao\Input;
 use Contao\LayoutModel;
@@ -24,17 +23,15 @@ class GetPageLayoutListener
         $this->getMasterByPageId($pageModel->id);
     }
 
-    public function getMasterByPageId($strPageId, $strAlias=null) {
-
+    public function getMasterByPageId($strPageId, $strAlias = null): void
+    {
         $strMasterPageId = $strPageId;
-        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing','1',$strPageId);
+        $objModule = Database::getInstance()->prepare('SELECT * FROM tl_module WHERE `type`=? AND cmMaster=? AND cmMasterPage=?')->execute('listing', '1', $strPageId);
 
         if (!$objModule->numRows) {
-
             $strTable = $this->searchTableAndReturnTable($strPageId);
-
             if (!$strTable) {
-                return null;
+                return;
             }
 
         } else {
@@ -43,27 +40,29 @@ class GetPageLayoutListener
         }
 
         if (!$strAlias) {
-            $strAlias = Input::get('auto_item');
+            $strAlias = Input::xssClean($_GET['auto_item']);
         }
 
         $arrMaster = (new Master($strTable, [
             'alias' => $strAlias,
             'masterPage' => $strMasterPageId
         ]))->parse();
+
         $arrMaster = $arrMaster[0] ?? [];
 
-        if (!empty($arrMaster)) {
-            $GLOBALS['CM_MASTER'] = $arrMaster;
+        if (empty($arrMaster)) {
+            return;
         }
 
+        $GLOBALS['CM_MASTER'] = $arrMaster;
         $this->setMetaInformation($strTable);
     }
 
-    protected function setMetaInformation($strTable = null)
+    protected function setMetaInformation($strTable = null): void
     {
 
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
-            return null;
+            return;
         }
 
         global $objPage;

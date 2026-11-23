@@ -19,7 +19,6 @@ class GeneratePageListener
 
     protected function setMetaInformation()
     {
-
         if (!is_array($GLOBALS['CM_MASTER']) || empty($GLOBALS['CM_MASTER'])) {
             return null;
         }
