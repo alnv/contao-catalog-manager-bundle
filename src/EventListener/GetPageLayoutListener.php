@@ -13,12 +13,6 @@ use Contao\System;
 
 class GetPageLayoutListener
 {
-    /**
-     * Bereits aufgelöste Detailansichten pro Request (Seite + Alias), damit Layout-Hook und
-     * AJAX-Controller nicht mehrfach parsen.
-     *
-     * @var array<string, array{table: string, alias: string}|null>
-     */
     private static array $arrResolved = [];
 
     public function __invoke(PageModel $pageModel, LayoutModel $layout, PageRegular $pageRegular): void
@@ -33,7 +27,7 @@ class GetPageLayoutListener
     public function getMasterByPageId($strPageId, $strAlias = null)
     {
         if (!$strAlias) {
-            $strAlias = ($_GET['auto_item'] ?? '') ? Input::get('auto_item') : '';
+            $strAlias = ($_GET['auto_item'] ?? '') ? Input::xssClean($_GET['auto_item']) : '';
         }
 
         $strKey = (int)$strPageId . '|' . $strAlias;
@@ -100,14 +94,6 @@ class GetPageLayoutListener
         }
     }
 
-    /**
-     * Sucht auf der Seite die Katalog-Tabelle der Detailansicht – mit einer einzigen Abfrage
-     * statt einer Abfrage pro Artikel und pro Modul (N+1).
-     *
-     * Reihenfolge wie bisher: zuerst ein Detail-Modul (cmMaster bzw. Typ "master"), danach ein
-     * Inhaltselement "listview". Anders als vorher werden dabei alle Artikel der Seite berücksichtigt
-     * (vorher wurden die listview-Elemente nur im letzten Artikel gesucht).
-     */
     protected function searchTableAndReturnTable($strPageId)
     {
         $intTime = Date::floorToMinute();

@@ -59,7 +59,6 @@ class GetSearchablePagesListener
 
             Controller::loadDataContainer($strTable);
 
-            // Nur sichtbare Einträge berücksichtigen (vorher: alle, auch unveröffentlichte)
             $arrFindOptions = [];
             if ($objCatalog->enableVisibility && Database::getInstance()->fieldExists('published', $strTable)) {
                 $arrFindOptions['column'] = [$this->getVisibilityColumn(($GLOBALS['TL_DCA'][$strTable]['config']['_table'] ?? '') ?: $strTable)];
@@ -124,8 +123,6 @@ class GetSearchablePagesListener
                 continue;
             }
 
-            // Unveröffentlichte, geschützte oder per robots/noSearch ausgeschlossene Detailseiten
-            // gehören nicht in Sitemap/Suchindex
             if (!$this->isIndexablePage($objPage, $blnIsSitemap)) {
                 continue;
             }
@@ -203,7 +200,6 @@ class GetSearchablePagesListener
             return false;
         }
 
-        // Geschützte Seiten (Mitgliederbereich) nicht veröffentlichen – wie Contaos eigener Sitemap-Generator
         if ($objPage->protected) {
             return false;
         }
