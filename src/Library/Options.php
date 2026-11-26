@@ -103,7 +103,7 @@ class Options
                                 }
                             }
 
-                            $arrReturn[$strValue] = self::getLabel($strValue, $strLabel);
+                            $arrReturn[$strValue] = self::getLabel($strValue, $strLabel, false);
                         }
                     }
                     break;
@@ -233,12 +233,13 @@ class Options
         }
     }
 
-    protected static function getLabel($strValue, $strFallbackLabel = ''): string
+    protected static function getLabel($strValue, $strFallbackLabel = '', bool $blnRegister = true): string
     {
 
         $strTable = self::$arrField['dbTable'] ?: 'option';
         $strFallbackLabel = StringUtil::decodeEntities($strFallbackLabel);
+        $strKey = ($strTable ? $strTable . '.' : '') . (self::$arrField['fieldname'] ?: self::$arrField['dbKey']) . '.' . $strValue;
 
-        return Toolkit::replaceInsertTags(Translation::getInstance()->translate(($strTable ? $strTable . '.' : '') . (self::$arrField['fieldname'] ?: self::$arrField['dbKey']) . '.' . $strValue, $strFallbackLabel));
+        return Toolkit::replaceInsertTags(Translation::getInstance()->translate($strKey, $strFallbackLabel, [], $blnRegister));
     }
 }

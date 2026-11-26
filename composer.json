@@ -3,7 +3,7 @@
   "type": "contao-bundle",
   "license": "proprietary",
   "description": "Catalog Manager for Contao CMS",
-  "keywords": ["contao", "catalog", "filter", "umkreissuche", "merkliste", "wunschliste", "immobilien", "jobs", "stellenbörse", "produkte", "pim", "mediathek", "events", "news", "blog"],
+  "keywords": ["contao", "catalog", "filter", "umkreissuche", "merkliste", "wunschliste", "immobilien", "jobs", "stellenbörse", "produkte", "pim", "mediathek", "events", "news", "blog", "mcp"],
   "homepage": "https://catalog-manager.org",
   "authors": [
     {
@@ -26,7 +26,7 @@
     "php": "^8.3",
     "contao/core-bundle": "~5.7",
     "terminal42/dcawizard": "^4.0 || ^5.0",
-    "alnv/translation-manager-bundle": "^3.0",
+    "alnv/translation-manager-bundle": "^3.0 || ^4.0",
     "alnv/widget-collection-bundle": "^3.0",
     "terminal42/dc_multilingual": "~4.7",
     "terminal42/contao-changelanguage": "^3.7",

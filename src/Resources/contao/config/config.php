@@ -22,7 +22,7 @@ use Contao\ArrayUtil;
 use Contao\Combiner;
 use Contao\DC_Table;
 
-const CATALOG_MANAGER_BUNDLE_VERSION = "4.1.3";
+const CATALOG_MANAGER_BUNDLE_VERSION = "4.1.4";
 
 ArrayUtil::arrayInsert($GLOBALS['BE_MOD'], 2, [
     'catalog-manager-bundle' => [
